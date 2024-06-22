@@ -1,8 +1,6 @@
 package tmdb
 
 import (
-	"polaris/log"
-
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/pkg/errors"
 )
@@ -24,19 +22,30 @@ func NewClient(apiKey string) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) GetTvDetails(id int, language string) {
+func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) {
 	language = wrapLanguage(language)
-	d, err := c.tmdbClient.GetTVDetails(id, map[string]string{
-		"language": language,
-	})
-	log.Infof("error %v", err)
-	log.Infof("detail %+v", d)
+	d, err := c.tmdbClient.GetTVDetails(id, withLangOption(language))
+	return d, err
 }
 
+func (c *Client) SearchTvShow(query string, lang string) (*tmdb.SearchTVShows, error) {
+	r, err := c.tmdbClient.GetSearchTVShow(query, withLangOption(lang))
+	if err != nil {
+		return nil, errors.Wrap(err, "tmdb search tv")
+	}
+	return r, nil
+}
 
 func wrapLanguage(lang string) string {
 	if lang == "" {
 		lang = "zh-CN"
 	}
 	return lang
+}
+
+func withLangOption(language string) map[string]string {
+	language = wrapLanguage(language)
+	return map[string]string{
+		"language": language,
+	}
 }
