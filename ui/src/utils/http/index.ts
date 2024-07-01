@@ -8,7 +8,7 @@ import type {
   RequestMethods,
   PureHttpResponse,
   PureHttpRequestConfig
-} from "./types.d";
+} from "./types";
 import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";

@@ -7,10 +7,10 @@ import { storageLocal, isAllEmpty } from "@pureadmin/utils";
 import { findRouteByPath, getParentPaths } from "@/router/utils";
 import { usePermissionStoreHook } from "@/store/modules/permission";
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
-import LaySidebarLogo from "../lay-sidebar/components/SidebarLogo.vue";
-import LaySidebarItem from "../lay-sidebar/components/SidebarItem.vue";
-import LaySidebarLeftCollapse from "../lay-sidebar/components/SidebarLeftCollapse.vue";
-import LaySidebarCenterCollapse from "../lay-sidebar/components/SidebarCenterCollapse.vue";
+import LaySidebarLogo from "./components/SidebarLogo.vue";
+import LaySidebarItem from "./components/SidebarItem.vue";
+import LaySidebarLeftCollapse from "./components/SidebarLeftCollapse.vue";
+import LaySidebarCenterCollapse from "./components/SidebarCenterCollapse.vue";
 
 const route = useRoute();
 const isShow = ref(false);
