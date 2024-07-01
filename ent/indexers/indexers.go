@@ -45,6 +45,11 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultEnableRss holds the default value on creation for the "enable_rss" field.
+	DefaultEnableRss bool
+)
+
 // OrderOption defines the ordering options for the Indexers queries.
 type OrderOption func(*sql.Selector)
 

@@ -13,6 +13,7 @@ import (
 
 	"polaris/ent/downloadclients"
 	"polaris/ent/epidodes"
+	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/series"
 	"polaris/ent/settings"
@@ -31,6 +32,8 @@ type Client struct {
 	DownloadClients *DownloadClientsClient
 	// Epidodes is the client for interacting with the Epidodes builders.
 	Epidodes *EpidodesClient
+	// History is the client for interacting with the History builders.
+	History *HistoryClient
 	// Indexers is the client for interacting with the Indexers builders.
 	Indexers *IndexersClient
 	// Series is the client for interacting with the Series builders.
@@ -50,6 +53,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.DownloadClients = NewDownloadClientsClient(c.config)
 	c.Epidodes = NewEpidodesClient(c.config)
+	c.History = NewHistoryClient(c.config)
 	c.Indexers = NewIndexersClient(c.config)
 	c.Series = NewSeriesClient(c.config)
 	c.Settings = NewSettingsClient(c.config)
@@ -147,6 +151,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:          cfg,
 		DownloadClients: NewDownloadClientsClient(cfg),
 		Epidodes:        NewEpidodesClient(cfg),
+		History:         NewHistoryClient(cfg),
 		Indexers:        NewIndexersClient(cfg),
 		Series:          NewSeriesClient(cfg),
 		Settings:        NewSettingsClient(cfg),
@@ -171,6 +176,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:          cfg,
 		DownloadClients: NewDownloadClientsClient(cfg),
 		Epidodes:        NewEpidodesClient(cfg),
+		History:         NewHistoryClient(cfg),
 		Indexers:        NewIndexersClient(cfg),
 		Series:          NewSeriesClient(cfg),
 		Settings:        NewSettingsClient(cfg),
@@ -202,21 +208,21 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.DownloadClients.Use(hooks...)
-	c.Epidodes.Use(hooks...)
-	c.Indexers.Use(hooks...)
-	c.Series.Use(hooks...)
-	c.Settings.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.DownloadClients, c.Epidodes, c.History, c.Indexers, c.Series, c.Settings,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.DownloadClients.Intercept(interceptors...)
-	c.Epidodes.Intercept(interceptors...)
-	c.Indexers.Intercept(interceptors...)
-	c.Series.Intercept(interceptors...)
-	c.Settings.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.DownloadClients, c.Epidodes, c.History, c.Indexers, c.Series, c.Settings,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -226,6 +232,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.DownloadClients.mutate(ctx, m)
 	case *EpidodesMutation:
 		return c.Epidodes.mutate(ctx, m)
+	case *HistoryMutation:
+		return c.History.mutate(ctx, m)
 	case *IndexersMutation:
 		return c.Indexers.mutate(ctx, m)
 	case *SeriesMutation:
@@ -500,6 +508,139 @@ func (c *EpidodesClient) mutate(ctx context.Context, m *EpidodesMutation) (Value
 		return (&EpidodesDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Epidodes mutation op: %q", m.Op())
+	}
+}
+
+// HistoryClient is a client for the History schema.
+type HistoryClient struct {
+	config
+}
+
+// NewHistoryClient returns a client for the History from the given config.
+func NewHistoryClient(c config) *HistoryClient {
+	return &HistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `history.Hooks(f(g(h())))`.
+func (c *HistoryClient) Use(hooks ...Hook) {
+	c.hooks.History = append(c.hooks.History, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `history.Intercept(f(g(h())))`.
+func (c *HistoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.History = append(c.inters.History, interceptors...)
+}
+
+// Create returns a builder for creating a History entity.
+func (c *HistoryClient) Create() *HistoryCreate {
+	mutation := newHistoryMutation(c.config, OpCreate)
+	return &HistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of History entities.
+func (c *HistoryClient) CreateBulk(builders ...*HistoryCreate) *HistoryCreateBulk {
+	return &HistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *HistoryClient) MapCreateBulk(slice any, setFunc func(*HistoryCreate, int)) *HistoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &HistoryCreateBulk{err: fmt.Errorf("calling to HistoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*HistoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &HistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for History.
+func (c *HistoryClient) Update() *HistoryUpdate {
+	mutation := newHistoryMutation(c.config, OpUpdate)
+	return &HistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *HistoryClient) UpdateOne(h *History) *HistoryUpdateOne {
+	mutation := newHistoryMutation(c.config, OpUpdateOne, withHistory(h))
+	return &HistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *HistoryClient) UpdateOneID(id int) *HistoryUpdateOne {
+	mutation := newHistoryMutation(c.config, OpUpdateOne, withHistoryID(id))
+	return &HistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for History.
+func (c *HistoryClient) Delete() *HistoryDelete {
+	mutation := newHistoryMutation(c.config, OpDelete)
+	return &HistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *HistoryClient) DeleteOne(h *History) *HistoryDeleteOne {
+	return c.DeleteOneID(h.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *HistoryClient) DeleteOneID(id int) *HistoryDeleteOne {
+	builder := c.Delete().Where(history.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &HistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for History.
+func (c *HistoryClient) Query() *HistoryQuery {
+	return &HistoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeHistory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a History entity by its id.
+func (c *HistoryClient) Get(ctx context.Context, id int) (*History, error) {
+	return c.Query().Where(history.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *HistoryClient) GetX(ctx context.Context, id int) *History {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *HistoryClient) Hooks() []Hook {
+	return c.hooks.History
+}
+
+// Interceptors returns the client interceptors.
+func (c *HistoryClient) Interceptors() []Interceptor {
+	return c.inters.History
+}
+
+func (c *HistoryClient) mutate(ctx context.Context, m *HistoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&HistoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&HistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&HistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&HistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown History mutation op: %q", m.Op())
 	}
 }
 
@@ -905,9 +1046,9 @@ func (c *SettingsClient) mutate(ctx context.Context, m *SettingsMutation) (Value
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		DownloadClients, Epidodes, Indexers, Series, Settings []ent.Hook
+		DownloadClients, Epidodes, History, Indexers, Series, Settings []ent.Hook
 	}
 	inters struct {
-		DownloadClients, Epidodes, Indexers, Series, Settings []ent.Interceptor
+		DownloadClients, Epidodes, History, Indexers, Series, Settings []ent.Interceptor
 	}
 )

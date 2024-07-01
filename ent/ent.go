@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"polaris/ent/downloadclients"
 	"polaris/ent/epidodes"
+	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/series"
 	"polaris/ent/settings"
@@ -79,6 +80,7 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			downloadclients.Table: downloadclients.ValidColumn,
 			epidodes.Table:        epidodes.ValidColumn,
+			history.Table:         history.ValidColumn,
 			indexers.Table:        indexers.ValidColumn,
 			series.Table:          series.ValidColumn,
 			settings.Table:        settings.ValidColumn,

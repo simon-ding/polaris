@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/epidodes"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -51,8 +50,8 @@ func (ec *EpidodesCreate) SetOverview(s string) *EpidodesCreate {
 }
 
 // SetAirDate sets the "air_date" field.
-func (ec *EpidodesCreate) SetAirDate(t time.Time) *EpidodesCreate {
-	ec.mutation.SetAirDate(t)
+func (ec *EpidodesCreate) SetAirDate(s string) *EpidodesCreate {
+	ec.mutation.SetAirDate(s)
 	return ec
 }
 
@@ -155,7 +154,7 @@ func (ec *EpidodesCreate) createSpec() (*Epidodes, *sqlgraph.CreateSpec) {
 		_node.Overview = value
 	}
 	if value, ok := ec.mutation.AirDate(); ok {
-		_spec.SetField(epidodes.FieldAirDate, field.TypeTime, value)
+		_spec.SetField(epidodes.FieldAirDate, field.TypeString, value)
 		_node.AirDate = value
 	}
 	return _node, _spec

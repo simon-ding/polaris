@@ -16,6 +16,8 @@ type Tx struct {
 	DownloadClients *DownloadClientsClient
 	// Epidodes is the client for interacting with the Epidodes builders.
 	Epidodes *EpidodesClient
+	// History is the client for interacting with the History builders.
+	History *HistoryClient
 	// Indexers is the client for interacting with the Indexers builders.
 	Indexers *IndexersClient
 	// Series is the client for interacting with the Series builders.
@@ -155,6 +157,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.DownloadClients = NewDownloadClientsClient(tx.config)
 	tx.Epidodes = NewEpidodesClient(tx.config)
+	tx.History = NewHistoryClient(tx.config)
 	tx.Indexers = NewIndexersClient(tx.config)
 	tx.Series = NewSeriesClient(tx.config)
 	tx.Settings = NewSettingsClient(tx.config)

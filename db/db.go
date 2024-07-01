@@ -2,10 +2,14 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"polaris/ent"
+	"polaris/ent/downloadclients"
+	"polaris/ent/indexers"
 	"polaris/ent/settings"
 	"polaris/log"
 
+	"entgo.io/ent/dialect"
 	tmdb "github.com/cyruzin/golang-tmdb"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
@@ -16,7 +20,7 @@ type Client struct {
 }
 
 func Open() (*Client, error) {
-	client, err := ent.Open("sqlite3", "file:polaris.db?cache=shared&_fk=1")
+	client, err := ent.Open(dialect.SQLite, "file:polaris.db?cache=shared&_fk=1")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed opening connection to sqlite")
 	}
@@ -61,11 +65,11 @@ func (c *Client) GetLanguage() string {
 
 func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails) error {
 	_, err := c.ent.Series.Create().
-		SetTmdbID(int(detail.ID)). 
-		SetPath(path). 
-		SetOverview(detail.Overview). 
-		SetTitle(detail.Name). 
-		SetOriginalName(detail.OriginalName). 
+		SetTmdbID(int(detail.ID)).
+		SetPath(path).
+		SetOverview(detail.Overview).
+		SetTitle(detail.Name).
+		SetOriginalName(detail.OriginalName).
 		Save(context.TODO())
 	return err
 }
@@ -77,4 +81,65 @@ func (c *Client) GetWatchlist() []*ent.Series {
 		return nil
 	}
 	return list
+}
+
+func (c *Client) SaveEposideDetail(tmdbId int, d *tmdb.TVEpisodeDetails) error {
+	_, err := c.ent.Epidodes.Create().
+		SetAirDate(d.AirDate).
+		SetSeasonNumber(d.SeasonNumber).
+		SetEpisodeNumber(d.EpisodeNumber).
+		SetSeriesID(tmdbId).
+		SetOverview(d.Overview).
+		SetTitle(d.Name).Save(context.TODO())
+
+	return err
+}
+
+type TorznabSetting struct {
+	URL    string `json:"url"`
+	ApiKey string `json:"api_key"`
+}
+
+func (c *Client) SaveTorznabInfo(name string, setting TorznabSetting) error {
+	data, err := json.Marshal(setting)
+	if err != nil {
+		return errors.Wrap(err, "marshal json")
+	}
+	_, err = c.ent.Indexers.Create().
+		SetName(name).SetImplementation(IndexerTorznabImpl).SetPriority(1).SetSettings(string(data)).Save(context.TODO())
+	if err != nil {
+		return errors.Wrap(err, "save db")
+	}
+	return nil
+}
+
+func (c *Client) GetAllTorznabInfo() map[string]TorznabSetting {
+	res := c.ent.Indexers.Query().Where(indexers.Implementation(IndexerTorznabImpl)).AllX(context.TODO())
+	var m = make(map[string]TorznabSetting, len(res))
+	for _, r := range res {
+		var ss TorznabSetting
+		err := json.Unmarshal([]byte(r.Settings), &ss)
+		if err != nil {
+			log.Errorf("unmarshal torznab %s error: %v", r.Name, err)
+			continue
+		}
+		m[r.Name] = ss
+	}
+	return m
+}
+
+func (c *Client) SaveTransmission(name, url, user, password string) error {
+	_, err := c.ent.DownloadClients.Create().SetEnable(true).SetImplementation("transmission").
+		SetName(name).SetURL(url).SetUser(user).SetPassword(password).Save(context.TODO())
+
+	return err
+}
+
+func (c *Client) GetTransmission() *ent.DownloadClients {
+	dc, err := c.ent.DownloadClients.Query().Where(downloadclients.Implementation("transmission")).First(context.TODO())
+	if err != nil {
+		log.Errorf("no transmission client found: %v", err)
+		return nil
+	}
+	return dc
 }

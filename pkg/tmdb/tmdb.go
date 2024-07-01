@@ -36,6 +36,11 @@ func (c *Client) SearchTvShow(query string, lang string) (*tmdb.SearchTVShows, e
 	return r, nil
 }
 
+func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language string) (*tmdb.TVEpisodeDetails, error) {
+	d, err := c.tmdbClient.GetTVEpisodeDetails(id, seasonNumber, eposideNumber, withLangOption(language))
+	return d, err
+}
+
 func wrapLanguage(lang string) string {
 	if lang == "" {
 		lang = "zh-CN"

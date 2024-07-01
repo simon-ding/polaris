@@ -42,6 +42,21 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 	if err := s.db.AddWatchlist(in.RootFolder, detail); err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}
+
+	for _, season := range detail.Seasons {
+		seasonId := season.SeasonNumber
+		for  i := 1; i <= season.EpisodeCount; i++ {
+			ep, err := s.MustTMDB().GetEposideDetail(int(detail.ID), seasonId, i, s.language)
+			if err != nil {
+				log.Errorf("get eposide detail: %v", err)
+				return nil, errors.Wrap(err, "get eposide detail")
+			}
+			err = s.db.SaveEposideDetail(int(detail.ID), ep)
+			if err != nil {
+				return nil, errors.Wrap(err, "save episode")
+			}
+		}
+	}
 	log.Infof("add tv %s to watchlist success", detail.Name)
 	return nil, nil
 }

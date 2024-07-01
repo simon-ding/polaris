@@ -37,9 +37,51 @@ func (dcc *DownloadClientsCreate) SetImplementation(s string) *DownloadClientsCr
 	return dcc
 }
 
+// SetURL sets the "url" field.
+func (dcc *DownloadClientsCreate) SetURL(s string) *DownloadClientsCreate {
+	dcc.mutation.SetURL(s)
+	return dcc
+}
+
+// SetUser sets the "user" field.
+func (dcc *DownloadClientsCreate) SetUser(s string) *DownloadClientsCreate {
+	dcc.mutation.SetUser(s)
+	return dcc
+}
+
+// SetNillableUser sets the "user" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillableUser(s *string) *DownloadClientsCreate {
+	if s != nil {
+		dcc.SetUser(*s)
+	}
+	return dcc
+}
+
+// SetPassword sets the "password" field.
+func (dcc *DownloadClientsCreate) SetPassword(s string) *DownloadClientsCreate {
+	dcc.mutation.SetPassword(s)
+	return dcc
+}
+
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillablePassword(s *string) *DownloadClientsCreate {
+	if s != nil {
+		dcc.SetPassword(*s)
+	}
+	return dcc
+}
+
 // SetSettings sets the "settings" field.
 func (dcc *DownloadClientsCreate) SetSettings(s string) *DownloadClientsCreate {
 	dcc.mutation.SetSettings(s)
+	return dcc
+}
+
+// SetNillableSettings sets the "settings" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillableSettings(s *string) *DownloadClientsCreate {
+	if s != nil {
+		dcc.SetSettings(*s)
+	}
 	return dcc
 }
 
@@ -49,9 +91,25 @@ func (dcc *DownloadClientsCreate) SetPriority(s string) *DownloadClientsCreate {
 	return dcc
 }
 
+// SetNillablePriority sets the "priority" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillablePriority(s *string) *DownloadClientsCreate {
+	if s != nil {
+		dcc.SetPriority(*s)
+	}
+	return dcc
+}
+
 // SetRemoveCompletedDownloads sets the "remove_completed_downloads" field.
 func (dcc *DownloadClientsCreate) SetRemoveCompletedDownloads(b bool) *DownloadClientsCreate {
 	dcc.mutation.SetRemoveCompletedDownloads(b)
+	return dcc
+}
+
+// SetNillableRemoveCompletedDownloads sets the "remove_completed_downloads" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillableRemoveCompletedDownloads(b *bool) *DownloadClientsCreate {
+	if b != nil {
+		dcc.SetRemoveCompletedDownloads(*b)
+	}
 	return dcc
 }
 
@@ -61,9 +119,25 @@ func (dcc *DownloadClientsCreate) SetRemoveFailedDownloads(b bool) *DownloadClie
 	return dcc
 }
 
+// SetNillableRemoveFailedDownloads sets the "remove_failed_downloads" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillableRemoveFailedDownloads(b *bool) *DownloadClientsCreate {
+	if b != nil {
+		dcc.SetRemoveFailedDownloads(*b)
+	}
+	return dcc
+}
+
 // SetTags sets the "tags" field.
 func (dcc *DownloadClientsCreate) SetTags(s string) *DownloadClientsCreate {
 	dcc.mutation.SetTags(s)
+	return dcc
+}
+
+// SetNillableTags sets the "tags" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillableTags(s *string) *DownloadClientsCreate {
+	if s != nil {
+		dcc.SetTags(*s)
+	}
 	return dcc
 }
 
@@ -74,6 +148,7 @@ func (dcc *DownloadClientsCreate) Mutation() *DownloadClientsMutation {
 
 // Save creates the DownloadClients in the database.
 func (dcc *DownloadClientsCreate) Save(ctx context.Context) (*DownloadClients, error) {
+	dcc.defaults()
 	return withHooks(ctx, dcc.sqlSave, dcc.mutation, dcc.hooks)
 }
 
@@ -99,6 +174,38 @@ func (dcc *DownloadClientsCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (dcc *DownloadClientsCreate) defaults() {
+	if _, ok := dcc.mutation.User(); !ok {
+		v := downloadclients.DefaultUser
+		dcc.mutation.SetUser(v)
+	}
+	if _, ok := dcc.mutation.Password(); !ok {
+		v := downloadclients.DefaultPassword
+		dcc.mutation.SetPassword(v)
+	}
+	if _, ok := dcc.mutation.Settings(); !ok {
+		v := downloadclients.DefaultSettings
+		dcc.mutation.SetSettings(v)
+	}
+	if _, ok := dcc.mutation.Priority(); !ok {
+		v := downloadclients.DefaultPriority
+		dcc.mutation.SetPriority(v)
+	}
+	if _, ok := dcc.mutation.RemoveCompletedDownloads(); !ok {
+		v := downloadclients.DefaultRemoveCompletedDownloads
+		dcc.mutation.SetRemoveCompletedDownloads(v)
+	}
+	if _, ok := dcc.mutation.RemoveFailedDownloads(); !ok {
+		v := downloadclients.DefaultRemoveFailedDownloads
+		dcc.mutation.SetRemoveFailedDownloads(v)
+	}
+	if _, ok := dcc.mutation.Tags(); !ok {
+		v := downloadclients.DefaultTags
+		dcc.mutation.SetTags(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (dcc *DownloadClientsCreate) check() error {
 	if _, ok := dcc.mutation.Enable(); !ok {
@@ -109,6 +216,15 @@ func (dcc *DownloadClientsCreate) check() error {
 	}
 	if _, ok := dcc.mutation.Implementation(); !ok {
 		return &ValidationError{Name: "implementation", err: errors.New(`ent: missing required field "DownloadClients.implementation"`)}
+	}
+	if _, ok := dcc.mutation.URL(); !ok {
+		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "DownloadClients.url"`)}
+	}
+	if _, ok := dcc.mutation.User(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required field "DownloadClients.user"`)}
+	}
+	if _, ok := dcc.mutation.Password(); !ok {
+		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "DownloadClients.password"`)}
 	}
 	if _, ok := dcc.mutation.Settings(); !ok {
 		return &ValidationError{Name: "settings", err: errors.New(`ent: missing required field "DownloadClients.settings"`)}
@@ -163,6 +279,18 @@ func (dcc *DownloadClientsCreate) createSpec() (*DownloadClients, *sqlgraph.Crea
 		_spec.SetField(downloadclients.FieldImplementation, field.TypeString, value)
 		_node.Implementation = value
 	}
+	if value, ok := dcc.mutation.URL(); ok {
+		_spec.SetField(downloadclients.FieldURL, field.TypeString, value)
+		_node.URL = value
+	}
+	if value, ok := dcc.mutation.User(); ok {
+		_spec.SetField(downloadclients.FieldUser, field.TypeString, value)
+		_node.User = value
+	}
+	if value, ok := dcc.mutation.Password(); ok {
+		_spec.SetField(downloadclients.FieldPassword, field.TypeString, value)
+		_node.Password = value
+	}
 	if value, ok := dcc.mutation.Settings(); ok {
 		_spec.SetField(downloadclients.FieldSettings, field.TypeString, value)
 		_node.Settings = value
@@ -204,6 +332,7 @@ func (dccb *DownloadClientsCreateBulk) Save(ctx context.Context) ([]*DownloadCli
 	for i := range dccb.builders {
 		func(i int, root context.Context) {
 			builder := dccb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*DownloadClientsMutation)
 				if !ok {

@@ -16,7 +16,7 @@ func (Indexers) Fields() []ent.Field {
 		field.String("name"),
 		field.String("implementation"),
 		field.String("settings"),
-		field.Bool("enable_rss"),
+		field.Bool("enable_rss").Default(true),
 		field.Int("priority"),
 	}
 }

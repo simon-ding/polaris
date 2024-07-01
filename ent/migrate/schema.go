@@ -14,11 +14,14 @@ var (
 		{Name: "enable", Type: field.TypeBool},
 		{Name: "name", Type: field.TypeString},
 		{Name: "implementation", Type: field.TypeString},
-		{Name: "settings", Type: field.TypeString},
-		{Name: "priority", Type: field.TypeString},
-		{Name: "remove_completed_downloads", Type: field.TypeBool},
-		{Name: "remove_failed_downloads", Type: field.TypeBool},
-		{Name: "tags", Type: field.TypeString},
+		{Name: "url", Type: field.TypeString},
+		{Name: "user", Type: field.TypeString, Default: ""},
+		{Name: "password", Type: field.TypeString, Default: ""},
+		{Name: "settings", Type: field.TypeString, Default: ""},
+		{Name: "priority", Type: field.TypeString, Default: ""},
+		{Name: "remove_completed_downloads", Type: field.TypeBool, Default: true},
+		{Name: "remove_failed_downloads", Type: field.TypeBool, Default: true},
+		{Name: "tags", Type: field.TypeString, Default: ""},
 	}
 	// DownloadClientsTable holds the schema information for the "download_clients" table.
 	DownloadClientsTable = &schema.Table{
@@ -34,7 +37,7 @@ var (
 		{Name: "episode_number", Type: field.TypeInt},
 		{Name: "title", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
-		{Name: "air_date", Type: field.TypeTime},
+		{Name: "air_date", Type: field.TypeString},
 	}
 	// EpidodesTable holds the schema information for the "epidodes" table.
 	EpidodesTable = &schema.Table{
@@ -42,13 +45,27 @@ var (
 		Columns:    EpidodesColumns,
 		PrimaryKey: []*schema.Column{EpidodesColumns[0]},
 	}
+	// HistoriesColumns holds the columns for the "histories" table.
+	HistoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "series_id", Type: field.TypeInt},
+		{Name: "episode_id", Type: field.TypeInt},
+		{Name: "source_title", Type: field.TypeString},
+		{Name: "date", Type: field.TypeTime},
+	}
+	// HistoriesTable holds the schema information for the "histories" table.
+	HistoriesTable = &schema.Table{
+		Name:       "histories",
+		Columns:    HistoriesColumns,
+		PrimaryKey: []*schema.Column{HistoriesColumns[0]},
+	}
 	// IndexersColumns holds the columns for the "indexers" table.
 	IndexersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "implementation", Type: field.TypeString},
 		{Name: "settings", Type: field.TypeString},
-		{Name: "enable_rss", Type: field.TypeBool},
+		{Name: "enable_rss", Type: field.TypeBool, Default: true},
 		{Name: "priority", Type: field.TypeInt},
 	}
 	// IndexersTable holds the schema information for the "indexers" table.
@@ -89,6 +106,7 @@ var (
 	Tables = []*schema.Table{
 		DownloadClientsTable,
 		EpidodesTable,
+		HistoriesTable,
 		IndexersTable,
 		SeriesTable,
 		SettingsTable,

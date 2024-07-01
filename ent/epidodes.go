@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"polaris/ent/epidodes"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -28,7 +27,7 @@ type Epidodes struct {
 	// Overview holds the value of the "overview" field.
 	Overview string `json:"overview,omitempty"`
 	// AirDate holds the value of the "air_date" field.
-	AirDate      time.Time `json:"air_date,omitempty"`
+	AirDate      string `json:"air_date,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -39,10 +38,8 @@ func (*Epidodes) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case epidodes.FieldID, epidodes.FieldSeriesID, epidodes.FieldSeasonNumber, epidodes.FieldEpisodeNumber:
 			values[i] = new(sql.NullInt64)
-		case epidodes.FieldTitle, epidodes.FieldOverview:
+		case epidodes.FieldTitle, epidodes.FieldOverview, epidodes.FieldAirDate:
 			values[i] = new(sql.NullString)
-		case epidodes.FieldAirDate:
-			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -95,10 +92,10 @@ func (e *Epidodes) assignValues(columns []string, values []any) error {
 				e.Overview = value.String
 			}
 		case epidodes.FieldAirDate:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field air_date", values[i])
 			} else if value.Valid {
-				e.AirDate = value.Time
+				e.AirDate = value.String
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -152,7 +149,7 @@ func (e *Epidodes) String() string {
 	builder.WriteString(e.Overview)
 	builder.WriteString(", ")
 	builder.WriteString("air_date=")
-	builder.WriteString(e.AirDate.Format(time.ANSIC))
+	builder.WriteString(e.AirDate)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -17,6 +17,12 @@ const (
 	FieldName = "name"
 	// FieldImplementation holds the string denoting the implementation field in the database.
 	FieldImplementation = "implementation"
+	// FieldURL holds the string denoting the url field in the database.
+	FieldURL = "url"
+	// FieldUser holds the string denoting the user field in the database.
+	FieldUser = "user"
+	// FieldPassword holds the string denoting the password field in the database.
+	FieldPassword = "password"
 	// FieldSettings holds the string denoting the settings field in the database.
 	FieldSettings = "settings"
 	// FieldPriority holds the string denoting the priority field in the database.
@@ -37,6 +43,9 @@ var Columns = []string{
 	FieldEnable,
 	FieldName,
 	FieldImplementation,
+	FieldURL,
+	FieldUser,
+	FieldPassword,
 	FieldSettings,
 	FieldPriority,
 	FieldRemoveCompletedDownloads,
@@ -53,6 +62,23 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultUser holds the default value on creation for the "user" field.
+	DefaultUser string
+	// DefaultPassword holds the default value on creation for the "password" field.
+	DefaultPassword string
+	// DefaultSettings holds the default value on creation for the "settings" field.
+	DefaultSettings string
+	// DefaultPriority holds the default value on creation for the "priority" field.
+	DefaultPriority string
+	// DefaultRemoveCompletedDownloads holds the default value on creation for the "remove_completed_downloads" field.
+	DefaultRemoveCompletedDownloads bool
+	// DefaultRemoveFailedDownloads holds the default value on creation for the "remove_failed_downloads" field.
+	DefaultRemoveFailedDownloads bool
+	// DefaultTags holds the default value on creation for the "tags" field.
+	DefaultTags string
+)
 
 // OrderOption defines the ordering options for the DownloadClients queries.
 type OrderOption func(*sql.Selector)
@@ -75,6 +101,21 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByImplementation orders the results by the implementation field.
 func ByImplementation(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldImplementation, opts...).ToFunc()
+}
+
+// ByURL orders the results by the url field.
+func ByURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// ByUser orders the results by the user field.
+func ByUser(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUser, opts...).ToFunc()
+}
+
+// ByPassword orders the results by the password field.
+func ByPassword(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPassword, opts...).ToFunc()
 }
 
 // BySettings orders the results by the settings field.

@@ -18,7 +18,7 @@ func (Epidodes) Fields() []ent.Field {
 		field.Int("episode_number"),
 		field.String("title"),
 		field.String("overview"),
-		field.Time("air_date"),
+		field.String("air_date"),
 	}
 }
 

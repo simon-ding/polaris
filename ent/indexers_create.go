@@ -43,6 +43,14 @@ func (ic *IndexersCreate) SetEnableRss(b bool) *IndexersCreate {
 	return ic
 }
 
+// SetNillableEnableRss sets the "enable_rss" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableEnableRss(b *bool) *IndexersCreate {
+	if b != nil {
+		ic.SetEnableRss(*b)
+	}
+	return ic
+}
+
 // SetPriority sets the "priority" field.
 func (ic *IndexersCreate) SetPriority(i int) *IndexersCreate {
 	ic.mutation.SetPriority(i)
@@ -56,6 +64,7 @@ func (ic *IndexersCreate) Mutation() *IndexersMutation {
 
 // Save creates the Indexers in the database.
 func (ic *IndexersCreate) Save(ctx context.Context) (*Indexers, error) {
+	ic.defaults()
 	return withHooks(ctx, ic.sqlSave, ic.mutation, ic.hooks)
 }
 
@@ -78,6 +87,14 @@ func (ic *IndexersCreate) Exec(ctx context.Context) error {
 func (ic *IndexersCreate) ExecX(ctx context.Context) {
 	if err := ic.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (ic *IndexersCreate) defaults() {
+	if _, ok := ic.mutation.EnableRss(); !ok {
+		v := indexers.DefaultEnableRss
+		ic.mutation.SetEnableRss(v)
 	}
 }
 
@@ -165,6 +182,7 @@ func (icb *IndexersCreateBulk) Save(ctx context.Context) ([]*Indexers, error) {
 	for i := range icb.builders {
 		func(i int, root context.Context) {
 			builder := icb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*IndexersMutation)
 				if !ok {

@@ -68,6 +68,21 @@ func Implementation(v string) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldEQ(FieldImplementation, v))
 }
 
+// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
+func URL(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldURL, v))
+}
+
+// User applies equality check predicate on the "user" field. It's identical to UserEQ.
+func User(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldUser, v))
+}
+
+// Password applies equality check predicate on the "password" field. It's identical to PasswordEQ.
+func Password(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldPassword, v))
+}
+
 // Settings applies equality check predicate on the "settings" field. It's identical to SettingsEQ.
 func Settings(v string) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldEQ(FieldSettings, v))
@@ -231,6 +246,201 @@ func ImplementationEqualFold(v string) predicate.DownloadClients {
 // ImplementationContainsFold applies the ContainsFold predicate on the "implementation" field.
 func ImplementationContainsFold(v string) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldContainsFold(FieldImplementation, v))
+}
+
+// URLEQ applies the EQ predicate on the "url" field.
+func URLEQ(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldURL, v))
+}
+
+// URLNEQ applies the NEQ predicate on the "url" field.
+func URLNEQ(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNEQ(FieldURL, v))
+}
+
+// URLIn applies the In predicate on the "url" field.
+func URLIn(vs ...string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldIn(FieldURL, vs...))
+}
+
+// URLNotIn applies the NotIn predicate on the "url" field.
+func URLNotIn(vs ...string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNotIn(FieldURL, vs...))
+}
+
+// URLGT applies the GT predicate on the "url" field.
+func URLGT(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGT(FieldURL, v))
+}
+
+// URLGTE applies the GTE predicate on the "url" field.
+func URLGTE(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGTE(FieldURL, v))
+}
+
+// URLLT applies the LT predicate on the "url" field.
+func URLLT(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLT(FieldURL, v))
+}
+
+// URLLTE applies the LTE predicate on the "url" field.
+func URLLTE(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLTE(FieldURL, v))
+}
+
+// URLContains applies the Contains predicate on the "url" field.
+func URLContains(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldContains(FieldURL, v))
+}
+
+// URLHasPrefix applies the HasPrefix predicate on the "url" field.
+func URLHasPrefix(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldHasPrefix(FieldURL, v))
+}
+
+// URLHasSuffix applies the HasSuffix predicate on the "url" field.
+func URLHasSuffix(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldHasSuffix(FieldURL, v))
+}
+
+// URLEqualFold applies the EqualFold predicate on the "url" field.
+func URLEqualFold(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEqualFold(FieldURL, v))
+}
+
+// URLContainsFold applies the ContainsFold predicate on the "url" field.
+func URLContainsFold(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldContainsFold(FieldURL, v))
+}
+
+// UserEQ applies the EQ predicate on the "user" field.
+func UserEQ(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldUser, v))
+}
+
+// UserNEQ applies the NEQ predicate on the "user" field.
+func UserNEQ(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNEQ(FieldUser, v))
+}
+
+// UserIn applies the In predicate on the "user" field.
+func UserIn(vs ...string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldIn(FieldUser, vs...))
+}
+
+// UserNotIn applies the NotIn predicate on the "user" field.
+func UserNotIn(vs ...string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNotIn(FieldUser, vs...))
+}
+
+// UserGT applies the GT predicate on the "user" field.
+func UserGT(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGT(FieldUser, v))
+}
+
+// UserGTE applies the GTE predicate on the "user" field.
+func UserGTE(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGTE(FieldUser, v))
+}
+
+// UserLT applies the LT predicate on the "user" field.
+func UserLT(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLT(FieldUser, v))
+}
+
+// UserLTE applies the LTE predicate on the "user" field.
+func UserLTE(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLTE(FieldUser, v))
+}
+
+// UserContains applies the Contains predicate on the "user" field.
+func UserContains(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldContains(FieldUser, v))
+}
+
+// UserHasPrefix applies the HasPrefix predicate on the "user" field.
+func UserHasPrefix(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldHasPrefix(FieldUser, v))
+}
+
+// UserHasSuffix applies the HasSuffix predicate on the "user" field.
+func UserHasSuffix(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldHasSuffix(FieldUser, v))
+}
+
+// UserEqualFold applies the EqualFold predicate on the "user" field.
+func UserEqualFold(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEqualFold(FieldUser, v))
+}
+
+// UserContainsFold applies the ContainsFold predicate on the "user" field.
+func UserContainsFold(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldContainsFold(FieldUser, v))
+}
+
+// PasswordEQ applies the EQ predicate on the "password" field.
+func PasswordEQ(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldPassword, v))
+}
+
+// PasswordNEQ applies the NEQ predicate on the "password" field.
+func PasswordNEQ(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNEQ(FieldPassword, v))
+}
+
+// PasswordIn applies the In predicate on the "password" field.
+func PasswordIn(vs ...string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldIn(FieldPassword, vs...))
+}
+
+// PasswordNotIn applies the NotIn predicate on the "password" field.
+func PasswordNotIn(vs ...string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNotIn(FieldPassword, vs...))
+}
+
+// PasswordGT applies the GT predicate on the "password" field.
+func PasswordGT(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGT(FieldPassword, v))
+}
+
+// PasswordGTE applies the GTE predicate on the "password" field.
+func PasswordGTE(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGTE(FieldPassword, v))
+}
+
+// PasswordLT applies the LT predicate on the "password" field.
+func PasswordLT(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLT(FieldPassword, v))
+}
+
+// PasswordLTE applies the LTE predicate on the "password" field.
+func PasswordLTE(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLTE(FieldPassword, v))
+}
+
+// PasswordContains applies the Contains predicate on the "password" field.
+func PasswordContains(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldContains(FieldPassword, v))
+}
+
+// PasswordHasPrefix applies the HasPrefix predicate on the "password" field.
+func PasswordHasPrefix(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldHasPrefix(FieldPassword, v))
+}
+
+// PasswordHasSuffix applies the HasSuffix predicate on the "password" field.
+func PasswordHasSuffix(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldHasSuffix(FieldPassword, v))
+}
+
+// PasswordEqualFold applies the EqualFold predicate on the "password" field.
+func PasswordEqualFold(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEqualFold(FieldPassword, v))
+}
+
+// PasswordContainsFold applies the ContainsFold predicate on the "password" field.
+func PasswordContainsFold(v string) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldContainsFold(FieldPassword, v))
 }
 
 // SettingsEQ applies the EQ predicate on the "settings" field.

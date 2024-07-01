@@ -22,6 +22,12 @@ type DownloadClients struct {
 	Name string `json:"name,omitempty"`
 	// Implementation holds the value of the "implementation" field.
 	Implementation string `json:"implementation,omitempty"`
+	// URL holds the value of the "url" field.
+	URL string `json:"url,omitempty"`
+	// User holds the value of the "user" field.
+	User string `json:"user,omitempty"`
+	// Password holds the value of the "password" field.
+	Password string `json:"password,omitempty"`
 	// Settings holds the value of the "settings" field.
 	Settings string `json:"settings,omitempty"`
 	// Priority holds the value of the "priority" field.
@@ -44,7 +50,7 @@ func (*DownloadClients) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case downloadclients.FieldID:
 			values[i] = new(sql.NullInt64)
-		case downloadclients.FieldName, downloadclients.FieldImplementation, downloadclients.FieldSettings, downloadclients.FieldPriority, downloadclients.FieldTags:
+		case downloadclients.FieldName, downloadclients.FieldImplementation, downloadclients.FieldURL, downloadclients.FieldUser, downloadclients.FieldPassword, downloadclients.FieldSettings, downloadclients.FieldPriority, downloadclients.FieldTags:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -84,6 +90,24 @@ func (dc *DownloadClients) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field implementation", values[i])
 			} else if value.Valid {
 				dc.Implementation = value.String
+			}
+		case downloadclients.FieldURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url", values[i])
+			} else if value.Valid {
+				dc.URL = value.String
+			}
+		case downloadclients.FieldUser:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user", values[i])
+			} else if value.Valid {
+				dc.User = value.String
+			}
+		case downloadclients.FieldPassword:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field password", values[i])
+			} else if value.Valid {
+				dc.Password = value.String
 			}
 		case downloadclients.FieldSettings:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -159,6 +183,15 @@ func (dc *DownloadClients) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("implementation=")
 	builder.WriteString(dc.Implementation)
+	builder.WriteString(", ")
+	builder.WriteString("url=")
+	builder.WriteString(dc.URL)
+	builder.WriteString(", ")
+	builder.WriteString("user=")
+	builder.WriteString(dc.User)
+	builder.WriteString(", ")
+	builder.WriteString("password=")
+	builder.WriteString(dc.Password)
 	builder.WriteString(", ")
 	builder.WriteString("settings=")
 	builder.WriteString(dc.Settings)

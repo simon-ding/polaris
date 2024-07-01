@@ -16,11 +16,14 @@ func (DownloadClients) Fields() []ent.Field {
 		field.Bool("enable"),
 		field.String("name"),
 		field.String("implementation"),
-		field.String("settings"),
-		field.String("priority"),
-		field.Bool("remove_completed_downloads"),
-		field.Bool("remove_failed_downloads"),
-		field.String("tags"),
+		field.String("url"),
+		field.String("user").Default(""),
+		field.String("password").Default(""),
+		field.String("settings").Default(""),
+		field.String("priority").Default(""),
+		field.Bool("remove_completed_downloads").Default(true),
+		field.Bool("remove_failed_downloads").Default(true),
+		field.String("tags").Default(""),
 	}
 }
 

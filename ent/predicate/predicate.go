@@ -12,6 +12,9 @@ type DownloadClients func(*sql.Selector)
 // Epidodes is the predicate function for epidodes builders.
 type Epidodes func(*sql.Selector)
 
+// History is the predicate function for history builders.
+type History func(*sql.Selector)
+
 // Indexers is the predicate function for indexers builders.
 type Indexers func(*sql.Selector)
 

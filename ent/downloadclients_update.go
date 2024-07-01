@@ -69,6 +69,48 @@ func (dcu *DownloadClientsUpdate) SetNillableImplementation(s *string) *Download
 	return dcu
 }
 
+// SetURL sets the "url" field.
+func (dcu *DownloadClientsUpdate) SetURL(s string) *DownloadClientsUpdate {
+	dcu.mutation.SetURL(s)
+	return dcu
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (dcu *DownloadClientsUpdate) SetNillableURL(s *string) *DownloadClientsUpdate {
+	if s != nil {
+		dcu.SetURL(*s)
+	}
+	return dcu
+}
+
+// SetUser sets the "user" field.
+func (dcu *DownloadClientsUpdate) SetUser(s string) *DownloadClientsUpdate {
+	dcu.mutation.SetUser(s)
+	return dcu
+}
+
+// SetNillableUser sets the "user" field if the given value is not nil.
+func (dcu *DownloadClientsUpdate) SetNillableUser(s *string) *DownloadClientsUpdate {
+	if s != nil {
+		dcu.SetUser(*s)
+	}
+	return dcu
+}
+
+// SetPassword sets the "password" field.
+func (dcu *DownloadClientsUpdate) SetPassword(s string) *DownloadClientsUpdate {
+	dcu.mutation.SetPassword(s)
+	return dcu
+}
+
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (dcu *DownloadClientsUpdate) SetNillablePassword(s *string) *DownloadClientsUpdate {
+	if s != nil {
+		dcu.SetPassword(*s)
+	}
+	return dcu
+}
+
 // SetSettings sets the "settings" field.
 func (dcu *DownloadClientsUpdate) SetSettings(s string) *DownloadClientsUpdate {
 	dcu.mutation.SetSettings(s)
@@ -189,6 +231,15 @@ func (dcu *DownloadClientsUpdate) sqlSave(ctx context.Context) (n int, err error
 	if value, ok := dcu.mutation.Implementation(); ok {
 		_spec.SetField(downloadclients.FieldImplementation, field.TypeString, value)
 	}
+	if value, ok := dcu.mutation.URL(); ok {
+		_spec.SetField(downloadclients.FieldURL, field.TypeString, value)
+	}
+	if value, ok := dcu.mutation.User(); ok {
+		_spec.SetField(downloadclients.FieldUser, field.TypeString, value)
+	}
+	if value, ok := dcu.mutation.Password(); ok {
+		_spec.SetField(downloadclients.FieldPassword, field.TypeString, value)
+	}
 	if value, ok := dcu.mutation.Settings(); ok {
 		_spec.SetField(downloadclients.FieldSettings, field.TypeString, value)
 	}
@@ -262,6 +313,48 @@ func (dcuo *DownloadClientsUpdateOne) SetImplementation(s string) *DownloadClien
 func (dcuo *DownloadClientsUpdateOne) SetNillableImplementation(s *string) *DownloadClientsUpdateOne {
 	if s != nil {
 		dcuo.SetImplementation(*s)
+	}
+	return dcuo
+}
+
+// SetURL sets the "url" field.
+func (dcuo *DownloadClientsUpdateOne) SetURL(s string) *DownloadClientsUpdateOne {
+	dcuo.mutation.SetURL(s)
+	return dcuo
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (dcuo *DownloadClientsUpdateOne) SetNillableURL(s *string) *DownloadClientsUpdateOne {
+	if s != nil {
+		dcuo.SetURL(*s)
+	}
+	return dcuo
+}
+
+// SetUser sets the "user" field.
+func (dcuo *DownloadClientsUpdateOne) SetUser(s string) *DownloadClientsUpdateOne {
+	dcuo.mutation.SetUser(s)
+	return dcuo
+}
+
+// SetNillableUser sets the "user" field if the given value is not nil.
+func (dcuo *DownloadClientsUpdateOne) SetNillableUser(s *string) *DownloadClientsUpdateOne {
+	if s != nil {
+		dcuo.SetUser(*s)
+	}
+	return dcuo
+}
+
+// SetPassword sets the "password" field.
+func (dcuo *DownloadClientsUpdateOne) SetPassword(s string) *DownloadClientsUpdateOne {
+	dcuo.mutation.SetPassword(s)
+	return dcuo
+}
+
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (dcuo *DownloadClientsUpdateOne) SetNillablePassword(s *string) *DownloadClientsUpdateOne {
+	if s != nil {
+		dcuo.SetPassword(*s)
 	}
 	return dcuo
 }
@@ -415,6 +508,15 @@ func (dcuo *DownloadClientsUpdateOne) sqlSave(ctx context.Context) (_node *Downl
 	}
 	if value, ok := dcuo.mutation.Implementation(); ok {
 		_spec.SetField(downloadclients.FieldImplementation, field.TypeString, value)
+	}
+	if value, ok := dcuo.mutation.URL(); ok {
+		_spec.SetField(downloadclients.FieldURL, field.TypeString, value)
+	}
+	if value, ok := dcuo.mutation.User(); ok {
+		_spec.SetField(downloadclients.FieldUser, field.TypeString, value)
+	}
+	if value, ok := dcuo.mutation.Password(); ok {
+		_spec.SetField(downloadclients.FieldPassword, field.TypeString, value)
 	}
 	if value, ok := dcuo.mutation.Settings(); ok {
 		_spec.SetField(downloadclients.FieldSettings, field.TypeString, value)

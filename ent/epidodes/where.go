@@ -4,7 +4,6 @@ package epidodes
 
 import (
 	"polaris/ent/predicate"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -80,7 +79,7 @@ func Overview(v string) predicate.Epidodes {
 }
 
 // AirDate applies equality check predicate on the "air_date" field. It's identical to AirDateEQ.
-func AirDate(v time.Time) predicate.Epidodes {
+func AirDate(v string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldEQ(FieldAirDate, v))
 }
 
@@ -335,43 +334,68 @@ func OverviewContainsFold(v string) predicate.Epidodes {
 }
 
 // AirDateEQ applies the EQ predicate on the "air_date" field.
-func AirDateEQ(v time.Time) predicate.Epidodes {
+func AirDateEQ(v string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldEQ(FieldAirDate, v))
 }
 
 // AirDateNEQ applies the NEQ predicate on the "air_date" field.
-func AirDateNEQ(v time.Time) predicate.Epidodes {
+func AirDateNEQ(v string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldNEQ(FieldAirDate, v))
 }
 
 // AirDateIn applies the In predicate on the "air_date" field.
-func AirDateIn(vs ...time.Time) predicate.Epidodes {
+func AirDateIn(vs ...string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldIn(FieldAirDate, vs...))
 }
 
 // AirDateNotIn applies the NotIn predicate on the "air_date" field.
-func AirDateNotIn(vs ...time.Time) predicate.Epidodes {
+func AirDateNotIn(vs ...string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldNotIn(FieldAirDate, vs...))
 }
 
 // AirDateGT applies the GT predicate on the "air_date" field.
-func AirDateGT(v time.Time) predicate.Epidodes {
+func AirDateGT(v string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldGT(FieldAirDate, v))
 }
 
 // AirDateGTE applies the GTE predicate on the "air_date" field.
-func AirDateGTE(v time.Time) predicate.Epidodes {
+func AirDateGTE(v string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldGTE(FieldAirDate, v))
 }
 
 // AirDateLT applies the LT predicate on the "air_date" field.
-func AirDateLT(v time.Time) predicate.Epidodes {
+func AirDateLT(v string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldLT(FieldAirDate, v))
 }
 
 // AirDateLTE applies the LTE predicate on the "air_date" field.
-func AirDateLTE(v time.Time) predicate.Epidodes {
+func AirDateLTE(v string) predicate.Epidodes {
 	return predicate.Epidodes(sql.FieldLTE(FieldAirDate, v))
+}
+
+// AirDateContains applies the Contains predicate on the "air_date" field.
+func AirDateContains(v string) predicate.Epidodes {
+	return predicate.Epidodes(sql.FieldContains(FieldAirDate, v))
+}
+
+// AirDateHasPrefix applies the HasPrefix predicate on the "air_date" field.
+func AirDateHasPrefix(v string) predicate.Epidodes {
+	return predicate.Epidodes(sql.FieldHasPrefix(FieldAirDate, v))
+}
+
+// AirDateHasSuffix applies the HasSuffix predicate on the "air_date" field.
+func AirDateHasSuffix(v string) predicate.Epidodes {
+	return predicate.Epidodes(sql.FieldHasSuffix(FieldAirDate, v))
+}
+
+// AirDateEqualFold applies the EqualFold predicate on the "air_date" field.
+func AirDateEqualFold(v string) predicate.Epidodes {
+	return predicate.Epidodes(sql.FieldEqualFold(FieldAirDate, v))
+}
+
+// AirDateContainsFold applies the ContainsFold predicate on the "air_date" field.
+func AirDateContainsFold(v string) predicate.Epidodes {
+	return predicate.Epidodes(sql.FieldContainsFold(FieldAirDate, v))
 }
 
 // And groups predicates with the AND operator between them.

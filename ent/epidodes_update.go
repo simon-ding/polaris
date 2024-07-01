@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"polaris/ent/epidodes"
 	"polaris/ent/predicate"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -120,15 +119,15 @@ func (eu *EpidodesUpdate) SetNillableOverview(s *string) *EpidodesUpdate {
 }
 
 // SetAirDate sets the "air_date" field.
-func (eu *EpidodesUpdate) SetAirDate(t time.Time) *EpidodesUpdate {
-	eu.mutation.SetAirDate(t)
+func (eu *EpidodesUpdate) SetAirDate(s string) *EpidodesUpdate {
+	eu.mutation.SetAirDate(s)
 	return eu
 }
 
 // SetNillableAirDate sets the "air_date" field if the given value is not nil.
-func (eu *EpidodesUpdate) SetNillableAirDate(t *time.Time) *EpidodesUpdate {
-	if t != nil {
-		eu.SetAirDate(*t)
+func (eu *EpidodesUpdate) SetNillableAirDate(s *string) *EpidodesUpdate {
+	if s != nil {
+		eu.SetAirDate(*s)
 	}
 	return eu
 }
@@ -199,7 +198,7 @@ func (eu *EpidodesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(epidodes.FieldOverview, field.TypeString, value)
 	}
 	if value, ok := eu.mutation.AirDate(); ok {
-		_spec.SetField(epidodes.FieldAirDate, field.TypeTime, value)
+		_spec.SetField(epidodes.FieldAirDate, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -313,15 +312,15 @@ func (euo *EpidodesUpdateOne) SetNillableOverview(s *string) *EpidodesUpdateOne 
 }
 
 // SetAirDate sets the "air_date" field.
-func (euo *EpidodesUpdateOne) SetAirDate(t time.Time) *EpidodesUpdateOne {
-	euo.mutation.SetAirDate(t)
+func (euo *EpidodesUpdateOne) SetAirDate(s string) *EpidodesUpdateOne {
+	euo.mutation.SetAirDate(s)
 	return euo
 }
 
 // SetNillableAirDate sets the "air_date" field if the given value is not nil.
-func (euo *EpidodesUpdateOne) SetNillableAirDate(t *time.Time) *EpidodesUpdateOne {
-	if t != nil {
-		euo.SetAirDate(*t)
+func (euo *EpidodesUpdateOne) SetNillableAirDate(s *string) *EpidodesUpdateOne {
+	if s != nil {
+		euo.SetAirDate(*s)
 	}
 	return euo
 }
@@ -422,7 +421,7 @@ func (euo *EpidodesUpdateOne) sqlSave(ctx context.Context) (_node *Epidodes, err
 		_spec.SetField(epidodes.FieldOverview, field.TypeString, value)
 	}
 	if value, ok := euo.mutation.AirDate(); ok {
-		_spec.SetField(epidodes.FieldAirDate, field.TypeTime, value)
+		_spec.SetField(epidodes.FieldAirDate, field.TypeString, value)
 	}
 	_node = &Epidodes{config: euo.config}
 	_spec.Assign = _node.assignValues
