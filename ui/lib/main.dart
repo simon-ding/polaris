@@ -88,13 +88,13 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
+      body: const Center(
           // Center is a layout widget. It takes a single child and positions it
           // in the middle of the parent.
           child: Row(
         children: <Widget>[
           NavDrawer(),
-          const SearchPage(),
+          SearchPage(),
         ],
       )),
       floatingActionButton: FloatingActionButton(

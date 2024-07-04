@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:ui/APIs.dart';
@@ -38,26 +37,43 @@ class _SearchPageState extends State<SearchPage> {
     for (final item in list) {
       var m = item as Map<String, dynamic>;
       cards.add(Card(
-        margin: const EdgeInsets.all(10),
-        child: Row(
-          children: <Widget>[
-            Flexible(
-              child: SizedBox(
-                width: 150,
-                height: 200,
-                child: Image.network(
-                  tmdbImgBaseUrl + m["poster_path"],
-                  fit: BoxFit.contain,
+          margin: const EdgeInsets.all(4),
+          clipBehavior: Clip.hardEdge,
+          child: InkWell(
+            //splashColor: Colors.blue.withAlpha(30),
+            onTap: () {
+              //showDialog(context: context, builder: builder)
+              debugPrint('Card tapped.');
+            },
+            child: Row(
+              children: <Widget>[
+                Flexible(
+                  child: SizedBox(
+                    width: 150,
+                    height: 200,
+                    child: Image.network(
+                      tmdbImgBaseUrl + m["poster_path"],
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-              ),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        m["name"],
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      const Text(""),
+                      Text(m["overview"])
+                    ],
+                  ),
+                )
+              ],
             ),
-            Flexible(
-              child: ListTile(title: Text(m["name"])),
-            ),
-            Flexible(child: Text(m["overview"]))
-          ],
-        ),
-      ));
+          )));
     }
 
     return Expanded(
