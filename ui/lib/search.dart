@@ -13,7 +13,6 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   List<dynamic> list = List.empty();
-  final tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/";
 
   void _queryResults(String q) async {
     final dio = Dio();
@@ -52,7 +51,7 @@ class _SearchPageState extends State<SearchPage> {
                     width: 150,
                     height: 200,
                     child: Image.network(
-                      tmdbImgBaseUrl + m["poster_path"],
+                      APIs.tmdbImgBaseUrl + m["poster_path"],
                       fit: BoxFit.contain,
                     ),
                   ),
