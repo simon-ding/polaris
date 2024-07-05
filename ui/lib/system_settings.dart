@@ -20,6 +20,8 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
   Widget build(BuildContext context) {
     _handleRefresh();
     return Expanded(
+        child: Container(
+      padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
       child: RefreshIndicator(
           onRefresh: _handleRefresh,
           child: Form(
@@ -39,34 +41,29 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
                     return v!.trim().isNotEmpty ? null : "ApiKey 不能为空";
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 28.0),
-                  child: Row(
-                    children: <Widget>[
-                      Center(
-                        child: ElevatedButton(
-                          child: const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text("保存"),
-                          ),
-                          onPressed: () {
-                            // 通过_formKey.currentState 获取FormState后，
-                            // 调用validate()方法校验用户名密码是否合法，校验
-                            // 通过后再提交数据。
-                            if ((_formKey.currentState as FormState)
-                                .validate()) {
-                              _submitSettings(context,_tmdbApiKeyController.text);
-                            }
-                          },
-                        ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 28.0),
+                    child: ElevatedButton(
+                      child: const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text("保存"),
                       ),
-                    ],
+                      onPressed: () {
+                        // 通过_formKey.currentState 获取FormState后，
+                        // 调用validate()方法校验用户名密码是否合法，校验
+                        // 通过后再提交数据。
+                        if ((_formKey.currentState as FormState).validate()) {
+                          _submitSettings(context, _tmdbApiKeyController.text);
+                        }
+                      },
+                    ),
                   ),
                 )
               ],
             ),
           )),
-    );
+    ));
   }
 
   Future<void> _handleRefresh() async {
