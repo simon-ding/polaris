@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ui/search.dart';
+import 'package:ui/system_settings.dart';
+import 'package:ui/weclome.dart';
 
 class NavDrawer extends StatefulWidget {
   @override
@@ -27,9 +30,11 @@ class _NavDrawerState extends State<NavDrawer> {
                     _counter = value;
                   });
                   if (value == 0) {
-                    context.go('/');
+                    context.go(WelcomePage.route);
                   } else if (value == 1) {
-                    context.go("/search");
+                    context.go(SearchPage.route);
+                  } else if (value == 2) {
+                    context.go(SystemSettingsPage.route);
                   }
                 },
                 extended: MediaQuery.of(context).size.width >= 850,

@@ -29,5 +29,5 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	}
 	v := s.db.GetSetting(q)
 	log.Infof("get value for key %v: %v", q, v)
-	return v, nil
+	return gin.H{q: v}, nil
 }

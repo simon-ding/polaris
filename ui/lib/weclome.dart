@@ -3,6 +3,7 @@ import 'package:ui/APIs.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
+  static const route = "/welcome";
 
   @override
   State<StatefulWidget> createState() {

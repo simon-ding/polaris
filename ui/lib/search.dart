@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:ui/APIs.dart';
+import 'package:ui/server_response.dart';
+import 'package:ui/utils.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
+
+  static const route = "/search";
 
   @override
   State<StatefulWidget> createState() {
@@ -14,15 +18,19 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   List<dynamic> list = List.empty();
 
-  void _queryResults(String q) async {
+  void _queryResults(BuildContext context, String q) async {
     final dio = Dio();
     var resp = await dio.get(APIs.searchUrl, queryParameters: {"query": q});
     //var dy = jsonDecode(resp.data.toString());
 
     print("search page results: ${resp.data}");
+    var rsp = ServerResponse.fromJson(resp.data as Map<String, dynamic>);
+    if (rsp.code != 0 && context.mounted) {
+      Utils.showAlertDialog(context, rsp.message);
+      return;
+    }
 
-    var rsp = resp.data as Map<String, dynamic>;
-    var data = rsp["data"] as Map<String, dynamic>;
+    var data = rsp.data as Map<String, dynamic>;
     var results = data["results"] as List<dynamic>;
 
     setState(() {
@@ -80,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           TextField(
             autofocus: true,
-            onSubmitted: (value) => _queryResults(value),
+            onSubmitted: (value) => _queryResults(context,value),
             decoration: const InputDecoration(
                 labelText: "搜索",
                 hintText: "搜索剧集名称",

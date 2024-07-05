@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/navdrawer.dart';
 import 'package:ui/search.dart';
+import 'package:ui/system_settings.dart';
 import 'package:ui/weclome.dart';
 
 void main() {
@@ -41,19 +42,23 @@ class MyApp extends StatelessWidget {
       },
       routes: [
         GoRoute(
-          path: '/',
+          path: WelcomePage.route,
           builder: (context, state) => WelcomePage(),
         ),
         GoRoute(
-          path: "/search",
+          path: SearchPage.route,
           builder: (context, state) => const SearchPage(),
+        ),
+        GoRoute(
+          path: SystemSettingsPage.route,
+          builder: (context, state) => SystemSettingsPage(),
         )
       ],
     );
 
     final _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: '/',
+      initialLocation: WelcomePage.route,
       routes: [
         _shellRoute,
       ],
