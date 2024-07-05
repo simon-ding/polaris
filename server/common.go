@@ -12,6 +12,7 @@ func HttpHandler(f func(*gin.Context) (interface{}, error)) gin.HandlerFunc {
 
 		r, err := f(ctx)
 		if err != nil {
+			log.Errorf("url %v return error: %v", ctx.Request.URL, err)
 			ctx.JSON(200, Response{
 				Code:    1,
 				Message: fmt.Sprintf("%v", err),

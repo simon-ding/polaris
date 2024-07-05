@@ -62,6 +62,12 @@ func (su *SeriesUpdate) SetNillableImdbID(s *string) *SeriesUpdate {
 	return su
 }
 
+// ClearImdbID clears the value of the "imdb_id" field.
+func (su *SeriesUpdate) ClearImdbID() *SeriesUpdate {
+	su.mutation.ClearImdbID()
+	return su
+}
+
 // SetTitle sets the "title" field.
 func (su *SeriesUpdate) SetTitle(s string) *SeriesUpdate {
 	su.mutation.SetTitle(s)
@@ -118,6 +124,26 @@ func (su *SeriesUpdate) SetNillablePath(s *string) *SeriesUpdate {
 	return su
 }
 
+// SetPosterPath sets the "poster_path" field.
+func (su *SeriesUpdate) SetPosterPath(s string) *SeriesUpdate {
+	su.mutation.SetPosterPath(s)
+	return su
+}
+
+// SetNillablePosterPath sets the "poster_path" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillablePosterPath(s *string) *SeriesUpdate {
+	if s != nil {
+		su.SetPosterPath(*s)
+	}
+	return su
+}
+
+// ClearPosterPath clears the value of the "poster_path" field.
+func (su *SeriesUpdate) ClearPosterPath() *SeriesUpdate {
+	su.mutation.ClearPosterPath()
+	return su
+}
+
 // Mutation returns the SeriesMutation object of the builder.
 func (su *SeriesUpdate) Mutation() *SeriesMutation {
 	return su.mutation
@@ -168,6 +194,9 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.ImdbID(); ok {
 		_spec.SetField(series.FieldImdbID, field.TypeString, value)
 	}
+	if su.mutation.ImdbIDCleared() {
+		_spec.ClearField(series.FieldImdbID, field.TypeString)
+	}
 	if value, ok := su.mutation.Title(); ok {
 		_spec.SetField(series.FieldTitle, field.TypeString, value)
 	}
@@ -179,6 +208,12 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Path(); ok {
 		_spec.SetField(series.FieldPath, field.TypeString, value)
+	}
+	if value, ok := su.mutation.PosterPath(); ok {
+		_spec.SetField(series.FieldPosterPath, field.TypeString, value)
+	}
+	if su.mutation.PosterPathCleared() {
+		_spec.ClearField(series.FieldPosterPath, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -235,6 +270,12 @@ func (suo *SeriesUpdateOne) SetNillableImdbID(s *string) *SeriesUpdateOne {
 	return suo
 }
 
+// ClearImdbID clears the value of the "imdb_id" field.
+func (suo *SeriesUpdateOne) ClearImdbID() *SeriesUpdateOne {
+	suo.mutation.ClearImdbID()
+	return suo
+}
+
 // SetTitle sets the "title" field.
 func (suo *SeriesUpdateOne) SetTitle(s string) *SeriesUpdateOne {
 	suo.mutation.SetTitle(s)
@@ -288,6 +329,26 @@ func (suo *SeriesUpdateOne) SetNillablePath(s *string) *SeriesUpdateOne {
 	if s != nil {
 		suo.SetPath(*s)
 	}
+	return suo
+}
+
+// SetPosterPath sets the "poster_path" field.
+func (suo *SeriesUpdateOne) SetPosterPath(s string) *SeriesUpdateOne {
+	suo.mutation.SetPosterPath(s)
+	return suo
+}
+
+// SetNillablePosterPath sets the "poster_path" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillablePosterPath(s *string) *SeriesUpdateOne {
+	if s != nil {
+		suo.SetPosterPath(*s)
+	}
+	return suo
+}
+
+// ClearPosterPath clears the value of the "poster_path" field.
+func (suo *SeriesUpdateOne) ClearPosterPath() *SeriesUpdateOne {
+	suo.mutation.ClearPosterPath()
 	return suo
 }
 
@@ -371,6 +432,9 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	if value, ok := suo.mutation.ImdbID(); ok {
 		_spec.SetField(series.FieldImdbID, field.TypeString, value)
 	}
+	if suo.mutation.ImdbIDCleared() {
+		_spec.ClearField(series.FieldImdbID, field.TypeString)
+	}
 	if value, ok := suo.mutation.Title(); ok {
 		_spec.SetField(series.FieldTitle, field.TypeString, value)
 	}
@@ -382,6 +446,12 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	}
 	if value, ok := suo.mutation.Path(); ok {
 		_spec.SetField(series.FieldPath, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.PosterPath(); ok {
+		_spec.SetField(series.FieldPosterPath, field.TypeString, value)
+	}
+	if suo.mutation.PosterPathCleared() {
+		_spec.ClearField(series.FieldPosterPath, field.TypeString)
 	}
 	_node = &Series{config: suo.config}
 	_spec.Assign = _node.assignValues

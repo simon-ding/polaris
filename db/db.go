@@ -3,9 +3,11 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/ent/indexers"
+	"polaris/ent/series"
 	"polaris/ent/settings"
 	"polaris/log"
 
@@ -58,18 +60,23 @@ func (c *Client) GetLanguage() string {
 	lang := c.GetSetting(SettingLanguage)
 	log.Infof("get application language: %s", lang)
 	if lang == "" {
-		return "zh_CN"
+		return "zh-CN"
 	}
 	return lang
 }
 
 func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails) error {
+	count := c.ent.Series.Query().Where(series.TmdbID(int(detail.ID))).CountX(context.Background())
+	if (count > 0) {
+		return fmt.Errorf("tv series %s already in watchlist", detail.Name)
+	}
 	_, err := c.ent.Series.Create().
 		SetTmdbID(int(detail.ID)).
 		SetPath(path).
 		SetOverview(detail.Overview).
 		SetTitle(detail.Name).
 		SetOriginalName(detail.OriginalName).
+		SetPosterPath(detail.PosterPath).
 		Save(context.TODO())
 	return err
 }

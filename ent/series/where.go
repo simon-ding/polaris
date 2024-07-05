@@ -83,6 +83,11 @@ func Path(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldPath, v))
 }
 
+// PosterPath applies equality check predicate on the "poster_path" field. It's identical to PosterPathEQ.
+func PosterPath(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldPosterPath, v))
+}
+
 // TmdbIDEQ applies the EQ predicate on the "tmdb_id" field.
 func TmdbIDEQ(v int) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldTmdbID, v))
@@ -176,6 +181,16 @@ func ImdbIDHasPrefix(v string) predicate.Series {
 // ImdbIDHasSuffix applies the HasSuffix predicate on the "imdb_id" field.
 func ImdbIDHasSuffix(v string) predicate.Series {
 	return predicate.Series(sql.FieldHasSuffix(FieldImdbID, v))
+}
+
+// ImdbIDIsNil applies the IsNil predicate on the "imdb_id" field.
+func ImdbIDIsNil() predicate.Series {
+	return predicate.Series(sql.FieldIsNull(FieldImdbID))
+}
+
+// ImdbIDNotNil applies the NotNil predicate on the "imdb_id" field.
+func ImdbIDNotNil() predicate.Series {
+	return predicate.Series(sql.FieldNotNull(FieldImdbID))
 }
 
 // ImdbIDEqualFold applies the EqualFold predicate on the "imdb_id" field.
@@ -446,6 +461,81 @@ func PathEqualFold(v string) predicate.Series {
 // PathContainsFold applies the ContainsFold predicate on the "path" field.
 func PathContainsFold(v string) predicate.Series {
 	return predicate.Series(sql.FieldContainsFold(FieldPath, v))
+}
+
+// PosterPathEQ applies the EQ predicate on the "poster_path" field.
+func PosterPathEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldPosterPath, v))
+}
+
+// PosterPathNEQ applies the NEQ predicate on the "poster_path" field.
+func PosterPathNEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldPosterPath, v))
+}
+
+// PosterPathIn applies the In predicate on the "poster_path" field.
+func PosterPathIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldPosterPath, vs...))
+}
+
+// PosterPathNotIn applies the NotIn predicate on the "poster_path" field.
+func PosterPathNotIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldPosterPath, vs...))
+}
+
+// PosterPathGT applies the GT predicate on the "poster_path" field.
+func PosterPathGT(v string) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldPosterPath, v))
+}
+
+// PosterPathGTE applies the GTE predicate on the "poster_path" field.
+func PosterPathGTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldPosterPath, v))
+}
+
+// PosterPathLT applies the LT predicate on the "poster_path" field.
+func PosterPathLT(v string) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldPosterPath, v))
+}
+
+// PosterPathLTE applies the LTE predicate on the "poster_path" field.
+func PosterPathLTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldPosterPath, v))
+}
+
+// PosterPathContains applies the Contains predicate on the "poster_path" field.
+func PosterPathContains(v string) predicate.Series {
+	return predicate.Series(sql.FieldContains(FieldPosterPath, v))
+}
+
+// PosterPathHasPrefix applies the HasPrefix predicate on the "poster_path" field.
+func PosterPathHasPrefix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasPrefix(FieldPosterPath, v))
+}
+
+// PosterPathHasSuffix applies the HasSuffix predicate on the "poster_path" field.
+func PosterPathHasSuffix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasSuffix(FieldPosterPath, v))
+}
+
+// PosterPathIsNil applies the IsNil predicate on the "poster_path" field.
+func PosterPathIsNil() predicate.Series {
+	return predicate.Series(sql.FieldIsNull(FieldPosterPath))
+}
+
+// PosterPathNotNil applies the NotNil predicate on the "poster_path" field.
+func PosterPathNotNil() predicate.Series {
+	return predicate.Series(sql.FieldNotNull(FieldPosterPath))
+}
+
+// PosterPathEqualFold applies the EqualFold predicate on the "poster_path" field.
+func PosterPathEqualFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldEqualFold(FieldPosterPath, v))
+}
+
+// PosterPathContainsFold applies the ContainsFold predicate on the "poster_path" field.
+func PosterPathContainsFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldContainsFold(FieldPosterPath, v))
 }
 
 // And groups predicates with the AND operator between them.

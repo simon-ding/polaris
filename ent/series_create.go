@@ -31,6 +31,14 @@ func (sc *SeriesCreate) SetImdbID(s string) *SeriesCreate {
 	return sc
 }
 
+// SetNillableImdbID sets the "imdb_id" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillableImdbID(s *string) *SeriesCreate {
+	if s != nil {
+		sc.SetImdbID(*s)
+	}
+	return sc
+}
+
 // SetTitle sets the "title" field.
 func (sc *SeriesCreate) SetTitle(s string) *SeriesCreate {
 	sc.mutation.SetTitle(s)
@@ -52,6 +60,20 @@ func (sc *SeriesCreate) SetOverview(s string) *SeriesCreate {
 // SetPath sets the "path" field.
 func (sc *SeriesCreate) SetPath(s string) *SeriesCreate {
 	sc.mutation.SetPath(s)
+	return sc
+}
+
+// SetPosterPath sets the "poster_path" field.
+func (sc *SeriesCreate) SetPosterPath(s string) *SeriesCreate {
+	sc.mutation.SetPosterPath(s)
+	return sc
+}
+
+// SetNillablePosterPath sets the "poster_path" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillablePosterPath(s *string) *SeriesCreate {
+	if s != nil {
+		sc.SetPosterPath(*s)
+	}
 	return sc
 }
 
@@ -91,9 +113,6 @@ func (sc *SeriesCreate) ExecX(ctx context.Context) {
 func (sc *SeriesCreate) check() error {
 	if _, ok := sc.mutation.TmdbID(); !ok {
 		return &ValidationError{Name: "tmdb_id", err: errors.New(`ent: missing required field "Series.tmdb_id"`)}
-	}
-	if _, ok := sc.mutation.ImdbID(); !ok {
-		return &ValidationError{Name: "imdb_id", err: errors.New(`ent: missing required field "Series.imdb_id"`)}
 	}
 	if _, ok := sc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Series.title"`)}
@@ -156,6 +175,10 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Path(); ok {
 		_spec.SetField(series.FieldPath, field.TypeString, value)
 		_node.Path = value
+	}
+	if value, ok := sc.mutation.PosterPath(); ok {
+		_spec.SetField(series.FieldPosterPath, field.TypeString, value)
+		_node.PosterPath = value
 	}
 	return _node, _spec
 }

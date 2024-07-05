@@ -6,6 +6,8 @@ import 'package:ui/utils.dart';
 
 class SystemSettingsPage extends StatefulWidget {
   static const route = "/systemsettings";
+
+  const SystemSettingsPage({super.key});
   @override
   State<StatefulWidget> createState() {
     return _SystemSettingsPageState();
@@ -19,8 +21,7 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
   @override
   Widget build(BuildContext context) {
     _handleRefresh();
-    return Expanded(
-        child: Container(
+    return Container(
       padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
       child: RefreshIndicator(
           onRefresh: _handleRefresh,
@@ -63,7 +64,7 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
               ],
             ),
           )),
-    ));
+    );
   }
 
   Future<void> _handleRefresh() async {

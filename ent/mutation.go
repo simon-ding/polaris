@@ -2749,6 +2749,7 @@ type SeriesMutation struct {
 	original_name *string
 	overview      *string
 	_path         *string
+	poster_path   *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Series, error)
@@ -2940,9 +2941,22 @@ func (m *SeriesMutation) OldImdbID(ctx context.Context) (v string, err error) {
 	return oldValue.ImdbID, nil
 }
 
+// ClearImdbID clears the value of the "imdb_id" field.
+func (m *SeriesMutation) ClearImdbID() {
+	m.imdb_id = nil
+	m.clearedFields[series.FieldImdbID] = struct{}{}
+}
+
+// ImdbIDCleared returns if the "imdb_id" field was cleared in this mutation.
+func (m *SeriesMutation) ImdbIDCleared() bool {
+	_, ok := m.clearedFields[series.FieldImdbID]
+	return ok
+}
+
 // ResetImdbID resets all changes to the "imdb_id" field.
 func (m *SeriesMutation) ResetImdbID() {
 	m.imdb_id = nil
+	delete(m.clearedFields, series.FieldImdbID)
 }
 
 // SetTitle sets the "title" field.
@@ -3089,6 +3103,55 @@ func (m *SeriesMutation) ResetPath() {
 	m._path = nil
 }
 
+// SetPosterPath sets the "poster_path" field.
+func (m *SeriesMutation) SetPosterPath(s string) {
+	m.poster_path = &s
+}
+
+// PosterPath returns the value of the "poster_path" field in the mutation.
+func (m *SeriesMutation) PosterPath() (r string, exists bool) {
+	v := m.poster_path
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPosterPath returns the old "poster_path" field's value of the Series entity.
+// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeriesMutation) OldPosterPath(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPosterPath is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPosterPath requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPosterPath: %w", err)
+	}
+	return oldValue.PosterPath, nil
+}
+
+// ClearPosterPath clears the value of the "poster_path" field.
+func (m *SeriesMutation) ClearPosterPath() {
+	m.poster_path = nil
+	m.clearedFields[series.FieldPosterPath] = struct{}{}
+}
+
+// PosterPathCleared returns if the "poster_path" field was cleared in this mutation.
+func (m *SeriesMutation) PosterPathCleared() bool {
+	_, ok := m.clearedFields[series.FieldPosterPath]
+	return ok
+}
+
+// ResetPosterPath resets all changes to the "poster_path" field.
+func (m *SeriesMutation) ResetPosterPath() {
+	m.poster_path = nil
+	delete(m.clearedFields, series.FieldPosterPath)
+}
+
 // Where appends a list predicates to the SeriesMutation builder.
 func (m *SeriesMutation) Where(ps ...predicate.Series) {
 	m.predicates = append(m.predicates, ps...)
@@ -3123,7 +3186,7 @@ func (m *SeriesMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SeriesMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.tmdb_id != nil {
 		fields = append(fields, series.FieldTmdbID)
 	}
@@ -3141,6 +3204,9 @@ func (m *SeriesMutation) Fields() []string {
 	}
 	if m._path != nil {
 		fields = append(fields, series.FieldPath)
+	}
+	if m.poster_path != nil {
+		fields = append(fields, series.FieldPosterPath)
 	}
 	return fields
 }
@@ -3162,6 +3228,8 @@ func (m *SeriesMutation) Field(name string) (ent.Value, bool) {
 		return m.Overview()
 	case series.FieldPath:
 		return m.Path()
+	case series.FieldPosterPath:
+		return m.PosterPath()
 	}
 	return nil, false
 }
@@ -3183,6 +3251,8 @@ func (m *SeriesMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldOverview(ctx)
 	case series.FieldPath:
 		return m.OldPath(ctx)
+	case series.FieldPosterPath:
+		return m.OldPosterPath(ctx)
 	}
 	return nil, fmt.Errorf("unknown Series field %s", name)
 }
@@ -3234,6 +3304,13 @@ func (m *SeriesMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPath(v)
 		return nil
+	case series.FieldPosterPath:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPosterPath(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Series field %s", name)
 }
@@ -3278,7 +3355,14 @@ func (m *SeriesMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SeriesMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(series.FieldImdbID) {
+		fields = append(fields, series.FieldImdbID)
+	}
+	if m.FieldCleared(series.FieldPosterPath) {
+		fields = append(fields, series.FieldPosterPath)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3291,6 +3375,14 @@ func (m *SeriesMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SeriesMutation) ClearField(name string) error {
+	switch name {
+	case series.FieldImdbID:
+		m.ClearImdbID()
+		return nil
+	case series.FieldPosterPath:
+		m.ClearPosterPath()
+		return nil
+	}
 	return fmt.Errorf("unknown Series nullable field %s", name)
 }
 
@@ -3315,6 +3407,9 @@ func (m *SeriesMutation) ResetField(name string) error {
 		return nil
 	case series.FieldPath:
 		m.ResetPath()
+		return nil
+	case series.FieldPosterPath:
+		m.ResetPosterPath()
 		return nil
 	}
 	return fmt.Errorf("unknown Series field %s", name)

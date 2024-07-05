@@ -23,6 +23,8 @@ const (
 	FieldOverview = "overview"
 	// FieldPath holds the string denoting the path field in the database.
 	FieldPath = "path"
+	// FieldPosterPath holds the string denoting the poster_path field in the database.
+	FieldPosterPath = "poster_path"
 	// Table holds the table name of the series in the database.
 	Table = "series"
 )
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldOriginalName,
 	FieldOverview,
 	FieldPath,
+	FieldPosterPath,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -84,4 +87,9 @@ func ByOverview(opts ...sql.OrderTermOption) OrderOption {
 // ByPath orders the results by the path field.
 func ByPath(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPath, opts...).ToFunc()
+}
+
+// ByPosterPath orders the results by the poster_path field.
+func ByPosterPath(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPosterPath, opts...).ToFunc()
 }

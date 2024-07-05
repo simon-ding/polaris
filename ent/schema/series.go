@@ -14,11 +14,12 @@ type Series struct {
 func (Series) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("tmdb_id"),
-		field.String("imdb_id"),
+		field.String("imdb_id").Optional(),
 		field.String("title"),
 		field.String("original_name"),
 		field.String("overview"),
 		field.String("path"),
+		field.String("poster_path").Optional(),
 	}
 }
 

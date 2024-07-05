@@ -1,6 +1,8 @@
 package tmdb
 
 import (
+	"polaris/log"
+
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/pkg/errors"
 )
@@ -23,6 +25,7 @@ func NewClient(apiKey string) (*Client, error) {
 }
 
 func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) {
+	log.Infof("tv id %d, language %s", id, language)
 	language = wrapLanguage(language)
 	d, err := c.tmdbClient.GetTVDetails(id, withLangOption(language))
 	return d, err

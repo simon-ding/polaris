@@ -27,7 +27,9 @@ type Series struct {
 	// Overview holds the value of the "overview" field.
 	Overview string `json:"overview,omitempty"`
 	// Path holds the value of the "path" field.
-	Path         string `json:"path,omitempty"`
+	Path string `json:"path,omitempty"`
+	// PosterPath holds the value of the "poster_path" field.
+	PosterPath   string `json:"poster_path,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -38,7 +40,7 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case series.FieldID, series.FieldTmdbID:
 			values[i] = new(sql.NullInt64)
-		case series.FieldImdbID, series.FieldTitle, series.FieldOriginalName, series.FieldOverview, series.FieldPath:
+		case series.FieldImdbID, series.FieldTitle, series.FieldOriginalName, series.FieldOverview, series.FieldPath, series.FieldPosterPath:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -97,6 +99,12 @@ func (s *Series) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Path = value.String
 			}
+		case series.FieldPosterPath:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field poster_path", values[i])
+			} else if value.Valid {
+				s.PosterPath = value.String
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -150,6 +158,9 @@ func (s *Series) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("path=")
 	builder.WriteString(s.Path)
+	builder.WriteString(", ")
+	builder.WriteString("poster_path=")
+	builder.WriteString(s.PosterPath)
 	builder.WriteByte(')')
 	return builder.String()
 }

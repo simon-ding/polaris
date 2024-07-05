@@ -31,17 +31,19 @@ type addWatchlistIn struct {
 
 func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 	var in addWatchlistIn
-	if err := c.ShouldBindQuery(&in); err != nil {
+	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
 	detail, err := s.MustTMDB().GetTvDetails(in.ID, s.language)
 	if err != nil {
 		return nil, errors.Wrap(err, "get tv detail")
 	}
+	log.Infof("find detail for tv id %d: %v", in.ID, detail)
 	 
 	if err := s.db.AddWatchlist(in.RootFolder, detail); err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}
+	log.Infof("save watchlist success: %s", detail.Name)
 
 	for _, season := range detail.Seasons {
 		seasonId := season.SeasonNumber

@@ -42,7 +42,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     var cards = List<Widget>.empty(growable: true);
     for (final item in list) {
-      var m = item as Map<String, dynamic>;
+      var m = SearchResult.fromJson(item);
       cards.add(Card(
           margin: const EdgeInsets.all(4),
           clipBehavior: Clip.hardEdge,
@@ -50,7 +50,7 @@ class _SearchPageState extends State<SearchPage> {
             //splashColor: Colors.blue.withAlpha(30),
             onTap: () {
               //showDialog(context: context, builder: builder)
-              debugPrint('Card tapped.');
+              _showSubmitDialog(context, m);
             },
             child: Row(
               children: <Widget>[
@@ -59,7 +59,7 @@ class _SearchPageState extends State<SearchPage> {
                     width: 150,
                     height: 200,
                     child: Image.network(
-                      APIs.tmdbImgBaseUrl + m["poster_path"],
+                      APIs.tmdbImgBaseUrl + m.posterPath!,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -69,12 +69,12 @@ class _SearchPageState extends State<SearchPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        m["name"],
+                        m.name!,
                         style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       const Text(""),
-                      Text(m["overview"])
+                      Text(m.overview!)
                     ],
                   ),
                 )
@@ -83,24 +83,63 @@ class _SearchPageState extends State<SearchPage> {
           )));
     }
 
-    return Expanded(
-      child: Column(
-        children: [
-          TextField(
-            autofocus: true,
-            onSubmitted: (value) => _queryResults(context,value),
-            decoration: const InputDecoration(
-                labelText: "搜索",
-                hintText: "搜索剧集名称",
-                prefixIcon: Icon(Icons.search)),
-          ),
-          Expanded(
-              child: ListView(
-            children: cards,
-          ))
-        ],
-      ),
+    return Column(
+      children: [
+        TextField(
+          autofocus: true,
+          onSubmitted: (value) => _queryResults(context, value),
+          decoration: const InputDecoration(
+              labelText: "搜索",
+              hintText: "搜索剧集名称",
+              prefixIcon: Icon(Icons.search)),
+        ),
+        Expanded(
+            child: ListView(
+          children: cards,
+        ))
+      ],
     );
+  }
+
+  Future<void> _showSubmitDialog(BuildContext context, SearchResult item) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('添加剧集'),
+            content: Text("是否添加剧集: ${item.name}"),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('取消'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('确定'),
+                onPressed: () {
+                  _submit2Watchlist(context, item.id!);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _submit2Watchlist(BuildContext context, int id) async {
+    var resp = await Dio()
+        .post(APIs.watchlistUrl, data: {"id": id, "folder": "/downloads"});
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0 && context.mounted) {
+      Utils.showAlertDialog(context, sp.message);
+    }
   }
 }
 
@@ -140,5 +179,52 @@ class _SearchBarAppState extends State<SearchBarApp> {
         );
       });
     });
+  }
+}
+
+class SearchResult {
+  String? originalName;
+  int? id;
+  String? name;
+  int? voteCount;
+  double? voteAverage;
+  String? posterPath;
+  String? firstAirDate;
+  double? popularity;
+  List<int>? genreIds;
+  String? originalLanguage;
+  String? backdropPath;
+  String? overview;
+  List<String>? originCountry;
+
+  SearchResult(
+      {this.originalName,
+      this.id,
+      this.name,
+      this.voteCount,
+      this.voteAverage,
+      this.posterPath,
+      this.firstAirDate,
+      this.popularity,
+      this.genreIds,
+      this.originalLanguage,
+      this.backdropPath,
+      this.overview,
+      this.originCountry});
+
+  SearchResult.fromJson(Map<String, dynamic> json) {
+    originalName = json['original_name'];
+    id = json['id'];
+    name = json['name'];
+    voteCount = json['vote_count'];
+    voteAverage = json['vote_average'];
+    posterPath = json['poster_path'];
+    firstAirDate = json['first_air_date'];
+    popularity = json['popularity'];
+    genreIds = json['genre_ids'].cast<int>();
+    originalLanguage = json['original_language'];
+    backdropPath = json['backdrop_path'];
+    overview = json['overview'];
+    originCountry = json['origin_country'].cast<String>();
   }
 }

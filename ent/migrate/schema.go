@@ -78,11 +78,12 @@ var (
 	SeriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tmdb_id", Type: field.TypeInt},
-		{Name: "imdb_id", Type: field.TypeString},
+		{Name: "imdb_id", Type: field.TypeString, Nullable: true},
 		{Name: "title", Type: field.TypeString},
 		{Name: "original_name", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
 		{Name: "path", Type: field.TypeString},
+		{Name: "poster_path", Type: field.TypeString, Nullable: true},
 	}
 	// SeriesTable holds the schema information for the "series" table.
 	SeriesTable = &schema.Table{
