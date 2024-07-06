@@ -6,6 +6,8 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/ent/indexers"
 	"polaris/ent/schema"
+	"polaris/ent/series"
+	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -48,4 +50,10 @@ func init() {
 	indexersDescEnableRss := indexersFields[3].Descriptor()
 	// indexers.DefaultEnableRss holds the default value on creation for the enable_rss field.
 	indexers.DefaultEnableRss = indexersDescEnableRss.Default.(bool)
+	seriesFields := schema.Series{}.Fields()
+	_ = seriesFields
+	// seriesDescCreatedAt is the schema descriptor for created_at field.
+	seriesDescCreatedAt := seriesFields[7].Descriptor()
+	// series.DefaultCreatedAt holds the default value on creation for the created_at field.
+	series.DefaultCreatedAt = seriesDescCreatedAt.Default.(time.Time)
 }

@@ -3,6 +3,8 @@
 package series
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -25,6 +27,8 @@ const (
 	FieldPath = "path"
 	// FieldPosterPath holds the string denoting the poster_path field in the database.
 	FieldPosterPath = "poster_path"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
 	// Table holds the table name of the series in the database.
 	Table = "series"
 )
@@ -39,6 +43,7 @@ var Columns = []string{
 	FieldOverview,
 	FieldPath,
 	FieldPosterPath,
+	FieldCreatedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -50,6 +55,11 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt time.Time
+)
 
 // OrderOption defines the ordering options for the Series queries.
 type OrderOption func(*sql.Selector)
@@ -92,4 +102,9 @@ func ByPath(opts ...sql.OrderTermOption) OrderOption {
 // ByPosterPath orders the results by the poster_path field.
 func ByPosterPath(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPosterPath, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }

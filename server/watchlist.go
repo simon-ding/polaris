@@ -1,6 +1,7 @@
 package server
 
 import (
+	"polaris/ent"
 	"polaris/log"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +26,7 @@ func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
 }
 
 type addWatchlistIn struct {
-	ID         int `json:"id" binding:"required"`
+	ID         int    `json:"id" binding:"required"`
 	RootFolder string `json:"folder" binding:"required"`
 }
 
@@ -39,23 +40,32 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "get tv detail")
 	}
 	log.Infof("find detail for tv id %d: %v", in.ID, detail)
-	 
-	if err := s.db.AddWatchlist(in.RootFolder, detail); err != nil {
+
+	wl, err := s.db.AddWatchlist(in.RootFolder, detail)
+	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}
 	log.Infof("save watchlist success: %s", detail.Name)
 
 	for _, season := range detail.Seasons {
 		seasonId := season.SeasonNumber
-		for  i := 1; i <= season.EpisodeCount; i++ {
-			ep, err := s.MustTMDB().GetEposideDetail(int(detail.ID), seasonId, i, s.language)
+		se, err := s.MustTMDB().GetSeasonDetails(int(detail.ID), seasonId, s.language)
+		if err != nil {
+			log.Errorf("get season detail (%s) error: %v", detail.Name, err)
+			continue
+		}
+		for _, ep := range se.Episodes {
+			err = s.db.SaveEposideDetail(&ent.Epidodes{
+				SeriesID:      wl.ID,
+				SeasonNumber:  seasonId,
+				EpisodeNumber: ep.EpisodeNumber,
+				Title:         ep.Name,
+				Overview:      ep.Overview,
+				AirDate:       ep.AirDate,
+			})
 			if err != nil {
-				log.Errorf("get eposide detail: %v", err)
-				return nil, errors.Wrap(err, "get eposide detail")
-			}
-			err = s.db.SaveEposideDetail(int(detail.ID), ep)
-			if err != nil {
-				return nil, errors.Wrap(err, "save episode")
+				log.Errorf("save episode info error: %v", err)
+				continue
 			}
 		}
 	}

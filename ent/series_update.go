@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"polaris/ent/predicate"
 	"polaris/ent/series"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -144,6 +145,20 @@ func (su *SeriesUpdate) ClearPosterPath() *SeriesUpdate {
 	return su
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (su *SeriesUpdate) SetCreatedAt(t time.Time) *SeriesUpdate {
+	su.mutation.SetCreatedAt(t)
+	return su
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableCreatedAt(t *time.Time) *SeriesUpdate {
+	if t != nil {
+		su.SetCreatedAt(*t)
+	}
+	return su
+}
+
 // Mutation returns the SeriesMutation object of the builder.
 func (su *SeriesUpdate) Mutation() *SeriesMutation {
 	return su.mutation
@@ -214,6 +229,9 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.PosterPathCleared() {
 		_spec.ClearField(series.FieldPosterPath, field.TypeString)
+	}
+	if value, ok := su.mutation.CreatedAt(); ok {
+		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -352,6 +370,20 @@ func (suo *SeriesUpdateOne) ClearPosterPath() *SeriesUpdateOne {
 	return suo
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (suo *SeriesUpdateOne) SetCreatedAt(t time.Time) *SeriesUpdateOne {
+	suo.mutation.SetCreatedAt(t)
+	return suo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableCreatedAt(t *time.Time) *SeriesUpdateOne {
+	if t != nil {
+		suo.SetCreatedAt(*t)
+	}
+	return suo
+}
+
 // Mutation returns the SeriesMutation object of the builder.
 func (suo *SeriesUpdateOne) Mutation() *SeriesMutation {
 	return suo.mutation
@@ -452,6 +484,9 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	}
 	if suo.mutation.PosterPathCleared() {
 		_spec.ClearField(series.FieldPosterPath, field.TypeString)
+	}
+	if value, ok := suo.mutation.CreatedAt(); ok {
+		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
 	}
 	_node = &Series{config: suo.config}
 	_spec.Assign = _node.assignValues

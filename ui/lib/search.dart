@@ -69,7 +69,7 @@ class _SearchPageState extends State<SearchPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        m.name!,
+                        "${m.name} (${m.firstAirDate?.split("-")[0]})",
                         style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.bold),
                       ),

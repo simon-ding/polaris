@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -20,6 +22,7 @@ func (Series) Fields() []ent.Field {
 		field.String("overview"),
 		field.String("path"),
 		field.String("poster_path").Optional(),
+		field.Time("created_at").Default(time.Now()),
 	}
 }
 

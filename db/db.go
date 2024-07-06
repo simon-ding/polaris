@@ -65,12 +65,12 @@ func (c *Client) GetLanguage() string {
 	return lang
 }
 
-func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails) error {
+func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails) (*ent.Series, error) {
 	count := c.ent.Series.Query().Where(series.TmdbID(int(detail.ID))).CountX(context.Background())
 	if (count > 0) {
-		return fmt.Errorf("tv series %s already in watchlist", detail.Name)
+		return nil, fmt.Errorf("tv series %s already in watchlist", detail.Name)
 	}
-	_, err := c.ent.Series.Create().
+	r, err := c.ent.Series.Create().
 		SetTmdbID(int(detail.ID)).
 		SetPath(path).
 		SetOverview(detail.Overview).
@@ -78,7 +78,7 @@ func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails) error {
 		SetOriginalName(detail.OriginalName).
 		SetPosterPath(detail.PosterPath).
 		Save(context.TODO())
-	return err
+	return r, err
 }
 
 func (c *Client) GetWatchlist() []*ent.Series {
@@ -90,14 +90,14 @@ func (c *Client) GetWatchlist() []*ent.Series {
 	return list
 }
 
-func (c *Client) SaveEposideDetail(tmdbId int, d *tmdb.TVEpisodeDetails) error {
+func (c *Client) SaveEposideDetail(d *ent.Epidodes) error {
 	_, err := c.ent.Epidodes.Create().
 		SetAirDate(d.AirDate).
 		SetSeasonNumber(d.SeasonNumber).
 		SetEpisodeNumber(d.EpisodeNumber).
-		SetSeriesID(tmdbId).
+		SetSeriesID(d.SeriesID).
 		SetOverview(d.Overview).
-		SetTitle(d.Name).Save(context.TODO())
+		SetTitle(d.Title).Save(context.TODO())
 
 	return err
 }

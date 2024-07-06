@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/series"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -77,6 +78,20 @@ func (sc *SeriesCreate) SetNillablePosterPath(s *string) *SeriesCreate {
 	return sc
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (sc *SeriesCreate) SetCreatedAt(t time.Time) *SeriesCreate {
+	sc.mutation.SetCreatedAt(t)
+	return sc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillableCreatedAt(t *time.Time) *SeriesCreate {
+	if t != nil {
+		sc.SetCreatedAt(*t)
+	}
+	return sc
+}
+
 // Mutation returns the SeriesMutation object of the builder.
 func (sc *SeriesCreate) Mutation() *SeriesMutation {
 	return sc.mutation
@@ -84,6 +99,7 @@ func (sc *SeriesCreate) Mutation() *SeriesMutation {
 
 // Save creates the Series in the database.
 func (sc *SeriesCreate) Save(ctx context.Context) (*Series, error) {
+	sc.defaults()
 	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
 }
 
@@ -109,6 +125,14 @@ func (sc *SeriesCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (sc *SeriesCreate) defaults() {
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		v := series.DefaultCreatedAt
+		sc.mutation.SetCreatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (sc *SeriesCreate) check() error {
 	if _, ok := sc.mutation.TmdbID(); !ok {
@@ -125,6 +149,9 @@ func (sc *SeriesCreate) check() error {
 	}
 	if _, ok := sc.mutation.Path(); !ok {
 		return &ValidationError{Name: "path", err: errors.New(`ent: missing required field "Series.path"`)}
+	}
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Series.created_at"`)}
 	}
 	return nil
 }
@@ -180,6 +207,10 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 		_spec.SetField(series.FieldPosterPath, field.TypeString, value)
 		_node.PosterPath = value
 	}
+	if value, ok := sc.mutation.CreatedAt(); ok {
+		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
 	return _node, _spec
 }
 
@@ -201,6 +232,7 @@ func (scb *SeriesCreateBulk) Save(ctx context.Context) ([]*Series, error) {
 	for i := range scb.builders {
 		func(i int, root context.Context) {
 			builder := scb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*SeriesMutation)
 				if !ok {

@@ -37,7 +37,7 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
                     labelText: "TMDB Api Key",
                     icon: Icon(Icons.key),
                   ),
-                  // 校验用户名
+                  // 
                   validator: (v) {
                     return v!.trim().isNotEmpty ? null : "ApiKey 不能为空";
                   },

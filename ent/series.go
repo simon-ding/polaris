@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"polaris/ent/series"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -29,7 +30,9 @@ type Series struct {
 	// Path holds the value of the "path" field.
 	Path string `json:"path,omitempty"`
 	// PosterPath holds the value of the "poster_path" field.
-	PosterPath   string `json:"poster_path,omitempty"`
+	PosterPath string `json:"poster_path,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt    time.Time `json:"created_at,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -42,6 +45,8 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case series.FieldImdbID, series.FieldTitle, series.FieldOriginalName, series.FieldOverview, series.FieldPath, series.FieldPosterPath:
 			values[i] = new(sql.NullString)
+		case series.FieldCreatedAt:
+			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -105,6 +110,12 @@ func (s *Series) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.PosterPath = value.String
 			}
+		case series.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				s.CreatedAt = value.Time
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -161,6 +172,9 @@ func (s *Series) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("poster_path=")
 	builder.WriteString(s.PosterPath)
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

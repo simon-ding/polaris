@@ -44,6 +44,10 @@ func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language 
 	return d, err
 }
 
+func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.TVSeasonDetails, error) {
+	return c.tmdbClient.GetTVSeasonDetails(id, seasonNumber, withLangOption(language))
+}
+
 func wrapLanguage(lang string) string {
 	if lang == "" {
 		lang = "zh-CN"
