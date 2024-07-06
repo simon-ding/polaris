@@ -48,7 +48,7 @@ class _WeclomePageState extends State<WelcomePage> {
                           ),
                           Flexible(
                             child: Text(
-                              item.title!,
+                              item.name!,
                               style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),
@@ -75,7 +75,7 @@ class _WeclomePageState extends State<WelcomePage> {
 class TvSeries {
   int? id;
   int? tmdbId;
-  String? title;
+  String? name;
   String? originalName;
   String? overview;
   String? path;
@@ -84,7 +84,7 @@ class TvSeries {
   TvSeries(
       {this.id,
       this.tmdbId,
-      this.title,
+      this.name,
       this.originalName,
       this.overview,
       this.path,
@@ -93,7 +93,7 @@ class TvSeries {
   TvSeries.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     tmdbId = json['tmdb_id'];
-    title = json['title'];
+    name = json['name'];
     originalName = json['original_name'];
     overview = json['overview'];
     path = json['path'];

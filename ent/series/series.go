@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,8 @@ const (
 	FieldTmdbID = "tmdb_id"
 	// FieldImdbID holds the string denoting the imdb_id field in the database.
 	FieldImdbID = "imdb_id"
-	// FieldTitle holds the string denoting the title field in the database.
-	FieldTitle = "title"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldOriginalName holds the string denoting the original_name field in the database.
 	FieldOriginalName = "original_name"
 	// FieldOverview holds the string denoting the overview field in the database.
@@ -29,8 +30,17 @@ const (
 	FieldPosterPath = "poster_path"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
+	EdgeEpisodes = "episodes"
 	// Table holds the table name of the series in the database.
 	Table = "series"
+	// EpisodesTable is the table that holds the episodes relation/edge.
+	EpisodesTable = "episodes"
+	// EpisodesInverseTable is the table name for the Episode entity.
+	// It exists in this package in order to avoid circular dependency with the "episode" package.
+	EpisodesInverseTable = "episodes"
+	// EpisodesColumn is the table column denoting the episodes relation/edge.
+	EpisodesColumn = "series_episodes"
 )
 
 // Columns holds all SQL columns for series fields.
@@ -38,7 +48,7 @@ var Columns = []string{
 	FieldID,
 	FieldTmdbID,
 	FieldImdbID,
-	FieldTitle,
+	FieldName,
 	FieldOriginalName,
 	FieldOverview,
 	FieldPath,
@@ -79,9 +89,9 @@ func ByImdbID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldImdbID, opts...).ToFunc()
 }
 
-// ByTitle orders the results by the title field.
-func ByTitle(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
 // ByOriginalName orders the results by the original_name field.
@@ -107,4 +117,25 @@ func ByPosterPath(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByEpisodesCount orders the results by episodes count.
+func ByEpisodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEpisodesStep(), opts...)
+	}
+}
+
+// ByEpisodes orders the results by episodes terms.
+func ByEpisodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEpisodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newEpisodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EpisodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EpisodesTable, EpisodesColumn),
+	)
 }

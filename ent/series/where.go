@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -64,9 +65,9 @@ func ImdbID(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldImdbID, v))
 }
 
-// Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
-func Title(v string) predicate.Series {
-	return predicate.Series(sql.FieldEQ(FieldTitle, v))
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldName, v))
 }
 
 // OriginalName applies equality check predicate on the "original_name" field. It's identical to OriginalNameEQ.
@@ -209,69 +210,69 @@ func ImdbIDContainsFold(v string) predicate.Series {
 	return predicate.Series(sql.FieldContainsFold(FieldImdbID, v))
 }
 
-// TitleEQ applies the EQ predicate on the "title" field.
-func TitleEQ(v string) predicate.Series {
-	return predicate.Series(sql.FieldEQ(FieldTitle, v))
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldName, v))
 }
 
-// TitleNEQ applies the NEQ predicate on the "title" field.
-func TitleNEQ(v string) predicate.Series {
-	return predicate.Series(sql.FieldNEQ(FieldTitle, v))
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldName, v))
 }
 
-// TitleIn applies the In predicate on the "title" field.
-func TitleIn(vs ...string) predicate.Series {
-	return predicate.Series(sql.FieldIn(FieldTitle, vs...))
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldName, vs...))
 }
 
-// TitleNotIn applies the NotIn predicate on the "title" field.
-func TitleNotIn(vs ...string) predicate.Series {
-	return predicate.Series(sql.FieldNotIn(FieldTitle, vs...))
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldName, vs...))
 }
 
-// TitleGT applies the GT predicate on the "title" field.
-func TitleGT(v string) predicate.Series {
-	return predicate.Series(sql.FieldGT(FieldTitle, v))
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldName, v))
 }
 
-// TitleGTE applies the GTE predicate on the "title" field.
-func TitleGTE(v string) predicate.Series {
-	return predicate.Series(sql.FieldGTE(FieldTitle, v))
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldName, v))
 }
 
-// TitleLT applies the LT predicate on the "title" field.
-func TitleLT(v string) predicate.Series {
-	return predicate.Series(sql.FieldLT(FieldTitle, v))
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldName, v))
 }
 
-// TitleLTE applies the LTE predicate on the "title" field.
-func TitleLTE(v string) predicate.Series {
-	return predicate.Series(sql.FieldLTE(FieldTitle, v))
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldName, v))
 }
 
-// TitleContains applies the Contains predicate on the "title" field.
-func TitleContains(v string) predicate.Series {
-	return predicate.Series(sql.FieldContains(FieldTitle, v))
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Series {
+	return predicate.Series(sql.FieldContains(FieldName, v))
 }
 
-// TitleHasPrefix applies the HasPrefix predicate on the "title" field.
-func TitleHasPrefix(v string) predicate.Series {
-	return predicate.Series(sql.FieldHasPrefix(FieldTitle, v))
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasPrefix(FieldName, v))
 }
 
-// TitleHasSuffix applies the HasSuffix predicate on the "title" field.
-func TitleHasSuffix(v string) predicate.Series {
-	return predicate.Series(sql.FieldHasSuffix(FieldTitle, v))
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasSuffix(FieldName, v))
 }
 
-// TitleEqualFold applies the EqualFold predicate on the "title" field.
-func TitleEqualFold(v string) predicate.Series {
-	return predicate.Series(sql.FieldEqualFold(FieldTitle, v))
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldEqualFold(FieldName, v))
 }
 
-// TitleContainsFold applies the ContainsFold predicate on the "title" field.
-func TitleContainsFold(v string) predicate.Series {
-	return predicate.Series(sql.FieldContainsFold(FieldTitle, v))
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldContainsFold(FieldName, v))
 }
 
 // OriginalNameEQ applies the EQ predicate on the "original_name" field.
@@ -582,6 +583,29 @@ func CreatedAtLT(v time.Time) predicate.Series {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Series {
 	return predicate.Series(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// HasEpisodes applies the HasEdge predicate on the "episodes" edge.
+func HasEpisodes() predicate.Series {
+	return predicate.Series(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EpisodesTable, EpisodesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEpisodesWith applies the HasEdge predicate on the "episodes" edge with a given conditions (other predicates).
+func HasEpisodesWith(preds ...predicate.Episode) predicate.Series {
+	return predicate.Series(func(s *sql.Selector) {
+		step := newEpisodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

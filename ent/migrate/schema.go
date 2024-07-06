@@ -29,21 +29,29 @@ var (
 		Columns:    DownloadClientsColumns,
 		PrimaryKey: []*schema.Column{DownloadClientsColumns[0]},
 	}
-	// EpidodesColumns holds the columns for the "epidodes" table.
-	EpidodesColumns = []*schema.Column{
+	// EpisodesColumns holds the columns for the "episodes" table.
+	EpisodesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "series_id", Type: field.TypeInt},
 		{Name: "season_number", Type: field.TypeInt},
 		{Name: "episode_number", Type: field.TypeInt},
 		{Name: "title", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
 		{Name: "air_date", Type: field.TypeString},
+		{Name: "series_episodes", Type: field.TypeInt, Nullable: true},
 	}
-	// EpidodesTable holds the schema information for the "epidodes" table.
-	EpidodesTable = &schema.Table{
-		Name:       "epidodes",
-		Columns:    EpidodesColumns,
-		PrimaryKey: []*schema.Column{EpidodesColumns[0]},
+	// EpisodesTable holds the schema information for the "episodes" table.
+	EpisodesTable = &schema.Table{
+		Name:       "episodes",
+		Columns:    EpisodesColumns,
+		PrimaryKey: []*schema.Column{EpisodesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "episodes_series_episodes",
+				Columns:    []*schema.Column{EpisodesColumns[6]},
+				RefColumns: []*schema.Column{SeriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// HistoriesColumns holds the columns for the "histories" table.
 	HistoriesColumns = []*schema.Column{
@@ -79,7 +87,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tmdb_id", Type: field.TypeInt},
 		{Name: "imdb_id", Type: field.TypeString, Nullable: true},
-		{Name: "title", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString},
 		{Name: "original_name", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
 		{Name: "path", Type: field.TypeString},
@@ -107,7 +115,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		DownloadClientsTable,
-		EpidodesTable,
+		EpisodesTable,
 		HistoriesTable,
 		IndexersTable,
 		SeriesTable,
@@ -116,4 +124,5 @@ var (
 )
 
 func init() {
+	EpisodesTable.ForeignKeys[0].RefTable = SeriesTable
 }

@@ -6,72 +6,97 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"polaris/ent/epidodes"
+	"polaris/ent/episode"
 	"polaris/ent/predicate"
+	"polaris/ent/series"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
 
-// EpidodesQuery is the builder for querying Epidodes entities.
-type EpidodesQuery struct {
+// EpisodeQuery is the builder for querying Episode entities.
+type EpisodeQuery struct {
 	config
 	ctx        *QueryContext
-	order      []epidodes.OrderOption
+	order      []episode.OrderOption
 	inters     []Interceptor
-	predicates []predicate.Epidodes
+	predicates []predicate.Episode
+	withSeries *SeriesQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the EpidodesQuery builder.
-func (eq *EpidodesQuery) Where(ps ...predicate.Epidodes) *EpidodesQuery {
+// Where adds a new predicate for the EpisodeQuery builder.
+func (eq *EpisodeQuery) Where(ps ...predicate.Episode) *EpisodeQuery {
 	eq.predicates = append(eq.predicates, ps...)
 	return eq
 }
 
 // Limit the number of records to be returned by this query.
-func (eq *EpidodesQuery) Limit(limit int) *EpidodesQuery {
+func (eq *EpisodeQuery) Limit(limit int) *EpisodeQuery {
 	eq.ctx.Limit = &limit
 	return eq
 }
 
 // Offset to start from.
-func (eq *EpidodesQuery) Offset(offset int) *EpidodesQuery {
+func (eq *EpisodeQuery) Offset(offset int) *EpisodeQuery {
 	eq.ctx.Offset = &offset
 	return eq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (eq *EpidodesQuery) Unique(unique bool) *EpidodesQuery {
+func (eq *EpisodeQuery) Unique(unique bool) *EpisodeQuery {
 	eq.ctx.Unique = &unique
 	return eq
 }
 
 // Order specifies how the records should be ordered.
-func (eq *EpidodesQuery) Order(o ...epidodes.OrderOption) *EpidodesQuery {
+func (eq *EpisodeQuery) Order(o ...episode.OrderOption) *EpisodeQuery {
 	eq.order = append(eq.order, o...)
 	return eq
 }
 
-// First returns the first Epidodes entity from the query.
-// Returns a *NotFoundError when no Epidodes was found.
-func (eq *EpidodesQuery) First(ctx context.Context) (*Epidodes, error) {
+// QuerySeries chains the current query on the "series" edge.
+func (eq *EpisodeQuery) QuerySeries() *SeriesQuery {
+	query := (&SeriesClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(episode.Table, episode.FieldID, selector),
+			sqlgraph.To(series.Table, series.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, episode.SeriesTable, episode.SeriesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// First returns the first Episode entity from the query.
+// Returns a *NotFoundError when no Episode was found.
+func (eq *EpisodeQuery) First(ctx context.Context) (*Episode, error) {
 	nodes, err := eq.Limit(1).All(setContextOp(ctx, eq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{epidodes.Label}
+		return nil, &NotFoundError{episode.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (eq *EpidodesQuery) FirstX(ctx context.Context) *Epidodes {
+func (eq *EpisodeQuery) FirstX(ctx context.Context) *Episode {
 	node, err := eq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -79,22 +104,22 @@ func (eq *EpidodesQuery) FirstX(ctx context.Context) *Epidodes {
 	return node
 }
 
-// FirstID returns the first Epidodes ID from the query.
-// Returns a *NotFoundError when no Epidodes ID was found.
-func (eq *EpidodesQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first Episode ID from the query.
+// Returns a *NotFoundError when no Episode ID was found.
+func (eq *EpisodeQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = eq.Limit(1).IDs(setContextOp(ctx, eq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{epidodes.Label}
+		err = &NotFoundError{episode.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (eq *EpidodesQuery) FirstIDX(ctx context.Context) int {
+func (eq *EpisodeQuery) FirstIDX(ctx context.Context) int {
 	id, err := eq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -102,10 +127,10 @@ func (eq *EpidodesQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Epidodes entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Epidodes entity is found.
-// Returns a *NotFoundError when no Epidodes entities are found.
-func (eq *EpidodesQuery) Only(ctx context.Context) (*Epidodes, error) {
+// Only returns a single Episode entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Episode entity is found.
+// Returns a *NotFoundError when no Episode entities are found.
+func (eq *EpisodeQuery) Only(ctx context.Context) (*Episode, error) {
 	nodes, err := eq.Limit(2).All(setContextOp(ctx, eq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -114,14 +139,14 @@ func (eq *EpidodesQuery) Only(ctx context.Context) (*Epidodes, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{epidodes.Label}
+		return nil, &NotFoundError{episode.Label}
 	default:
-		return nil, &NotSingularError{epidodes.Label}
+		return nil, &NotSingularError{episode.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (eq *EpidodesQuery) OnlyX(ctx context.Context) *Epidodes {
+func (eq *EpisodeQuery) OnlyX(ctx context.Context) *Episode {
 	node, err := eq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -129,10 +154,10 @@ func (eq *EpidodesQuery) OnlyX(ctx context.Context) *Epidodes {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Epidodes ID in the query.
-// Returns a *NotSingularError when more than one Epidodes ID is found.
+// OnlyID is like Only, but returns the only Episode ID in the query.
+// Returns a *NotSingularError when more than one Episode ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (eq *EpidodesQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (eq *EpisodeQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = eq.Limit(2).IDs(setContextOp(ctx, eq.ctx, "OnlyID")); err != nil {
 		return
@@ -141,15 +166,15 @@ func (eq *EpidodesQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{epidodes.Label}
+		err = &NotFoundError{episode.Label}
 	default:
-		err = &NotSingularError{epidodes.Label}
+		err = &NotSingularError{episode.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (eq *EpidodesQuery) OnlyIDX(ctx context.Context) int {
+func (eq *EpisodeQuery) OnlyIDX(ctx context.Context) int {
 	id, err := eq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -157,18 +182,18 @@ func (eq *EpidodesQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of EpidodesSlice.
-func (eq *EpidodesQuery) All(ctx context.Context) ([]*Epidodes, error) {
+// All executes the query and returns a list of Episodes.
+func (eq *EpisodeQuery) All(ctx context.Context) ([]*Episode, error) {
 	ctx = setContextOp(ctx, eq.ctx, "All")
 	if err := eq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*Epidodes, *EpidodesQuery]()
-	return withInterceptors[[]*Epidodes](ctx, eq, qr, eq.inters)
+	qr := querierAll[[]*Episode, *EpisodeQuery]()
+	return withInterceptors[[]*Episode](ctx, eq, qr, eq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (eq *EpidodesQuery) AllX(ctx context.Context) []*Epidodes {
+func (eq *EpisodeQuery) AllX(ctx context.Context) []*Episode {
 	nodes, err := eq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -176,20 +201,20 @@ func (eq *EpidodesQuery) AllX(ctx context.Context) []*Epidodes {
 	return nodes
 }
 
-// IDs executes the query and returns a list of Epidodes IDs.
-func (eq *EpidodesQuery) IDs(ctx context.Context) (ids []int, err error) {
+// IDs executes the query and returns a list of Episode IDs.
+func (eq *EpisodeQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if eq.ctx.Unique == nil && eq.path != nil {
 		eq.Unique(true)
 	}
 	ctx = setContextOp(ctx, eq.ctx, "IDs")
-	if err = eq.Select(epidodes.FieldID).Scan(ctx, &ids); err != nil {
+	if err = eq.Select(episode.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (eq *EpidodesQuery) IDsX(ctx context.Context) []int {
+func (eq *EpisodeQuery) IDsX(ctx context.Context) []int {
 	ids, err := eq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -198,16 +223,16 @@ func (eq *EpidodesQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (eq *EpidodesQuery) Count(ctx context.Context) (int, error) {
+func (eq *EpisodeQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, eq.ctx, "Count")
 	if err := eq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, eq, querierCount[*EpidodesQuery](), eq.inters)
+	return withInterceptors[int](ctx, eq, querierCount[*EpisodeQuery](), eq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (eq *EpidodesQuery) CountX(ctx context.Context) int {
+func (eq *EpisodeQuery) CountX(ctx context.Context) int {
 	count, err := eq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -216,7 +241,7 @@ func (eq *EpidodesQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (eq *EpidodesQuery) Exist(ctx context.Context) (bool, error) {
+func (eq *EpisodeQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, eq.ctx, "Exist")
 	switch _, err := eq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -229,7 +254,7 @@ func (eq *EpidodesQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (eq *EpidodesQuery) ExistX(ctx context.Context) bool {
+func (eq *EpisodeQuery) ExistX(ctx context.Context) bool {
 	exist, err := eq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -237,22 +262,34 @@ func (eq *EpidodesQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the EpidodesQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the EpisodeQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (eq *EpidodesQuery) Clone() *EpidodesQuery {
+func (eq *EpisodeQuery) Clone() *EpisodeQuery {
 	if eq == nil {
 		return nil
 	}
-	return &EpidodesQuery{
+	return &EpisodeQuery{
 		config:     eq.config,
 		ctx:        eq.ctx.Clone(),
-		order:      append([]epidodes.OrderOption{}, eq.order...),
+		order:      append([]episode.OrderOption{}, eq.order...),
 		inters:     append([]Interceptor{}, eq.inters...),
-		predicates: append([]predicate.Epidodes{}, eq.predicates...),
+		predicates: append([]predicate.Episode{}, eq.predicates...),
+		withSeries: eq.withSeries.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
+}
+
+// WithSeries tells the query-builder to eager-load the nodes that are connected to
+// the "series" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EpisodeQuery) WithSeries(opts ...func(*SeriesQuery)) *EpisodeQuery {
+	query := (&SeriesClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withSeries = query
+	return eq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -261,19 +298,19 @@ func (eq *EpidodesQuery) Clone() *EpidodesQuery {
 // Example:
 //
 //	var v []struct {
-//		SeriesID int `json:"series_id,omitempty"`
+//		SeasonNumber int `json:"season_number,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Epidodes.Query().
-//		GroupBy(epidodes.FieldSeriesID).
+//	client.Episode.Query().
+//		GroupBy(episode.FieldSeasonNumber).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (eq *EpidodesQuery) GroupBy(field string, fields ...string) *EpidodesGroupBy {
+func (eq *EpisodeQuery) GroupBy(field string, fields ...string) *EpisodeGroupBy {
 	eq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &EpidodesGroupBy{build: eq}
+	grbuild := &EpisodeGroupBy{build: eq}
 	grbuild.flds = &eq.ctx.Fields
-	grbuild.label = epidodes.Label
+	grbuild.label = episode.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -284,26 +321,26 @@ func (eq *EpidodesQuery) GroupBy(field string, fields ...string) *EpidodesGroupB
 // Example:
 //
 //	var v []struct {
-//		SeriesID int `json:"series_id,omitempty"`
+//		SeasonNumber int `json:"season_number,omitempty"`
 //	}
 //
-//	client.Epidodes.Query().
-//		Select(epidodes.FieldSeriesID).
+//	client.Episode.Query().
+//		Select(episode.FieldSeasonNumber).
 //		Scan(ctx, &v)
-func (eq *EpidodesQuery) Select(fields ...string) *EpidodesSelect {
+func (eq *EpisodeQuery) Select(fields ...string) *EpisodeSelect {
 	eq.ctx.Fields = append(eq.ctx.Fields, fields...)
-	sbuild := &EpidodesSelect{EpidodesQuery: eq}
-	sbuild.label = epidodes.Label
+	sbuild := &EpisodeSelect{EpisodeQuery: eq}
+	sbuild.label = episode.Label
 	sbuild.flds, sbuild.scan = &eq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a EpidodesSelect configured with the given aggregations.
-func (eq *EpidodesQuery) Aggregate(fns ...AggregateFunc) *EpidodesSelect {
+// Aggregate returns a EpisodeSelect configured with the given aggregations.
+func (eq *EpisodeQuery) Aggregate(fns ...AggregateFunc) *EpisodeSelect {
 	return eq.Select().Aggregate(fns...)
 }
 
-func (eq *EpidodesQuery) prepareQuery(ctx context.Context) error {
+func (eq *EpisodeQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range eq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -315,7 +352,7 @@ func (eq *EpidodesQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range eq.ctx.Fields {
-		if !epidodes.ValidColumn(f) {
+		if !episode.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -329,17 +366,28 @@ func (eq *EpidodesQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (eq *EpidodesQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Epidodes, error) {
+func (eq *EpisodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Episode, error) {
 	var (
-		nodes = []*Epidodes{}
-		_spec = eq.querySpec()
+		nodes       = []*Episode{}
+		withFKs     = eq.withFKs
+		_spec       = eq.querySpec()
+		loadedTypes = [1]bool{
+			eq.withSeries != nil,
+		}
 	)
+	if eq.withSeries != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, episode.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*Epidodes).scanValues(nil, columns)
+		return (*Episode).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Epidodes{config: eq.config}
+		node := &Episode{config: eq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,10 +399,49 @@ func (eq *EpidodesQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Epi
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := eq.withSeries; query != nil {
+		if err := eq.loadSeries(ctx, query, nodes, nil,
+			func(n *Episode, e *Series) { n.Edges.Series = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
-func (eq *EpidodesQuery) sqlCount(ctx context.Context) (int, error) {
+func (eq *EpisodeQuery) loadSeries(ctx context.Context, query *SeriesQuery, nodes []*Episode, init func(*Episode), assign func(*Episode, *Series)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Episode)
+	for i := range nodes {
+		if nodes[i].series_episodes == nil {
+			continue
+		}
+		fk := *nodes[i].series_episodes
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(series.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "series_episodes" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+
+func (eq *EpisodeQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := eq.querySpec()
 	_spec.Node.Columns = eq.ctx.Fields
 	if len(eq.ctx.Fields) > 0 {
@@ -363,8 +450,8 @@ func (eq *EpidodesQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, eq.driver, _spec)
 }
 
-func (eq *EpidodesQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(epidodes.Table, epidodes.Columns, sqlgraph.NewFieldSpec(epidodes.FieldID, field.TypeInt))
+func (eq *EpisodeQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(episode.Table, episode.Columns, sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt))
 	_spec.From = eq.sql
 	if unique := eq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -373,9 +460,9 @@ func (eq *EpidodesQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := eq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, epidodes.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, episode.FieldID)
 		for i := range fields {
-			if fields[i] != epidodes.FieldID {
+			if fields[i] != episode.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -403,12 +490,12 @@ func (eq *EpidodesQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (eq *EpidodesQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (eq *EpisodeQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(eq.driver.Dialect())
-	t1 := builder.Table(epidodes.Table)
+	t1 := builder.Table(episode.Table)
 	columns := eq.ctx.Fields
 	if len(columns) == 0 {
-		columns = epidodes.Columns
+		columns = episode.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if eq.sql != nil {
@@ -435,28 +522,28 @@ func (eq *EpidodesQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// EpidodesGroupBy is the group-by builder for Epidodes entities.
-type EpidodesGroupBy struct {
+// EpisodeGroupBy is the group-by builder for Episode entities.
+type EpisodeGroupBy struct {
 	selector
-	build *EpidodesQuery
+	build *EpisodeQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (egb *EpidodesGroupBy) Aggregate(fns ...AggregateFunc) *EpidodesGroupBy {
+func (egb *EpisodeGroupBy) Aggregate(fns ...AggregateFunc) *EpisodeGroupBy {
 	egb.fns = append(egb.fns, fns...)
 	return egb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (egb *EpidodesGroupBy) Scan(ctx context.Context, v any) error {
+func (egb *EpisodeGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, egb.build.ctx, "GroupBy")
 	if err := egb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*EpidodesQuery, *EpidodesGroupBy](ctx, egb.build, egb, egb.build.inters, v)
+	return scanWithInterceptors[*EpisodeQuery, *EpisodeGroupBy](ctx, egb.build, egb, egb.build.inters, v)
 }
 
-func (egb *EpidodesGroupBy) sqlScan(ctx context.Context, root *EpidodesQuery, v any) error {
+func (egb *EpisodeGroupBy) sqlScan(ctx context.Context, root *EpisodeQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(egb.fns))
 	for _, fn := range egb.fns {
@@ -483,28 +570,28 @@ func (egb *EpidodesGroupBy) sqlScan(ctx context.Context, root *EpidodesQuery, v 
 	return sql.ScanSlice(rows, v)
 }
 
-// EpidodesSelect is the builder for selecting fields of Epidodes entities.
-type EpidodesSelect struct {
-	*EpidodesQuery
+// EpisodeSelect is the builder for selecting fields of Episode entities.
+type EpisodeSelect struct {
+	*EpisodeQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (es *EpidodesSelect) Aggregate(fns ...AggregateFunc) *EpidodesSelect {
+func (es *EpisodeSelect) Aggregate(fns ...AggregateFunc) *EpisodeSelect {
 	es.fns = append(es.fns, fns...)
 	return es
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (es *EpidodesSelect) Scan(ctx context.Context, v any) error {
+func (es *EpisodeSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, es.ctx, "Select")
 	if err := es.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*EpidodesQuery, *EpidodesSelect](ctx, es.EpidodesQuery, es, es.inters, v)
+	return scanWithInterceptors[*EpisodeQuery, *EpisodeSelect](ctx, es.EpisodeQuery, es, es.inters, v)
 }
 
-func (es *EpidodesSelect) sqlScan(ctx context.Context, root *EpidodesQuery, v any) error {
+func (es *EpisodeSelect) sqlScan(ctx context.Context, root *EpisodeQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(es.fns))
 	for _, fn := range es.fns {

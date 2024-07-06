@@ -6,67 +6,81 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"polaris/ent/epidodes"
+	"polaris/ent/episode"
+	"polaris/ent/series"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
 
-// EpidodesCreate is the builder for creating a Epidodes entity.
-type EpidodesCreate struct {
+// EpisodeCreate is the builder for creating a Episode entity.
+type EpisodeCreate struct {
 	config
-	mutation *EpidodesMutation
+	mutation *EpisodeMutation
 	hooks    []Hook
 }
 
-// SetSeriesID sets the "series_id" field.
-func (ec *EpidodesCreate) SetSeriesID(i int) *EpidodesCreate {
-	ec.mutation.SetSeriesID(i)
-	return ec
-}
-
 // SetSeasonNumber sets the "season_number" field.
-func (ec *EpidodesCreate) SetSeasonNumber(i int) *EpidodesCreate {
+func (ec *EpisodeCreate) SetSeasonNumber(i int) *EpisodeCreate {
 	ec.mutation.SetSeasonNumber(i)
 	return ec
 }
 
 // SetEpisodeNumber sets the "episode_number" field.
-func (ec *EpidodesCreate) SetEpisodeNumber(i int) *EpidodesCreate {
+func (ec *EpisodeCreate) SetEpisodeNumber(i int) *EpisodeCreate {
 	ec.mutation.SetEpisodeNumber(i)
 	return ec
 }
 
 // SetTitle sets the "title" field.
-func (ec *EpidodesCreate) SetTitle(s string) *EpidodesCreate {
+func (ec *EpisodeCreate) SetTitle(s string) *EpisodeCreate {
 	ec.mutation.SetTitle(s)
 	return ec
 }
 
 // SetOverview sets the "overview" field.
-func (ec *EpidodesCreate) SetOverview(s string) *EpidodesCreate {
+func (ec *EpisodeCreate) SetOverview(s string) *EpisodeCreate {
 	ec.mutation.SetOverview(s)
 	return ec
 }
 
 // SetAirDate sets the "air_date" field.
-func (ec *EpidodesCreate) SetAirDate(s string) *EpidodesCreate {
+func (ec *EpisodeCreate) SetAirDate(s string) *EpisodeCreate {
 	ec.mutation.SetAirDate(s)
 	return ec
 }
 
-// Mutation returns the EpidodesMutation object of the builder.
-func (ec *EpidodesCreate) Mutation() *EpidodesMutation {
+// SetSeriesID sets the "series" edge to the Series entity by ID.
+func (ec *EpisodeCreate) SetSeriesID(id int) *EpisodeCreate {
+	ec.mutation.SetSeriesID(id)
+	return ec
+}
+
+// SetNillableSeriesID sets the "series" edge to the Series entity by ID if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableSeriesID(id *int) *EpisodeCreate {
+	if id != nil {
+		ec = ec.SetSeriesID(*id)
+	}
+	return ec
+}
+
+// SetSeries sets the "series" edge to the Series entity.
+func (ec *EpisodeCreate) SetSeries(s *Series) *EpisodeCreate {
+	return ec.SetSeriesID(s.ID)
+}
+
+// Mutation returns the EpisodeMutation object of the builder.
+func (ec *EpisodeCreate) Mutation() *EpisodeMutation {
 	return ec.mutation
 }
 
-// Save creates the Epidodes in the database.
-func (ec *EpidodesCreate) Save(ctx context.Context) (*Epidodes, error) {
+// Save creates the Episode in the database.
+func (ec *EpisodeCreate) Save(ctx context.Context) (*Episode, error) {
 	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (ec *EpidodesCreate) SaveX(ctx context.Context) *Epidodes {
+func (ec *EpisodeCreate) SaveX(ctx context.Context) *Episode {
 	v, err := ec.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -75,42 +89,39 @@ func (ec *EpidodesCreate) SaveX(ctx context.Context) *Epidodes {
 }
 
 // Exec executes the query.
-func (ec *EpidodesCreate) Exec(ctx context.Context) error {
+func (ec *EpisodeCreate) Exec(ctx context.Context) error {
 	_, err := ec.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ec *EpidodesCreate) ExecX(ctx context.Context) {
+func (ec *EpisodeCreate) ExecX(ctx context.Context) {
 	if err := ec.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ec *EpidodesCreate) check() error {
-	if _, ok := ec.mutation.SeriesID(); !ok {
-		return &ValidationError{Name: "series_id", err: errors.New(`ent: missing required field "Epidodes.series_id"`)}
-	}
+func (ec *EpisodeCreate) check() error {
 	if _, ok := ec.mutation.SeasonNumber(); !ok {
-		return &ValidationError{Name: "season_number", err: errors.New(`ent: missing required field "Epidodes.season_number"`)}
+		return &ValidationError{Name: "season_number", err: errors.New(`ent: missing required field "Episode.season_number"`)}
 	}
 	if _, ok := ec.mutation.EpisodeNumber(); !ok {
-		return &ValidationError{Name: "episode_number", err: errors.New(`ent: missing required field "Epidodes.episode_number"`)}
+		return &ValidationError{Name: "episode_number", err: errors.New(`ent: missing required field "Episode.episode_number"`)}
 	}
 	if _, ok := ec.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Epidodes.title"`)}
+		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Episode.title"`)}
 	}
 	if _, ok := ec.mutation.Overview(); !ok {
-		return &ValidationError{Name: "overview", err: errors.New(`ent: missing required field "Epidodes.overview"`)}
+		return &ValidationError{Name: "overview", err: errors.New(`ent: missing required field "Episode.overview"`)}
 	}
 	if _, ok := ec.mutation.AirDate(); !ok {
-		return &ValidationError{Name: "air_date", err: errors.New(`ent: missing required field "Epidodes.air_date"`)}
+		return &ValidationError{Name: "air_date", err: errors.New(`ent: missing required field "Episode.air_date"`)}
 	}
 	return nil
 }
 
-func (ec *EpidodesCreate) sqlSave(ctx context.Context) (*Epidodes, error) {
+func (ec *EpisodeCreate) sqlSave(ctx context.Context) (*Episode, error) {
 	if err := ec.check(); err != nil {
 		return nil, err
 	}
@@ -128,58 +139,71 @@ func (ec *EpidodesCreate) sqlSave(ctx context.Context) (*Epidodes, error) {
 	return _node, nil
 }
 
-func (ec *EpidodesCreate) createSpec() (*Epidodes, *sqlgraph.CreateSpec) {
+func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Epidodes{config: ec.config}
-		_spec = sqlgraph.NewCreateSpec(epidodes.Table, sqlgraph.NewFieldSpec(epidodes.FieldID, field.TypeInt))
+		_node = &Episode{config: ec.config}
+		_spec = sqlgraph.NewCreateSpec(episode.Table, sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt))
 	)
-	if value, ok := ec.mutation.SeriesID(); ok {
-		_spec.SetField(epidodes.FieldSeriesID, field.TypeInt, value)
-		_node.SeriesID = value
-	}
 	if value, ok := ec.mutation.SeasonNumber(); ok {
-		_spec.SetField(epidodes.FieldSeasonNumber, field.TypeInt, value)
+		_spec.SetField(episode.FieldSeasonNumber, field.TypeInt, value)
 		_node.SeasonNumber = value
 	}
 	if value, ok := ec.mutation.EpisodeNumber(); ok {
-		_spec.SetField(epidodes.FieldEpisodeNumber, field.TypeInt, value)
+		_spec.SetField(episode.FieldEpisodeNumber, field.TypeInt, value)
 		_node.EpisodeNumber = value
 	}
 	if value, ok := ec.mutation.Title(); ok {
-		_spec.SetField(epidodes.FieldTitle, field.TypeString, value)
+		_spec.SetField(episode.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
 	if value, ok := ec.mutation.Overview(); ok {
-		_spec.SetField(epidodes.FieldOverview, field.TypeString, value)
+		_spec.SetField(episode.FieldOverview, field.TypeString, value)
 		_node.Overview = value
 	}
 	if value, ok := ec.mutation.AirDate(); ok {
-		_spec.SetField(epidodes.FieldAirDate, field.TypeString, value)
+		_spec.SetField(episode.FieldAirDate, field.TypeString, value)
 		_node.AirDate = value
+	}
+	if nodes := ec.mutation.SeriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   episode.SeriesTable,
+			Columns: []string{episode.SeriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(series.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.series_episodes = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
 
-// EpidodesCreateBulk is the builder for creating many Epidodes entities in bulk.
-type EpidodesCreateBulk struct {
+// EpisodeCreateBulk is the builder for creating many Episode entities in bulk.
+type EpisodeCreateBulk struct {
 	config
 	err      error
-	builders []*EpidodesCreate
+	builders []*EpisodeCreate
 }
 
-// Save creates the Epidodes entities in the database.
-func (ecb *EpidodesCreateBulk) Save(ctx context.Context) ([]*Epidodes, error) {
+// Save creates the Episode entities in the database.
+func (ecb *EpisodeCreateBulk) Save(ctx context.Context) ([]*Episode, error) {
 	if ecb.err != nil {
 		return nil, ecb.err
 	}
 	specs := make([]*sqlgraph.CreateSpec, len(ecb.builders))
-	nodes := make([]*Epidodes, len(ecb.builders))
+	nodes := make([]*Episode, len(ecb.builders))
 	mutators := make([]Mutator, len(ecb.builders))
 	for i := range ecb.builders {
 		func(i int, root context.Context) {
 			builder := ecb.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*EpidodesMutation)
+				mutation, ok := m.(*EpisodeMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -226,7 +250,7 @@ func (ecb *EpidodesCreateBulk) Save(ctx context.Context) ([]*Epidodes, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ecb *EpidodesCreateBulk) SaveX(ctx context.Context) []*Epidodes {
+func (ecb *EpisodeCreateBulk) SaveX(ctx context.Context) []*Episode {
 	v, err := ecb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -235,13 +259,13 @@ func (ecb *EpidodesCreateBulk) SaveX(ctx context.Context) []*Epidodes {
 }
 
 // Exec executes the query.
-func (ecb *EpidodesCreateBulk) Exec(ctx context.Context) error {
+func (ecb *EpisodeCreateBulk) Exec(ctx context.Context) error {
 	_, err := ecb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ecb *EpidodesCreateBulk) ExecX(ctx context.Context) {
+func (ecb *EpisodeCreateBulk) ExecX(ctx context.Context) {
 	if err := ecb.Exec(ctx); err != nil {
 		panic(err)
 	}

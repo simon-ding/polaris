@@ -21,8 +21,8 @@ type Series struct {
 	TmdbID int `json:"tmdb_id,omitempty"`
 	// ImdbID holds the value of the "imdb_id" field.
 	ImdbID string `json:"imdb_id,omitempty"`
-	// Title holds the value of the "title" field.
-	Title string `json:"title,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// OriginalName holds the value of the "original_name" field.
 	OriginalName string `json:"original_name,omitempty"`
 	// Overview holds the value of the "overview" field.
@@ -32,8 +32,29 @@ type Series struct {
 	// PosterPath holds the value of the "poster_path" field.
 	PosterPath string `json:"poster_path,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt    time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the SeriesQuery when eager-loading is set.
+	Edges        SeriesEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// SeriesEdges holds the relations/edges for other nodes in the graph.
+type SeriesEdges struct {
+	// Episodes holds the value of the episodes edge.
+	Episodes []*Episode `json:"episodes,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// EpisodesOrErr returns the Episodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e SeriesEdges) EpisodesOrErr() ([]*Episode, error) {
+	if e.loadedTypes[0] {
+		return e.Episodes, nil
+	}
+	return nil, &NotLoadedError{edge: "episodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -43,7 +64,7 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case series.FieldID, series.FieldTmdbID:
 			values[i] = new(sql.NullInt64)
-		case series.FieldImdbID, series.FieldTitle, series.FieldOriginalName, series.FieldOverview, series.FieldPath, series.FieldPosterPath:
+		case series.FieldImdbID, series.FieldName, series.FieldOriginalName, series.FieldOverview, series.FieldPath, series.FieldPosterPath:
 			values[i] = new(sql.NullString)
 		case series.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -80,11 +101,11 @@ func (s *Series) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.ImdbID = value.String
 			}
-		case series.FieldTitle:
+		case series.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				s.Title = value.String
+				s.Name = value.String
 			}
 		case series.FieldOriginalName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -129,6 +150,11 @@ func (s *Series) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
+// QueryEpisodes queries the "episodes" edge of the Series entity.
+func (s *Series) QueryEpisodes() *EpisodeQuery {
+	return NewSeriesClient(s.config).QueryEpisodes(s)
+}
+
 // Update returns a builder for updating this Series.
 // Note that you need to call Series.Unwrap() before calling this method if this Series
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -158,8 +184,8 @@ func (s *Series) String() string {
 	builder.WriteString("imdb_id=")
 	builder.WriteString(s.ImdbID)
 	builder.WriteString(", ")
-	builder.WriteString("title=")
-	builder.WriteString(s.Title)
+	builder.WriteString("name=")
+	builder.WriteString(s.Name)
 	builder.WriteString(", ")
 	builder.WriteString("original_name=")
 	builder.WriteString(s.OriginalName)

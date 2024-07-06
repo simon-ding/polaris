@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -17,7 +18,7 @@ func (Series) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("tmdb_id"),
 		field.String("imdb_id").Optional(),
-		field.String("title"),
+		field.String("name"),
 		field.String("original_name"),
 		field.String("overview"),
 		field.String("path"),
@@ -28,5 +29,8 @@ func (Series) Fields() []ent.Field {
 
 // Edges of the Series.
 func (Series) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("episodes", Episode.Type),
+	}
+
 }

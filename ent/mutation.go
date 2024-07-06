@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/downloadclients"
-	"polaris/ent/epidodes"
+	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/predicate"
@@ -30,7 +30,7 @@ const (
 
 	// Node types.
 	TypeDownloadClients = "DownloadClients"
-	TypeEpidodes        = "Epidodes"
+	TypeEpisode         = "Episode"
 	TypeHistory         = "History"
 	TypeIndexers        = "Indexers"
 	TypeSeries          = "Series"
@@ -903,14 +903,12 @@ func (m *DownloadClientsMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown DownloadClients edge %s", name)
 }
 
-// EpidodesMutation represents an operation that mutates the Epidodes nodes in the graph.
-type EpidodesMutation struct {
+// EpisodeMutation represents an operation that mutates the Episode nodes in the graph.
+type EpisodeMutation struct {
 	config
 	op                Op
 	typ               string
 	id                *int
-	series_id         *int
-	addseries_id      *int
 	season_number     *int
 	addseason_number  *int
 	episode_number    *int
@@ -919,22 +917,24 @@ type EpidodesMutation struct {
 	overview          *string
 	air_date          *string
 	clearedFields     map[string]struct{}
+	series            *int
+	clearedseries     bool
 	done              bool
-	oldValue          func(context.Context) (*Epidodes, error)
-	predicates        []predicate.Epidodes
+	oldValue          func(context.Context) (*Episode, error)
+	predicates        []predicate.Episode
 }
 
-var _ ent.Mutation = (*EpidodesMutation)(nil)
+var _ ent.Mutation = (*EpisodeMutation)(nil)
 
-// epidodesOption allows management of the mutation configuration using functional options.
-type epidodesOption func(*EpidodesMutation)
+// episodeOption allows management of the mutation configuration using functional options.
+type episodeOption func(*EpisodeMutation)
 
-// newEpidodesMutation creates new mutation for the Epidodes entity.
-func newEpidodesMutation(c config, op Op, opts ...epidodesOption) *EpidodesMutation {
-	m := &EpidodesMutation{
+// newEpisodeMutation creates new mutation for the Episode entity.
+func newEpisodeMutation(c config, op Op, opts ...episodeOption) *EpisodeMutation {
+	m := &EpisodeMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeEpidodes,
+		typ:           TypeEpisode,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -943,20 +943,20 @@ func newEpidodesMutation(c config, op Op, opts ...epidodesOption) *EpidodesMutat
 	return m
 }
 
-// withEpidodesID sets the ID field of the mutation.
-func withEpidodesID(id int) epidodesOption {
-	return func(m *EpidodesMutation) {
+// withEpisodeID sets the ID field of the mutation.
+func withEpisodeID(id int) episodeOption {
+	return func(m *EpisodeMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Epidodes
+			value *Episode
 		)
-		m.oldValue = func(ctx context.Context) (*Epidodes, error) {
+		m.oldValue = func(ctx context.Context) (*Episode, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Epidodes.Get(ctx, id)
+					value, err = m.Client().Episode.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -965,10 +965,10 @@ func withEpidodesID(id int) epidodesOption {
 	}
 }
 
-// withEpidodes sets the old Epidodes of the mutation.
-func withEpidodes(node *Epidodes) epidodesOption {
-	return func(m *EpidodesMutation) {
-		m.oldValue = func(context.Context) (*Epidodes, error) {
+// withEpisode sets the old Episode of the mutation.
+func withEpisode(node *Episode) episodeOption {
+	return func(m *EpisodeMutation) {
+		m.oldValue = func(context.Context) (*Episode, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -977,7 +977,7 @@ func withEpidodes(node *Epidodes) epidodesOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m EpidodesMutation) Client() *Client {
+func (m EpisodeMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -985,7 +985,7 @@ func (m EpidodesMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m EpidodesMutation) Tx() (*Tx, error) {
+func (m EpisodeMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -996,7 +996,7 @@ func (m EpidodesMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *EpidodesMutation) ID() (id int, exists bool) {
+func (m *EpisodeMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1007,7 +1007,7 @@ func (m *EpidodesMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *EpidodesMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *EpisodeMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -1016,76 +1016,20 @@ func (m *EpidodesMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Epidodes.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Episode.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// SetSeriesID sets the "series_id" field.
-func (m *EpidodesMutation) SetSeriesID(i int) {
-	m.series_id = &i
-	m.addseries_id = nil
-}
-
-// SeriesID returns the value of the "series_id" field in the mutation.
-func (m *EpidodesMutation) SeriesID() (r int, exists bool) {
-	v := m.series_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSeriesID returns the old "series_id" field's value of the Epidodes entity.
-// If the Epidodes object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpidodesMutation) OldSeriesID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSeriesID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSeriesID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSeriesID: %w", err)
-	}
-	return oldValue.SeriesID, nil
-}
-
-// AddSeriesID adds i to the "series_id" field.
-func (m *EpidodesMutation) AddSeriesID(i int) {
-	if m.addseries_id != nil {
-		*m.addseries_id += i
-	} else {
-		m.addseries_id = &i
-	}
-}
-
-// AddedSeriesID returns the value that was added to the "series_id" field in this mutation.
-func (m *EpidodesMutation) AddedSeriesID() (r int, exists bool) {
-	v := m.addseries_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetSeriesID resets all changes to the "series_id" field.
-func (m *EpidodesMutation) ResetSeriesID() {
-	m.series_id = nil
-	m.addseries_id = nil
-}
-
 // SetSeasonNumber sets the "season_number" field.
-func (m *EpidodesMutation) SetSeasonNumber(i int) {
+func (m *EpisodeMutation) SetSeasonNumber(i int) {
 	m.season_number = &i
 	m.addseason_number = nil
 }
 
 // SeasonNumber returns the value of the "season_number" field in the mutation.
-func (m *EpidodesMutation) SeasonNumber() (r int, exists bool) {
+func (m *EpisodeMutation) SeasonNumber() (r int, exists bool) {
 	v := m.season_number
 	if v == nil {
 		return
@@ -1093,10 +1037,10 @@ func (m *EpidodesMutation) SeasonNumber() (r int, exists bool) {
 	return *v, true
 }
 
-// OldSeasonNumber returns the old "season_number" field's value of the Epidodes entity.
-// If the Epidodes object wasn't provided to the builder, the object is fetched from the database.
+// OldSeasonNumber returns the old "season_number" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpidodesMutation) OldSeasonNumber(ctx context.Context) (v int, err error) {
+func (m *EpisodeMutation) OldSeasonNumber(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSeasonNumber is only allowed on UpdateOne operations")
 	}
@@ -1111,7 +1055,7 @@ func (m *EpidodesMutation) OldSeasonNumber(ctx context.Context) (v int, err erro
 }
 
 // AddSeasonNumber adds i to the "season_number" field.
-func (m *EpidodesMutation) AddSeasonNumber(i int) {
+func (m *EpisodeMutation) AddSeasonNumber(i int) {
 	if m.addseason_number != nil {
 		*m.addseason_number += i
 	} else {
@@ -1120,7 +1064,7 @@ func (m *EpidodesMutation) AddSeasonNumber(i int) {
 }
 
 // AddedSeasonNumber returns the value that was added to the "season_number" field in this mutation.
-func (m *EpidodesMutation) AddedSeasonNumber() (r int, exists bool) {
+func (m *EpisodeMutation) AddedSeasonNumber() (r int, exists bool) {
 	v := m.addseason_number
 	if v == nil {
 		return
@@ -1129,19 +1073,19 @@ func (m *EpidodesMutation) AddedSeasonNumber() (r int, exists bool) {
 }
 
 // ResetSeasonNumber resets all changes to the "season_number" field.
-func (m *EpidodesMutation) ResetSeasonNumber() {
+func (m *EpisodeMutation) ResetSeasonNumber() {
 	m.season_number = nil
 	m.addseason_number = nil
 }
 
 // SetEpisodeNumber sets the "episode_number" field.
-func (m *EpidodesMutation) SetEpisodeNumber(i int) {
+func (m *EpisodeMutation) SetEpisodeNumber(i int) {
 	m.episode_number = &i
 	m.addepisode_number = nil
 }
 
 // EpisodeNumber returns the value of the "episode_number" field in the mutation.
-func (m *EpidodesMutation) EpisodeNumber() (r int, exists bool) {
+func (m *EpisodeMutation) EpisodeNumber() (r int, exists bool) {
 	v := m.episode_number
 	if v == nil {
 		return
@@ -1149,10 +1093,10 @@ func (m *EpidodesMutation) EpisodeNumber() (r int, exists bool) {
 	return *v, true
 }
 
-// OldEpisodeNumber returns the old "episode_number" field's value of the Epidodes entity.
-// If the Epidodes object wasn't provided to the builder, the object is fetched from the database.
+// OldEpisodeNumber returns the old "episode_number" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpidodesMutation) OldEpisodeNumber(ctx context.Context) (v int, err error) {
+func (m *EpisodeMutation) OldEpisodeNumber(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldEpisodeNumber is only allowed on UpdateOne operations")
 	}
@@ -1167,7 +1111,7 @@ func (m *EpidodesMutation) OldEpisodeNumber(ctx context.Context) (v int, err err
 }
 
 // AddEpisodeNumber adds i to the "episode_number" field.
-func (m *EpidodesMutation) AddEpisodeNumber(i int) {
+func (m *EpisodeMutation) AddEpisodeNumber(i int) {
 	if m.addepisode_number != nil {
 		*m.addepisode_number += i
 	} else {
@@ -1176,7 +1120,7 @@ func (m *EpidodesMutation) AddEpisodeNumber(i int) {
 }
 
 // AddedEpisodeNumber returns the value that was added to the "episode_number" field in this mutation.
-func (m *EpidodesMutation) AddedEpisodeNumber() (r int, exists bool) {
+func (m *EpisodeMutation) AddedEpisodeNumber() (r int, exists bool) {
 	v := m.addepisode_number
 	if v == nil {
 		return
@@ -1185,18 +1129,18 @@ func (m *EpidodesMutation) AddedEpisodeNumber() (r int, exists bool) {
 }
 
 // ResetEpisodeNumber resets all changes to the "episode_number" field.
-func (m *EpidodesMutation) ResetEpisodeNumber() {
+func (m *EpisodeMutation) ResetEpisodeNumber() {
 	m.episode_number = nil
 	m.addepisode_number = nil
 }
 
 // SetTitle sets the "title" field.
-func (m *EpidodesMutation) SetTitle(s string) {
+func (m *EpisodeMutation) SetTitle(s string) {
 	m.title = &s
 }
 
 // Title returns the value of the "title" field in the mutation.
-func (m *EpidodesMutation) Title() (r string, exists bool) {
+func (m *EpisodeMutation) Title() (r string, exists bool) {
 	v := m.title
 	if v == nil {
 		return
@@ -1204,10 +1148,10 @@ func (m *EpidodesMutation) Title() (r string, exists bool) {
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the Epidodes entity.
-// If the Epidodes object wasn't provided to the builder, the object is fetched from the database.
+// OldTitle returns the old "title" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpidodesMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *EpisodeMutation) OldTitle(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
 	}
@@ -1222,17 +1166,17 @@ func (m *EpidodesMutation) OldTitle(ctx context.Context) (v string, err error) {
 }
 
 // ResetTitle resets all changes to the "title" field.
-func (m *EpidodesMutation) ResetTitle() {
+func (m *EpisodeMutation) ResetTitle() {
 	m.title = nil
 }
 
 // SetOverview sets the "overview" field.
-func (m *EpidodesMutation) SetOverview(s string) {
+func (m *EpisodeMutation) SetOverview(s string) {
 	m.overview = &s
 }
 
 // Overview returns the value of the "overview" field in the mutation.
-func (m *EpidodesMutation) Overview() (r string, exists bool) {
+func (m *EpisodeMutation) Overview() (r string, exists bool) {
 	v := m.overview
 	if v == nil {
 		return
@@ -1240,10 +1184,10 @@ func (m *EpidodesMutation) Overview() (r string, exists bool) {
 	return *v, true
 }
 
-// OldOverview returns the old "overview" field's value of the Epidodes entity.
-// If the Epidodes object wasn't provided to the builder, the object is fetched from the database.
+// OldOverview returns the old "overview" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpidodesMutation) OldOverview(ctx context.Context) (v string, err error) {
+func (m *EpisodeMutation) OldOverview(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOverview is only allowed on UpdateOne operations")
 	}
@@ -1258,17 +1202,17 @@ func (m *EpidodesMutation) OldOverview(ctx context.Context) (v string, err error
 }
 
 // ResetOverview resets all changes to the "overview" field.
-func (m *EpidodesMutation) ResetOverview() {
+func (m *EpisodeMutation) ResetOverview() {
 	m.overview = nil
 }
 
 // SetAirDate sets the "air_date" field.
-func (m *EpidodesMutation) SetAirDate(s string) {
+func (m *EpisodeMutation) SetAirDate(s string) {
 	m.air_date = &s
 }
 
 // AirDate returns the value of the "air_date" field in the mutation.
-func (m *EpidodesMutation) AirDate() (r string, exists bool) {
+func (m *EpisodeMutation) AirDate() (r string, exists bool) {
 	v := m.air_date
 	if v == nil {
 		return
@@ -1276,10 +1220,10 @@ func (m *EpidodesMutation) AirDate() (r string, exists bool) {
 	return *v, true
 }
 
-// OldAirDate returns the old "air_date" field's value of the Epidodes entity.
-// If the Epidodes object wasn't provided to the builder, the object is fetched from the database.
+// OldAirDate returns the old "air_date" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpidodesMutation) OldAirDate(ctx context.Context) (v string, err error) {
+func (m *EpisodeMutation) OldAirDate(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAirDate is only allowed on UpdateOne operations")
 	}
@@ -1294,19 +1238,58 @@ func (m *EpidodesMutation) OldAirDate(ctx context.Context) (v string, err error)
 }
 
 // ResetAirDate resets all changes to the "air_date" field.
-func (m *EpidodesMutation) ResetAirDate() {
+func (m *EpisodeMutation) ResetAirDate() {
 	m.air_date = nil
 }
 
-// Where appends a list predicates to the EpidodesMutation builder.
-func (m *EpidodesMutation) Where(ps ...predicate.Epidodes) {
+// SetSeriesID sets the "series" edge to the Series entity by id.
+func (m *EpisodeMutation) SetSeriesID(id int) {
+	m.series = &id
+}
+
+// ClearSeries clears the "series" edge to the Series entity.
+func (m *EpisodeMutation) ClearSeries() {
+	m.clearedseries = true
+}
+
+// SeriesCleared reports if the "series" edge to the Series entity was cleared.
+func (m *EpisodeMutation) SeriesCleared() bool {
+	return m.clearedseries
+}
+
+// SeriesID returns the "series" edge ID in the mutation.
+func (m *EpisodeMutation) SeriesID() (id int, exists bool) {
+	if m.series != nil {
+		return *m.series, true
+	}
+	return
+}
+
+// SeriesIDs returns the "series" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SeriesID instead. It exists only for internal usage by the builders.
+func (m *EpisodeMutation) SeriesIDs() (ids []int) {
+	if id := m.series; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSeries resets all changes to the "series" edge.
+func (m *EpisodeMutation) ResetSeries() {
+	m.series = nil
+	m.clearedseries = false
+}
+
+// Where appends a list predicates to the EpisodeMutation builder.
+func (m *EpisodeMutation) Where(ps ...predicate.Episode) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the EpidodesMutation builder. Using this method,
+// WhereP appends storage-level predicates to the EpisodeMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *EpidodesMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Epidodes, len(ps))
+func (m *EpisodeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Episode, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -1314,42 +1297,39 @@ func (m *EpidodesMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *EpidodesMutation) Op() Op {
+func (m *EpisodeMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *EpidodesMutation) SetOp(op Op) {
+func (m *EpisodeMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (Epidodes).
-func (m *EpidodesMutation) Type() string {
+// Type returns the node type of this mutation (Episode).
+func (m *EpisodeMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *EpidodesMutation) Fields() []string {
-	fields := make([]string, 0, 6)
-	if m.series_id != nil {
-		fields = append(fields, epidodes.FieldSeriesID)
-	}
+func (m *EpisodeMutation) Fields() []string {
+	fields := make([]string, 0, 5)
 	if m.season_number != nil {
-		fields = append(fields, epidodes.FieldSeasonNumber)
+		fields = append(fields, episode.FieldSeasonNumber)
 	}
 	if m.episode_number != nil {
-		fields = append(fields, epidodes.FieldEpisodeNumber)
+		fields = append(fields, episode.FieldEpisodeNumber)
 	}
 	if m.title != nil {
-		fields = append(fields, epidodes.FieldTitle)
+		fields = append(fields, episode.FieldTitle)
 	}
 	if m.overview != nil {
-		fields = append(fields, epidodes.FieldOverview)
+		fields = append(fields, episode.FieldOverview)
 	}
 	if m.air_date != nil {
-		fields = append(fields, epidodes.FieldAirDate)
+		fields = append(fields, episode.FieldAirDate)
 	}
 	return fields
 }
@@ -1357,19 +1337,17 @@ func (m *EpidodesMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *EpidodesMutation) Field(name string) (ent.Value, bool) {
+func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case epidodes.FieldSeriesID:
-		return m.SeriesID()
-	case epidodes.FieldSeasonNumber:
+	case episode.FieldSeasonNumber:
 		return m.SeasonNumber()
-	case epidodes.FieldEpisodeNumber:
+	case episode.FieldEpisodeNumber:
 		return m.EpisodeNumber()
-	case epidodes.FieldTitle:
+	case episode.FieldTitle:
 		return m.Title()
-	case epidodes.FieldOverview:
+	case episode.FieldOverview:
 		return m.Overview()
-	case epidodes.FieldAirDate:
+	case episode.FieldAirDate:
 		return m.AirDate()
 	}
 	return nil, false
@@ -1378,65 +1356,56 @@ func (m *EpidodesMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *EpidodesMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case epidodes.FieldSeriesID:
-		return m.OldSeriesID(ctx)
-	case epidodes.FieldSeasonNumber:
+	case episode.FieldSeasonNumber:
 		return m.OldSeasonNumber(ctx)
-	case epidodes.FieldEpisodeNumber:
+	case episode.FieldEpisodeNumber:
 		return m.OldEpisodeNumber(ctx)
-	case epidodes.FieldTitle:
+	case episode.FieldTitle:
 		return m.OldTitle(ctx)
-	case epidodes.FieldOverview:
+	case episode.FieldOverview:
 		return m.OldOverview(ctx)
-	case epidodes.FieldAirDate:
+	case episode.FieldAirDate:
 		return m.OldAirDate(ctx)
 	}
-	return nil, fmt.Errorf("unknown Epidodes field %s", name)
+	return nil, fmt.Errorf("unknown Episode field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EpidodesMutation) SetField(name string, value ent.Value) error {
+func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case epidodes.FieldSeriesID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSeriesID(v)
-		return nil
-	case epidodes.FieldSeasonNumber:
+	case episode.FieldSeasonNumber:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSeasonNumber(v)
 		return nil
-	case epidodes.FieldEpisodeNumber:
+	case episode.FieldEpisodeNumber:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetEpisodeNumber(v)
 		return nil
-	case epidodes.FieldTitle:
+	case episode.FieldTitle:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTitle(v)
 		return nil
-	case epidodes.FieldOverview:
+	case episode.FieldOverview:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOverview(v)
 		return nil
-	case epidodes.FieldAirDate:
+	case episode.FieldAirDate:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -1444,21 +1413,18 @@ func (m *EpidodesMutation) SetField(name string, value ent.Value) error {
 		m.SetAirDate(v)
 		return nil
 	}
-	return fmt.Errorf("unknown Epidodes field %s", name)
+	return fmt.Errorf("unknown Episode field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *EpidodesMutation) AddedFields() []string {
+func (m *EpisodeMutation) AddedFields() []string {
 	var fields []string
-	if m.addseries_id != nil {
-		fields = append(fields, epidodes.FieldSeriesID)
-	}
 	if m.addseason_number != nil {
-		fields = append(fields, epidodes.FieldSeasonNumber)
+		fields = append(fields, episode.FieldSeasonNumber)
 	}
 	if m.addepisode_number != nil {
-		fields = append(fields, epidodes.FieldEpisodeNumber)
+		fields = append(fields, episode.FieldEpisodeNumber)
 	}
 	return fields
 }
@@ -1466,13 +1432,11 @@ func (m *EpidodesMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *EpidodesMutation) AddedField(name string) (ent.Value, bool) {
+func (m *EpisodeMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case epidodes.FieldSeriesID:
-		return m.AddedSeriesID()
-	case epidodes.FieldSeasonNumber:
+	case episode.FieldSeasonNumber:
 		return m.AddedSeasonNumber()
-	case epidodes.FieldEpisodeNumber:
+	case episode.FieldEpisodeNumber:
 		return m.AddedEpisodeNumber()
 	}
 	return nil, false
@@ -1481,23 +1445,16 @@ func (m *EpidodesMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EpidodesMutation) AddField(name string, value ent.Value) error {
+func (m *EpisodeMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case epidodes.FieldSeriesID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddSeriesID(v)
-		return nil
-	case epidodes.FieldSeasonNumber:
+	case episode.FieldSeasonNumber:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSeasonNumber(v)
 		return nil
-	case epidodes.FieldEpisodeNumber:
+	case episode.FieldEpisodeNumber:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -1505,100 +1462,123 @@ func (m *EpidodesMutation) AddField(name string, value ent.Value) error {
 		m.AddEpisodeNumber(v)
 		return nil
 	}
-	return fmt.Errorf("unknown Epidodes numeric field %s", name)
+	return fmt.Errorf("unknown Episode numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *EpidodesMutation) ClearedFields() []string {
+func (m *EpisodeMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *EpidodesMutation) FieldCleared(name string) bool {
+func (m *EpisodeMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *EpidodesMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Epidodes nullable field %s", name)
+func (m *EpisodeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Episode nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *EpidodesMutation) ResetField(name string) error {
+func (m *EpisodeMutation) ResetField(name string) error {
 	switch name {
-	case epidodes.FieldSeriesID:
-		m.ResetSeriesID()
-		return nil
-	case epidodes.FieldSeasonNumber:
+	case episode.FieldSeasonNumber:
 		m.ResetSeasonNumber()
 		return nil
-	case epidodes.FieldEpisodeNumber:
+	case episode.FieldEpisodeNumber:
 		m.ResetEpisodeNumber()
 		return nil
-	case epidodes.FieldTitle:
+	case episode.FieldTitle:
 		m.ResetTitle()
 		return nil
-	case epidodes.FieldOverview:
+	case episode.FieldOverview:
 		m.ResetOverview()
 		return nil
-	case epidodes.FieldAirDate:
+	case episode.FieldAirDate:
 		m.ResetAirDate()
 		return nil
 	}
-	return fmt.Errorf("unknown Epidodes field %s", name)
+	return fmt.Errorf("unknown Episode field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *EpidodesMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *EpisodeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.series != nil {
+		edges = append(edges, episode.EdgeSeries)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *EpidodesMutation) AddedIDs(name string) []ent.Value {
+func (m *EpisodeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case episode.EdgeSeries:
+		if id := m.series; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *EpidodesMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *EpisodeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *EpidodesMutation) RemovedIDs(name string) []ent.Value {
+func (m *EpisodeMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *EpidodesMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *EpisodeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedseries {
+		edges = append(edges, episode.EdgeSeries)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *EpidodesMutation) EdgeCleared(name string) bool {
+func (m *EpisodeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case episode.EdgeSeries:
+		return m.clearedseries
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *EpidodesMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown Epidodes unique edge %s", name)
+func (m *EpisodeMutation) ClearEdge(name string) error {
+	switch name {
+	case episode.EdgeSeries:
+		m.ClearSeries()
+		return nil
+	}
+	return fmt.Errorf("unknown Episode unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *EpidodesMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown Epidodes edge %s", name)
+func (m *EpisodeMutation) ResetEdge(name string) error {
+	switch name {
+	case episode.EdgeSeries:
+		m.ResetSeries()
+		return nil
+	}
+	return fmt.Errorf("unknown Episode edge %s", name)
 }
 
 // HistoryMutation represents an operation that mutates the History nodes in the graph.
@@ -2739,22 +2719,25 @@ func (m *IndexersMutation) ResetEdge(name string) error {
 // SeriesMutation represents an operation that mutates the Series nodes in the graph.
 type SeriesMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	tmdb_id       *int
-	addtmdb_id    *int
-	imdb_id       *string
-	title         *string
-	original_name *string
-	overview      *string
-	_path         *string
-	poster_path   *string
-	created_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Series, error)
-	predicates    []predicate.Series
+	op              Op
+	typ             string
+	id              *int
+	tmdb_id         *int
+	addtmdb_id      *int
+	imdb_id         *string
+	name            *string
+	original_name   *string
+	overview        *string
+	_path           *string
+	poster_path     *string
+	created_at      *time.Time
+	clearedFields   map[string]struct{}
+	episodes        map[int]struct{}
+	removedepisodes map[int]struct{}
+	clearedepisodes bool
+	done            bool
+	oldValue        func(context.Context) (*Series, error)
+	predicates      []predicate.Series
 }
 
 var _ ent.Mutation = (*SeriesMutation)(nil)
@@ -2960,40 +2943,40 @@ func (m *SeriesMutation) ResetImdbID() {
 	delete(m.clearedFields, series.FieldImdbID)
 }
 
-// SetTitle sets the "title" field.
-func (m *SeriesMutation) SetTitle(s string) {
-	m.title = &s
+// SetName sets the "name" field.
+func (m *SeriesMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *SeriesMutation) Title() (r string, exists bool) {
-	v := m.title
+// Name returns the value of the "name" field in the mutation.
+func (m *SeriesMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the Series entity.
+// OldName returns the old "name" field's value of the Series entity.
 // If the Series object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *SeriesMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.Name, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *SeriesMutation) ResetTitle() {
-	m.title = nil
+// ResetName resets all changes to the "name" field.
+func (m *SeriesMutation) ResetName() {
+	m.name = nil
 }
 
 // SetOriginalName sets the "original_name" field.
@@ -3189,6 +3172,60 @@ func (m *SeriesMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
+// AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
+func (m *SeriesMutation) AddEpisodeIDs(ids ...int) {
+	if m.episodes == nil {
+		m.episodes = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.episodes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEpisodes clears the "episodes" edge to the Episode entity.
+func (m *SeriesMutation) ClearEpisodes() {
+	m.clearedepisodes = true
+}
+
+// EpisodesCleared reports if the "episodes" edge to the Episode entity was cleared.
+func (m *SeriesMutation) EpisodesCleared() bool {
+	return m.clearedepisodes
+}
+
+// RemoveEpisodeIDs removes the "episodes" edge to the Episode entity by IDs.
+func (m *SeriesMutation) RemoveEpisodeIDs(ids ...int) {
+	if m.removedepisodes == nil {
+		m.removedepisodes = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.episodes, ids[i])
+		m.removedepisodes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEpisodes returns the removed IDs of the "episodes" edge to the Episode entity.
+func (m *SeriesMutation) RemovedEpisodesIDs() (ids []int) {
+	for id := range m.removedepisodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EpisodesIDs returns the "episodes" edge IDs in the mutation.
+func (m *SeriesMutation) EpisodesIDs() (ids []int) {
+	for id := range m.episodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEpisodes resets all changes to the "episodes" edge.
+func (m *SeriesMutation) ResetEpisodes() {
+	m.episodes = nil
+	m.clearedepisodes = false
+	m.removedepisodes = nil
+}
+
 // Where appends a list predicates to the SeriesMutation builder.
 func (m *SeriesMutation) Where(ps ...predicate.Series) {
 	m.predicates = append(m.predicates, ps...)
@@ -3230,8 +3267,8 @@ func (m *SeriesMutation) Fields() []string {
 	if m.imdb_id != nil {
 		fields = append(fields, series.FieldImdbID)
 	}
-	if m.title != nil {
-		fields = append(fields, series.FieldTitle)
+	if m.name != nil {
+		fields = append(fields, series.FieldName)
 	}
 	if m.original_name != nil {
 		fields = append(fields, series.FieldOriginalName)
@@ -3260,8 +3297,8 @@ func (m *SeriesMutation) Field(name string) (ent.Value, bool) {
 		return m.TmdbID()
 	case series.FieldImdbID:
 		return m.ImdbID()
-	case series.FieldTitle:
-		return m.Title()
+	case series.FieldName:
+		return m.Name()
 	case series.FieldOriginalName:
 		return m.OriginalName()
 	case series.FieldOverview:
@@ -3285,8 +3322,8 @@ func (m *SeriesMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldTmdbID(ctx)
 	case series.FieldImdbID:
 		return m.OldImdbID(ctx)
-	case series.FieldTitle:
-		return m.OldTitle(ctx)
+	case series.FieldName:
+		return m.OldName(ctx)
 	case series.FieldOriginalName:
 		return m.OldOriginalName(ctx)
 	case series.FieldOverview:
@@ -3320,12 +3357,12 @@ func (m *SeriesMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetImdbID(v)
 		return nil
-	case series.FieldTitle:
+	case series.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
+		m.SetName(v)
 		return nil
 	case series.FieldOriginalName:
 		v, ok := value.(string)
@@ -3447,8 +3484,8 @@ func (m *SeriesMutation) ResetField(name string) error {
 	case series.FieldImdbID:
 		m.ResetImdbID()
 		return nil
-	case series.FieldTitle:
-		m.ResetTitle()
+	case series.FieldName:
+		m.ResetName()
 		return nil
 	case series.FieldOriginalName:
 		m.ResetOriginalName()
@@ -3471,49 +3508,85 @@ func (m *SeriesMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *SeriesMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.episodes != nil {
+		edges = append(edges, series.EdgeEpisodes)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *SeriesMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case series.EdgeEpisodes:
+		ids := make([]ent.Value, 0, len(m.episodes))
+		for id := range m.episodes {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SeriesMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedepisodes != nil {
+		edges = append(edges, series.EdgeEpisodes)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *SeriesMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case series.EdgeEpisodes:
+		ids := make([]ent.Value, 0, len(m.removedepisodes))
+		for id := range m.removedepisodes {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *SeriesMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedepisodes {
+		edges = append(edges, series.EdgeEpisodes)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *SeriesMutation) EdgeCleared(name string) bool {
+	switch name {
+	case series.EdgeEpisodes:
+		return m.clearedepisodes
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *SeriesMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Series unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *SeriesMutation) ResetEdge(name string) error {
+	switch name {
+	case series.EdgeEpisodes:
+		m.ResetEpisodes()
+		return nil
+	}
 	return fmt.Errorf("unknown Series edge %s", name)
 }
 

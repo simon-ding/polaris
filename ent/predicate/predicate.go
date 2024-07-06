@@ -9,8 +9,8 @@ import (
 // DownloadClients is the predicate function for downloadclients builders.
 type DownloadClients func(*sql.Selector)
 
-// Epidodes is the predicate function for epidodes builders.
-type Epidodes func(*sql.Selector)
+// Episode is the predicate function for episode builders.
+type Episode func(*sql.Selector)
 
 // History is the predicate function for history builders.
 type History func(*sql.Selector)

@@ -41,12 +41,8 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 	}
 	log.Infof("find detail for tv id %d: %v", in.ID, detail)
 
-	wl, err := s.db.AddWatchlist(in.RootFolder, detail)
-	if err != nil {
-		return nil, errors.Wrap(err, "add to list")
-	}
-	log.Infof("save watchlist success: %s", detail.Name)
 
+	var epIds []int
 	for _, season := range detail.Seasons {
 		seasonId := season.SeasonNumber
 		se, err := s.MustTMDB().GetSeasonDetails(int(detail.ID), seasonId, s.language)
@@ -55,8 +51,7 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 			continue
 		}
 		for _, ep := range se.Episodes {
-			err = s.db.SaveEposideDetail(&ent.Epidodes{
-				SeriesID:      wl.ID,
+			epid, err := s.db.SaveEposideDetail(&ent.Episode{
 				SeasonNumber:  seasonId,
 				EpisodeNumber: ep.EpisodeNumber,
 				Title:         ep.Name,
@@ -67,8 +62,14 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 				log.Errorf("save episode info error: %v", err)
 				continue
 			}
+			epIds = append(epIds, epid)
 		}
 	}
+	_, err = s.db.AddWatchlist(in.RootFolder, detail, epIds)
+	if err != nil {
+		return nil, errors.Wrap(err, "add to list")
+	}
+
 	log.Infof("add tv %s to watchlist success", detail.Name)
 	return nil, nil
 }
@@ -76,4 +77,9 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 func (s *Server) GetWatchlist(c *gin.Context) (interface{}, error) {
 	list := s.db.GetWatchlist()
 	return list, nil
+}
+
+
+func (s *Server) GetTvDetails(c *gin.Context) (interface{}, error) {
+	return nil, nil
 }

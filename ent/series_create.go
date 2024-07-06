@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"polaris/ent/episode"
 	"polaris/ent/series"
 	"time"
 
@@ -40,9 +41,9 @@ func (sc *SeriesCreate) SetNillableImdbID(s *string) *SeriesCreate {
 	return sc
 }
 
-// SetTitle sets the "title" field.
-func (sc *SeriesCreate) SetTitle(s string) *SeriesCreate {
-	sc.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (sc *SeriesCreate) SetName(s string) *SeriesCreate {
+	sc.mutation.SetName(s)
 	return sc
 }
 
@@ -92,6 +93,21 @@ func (sc *SeriesCreate) SetNillableCreatedAt(t *time.Time) *SeriesCreate {
 	return sc
 }
 
+// AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
+func (sc *SeriesCreate) AddEpisodeIDs(ids ...int) *SeriesCreate {
+	sc.mutation.AddEpisodeIDs(ids...)
+	return sc
+}
+
+// AddEpisodes adds the "episodes" edges to the Episode entity.
+func (sc *SeriesCreate) AddEpisodes(e ...*Episode) *SeriesCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return sc.AddEpisodeIDs(ids...)
+}
+
 // Mutation returns the SeriesMutation object of the builder.
 func (sc *SeriesCreate) Mutation() *SeriesMutation {
 	return sc.mutation
@@ -138,8 +154,8 @@ func (sc *SeriesCreate) check() error {
 	if _, ok := sc.mutation.TmdbID(); !ok {
 		return &ValidationError{Name: "tmdb_id", err: errors.New(`ent: missing required field "Series.tmdb_id"`)}
 	}
-	if _, ok := sc.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Series.title"`)}
+	if _, ok := sc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Series.name"`)}
 	}
 	if _, ok := sc.mutation.OriginalName(); !ok {
 		return &ValidationError{Name: "original_name", err: errors.New(`ent: missing required field "Series.original_name"`)}
@@ -187,9 +203,9 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 		_spec.SetField(series.FieldImdbID, field.TypeString, value)
 		_node.ImdbID = value
 	}
-	if value, ok := sc.mutation.Title(); ok {
-		_spec.SetField(series.FieldTitle, field.TypeString, value)
-		_node.Title = value
+	if value, ok := sc.mutation.Name(); ok {
+		_spec.SetField(series.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if value, ok := sc.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)
@@ -210,6 +226,22 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if nodes := sc.mutation.EpisodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   series.EpisodesTable,
+			Columns: []string{series.EpisodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

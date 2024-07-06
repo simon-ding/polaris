@@ -20,16 +20,16 @@ func (f DownloadClientsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DownloadClientsMutation", m)
 }
 
-// The EpidodesFunc type is an adapter to allow the use of ordinary
-// function as Epidodes mutator.
-type EpidodesFunc func(context.Context, *ent.EpidodesMutation) (ent.Value, error)
+// The EpisodeFunc type is an adapter to allow the use of ordinary
+// function as Episode mutator.
+type EpisodeFunc func(context.Context, *ent.EpisodeMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f EpidodesFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.EpidodesMutation); ok {
+func (f EpisodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EpisodeMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EpidodesMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EpisodeMutation", m)
 }
 
 // The HistoryFunc type is an adapter to allow the use of ordinary

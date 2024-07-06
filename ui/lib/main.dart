@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     final _shellRoute = ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
         return Scaffold(
-             appBar: AppBar(
+            appBar: AppBar(
               // TRY THIS: Try changing the color here to a specific color (to
               // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
               // change color while the other colors stay the same.
@@ -30,6 +30,11 @@ class MyApp extends StatelessWidget {
               // Here we take the value from the MyHomePage object that was created by
               // the App.build method, and use it to set our appbar title.
               title: const Text("Polaris追剧"),
+              actions: [
+                IconButton(
+                    onPressed: () => context.go(SystemSettingsPage.route),
+                    icon: const Icon(Icons.settings))
+              ],
             ),
             body: Center(
                 // Center is a layout widget. It takes a single child and positions it

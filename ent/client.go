@@ -12,7 +12,7 @@ import (
 	"polaris/ent/migrate"
 
 	"polaris/ent/downloadclients"
-	"polaris/ent/epidodes"
+	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/series"
@@ -21,6 +21,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -30,8 +31,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// DownloadClients is the client for interacting with the DownloadClients builders.
 	DownloadClients *DownloadClientsClient
-	// Epidodes is the client for interacting with the Epidodes builders.
-	Epidodes *EpidodesClient
+	// Episode is the client for interacting with the Episode builders.
+	Episode *EpisodeClient
 	// History is the client for interacting with the History builders.
 	History *HistoryClient
 	// Indexers is the client for interacting with the Indexers builders.
@@ -52,7 +53,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.DownloadClients = NewDownloadClientsClient(c.config)
-	c.Epidodes = NewEpidodesClient(c.config)
+	c.Episode = NewEpisodeClient(c.config)
 	c.History = NewHistoryClient(c.config)
 	c.Indexers = NewIndexersClient(c.config)
 	c.Series = NewSeriesClient(c.config)
@@ -150,7 +151,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:             ctx,
 		config:          cfg,
 		DownloadClients: NewDownloadClientsClient(cfg),
-		Epidodes:        NewEpidodesClient(cfg),
+		Episode:         NewEpisodeClient(cfg),
 		History:         NewHistoryClient(cfg),
 		Indexers:        NewIndexersClient(cfg),
 		Series:          NewSeriesClient(cfg),
@@ -175,7 +176,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:             ctx,
 		config:          cfg,
 		DownloadClients: NewDownloadClientsClient(cfg),
-		Epidodes:        NewEpidodesClient(cfg),
+		Episode:         NewEpisodeClient(cfg),
 		History:         NewHistoryClient(cfg),
 		Indexers:        NewIndexersClient(cfg),
 		Series:          NewSeriesClient(cfg),
@@ -209,7 +210,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.DownloadClients, c.Epidodes, c.History, c.Indexers, c.Series, c.Settings,
+		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Series, c.Settings,
 	} {
 		n.Use(hooks...)
 	}
@@ -219,7 +220,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.DownloadClients, c.Epidodes, c.History, c.Indexers, c.Series, c.Settings,
+		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Series, c.Settings,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -230,8 +231,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *DownloadClientsMutation:
 		return c.DownloadClients.mutate(ctx, m)
-	case *EpidodesMutation:
-		return c.Epidodes.mutate(ctx, m)
+	case *EpisodeMutation:
+		return c.Episode.mutate(ctx, m)
 	case *HistoryMutation:
 		return c.History.mutate(ctx, m)
 	case *IndexersMutation:
@@ -378,107 +379,107 @@ func (c *DownloadClientsClient) mutate(ctx context.Context, m *DownloadClientsMu
 	}
 }
 
-// EpidodesClient is a client for the Epidodes schema.
-type EpidodesClient struct {
+// EpisodeClient is a client for the Episode schema.
+type EpisodeClient struct {
 	config
 }
 
-// NewEpidodesClient returns a client for the Epidodes from the given config.
-func NewEpidodesClient(c config) *EpidodesClient {
-	return &EpidodesClient{config: c}
+// NewEpisodeClient returns a client for the Episode from the given config.
+func NewEpisodeClient(c config) *EpisodeClient {
+	return &EpisodeClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `epidodes.Hooks(f(g(h())))`.
-func (c *EpidodesClient) Use(hooks ...Hook) {
-	c.hooks.Epidodes = append(c.hooks.Epidodes, hooks...)
+// A call to `Use(f, g, h)` equals to `episode.Hooks(f(g(h())))`.
+func (c *EpisodeClient) Use(hooks ...Hook) {
+	c.hooks.Episode = append(c.hooks.Episode, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `epidodes.Intercept(f(g(h())))`.
-func (c *EpidodesClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Epidodes = append(c.inters.Epidodes, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `episode.Intercept(f(g(h())))`.
+func (c *EpisodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Episode = append(c.inters.Episode, interceptors...)
 }
 
-// Create returns a builder for creating a Epidodes entity.
-func (c *EpidodesClient) Create() *EpidodesCreate {
-	mutation := newEpidodesMutation(c.config, OpCreate)
-	return &EpidodesCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Episode entity.
+func (c *EpisodeClient) Create() *EpisodeCreate {
+	mutation := newEpisodeMutation(c.config, OpCreate)
+	return &EpisodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Epidodes entities.
-func (c *EpidodesClient) CreateBulk(builders ...*EpidodesCreate) *EpidodesCreateBulk {
-	return &EpidodesCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Episode entities.
+func (c *EpisodeClient) CreateBulk(builders ...*EpisodeCreate) *EpisodeCreateBulk {
+	return &EpisodeCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *EpidodesClient) MapCreateBulk(slice any, setFunc func(*EpidodesCreate, int)) *EpidodesCreateBulk {
+func (c *EpisodeClient) MapCreateBulk(slice any, setFunc func(*EpisodeCreate, int)) *EpisodeCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &EpidodesCreateBulk{err: fmt.Errorf("calling to EpidodesClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &EpisodeCreateBulk{err: fmt.Errorf("calling to EpisodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*EpidodesCreate, rv.Len())
+	builders := make([]*EpisodeCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &EpidodesCreateBulk{config: c.config, builders: builders}
+	return &EpisodeCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Epidodes.
-func (c *EpidodesClient) Update() *EpidodesUpdate {
-	mutation := newEpidodesMutation(c.config, OpUpdate)
-	return &EpidodesUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Episode.
+func (c *EpisodeClient) Update() *EpisodeUpdate {
+	mutation := newEpisodeMutation(c.config, OpUpdate)
+	return &EpisodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *EpidodesClient) UpdateOne(e *Epidodes) *EpidodesUpdateOne {
-	mutation := newEpidodesMutation(c.config, OpUpdateOne, withEpidodes(e))
-	return &EpidodesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EpisodeClient) UpdateOne(e *Episode) *EpisodeUpdateOne {
+	mutation := newEpisodeMutation(c.config, OpUpdateOne, withEpisode(e))
+	return &EpisodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EpidodesClient) UpdateOneID(id int) *EpidodesUpdateOne {
-	mutation := newEpidodesMutation(c.config, OpUpdateOne, withEpidodesID(id))
-	return &EpidodesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EpisodeClient) UpdateOneID(id int) *EpisodeUpdateOne {
+	mutation := newEpisodeMutation(c.config, OpUpdateOne, withEpisodeID(id))
+	return &EpisodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Epidodes.
-func (c *EpidodesClient) Delete() *EpidodesDelete {
-	mutation := newEpidodesMutation(c.config, OpDelete)
-	return &EpidodesDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Episode.
+func (c *EpisodeClient) Delete() *EpisodeDelete {
+	mutation := newEpisodeMutation(c.config, OpDelete)
+	return &EpisodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *EpidodesClient) DeleteOne(e *Epidodes) *EpidodesDeleteOne {
+func (c *EpisodeClient) DeleteOne(e *Episode) *EpisodeDeleteOne {
 	return c.DeleteOneID(e.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EpidodesClient) DeleteOneID(id int) *EpidodesDeleteOne {
-	builder := c.Delete().Where(epidodes.ID(id))
+func (c *EpisodeClient) DeleteOneID(id int) *EpisodeDeleteOne {
+	builder := c.Delete().Where(episode.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &EpidodesDeleteOne{builder}
+	return &EpisodeDeleteOne{builder}
 }
 
-// Query returns a query builder for Epidodes.
-func (c *EpidodesClient) Query() *EpidodesQuery {
-	return &EpidodesQuery{
+// Query returns a query builder for Episode.
+func (c *EpisodeClient) Query() *EpisodeQuery {
+	return &EpisodeQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeEpidodes},
+		ctx:    &QueryContext{Type: TypeEpisode},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Epidodes entity by its id.
-func (c *EpidodesClient) Get(ctx context.Context, id int) (*Epidodes, error) {
-	return c.Query().Where(epidodes.ID(id)).Only(ctx)
+// Get returns a Episode entity by its id.
+func (c *EpisodeClient) Get(ctx context.Context, id int) (*Episode, error) {
+	return c.Query().Where(episode.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EpidodesClient) GetX(ctx context.Context, id int) *Epidodes {
+func (c *EpisodeClient) GetX(ctx context.Context, id int) *Episode {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -486,28 +487,44 @@ func (c *EpidodesClient) GetX(ctx context.Context, id int) *Epidodes {
 	return obj
 }
 
+// QuerySeries queries the series edge of a Episode.
+func (c *EpisodeClient) QuerySeries(e *Episode) *SeriesQuery {
+	query := (&SeriesClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(episode.Table, episode.FieldID, id),
+			sqlgraph.To(series.Table, series.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, episode.SeriesTable, episode.SeriesColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
-func (c *EpidodesClient) Hooks() []Hook {
-	return c.hooks.Epidodes
+func (c *EpisodeClient) Hooks() []Hook {
+	return c.hooks.Episode
 }
 
 // Interceptors returns the client interceptors.
-func (c *EpidodesClient) Interceptors() []Interceptor {
-	return c.inters.Epidodes
+func (c *EpisodeClient) Interceptors() []Interceptor {
+	return c.inters.Episode
 }
 
-func (c *EpidodesClient) mutate(ctx context.Context, m *EpidodesMutation) (Value, error) {
+func (c *EpisodeClient) mutate(ctx context.Context, m *EpisodeMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&EpidodesCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EpisodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&EpidodesUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EpisodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&EpidodesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EpisodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&EpidodesDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&EpisodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Epidodes mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Episode mutation op: %q", m.Op())
 	}
 }
 
@@ -885,6 +902,22 @@ func (c *SeriesClient) GetX(ctx context.Context, id int) *Series {
 	return obj
 }
 
+// QueryEpisodes queries the episodes edge of a Series.
+func (c *SeriesClient) QueryEpisodes(s *Series) *EpisodeQuery {
+	query := (&EpisodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(series.Table, series.FieldID, id),
+			sqlgraph.To(episode.Table, episode.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, series.EpisodesTable, series.EpisodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *SeriesClient) Hooks() []Hook {
 	return c.hooks.Series
@@ -1046,9 +1079,9 @@ func (c *SettingsClient) mutate(ctx context.Context, m *SettingsMutation) (Value
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		DownloadClients, Epidodes, History, Indexers, Series, Settings []ent.Hook
+		DownloadClients, Episode, History, Indexers, Series, Settings []ent.Hook
 	}
 	inters struct {
-		DownloadClients, Epidodes, History, Indexers, Series, Settings []ent.Interceptor
+		DownloadClients, Episode, History, Indexers, Series, Settings []ent.Interceptor
 	}
 )

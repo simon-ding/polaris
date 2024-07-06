@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"polaris/ent/episode"
 	"polaris/ent/predicate"
 	"polaris/ent/series"
 	"time"
@@ -69,16 +70,16 @@ func (su *SeriesUpdate) ClearImdbID() *SeriesUpdate {
 	return su
 }
 
-// SetTitle sets the "title" field.
-func (su *SeriesUpdate) SetTitle(s string) *SeriesUpdate {
-	su.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (su *SeriesUpdate) SetName(s string) *SeriesUpdate {
+	su.mutation.SetName(s)
 	return su
 }
 
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (su *SeriesUpdate) SetNillableTitle(s *string) *SeriesUpdate {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableName(s *string) *SeriesUpdate {
 	if s != nil {
-		su.SetTitle(*s)
+		su.SetName(*s)
 	}
 	return su
 }
@@ -159,9 +160,45 @@ func (su *SeriesUpdate) SetNillableCreatedAt(t *time.Time) *SeriesUpdate {
 	return su
 }
 
+// AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
+func (su *SeriesUpdate) AddEpisodeIDs(ids ...int) *SeriesUpdate {
+	su.mutation.AddEpisodeIDs(ids...)
+	return su
+}
+
+// AddEpisodes adds the "episodes" edges to the Episode entity.
+func (su *SeriesUpdate) AddEpisodes(e ...*Episode) *SeriesUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return su.AddEpisodeIDs(ids...)
+}
+
 // Mutation returns the SeriesMutation object of the builder.
 func (su *SeriesUpdate) Mutation() *SeriesMutation {
 	return su.mutation
+}
+
+// ClearEpisodes clears all "episodes" edges to the Episode entity.
+func (su *SeriesUpdate) ClearEpisodes() *SeriesUpdate {
+	su.mutation.ClearEpisodes()
+	return su
+}
+
+// RemoveEpisodeIDs removes the "episodes" edge to Episode entities by IDs.
+func (su *SeriesUpdate) RemoveEpisodeIDs(ids ...int) *SeriesUpdate {
+	su.mutation.RemoveEpisodeIDs(ids...)
+	return su
+}
+
+// RemoveEpisodes removes "episodes" edges to Episode entities.
+func (su *SeriesUpdate) RemoveEpisodes(e ...*Episode) *SeriesUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return su.RemoveEpisodeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -212,8 +249,8 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.ImdbIDCleared() {
 		_spec.ClearField(series.FieldImdbID, field.TypeString)
 	}
-	if value, ok := su.mutation.Title(); ok {
-		_spec.SetField(series.FieldTitle, field.TypeString, value)
+	if value, ok := su.mutation.Name(); ok {
+		_spec.SetField(series.FieldName, field.TypeString, value)
 	}
 	if value, ok := su.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)
@@ -232,6 +269,51 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.CreatedAt(); ok {
 		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
+	}
+	if su.mutation.EpisodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   series.EpisodesTable,
+			Columns: []string{series.EpisodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedEpisodesIDs(); len(nodes) > 0 && !su.mutation.EpisodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   series.EpisodesTable,
+			Columns: []string{series.EpisodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.EpisodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   series.EpisodesTable,
+			Columns: []string{series.EpisodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -294,16 +376,16 @@ func (suo *SeriesUpdateOne) ClearImdbID() *SeriesUpdateOne {
 	return suo
 }
 
-// SetTitle sets the "title" field.
-func (suo *SeriesUpdateOne) SetTitle(s string) *SeriesUpdateOne {
-	suo.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (suo *SeriesUpdateOne) SetName(s string) *SeriesUpdateOne {
+	suo.mutation.SetName(s)
 	return suo
 }
 
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (suo *SeriesUpdateOne) SetNillableTitle(s *string) *SeriesUpdateOne {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableName(s *string) *SeriesUpdateOne {
 	if s != nil {
-		suo.SetTitle(*s)
+		suo.SetName(*s)
 	}
 	return suo
 }
@@ -384,9 +466,45 @@ func (suo *SeriesUpdateOne) SetNillableCreatedAt(t *time.Time) *SeriesUpdateOne 
 	return suo
 }
 
+// AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
+func (suo *SeriesUpdateOne) AddEpisodeIDs(ids ...int) *SeriesUpdateOne {
+	suo.mutation.AddEpisodeIDs(ids...)
+	return suo
+}
+
+// AddEpisodes adds the "episodes" edges to the Episode entity.
+func (suo *SeriesUpdateOne) AddEpisodes(e ...*Episode) *SeriesUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return suo.AddEpisodeIDs(ids...)
+}
+
 // Mutation returns the SeriesMutation object of the builder.
 func (suo *SeriesUpdateOne) Mutation() *SeriesMutation {
 	return suo.mutation
+}
+
+// ClearEpisodes clears all "episodes" edges to the Episode entity.
+func (suo *SeriesUpdateOne) ClearEpisodes() *SeriesUpdateOne {
+	suo.mutation.ClearEpisodes()
+	return suo
+}
+
+// RemoveEpisodeIDs removes the "episodes" edge to Episode entities by IDs.
+func (suo *SeriesUpdateOne) RemoveEpisodeIDs(ids ...int) *SeriesUpdateOne {
+	suo.mutation.RemoveEpisodeIDs(ids...)
+	return suo
+}
+
+// RemoveEpisodes removes "episodes" edges to Episode entities.
+func (suo *SeriesUpdateOne) RemoveEpisodes(e ...*Episode) *SeriesUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return suo.RemoveEpisodeIDs(ids...)
 }
 
 // Where appends a list predicates to the SeriesUpdate builder.
@@ -467,8 +585,8 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	if suo.mutation.ImdbIDCleared() {
 		_spec.ClearField(series.FieldImdbID, field.TypeString)
 	}
-	if value, ok := suo.mutation.Title(); ok {
-		_spec.SetField(series.FieldTitle, field.TypeString, value)
+	if value, ok := suo.mutation.Name(); ok {
+		_spec.SetField(series.FieldName, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)
@@ -487,6 +605,51 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	}
 	if value, ok := suo.mutation.CreatedAt(); ok {
 		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
+	}
+	if suo.mutation.EpisodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   series.EpisodesTable,
+			Columns: []string{series.EpisodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedEpisodesIDs(); len(nodes) > 0 && !suo.mutation.EpisodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   series.EpisodesTable,
+			Columns: []string{series.EpisodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.EpisodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   series.EpisodesTable,
+			Columns: []string{series.EpisodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Series{config: suo.config}
 	_spec.Assign = _node.assignValues

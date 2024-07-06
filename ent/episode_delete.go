@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"polaris/ent/epidodes"
+	"polaris/ent/episode"
 	"polaris/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
@@ -12,26 +12,26 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// EpidodesDelete is the builder for deleting a Epidodes entity.
-type EpidodesDelete struct {
+// EpisodeDelete is the builder for deleting a Episode entity.
+type EpisodeDelete struct {
 	config
 	hooks    []Hook
-	mutation *EpidodesMutation
+	mutation *EpisodeMutation
 }
 
-// Where appends a list predicates to the EpidodesDelete builder.
-func (ed *EpidodesDelete) Where(ps ...predicate.Epidodes) *EpidodesDelete {
+// Where appends a list predicates to the EpisodeDelete builder.
+func (ed *EpisodeDelete) Where(ps ...predicate.Episode) *EpisodeDelete {
 	ed.mutation.Where(ps...)
 	return ed
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (ed *EpidodesDelete) Exec(ctx context.Context) (int, error) {
+func (ed *EpisodeDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, ed.sqlExec, ed.mutation, ed.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ed *EpidodesDelete) ExecX(ctx context.Context) int {
+func (ed *EpisodeDelete) ExecX(ctx context.Context) int {
 	n, err := ed.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -39,8 +39,8 @@ func (ed *EpidodesDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (ed *EpidodesDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(epidodes.Table, sqlgraph.NewFieldSpec(epidodes.FieldID, field.TypeInt))
+func (ed *EpisodeDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(episode.Table, sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt))
 	if ps := ed.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,32 +56,32 @@ func (ed *EpidodesDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// EpidodesDeleteOne is the builder for deleting a single Epidodes entity.
-type EpidodesDeleteOne struct {
-	ed *EpidodesDelete
+// EpisodeDeleteOne is the builder for deleting a single Episode entity.
+type EpisodeDeleteOne struct {
+	ed *EpisodeDelete
 }
 
-// Where appends a list predicates to the EpidodesDelete builder.
-func (edo *EpidodesDeleteOne) Where(ps ...predicate.Epidodes) *EpidodesDeleteOne {
+// Where appends a list predicates to the EpisodeDelete builder.
+func (edo *EpisodeDeleteOne) Where(ps ...predicate.Episode) *EpisodeDeleteOne {
 	edo.ed.mutation.Where(ps...)
 	return edo
 }
 
 // Exec executes the deletion query.
-func (edo *EpidodesDeleteOne) Exec(ctx context.Context) error {
+func (edo *EpisodeDeleteOne) Exec(ctx context.Context) error {
 	n, err := edo.ed.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{epidodes.Label}
+		return &NotFoundError{episode.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (edo *EpidodesDeleteOne) ExecX(ctx context.Context) {
+func (edo *EpisodeDeleteOne) ExecX(ctx context.Context) {
 	if err := edo.Exec(ctx); err != nil {
 		panic(err)
 	}

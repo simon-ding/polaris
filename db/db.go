@@ -65,7 +65,7 @@ func (c *Client) GetLanguage() string {
 	return lang
 }
 
-func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails) (*ent.Series, error) {
+func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails, episodes []int) (*ent.Series, error) {
 	count := c.ent.Series.Query().Where(series.TmdbID(int(detail.ID))).CountX(context.Background())
 	if (count > 0) {
 		return nil, fmt.Errorf("tv series %s already in watchlist", detail.Name)
@@ -74,9 +74,10 @@ func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails) (*ent.Series,
 		SetTmdbID(int(detail.ID)).
 		SetPath(path).
 		SetOverview(detail.Overview).
-		SetTitle(detail.Name).
+		SetName(detail.Name).
 		SetOriginalName(detail.OriginalName).
 		SetPosterPath(detail.PosterPath).
+		AddEpisodeIDs(episodes...).
 		Save(context.TODO())
 	return r, err
 }
@@ -90,16 +91,15 @@ func (c *Client) GetWatchlist() []*ent.Series {
 	return list
 }
 
-func (c *Client) SaveEposideDetail(d *ent.Epidodes) error {
-	_, err := c.ent.Epidodes.Create().
+func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
+	ep, err := c.ent.Episode.Create().
 		SetAirDate(d.AirDate).
 		SetSeasonNumber(d.SeasonNumber).
 		SetEpisodeNumber(d.EpisodeNumber).
-		SetSeriesID(d.SeriesID).
 		SetOverview(d.Overview).
 		SetTitle(d.Title).Save(context.TODO())
 
-	return err
+	return ep.ID,err
 }
 
 type TorznabSetting struct {
