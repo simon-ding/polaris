@@ -17,8 +17,10 @@ type Episode struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// SeriesID holds the value of the "series_id" field.
+	SeriesID int `json:"series_id,omitempty"`
 	// SeasonNumber holds the value of the "season_number" field.
-	SeasonNumber int `json:"season_number,omitempty"`
+	SeasonNumber int `json:"season_number"`
 	// EpisodeNumber holds the value of the "episode_number" field.
 	EpisodeNumber int `json:"episode_number,omitempty"`
 	// Title holds the value of the "title" field.
@@ -29,9 +31,8 @@ type Episode struct {
 	AirDate string `json:"air_date,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EpisodeQuery when eager-loading is set.
-	Edges           EpisodeEdges `json:"edges"`
-	series_episodes *int
-	selectValues    sql.SelectValues
+	Edges        EpisodeEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // EpisodeEdges holds the relations/edges for other nodes in the graph.
@@ -59,12 +60,10 @@ func (*Episode) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case episode.FieldID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
+		case episode.FieldID, episode.FieldSeriesID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
 			values[i] = new(sql.NullInt64)
 		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate:
 			values[i] = new(sql.NullString)
-		case episode.ForeignKeys[0]: // series_episodes
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -86,6 +85,12 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			e.ID = int(value.Int64)
+		case episode.FieldSeriesID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field series_id", values[i])
+			} else if value.Valid {
+				e.SeriesID = int(value.Int64)
+			}
 		case episode.FieldSeasonNumber:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field season_number", values[i])
@@ -115,13 +120,6 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field air_date", values[i])
 			} else if value.Valid {
 				e.AirDate = value.String
-			}
-		case episode.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field series_episodes", value)
-			} else if value.Valid {
-				e.series_episodes = new(int)
-				*e.series_episodes = int(value.Int64)
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -164,6 +162,9 @@ func (e *Episode) String() string {
 	var builder strings.Builder
 	builder.WriteString("Episode(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", e.ID))
+	builder.WriteString("series_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.SeriesID))
+	builder.WriteString(", ")
 	builder.WriteString("season_number=")
 	builder.WriteString(fmt.Sprintf("%v", e.SeasonNumber))
 	builder.WriteString(", ")

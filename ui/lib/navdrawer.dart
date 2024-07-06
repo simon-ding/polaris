@@ -42,7 +42,7 @@ class _NavDrawerState extends State<NavDrawer> {
                 destinations: const <NavigationRailDestination>[
                   NavigationRailDestination(
                     icon: Icon(Icons.live_tv),
-                    label: Text(' 电视剧'),
+                    label: Text('电视剧'),
                   ),
                   NavigationRailDestination(
                     icon: Icon(Icons.download),

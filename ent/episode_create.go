@@ -20,6 +20,20 @@ type EpisodeCreate struct {
 	hooks    []Hook
 }
 
+// SetSeriesID sets the "series_id" field.
+func (ec *EpisodeCreate) SetSeriesID(i int) *EpisodeCreate {
+	ec.mutation.SetSeriesID(i)
+	return ec
+}
+
+// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableSeriesID(i *int) *EpisodeCreate {
+	if i != nil {
+		ec.SetSeriesID(*i)
+	}
+	return ec
+}
+
 // SetSeasonNumber sets the "season_number" field.
 func (ec *EpisodeCreate) SetSeasonNumber(i int) *EpisodeCreate {
 	ec.mutation.SetSeasonNumber(i)
@@ -47,20 +61,6 @@ func (ec *EpisodeCreate) SetOverview(s string) *EpisodeCreate {
 // SetAirDate sets the "air_date" field.
 func (ec *EpisodeCreate) SetAirDate(s string) *EpisodeCreate {
 	ec.mutation.SetAirDate(s)
-	return ec
-}
-
-// SetSeriesID sets the "series" edge to the Series entity by ID.
-func (ec *EpisodeCreate) SetSeriesID(id int) *EpisodeCreate {
-	ec.mutation.SetSeriesID(id)
-	return ec
-}
-
-// SetNillableSeriesID sets the "series" edge to the Series entity by ID if the given value is not nil.
-func (ec *EpisodeCreate) SetNillableSeriesID(id *int) *EpisodeCreate {
-	if id != nil {
-		ec = ec.SetSeriesID(*id)
-	}
 	return ec
 }
 
@@ -178,7 +178,7 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.series_episodes = &nodes[0]
+		_node.SeriesID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

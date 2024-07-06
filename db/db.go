@@ -67,7 +67,7 @@ func (c *Client) GetLanguage() string {
 
 func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails, episodes []int) (*ent.Series, error) {
 	count := c.ent.Series.Query().Where(series.TmdbID(int(detail.ID))).CountX(context.Background())
-	if (count > 0) {
+	if count > 0 {
 		return nil, fmt.Errorf("tv series %s already in watchlist", detail.Name)
 	}
 	r, err := c.ent.Series.Create().
@@ -91,6 +91,20 @@ func (c *Client) GetWatchlist() []*ent.Series {
 	return list
 }
 
+type SeriesDetails struct {
+	*ent.Series
+	Episodes []*ent.Episode `json:"episodes"`
+}
+
+func (c *Client) GetSeriesDetails(id int) *SeriesDetails {
+	se := c.ent.Series.Query().Where(series.ID(id)).FirstX(context.TODO())
+	ep := se.QueryEpisodes().AllX(context.Background())
+	return &SeriesDetails{
+		Series:   se,
+		Episodes: ep,
+	}
+}
+
 func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
 	ep, err := c.ent.Episode.Create().
 		SetAirDate(d.AirDate).
@@ -99,7 +113,7 @@ func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
 		SetOverview(d.Overview).
 		SetTitle(d.Title).Save(context.TODO())
 
-	return ep.ID,err
+	return ep.ID, err
 }
 
 type TorznabSetting struct {

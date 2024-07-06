@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/navdrawer.dart';
 import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
+import 'package:ui/tv_details.dart';
 import 'package:ui/weclome.dart';
 
 void main() {
@@ -57,6 +58,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: SystemSettingsPage.route,
           builder: (context, state) => SystemSettingsPage(),
+        ),
+        GoRoute(
+          path: TvDetailsPage.route,
+          builder: (context, state) => TvDetailsPage(seriesId: state.pathParameters['id']!),
         )
       ],
     );

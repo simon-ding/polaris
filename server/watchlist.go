@@ -3,6 +3,7 @@ package server
 import (
 	"polaris/ent"
 	"polaris/log"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -81,5 +82,11 @@ func (s *Server) GetWatchlist(c *gin.Context) (interface{}, error) {
 
 
 func (s *Server) GetTvDetails(c *gin.Context) (interface{}, error) {
-	return nil, nil
+	ids := c.Param("id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, errors.Wrap(err, "convert")
+	}
+	detail := s.db.GetSeriesDetails(id)
+	return detail, nil
 }

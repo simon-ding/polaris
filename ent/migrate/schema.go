@@ -37,7 +37,7 @@ var (
 		{Name: "title", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
 		{Name: "air_date", Type: field.TypeString},
-		{Name: "series_episodes", Type: field.TypeInt, Nullable: true},
+		{Name: "series_id", Type: field.TypeInt, Nullable: true},
 	}
 	// EpisodesTable holds the schema information for the "episodes" table.
 	EpisodesTable = &schema.Table{

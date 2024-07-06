@@ -54,6 +54,11 @@ func IDLTE(id int) predicate.Episode {
 	return predicate.Episode(sql.FieldLTE(FieldID, id))
 }
 
+// SeriesID applies equality check predicate on the "series_id" field. It's identical to SeriesIDEQ.
+func SeriesID(v int) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldSeriesID, v))
+}
+
 // SeasonNumber applies equality check predicate on the "season_number" field. It's identical to SeasonNumberEQ.
 func SeasonNumber(v int) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldSeasonNumber, v))
@@ -77,6 +82,36 @@ func Overview(v string) predicate.Episode {
 // AirDate applies equality check predicate on the "air_date" field. It's identical to AirDateEQ.
 func AirDate(v string) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldAirDate, v))
+}
+
+// SeriesIDEQ applies the EQ predicate on the "series_id" field.
+func SeriesIDEQ(v int) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldSeriesID, v))
+}
+
+// SeriesIDNEQ applies the NEQ predicate on the "series_id" field.
+func SeriesIDNEQ(v int) predicate.Episode {
+	return predicate.Episode(sql.FieldNEQ(FieldSeriesID, v))
+}
+
+// SeriesIDIn applies the In predicate on the "series_id" field.
+func SeriesIDIn(vs ...int) predicate.Episode {
+	return predicate.Episode(sql.FieldIn(FieldSeriesID, vs...))
+}
+
+// SeriesIDNotIn applies the NotIn predicate on the "series_id" field.
+func SeriesIDNotIn(vs ...int) predicate.Episode {
+	return predicate.Episode(sql.FieldNotIn(FieldSeriesID, vs...))
+}
+
+// SeriesIDIsNil applies the IsNil predicate on the "series_id" field.
+func SeriesIDIsNil() predicate.Episode {
+	return predicate.Episode(sql.FieldIsNull(FieldSeriesID))
+}
+
+// SeriesIDNotNil applies the NotNil predicate on the "series_id" field.
+func SeriesIDNotNil() predicate.Episode {
+	return predicate.Episode(sql.FieldNotNull(FieldSeriesID))
 }
 
 // SeasonNumberEQ applies the EQ predicate on the "season_number" field.

@@ -23,7 +23,6 @@ type EpisodeQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Episode
 	withSeries *SeriesQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -298,12 +297,12 @@ func (eq *EpisodeQuery) WithSeries(opts ...func(*SeriesQuery)) *EpisodeQuery {
 // Example:
 //
 //	var v []struct {
-//		SeasonNumber int `json:"season_number,omitempty"`
+//		SeriesID int `json:"series_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Episode.Query().
-//		GroupBy(episode.FieldSeasonNumber).
+//		GroupBy(episode.FieldSeriesID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (eq *EpisodeQuery) GroupBy(field string, fields ...string) *EpisodeGroupBy {
@@ -321,11 +320,11 @@ func (eq *EpisodeQuery) GroupBy(field string, fields ...string) *EpisodeGroupBy 
 // Example:
 //
 //	var v []struct {
-//		SeasonNumber int `json:"season_number,omitempty"`
+//		SeriesID int `json:"series_id,omitempty"`
 //	}
 //
 //	client.Episode.Query().
-//		Select(episode.FieldSeasonNumber).
+//		Select(episode.FieldSeriesID).
 //		Scan(ctx, &v)
 func (eq *EpisodeQuery) Select(fields ...string) *EpisodeSelect {
 	eq.ctx.Fields = append(eq.ctx.Fields, fields...)
@@ -369,18 +368,11 @@ func (eq *EpisodeQuery) prepareQuery(ctx context.Context) error {
 func (eq *EpisodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Episode, error) {
 	var (
 		nodes       = []*Episode{}
-		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
 		loadedTypes = [1]bool{
 			eq.withSeries != nil,
 		}
 	)
-	if eq.withSeries != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, episode.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Episode).scanValues(nil, columns)
 	}
@@ -412,10 +404,7 @@ func (eq *EpisodeQuery) loadSeries(ctx context.Context, query *SeriesQuery, node
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Episode)
 	for i := range nodes {
-		if nodes[i].series_episodes == nil {
-			continue
-		}
-		fk := *nodes[i].series_episodes
+		fk := nodes[i].SeriesID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -432,7 +421,7 @@ func (eq *EpisodeQuery) loadSeries(ctx context.Context, query *SeriesQuery, node
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "series_episodes" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "series_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -465,6 +454,9 @@ func (eq *EpisodeQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != episode.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if eq.withSeries != nil {
+			_spec.Node.AddColumnOnce(episode.FieldSeriesID)
 		}
 	}
 	if ps := eq.predicates; len(ps) > 0 {

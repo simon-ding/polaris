@@ -40,7 +40,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "episode" package.
 	EpisodesInverseTable = "episodes"
 	// EpisodesColumn is the table column denoting the episodes relation/edge.
-	EpisodesColumn = "series_episodes"
+	EpisodesColumn = "series_id"
 )
 
 // Columns holds all SQL columns for series fields.

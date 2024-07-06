@@ -412,7 +412,9 @@ func (sq *SeriesQuery) loadEpisodes(ctx context.Context, query *EpisodeQuery, no
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(episode.FieldSeriesID)
+	}
 	query.Where(predicate.Episode(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(series.EpisodesColumn), fks...))
 	}))
@@ -421,13 +423,10 @@ func (sq *SeriesQuery) loadEpisodes(ctx context.Context, query *EpisodeQuery, no
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.series_episodes
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "series_episodes" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.SeriesID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "series_episodes" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "series_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -28,6 +28,26 @@ func (eu *EpisodeUpdate) Where(ps ...predicate.Episode) *EpisodeUpdate {
 	return eu
 }
 
+// SetSeriesID sets the "series_id" field.
+func (eu *EpisodeUpdate) SetSeriesID(i int) *EpisodeUpdate {
+	eu.mutation.SetSeriesID(i)
+	return eu
+}
+
+// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
+func (eu *EpisodeUpdate) SetNillableSeriesID(i *int) *EpisodeUpdate {
+	if i != nil {
+		eu.SetSeriesID(*i)
+	}
+	return eu
+}
+
+// ClearSeriesID clears the value of the "series_id" field.
+func (eu *EpisodeUpdate) ClearSeriesID() *EpisodeUpdate {
+	eu.mutation.ClearSeriesID()
+	return eu
+}
+
 // SetSeasonNumber sets the "season_number" field.
 func (eu *EpisodeUpdate) SetSeasonNumber(i int) *EpisodeUpdate {
 	eu.mutation.ResetSeasonNumber()
@@ -108,20 +128,6 @@ func (eu *EpisodeUpdate) SetAirDate(s string) *EpisodeUpdate {
 func (eu *EpisodeUpdate) SetNillableAirDate(s *string) *EpisodeUpdate {
 	if s != nil {
 		eu.SetAirDate(*s)
-	}
-	return eu
-}
-
-// SetSeriesID sets the "series" edge to the Series entity by ID.
-func (eu *EpisodeUpdate) SetSeriesID(id int) *EpisodeUpdate {
-	eu.mutation.SetSeriesID(id)
-	return eu
-}
-
-// SetNillableSeriesID sets the "series" edge to the Series entity by ID if the given value is not nil.
-func (eu *EpisodeUpdate) SetNillableSeriesID(id *int) *EpisodeUpdate {
-	if id != nil {
-		eu = eu.SetSeriesID(*id)
 	}
 	return eu
 }
@@ -248,6 +254,26 @@ type EpisodeUpdateOne struct {
 	mutation *EpisodeMutation
 }
 
+// SetSeriesID sets the "series_id" field.
+func (euo *EpisodeUpdateOne) SetSeriesID(i int) *EpisodeUpdateOne {
+	euo.mutation.SetSeriesID(i)
+	return euo
+}
+
+// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
+func (euo *EpisodeUpdateOne) SetNillableSeriesID(i *int) *EpisodeUpdateOne {
+	if i != nil {
+		euo.SetSeriesID(*i)
+	}
+	return euo
+}
+
+// ClearSeriesID clears the value of the "series_id" field.
+func (euo *EpisodeUpdateOne) ClearSeriesID() *EpisodeUpdateOne {
+	euo.mutation.ClearSeriesID()
+	return euo
+}
+
 // SetSeasonNumber sets the "season_number" field.
 func (euo *EpisodeUpdateOne) SetSeasonNumber(i int) *EpisodeUpdateOne {
 	euo.mutation.ResetSeasonNumber()
@@ -328,20 +354,6 @@ func (euo *EpisodeUpdateOne) SetAirDate(s string) *EpisodeUpdateOne {
 func (euo *EpisodeUpdateOne) SetNillableAirDate(s *string) *EpisodeUpdateOne {
 	if s != nil {
 		euo.SetAirDate(*s)
-	}
-	return euo
-}
-
-// SetSeriesID sets the "series" edge to the Series entity by ID.
-func (euo *EpisodeUpdateOne) SetSeriesID(id int) *EpisodeUpdateOne {
-	euo.mutation.SetSeriesID(id)
-	return euo
-}
-
-// SetNillableSeriesID sets the "series" edge to the Series entity by ID if the given value is not nil.
-func (euo *EpisodeUpdateOne) SetNillableSeriesID(id *int) *EpisodeUpdateOne {
-	if id != nil {
-		euo = euo.SetSeriesID(*id)
 	}
 	return euo
 }
