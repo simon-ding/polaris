@@ -27,10 +27,16 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
   _TvDetailsPageState({required this.seriesId});
 
   SeriesDetails? details;
+
+  @override
+  void initState() {
+
+    super.initState();
+    _querySeriesDetails();
+  }
+
   @override
   Widget build(BuildContext context) {
-    _querySeriesDetails(context);
-
     if (details == null) {
       return const Center(
         child: Text("nothing here"),
@@ -131,15 +137,13 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
     );
   }
 
-  void _querySeriesDetails(BuildContext context) async {
+  void _querySeriesDetails() async {
     if (details != null) {
       return;
     }
     var resp = await Dio().get("${APIs.seriesDetailUrl}$seriesId");
     var rsp = ServerResponse.fromJson(resp.data);
-    if (rsp.code != 0 && context.mounted) {
-      Utils.showAlertDialog(context, rsp.message);
-    }
+
     setState(() {
       details = SeriesDetails.fromJson(rsp.data);
     });

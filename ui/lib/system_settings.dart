@@ -19,8 +19,13 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
   final TextEditingController _tmdbApiKeyController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _handleRefresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
       child: RefreshIndicator(
@@ -37,7 +42,7 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
                     labelText: "TMDB Api Key",
                     icon: Icon(Icons.key),
                   ),
-                  // 
+                  //
                   validator: (v) {
                     return v!.trim().isNotEmpty ? null : "ApiKey 不能为空";
                   },

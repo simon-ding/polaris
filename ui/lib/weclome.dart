@@ -19,8 +19,13 @@ class _WeclomePageState extends State<WelcomePage> {
   var favList = List.empty(growable: true);
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _onRefresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return GridView.builder(
         itemCount: favList.length,
         gridDelegate:
