@@ -30,6 +30,8 @@ const (
 	FieldPosterPath = "poster_path"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldAirDate holds the string denoting the air_date field in the database.
+	FieldAirDate = "air_date"
 	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
 	EdgeEpisodes = "episodes"
 	// Table holds the table name of the series in the database.
@@ -54,6 +56,7 @@ var Columns = []string{
 	FieldPath,
 	FieldPosterPath,
 	FieldCreatedAt,
+	FieldAirDate,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -69,6 +72,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt time.Time
+	// DefaultAirDate holds the default value on creation for the "air_date" field.
+	DefaultAirDate string
 )
 
 // OrderOption defines the ordering options for the Series queries.
@@ -117,6 +122,11 @@ func ByPosterPath(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByAirDate orders the results by the air_date field.
+func ByAirDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAirDate, opts...).ToFunc()
 }
 
 // ByEpisodesCount orders the results by episodes count.

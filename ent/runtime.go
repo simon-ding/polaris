@@ -56,4 +56,8 @@ func init() {
 	seriesDescCreatedAt := seriesFields[7].Descriptor()
 	// series.DefaultCreatedAt holds the default value on creation for the created_at field.
 	series.DefaultCreatedAt = seriesDescCreatedAt.Default.(time.Time)
+	// seriesDescAirDate is the schema descriptor for air_date field.
+	seriesDescAirDate := seriesFields[8].Descriptor()
+	// series.DefaultAirDate holds the default value on creation for the air_date field.
+	series.DefaultAirDate = seriesDescAirDate.Default.(string)
 }

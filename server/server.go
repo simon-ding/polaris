@@ -4,7 +4,9 @@ import (
 	"polaris/db"
 	"polaris/log"
 	"polaris/pkg/tmdb"
+	"polaris/ui"
 
+	"github.com/gin-contrib/static"
 	"github.com/hekmon/transmissionrpc"
 	"github.com/robfig/cron"
 
@@ -15,9 +17,9 @@ import (
 func NewServer(db *db.Client) *Server {
 	r := gin.Default()
 	return &Server{
-		r:    r,
-		db:   db,
-		cron: cron.New(),
+		r:     r,
+		db:    db,
+		cron:  cron.New(),
 		tasks: make(map[string]*transmissionrpc.Torrent),
 	}
 }
@@ -27,7 +29,7 @@ type Server struct {
 	db       *db.Client
 	cron     *cron.Cron
 	language string
-	tasks map[string]*transmissionrpc.Torrent
+	tasks    map[string]*transmissionrpc.Torrent
 }
 
 func (s *Server) scheduler() {
@@ -42,6 +44,8 @@ func (s *Server) checkTasks() {
 
 func (s *Server) Serve() error {
 	s.scheduler()
+	//st, _ := fs.Sub(ui.Web, "build/web")
+	s.r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
 
 	api := s.r.Group("/api/v1")
 

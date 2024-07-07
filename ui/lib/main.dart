@@ -22,29 +22,35 @@ class MyApp extends StatelessWidget {
     // GoRouter configuration
     final _shellRoute = ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        return Scaffold(
-            appBar: AppBar(
-              // TRY THIS: Try changing the color here to a specific color (to
-              // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-              // change color while the other colors stay the same.
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: const Text("Polaris追剧"),
-              actions: [
-                IconButton(
-                    onPressed: () => context.go(SystemSettingsPage.route),
-                    icon: const Icon(Icons.settings))
-              ],
-            ),
-            body: Center(
-                // Center is a layout widget. It takes a single child and positions it
-                // in the middle of the parent.
-                child: Row(children: <Widget>[
-              NavDrawer(),
-              const VerticalDivider(thickness: 1, width: 1),
-              Expanded(child: child)
-            ])));
+        return SelectionArea(
+          child: Scaffold(
+              appBar: AppBar(
+                // TRY THIS: Try changing the color here to a specific color (to
+                // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+                // change color while the other colors stay the same.
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                // Here we take the value from the MyHomePage object that was created by
+                // the App.build method, and use it to set our appbar title.
+                title: const Text("Polaris追剧"),
+                actions: [
+                  IconButton(
+                      tooltip: "搜索剧集",
+                      onPressed: () => context.go(SearchPage.route),
+                      icon: const Icon(Icons.search)),
+                  IconButton(
+                      onPressed: () => context.go(SystemSettingsPage.route),
+                      icon: const Icon(Icons.settings))
+                ],
+              ),
+              body: Center(
+                  // Center is a layout widget. It takes a single child and positions it
+                  // in the middle of the parent.
+                  child: Row(children: <Widget>[
+                NavDrawer(),
+                const VerticalDivider(thickness: 1, width: 1),
+                Expanded(child: child)
+              ]))),
+        );
       },
       routes: [
         GoRoute(
@@ -61,7 +67,8 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: TvDetailsPage.route,
-          builder: (context, state) => TvDetailsPage(seriesId: state.pathParameters['id']!),
+          builder: (context, state) =>
+              TvDetailsPage(seriesId: state.pathParameters['id']!),
         )
       ],
     );
@@ -92,7 +99,8 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple, brightness: Brightness.dark),
         useMaterial3: true,
       ),
       routerConfig: _router,

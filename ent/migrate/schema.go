@@ -93,6 +93,7 @@ var (
 		{Name: "path", Type: field.TypeString},
 		{Name: "poster_path", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "air_date", Type: field.TypeString, Default: ""},
 	}
 	// SeriesTable holds the schema information for the "series" table.
 	SeriesTable = &schema.Table{

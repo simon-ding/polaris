@@ -24,6 +24,7 @@ func (Series) Fields() []ent.Field {
 		field.String("path"),
 		field.String("poster_path").Optional(),
 		field.Time("created_at").Default(time.Now()),
+		field.String("air_date").Default(""),
 	}
 }
 

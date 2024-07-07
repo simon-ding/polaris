@@ -93,6 +93,20 @@ func (sc *SeriesCreate) SetNillableCreatedAt(t *time.Time) *SeriesCreate {
 	return sc
 }
 
+// SetAirDate sets the "air_date" field.
+func (sc *SeriesCreate) SetAirDate(s string) *SeriesCreate {
+	sc.mutation.SetAirDate(s)
+	return sc
+}
+
+// SetNillableAirDate sets the "air_date" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillableAirDate(s *string) *SeriesCreate {
+	if s != nil {
+		sc.SetAirDate(*s)
+	}
+	return sc
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (sc *SeriesCreate) AddEpisodeIDs(ids ...int) *SeriesCreate {
 	sc.mutation.AddEpisodeIDs(ids...)
@@ -147,6 +161,10 @@ func (sc *SeriesCreate) defaults() {
 		v := series.DefaultCreatedAt
 		sc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := sc.mutation.AirDate(); !ok {
+		v := series.DefaultAirDate
+		sc.mutation.SetAirDate(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -168,6 +186,9 @@ func (sc *SeriesCreate) check() error {
 	}
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Series.created_at"`)}
+	}
+	if _, ok := sc.mutation.AirDate(); !ok {
+		return &ValidationError{Name: "air_date", err: errors.New(`ent: missing required field "Series.air_date"`)}
 	}
 	return nil
 }
@@ -226,6 +247,10 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := sc.mutation.AirDate(); ok {
+		_spec.SetField(series.FieldAirDate, field.TypeString, value)
+		_node.AirDate = value
 	}
 	if nodes := sc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

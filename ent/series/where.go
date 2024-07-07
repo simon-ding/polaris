@@ -95,6 +95,11 @@ func CreatedAt(v time.Time) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldCreatedAt, v))
 }
 
+// AirDate applies equality check predicate on the "air_date" field. It's identical to AirDateEQ.
+func AirDate(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldAirDate, v))
+}
+
 // TmdbIDEQ applies the EQ predicate on the "tmdb_id" field.
 func TmdbIDEQ(v int) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldTmdbID, v))
@@ -583,6 +588,71 @@ func CreatedAtLT(v time.Time) predicate.Series {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Series {
 	return predicate.Series(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// AirDateEQ applies the EQ predicate on the "air_date" field.
+func AirDateEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldAirDate, v))
+}
+
+// AirDateNEQ applies the NEQ predicate on the "air_date" field.
+func AirDateNEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldAirDate, v))
+}
+
+// AirDateIn applies the In predicate on the "air_date" field.
+func AirDateIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldAirDate, vs...))
+}
+
+// AirDateNotIn applies the NotIn predicate on the "air_date" field.
+func AirDateNotIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldAirDate, vs...))
+}
+
+// AirDateGT applies the GT predicate on the "air_date" field.
+func AirDateGT(v string) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldAirDate, v))
+}
+
+// AirDateGTE applies the GTE predicate on the "air_date" field.
+func AirDateGTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldAirDate, v))
+}
+
+// AirDateLT applies the LT predicate on the "air_date" field.
+func AirDateLT(v string) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldAirDate, v))
+}
+
+// AirDateLTE applies the LTE predicate on the "air_date" field.
+func AirDateLTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldAirDate, v))
+}
+
+// AirDateContains applies the Contains predicate on the "air_date" field.
+func AirDateContains(v string) predicate.Series {
+	return predicate.Series(sql.FieldContains(FieldAirDate, v))
+}
+
+// AirDateHasPrefix applies the HasPrefix predicate on the "air_date" field.
+func AirDateHasPrefix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasPrefix(FieldAirDate, v))
+}
+
+// AirDateHasSuffix applies the HasSuffix predicate on the "air_date" field.
+func AirDateHasSuffix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasSuffix(FieldAirDate, v))
+}
+
+// AirDateEqualFold applies the EqualFold predicate on the "air_date" field.
+func AirDateEqualFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldEqualFold(FieldAirDate, v))
+}
+
+// AirDateContainsFold applies the ContainsFold predicate on the "air_date" field.
+func AirDateContainsFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldContainsFold(FieldAirDate, v))
 }
 
 // HasEpisodes applies the HasEdge predicate on the "episodes" edge.

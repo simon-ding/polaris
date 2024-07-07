@@ -2794,6 +2794,7 @@ type SeriesMutation struct {
 	_path           *string
 	poster_path     *string
 	created_at      *time.Time
+	air_date        *string
 	clearedFields   map[string]struct{}
 	episodes        map[int]struct{}
 	removedepisodes map[int]struct{}
@@ -3235,6 +3236,42 @@ func (m *SeriesMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
+// SetAirDate sets the "air_date" field.
+func (m *SeriesMutation) SetAirDate(s string) {
+	m.air_date = &s
+}
+
+// AirDate returns the value of the "air_date" field in the mutation.
+func (m *SeriesMutation) AirDate() (r string, exists bool) {
+	v := m.air_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAirDate returns the old "air_date" field's value of the Series entity.
+// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeriesMutation) OldAirDate(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAirDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAirDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAirDate: %w", err)
+	}
+	return oldValue.AirDate, nil
+}
+
+// ResetAirDate resets all changes to the "air_date" field.
+func (m *SeriesMutation) ResetAirDate() {
+	m.air_date = nil
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
 func (m *SeriesMutation) AddEpisodeIDs(ids ...int) {
 	if m.episodes == nil {
@@ -3323,7 +3360,7 @@ func (m *SeriesMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SeriesMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.tmdb_id != nil {
 		fields = append(fields, series.FieldTmdbID)
 	}
@@ -3347,6 +3384,9 @@ func (m *SeriesMutation) Fields() []string {
 	}
 	if m.created_at != nil {
 		fields = append(fields, series.FieldCreatedAt)
+	}
+	if m.air_date != nil {
+		fields = append(fields, series.FieldAirDate)
 	}
 	return fields
 }
@@ -3372,6 +3412,8 @@ func (m *SeriesMutation) Field(name string) (ent.Value, bool) {
 		return m.PosterPath()
 	case series.FieldCreatedAt:
 		return m.CreatedAt()
+	case series.FieldAirDate:
+		return m.AirDate()
 	}
 	return nil, false
 }
@@ -3397,6 +3439,8 @@ func (m *SeriesMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldPosterPath(ctx)
 	case series.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case series.FieldAirDate:
+		return m.OldAirDate(ctx)
 	}
 	return nil, fmt.Errorf("unknown Series field %s", name)
 }
@@ -3461,6 +3505,13 @@ func (m *SeriesMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case series.FieldAirDate:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAirDate(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Series field %s", name)
@@ -3564,6 +3615,9 @@ func (m *SeriesMutation) ResetField(name string) error {
 		return nil
 	case series.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case series.FieldAirDate:
+		m.ResetAirDate()
 		return nil
 	}
 	return fmt.Errorf("unknown Series field %s", name)

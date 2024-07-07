@@ -33,6 +33,8 @@ type Series struct {
 	PosterPath string `json:"poster_path,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// AirDate holds the value of the "air_date" field.
+	AirDate string `json:"air_date,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SeriesQuery when eager-loading is set.
 	Edges        SeriesEdges `json:"edges"`
@@ -64,7 +66,7 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case series.FieldID, series.FieldTmdbID:
 			values[i] = new(sql.NullInt64)
-		case series.FieldImdbID, series.FieldName, series.FieldOriginalName, series.FieldOverview, series.FieldPath, series.FieldPosterPath:
+		case series.FieldImdbID, series.FieldName, series.FieldOriginalName, series.FieldOverview, series.FieldPath, series.FieldPosterPath, series.FieldAirDate:
 			values[i] = new(sql.NullString)
 		case series.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -137,6 +139,12 @@ func (s *Series) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.CreatedAt = value.Time
 			}
+		case series.FieldAirDate:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field air_date", values[i])
+			} else if value.Valid {
+				s.AirDate = value.String
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -201,6 +209,9 @@ func (s *Series) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("air_date=")
+	builder.WriteString(s.AirDate)
 	builder.WriteByte(')')
 	return builder.String()
 }

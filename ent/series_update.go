@@ -160,6 +160,20 @@ func (su *SeriesUpdate) SetNillableCreatedAt(t *time.Time) *SeriesUpdate {
 	return su
 }
 
+// SetAirDate sets the "air_date" field.
+func (su *SeriesUpdate) SetAirDate(s string) *SeriesUpdate {
+	su.mutation.SetAirDate(s)
+	return su
+}
+
+// SetNillableAirDate sets the "air_date" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableAirDate(s *string) *SeriesUpdate {
+	if s != nil {
+		su.SetAirDate(*s)
+	}
+	return su
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (su *SeriesUpdate) AddEpisodeIDs(ids ...int) *SeriesUpdate {
 	su.mutation.AddEpisodeIDs(ids...)
@@ -269,6 +283,9 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.CreatedAt(); ok {
 		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := su.mutation.AirDate(); ok {
+		_spec.SetField(series.FieldAirDate, field.TypeString, value)
 	}
 	if su.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -466,6 +483,20 @@ func (suo *SeriesUpdateOne) SetNillableCreatedAt(t *time.Time) *SeriesUpdateOne 
 	return suo
 }
 
+// SetAirDate sets the "air_date" field.
+func (suo *SeriesUpdateOne) SetAirDate(s string) *SeriesUpdateOne {
+	suo.mutation.SetAirDate(s)
+	return suo
+}
+
+// SetNillableAirDate sets the "air_date" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableAirDate(s *string) *SeriesUpdateOne {
+	if s != nil {
+		suo.SetAirDate(*s)
+	}
+	return suo
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (suo *SeriesUpdateOne) AddEpisodeIDs(ids ...int) *SeriesUpdateOne {
 	suo.mutation.AddEpisodeIDs(ids...)
@@ -605,6 +636,9 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	}
 	if value, ok := suo.mutation.CreatedAt(); ok {
 		_spec.SetField(series.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := suo.mutation.AirDate(); ok {
+		_spec.SetField(series.FieldAirDate, field.TypeString, value)
 	}
 	if suo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{

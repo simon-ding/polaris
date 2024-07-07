@@ -5,6 +5,8 @@ import 'package:ui/system_settings.dart';
 import 'package:ui/weclome.dart';
 
 class NavDrawer extends StatefulWidget {
+  const NavDrawer({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return _NavDrawerState();

@@ -77,6 +77,7 @@ func (c *Client) AddWatchlist(path string, detail *tmdb.TVDetails, episodes []in
 		SetName(detail.Name).
 		SetOriginalName(detail.OriginalName).
 		SetPosterPath(detail.PosterPath).
+		SetAirDate(detail.FirstAirDate).
 		AddEpisodeIDs(episodes...).
 		Save(context.TODO())
 	return r, err

@@ -41,9 +41,23 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
     for (final ep in details!.episodes!) {
       var w = Container(
         alignment: Alignment.topLeft,
-        child: Text(
-          "第 ${ep.seasonNumber} 季，第 ${ep.episodeNumber} 集：${ep.title}",
-          textAlign: TextAlign.left,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 70,
+              child: Text("第 ${ep.episodeNumber} 集"),
+            ),
+            SizedBox(
+              width: 100,
+              child: Opacity(
+                opacity: 0.5,
+                child: Text("${ep.airDate}"),
+              ),
+            ),
+            Text("${ep.title}", textAlign: TextAlign.left),
+            const Expanded(child: Text("")),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.search))
+          ],
         ),
       );
       if (m[ep.seasonNumber] == null) {
@@ -55,7 +69,9 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
     for (final k in m.keys) {
       bool _customTileExpanded = false;
       var seasonList = ExpansionTile(
-        initiallyExpanded: true,
+        tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+        initiallyExpanded: k == 0 ? false : true,
         title: Text("第 $k 季"),
         trailing: Icon(
           _customTileExpanded
@@ -116,6 +132,9 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
   }
 
   void _querySeriesDetails(BuildContext context) async {
+    if (details != null) {
+      return;
+    }
     var resp = await Dio().get("${APIs.seriesDetailUrl}$seriesId");
     var rsp = ServerResponse.fromJson(resp.data);
     if (rsp.code != 0 && context.mounted) {
