@@ -6,6 +6,7 @@ class APIs {
   static final settingsUrl = "$_baseUrl/api/v1/setting/do";
   static final watchlistUrl = "$_baseUrl/api/v1/tv/watchlist";
   static final seriesDetailUrl = "$_baseUrl/api/v1/tv/series/";
+  static final searchAndDownloadUrl = "$_baseUrl/api/v1/indexer/download";
 
   static const tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/";
 

@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: WelcomePage.route,
-          builder: (context, state) => WelcomePage(),
+          builder: (context, state) => const WelcomePage(),
         ),
         GoRoute(
           path: SearchPage.route,
@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: SystemSettingsPage.route,
-          builder: (context, state) => SystemSettingsPage(),
+          builder: (context, state) => const SystemSettingsPage(),
         ),
         GoRoute(
           path: TvDetailsPage.route,
@@ -106,4 +106,17 @@ class MyApp extends StatelessWidget {
       routerConfig: _router,
     );
   }
+}
+
+CustomTransitionPage buildPageWithDefaultTransition<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  );
 }

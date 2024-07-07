@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class Utils {
   static Future<void> showAlertDialog(BuildContext context, String msg) async {
-
     return showDialog<void>(
       context: context,
       barrierDismissible: true, // user must tap button!
@@ -27,5 +26,9 @@ class Utils {
         );
       },
     );
+  }
+
+  static showSnakeBar(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }

@@ -49,9 +49,9 @@ func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
 }
 
 type searchAndDownloadIn struct {
-	Title   string `json:"title"`
-	Season  int    `json:"season"`
-	Episode int    `json:"episode"`
+	ID      int `json:"id"`
+	Season  int `json:"season"`
+	Episode int `json:"episode"`
 }
 
 func (s *Server) SearchAndDownload(c *gin.Context) (interface{}, error) {
@@ -64,8 +64,16 @@ func (s *Server) SearchAndDownload(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
+	log.Infof("search episode resources link: %v", in)
+	series := s.db.GetSeriesDetails(in.ID)
+	if series == nil {
+		return nil, fmt.Errorf("no tv series of id %v", in.ID)
+	}
 
-	res := s.searchTvWithTorznab(in.Title, in.Season, in.Episode)
+	res := s.searchTvWithTorznab(series.OriginalName, in.Season, in.Episode)
+	if len(res) == 0 {
+		return "", fmt.Errorf("no resource found")
+	}
 	r1 := res[0]
 	log.Infof("found resource to download: %v", r1)
 	torrent, err := trc.Download(r1.Magnet)
@@ -78,7 +86,9 @@ func (s *Server) SearchAndDownload(c *gin.Context) (interface{}, error) {
 	// 	return nil, errors.Wrap(err, "download torrent")
 	// }
 	log.Errorf("success add %s to download task", r1.Name)
-	return nil, nil
+	return gin.H{
+		"name": r1.Name,
+	}, nil
 }
 
 type downloadClientIn struct {

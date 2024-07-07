@@ -30,7 +30,6 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
 
   @override
   void initState() {
-
     super.initState();
     _querySeriesDetails();
   }
@@ -62,7 +61,12 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
             ),
             Text("${ep.title}", textAlign: TextAlign.left),
             const Expanded(child: Text("")),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.search))
+            IconButton(
+                onPressed: () {
+                  _searchAndDownload(
+                      context, seriesId, ep.seasonNumber!, ep.episodeNumber!);
+                },
+                icon: const Icon(Icons.search))
           ],
         ),
       );
@@ -147,6 +151,24 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
     setState(() {
       details = SeriesDetails.fromJson(rsp.data);
     });
+  }
+
+  void _searchAndDownload(BuildContext context, String seriesId, int seasonNum,
+      int episodeNum) async {
+    var resp = await Dio().post(APIs.searchAndDownloadUrl, data: {
+      "id": int.parse(seriesId),
+      "season": seasonNum,
+      "episode": episodeNum,
+    });
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0 && context.mounted) {
+      Utils.showAlertDialog(context, sp.message);
+      return;
+    }
+    var name = (sp.data as Map<String, dynamic>)["name"];
+    if (context.mounted) {
+      Utils.showSnakeBar(context, "$name 开始下载...");
+    }
   }
 }
 
