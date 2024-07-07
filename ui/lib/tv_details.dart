@@ -76,7 +76,7 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
       m[ep.seasonNumber!]!.add(w);
     }
     List<ExpansionTile> list = List.empty(growable: true);
-    for (final k in m.keys) {
+    for (final k in m.keys.toList().reversed) {
       bool _customTileExpanded = false;
       var seasonList = ExpansionTile(
         tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -97,8 +97,8 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
       );
       list.add(seasonList);
     }
-
-    return Column(
+    
+    return ListView(
       children: [
         Card(
           margin: const EdgeInsets.all(4),
@@ -132,11 +132,10 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
             ],
           ),
         ),
-        Expanded(
-          child: ListView(
+         Column(
             children: list,
           ),
-        ),
+        
       ],
     );
   }
