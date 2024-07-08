@@ -64,12 +64,14 @@ func (s *Server) Serve() error {
 	}
 	indexer := api.Group("/indexer")
 	{
+		indexer.GET("/", HttpHandler(s.GetAllIndexers))
 		indexer.POST("/add", HttpHandler(s.AddTorznabInfo))
 		indexer.POST("/download", HttpHandler(s.SearchAndDownload))
 	}
 
 	downloader := api.Group("/downloader")
 	{
+		downloader.GET("/", HttpHandler(s.GetAllDonloadClients))
 		downloader.POST("/add", HttpHandler(s.AddDownloadClient))
 	}
 

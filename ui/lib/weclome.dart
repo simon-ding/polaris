@@ -29,42 +29,40 @@ class _WeclomePageState extends State<WelcomePage> {
     return GridView.builder(
         itemCount: favList.length,
         gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
         itemBuilder: (context, i) {
           var item = TvSeries.fromJson(favList[i]);
-          return Container(
-            child: Card(
-                margin: const EdgeInsets.all(4),
-                clipBehavior: Clip.hardEdge,
-                child: InkWell(
-                  //splashColor: Colors.blue.withAlpha(30),
-                  onTap: () {
-                    context.go(TvDetailsPage.toRoute(item.id!));
-                    //showDialog(context: context, builder: builder)
-                  },
-                  child: Column(
-                    children: <Widget>[
-                      Flexible(
-                        child: SizedBox(
-                          width: 300,
-                          height: 600,
-                          child: Image.network(
-                            APIs.tmdbImgBaseUrl + item.posterPath!,
-                            fit: BoxFit.contain,
-                          ),
+          return Card(
+              margin: const EdgeInsets.all(4),
+              clipBehavior: Clip.hardEdge,
+              child: InkWell(
+                //splashColor: Colors.blue.withAlpha(30),
+                onTap: () {
+                  context.go(TvDetailsPage.toRoute(item.id!));
+                  //showDialog(context: context, builder: builder)
+                },
+                child: Column(
+                  children: <Widget>[
+                    Flexible(
+                      child: SizedBox(
+                        width: 300,
+                        height: 600,
+                        child: Image.network(
+                          APIs.tmdbImgBaseUrl + item.posterPath!,
+                          fit: BoxFit.contain,
                         ),
                       ),
-                      Flexible(
-                        child: Text(
-                          item.name!,
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
-                  ),
-                )),
-          );
+                    ),
+                    Flexible(
+                      child: Text(
+                        item.name!,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
+              ));
         });
   }
 

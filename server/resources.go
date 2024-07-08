@@ -16,10 +16,10 @@ func (s *Server) searchTvWithTorznab(name string, season, episode int) []torznab
 
 	var res []torznab.Result
 	allTorznab := s.db.GetAllTorznabInfo()
-	for name, setting := range allTorznab {
-		resp, err := torznab.Search(setting.URL, setting.ApiKey, q)
+	for _, tor := range allTorznab {
+		resp, err := torznab.Search(tor.URL, tor.ApiKey, q)
 		if err != nil {
-			log.Errorf("search %s error: %v", name, err)
+			log.Errorf("search %s error: %v", tor.Name, err)
 			continue
 		}
 		res = append(res, resp...)
@@ -46,6 +46,14 @@ func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "add ")
 	}
 	return nil, nil
+}
+
+func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
+	indexers := s.db.GetAllTorznabInfo()
+	if len(indexers) == 0 {
+		return nil, fmt.Errorf("no indexer found")
+	}
+	return indexers, nil
 }
 
 type searchAndDownloadIn struct {
@@ -108,4 +116,12 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "save transmission")
 	}
 	return nil, nil
+}
+
+func (s *Server) GetAllDonloadClients(c *gin.Context) (interface{}, error) {
+	res := s.db.GetAllDonloadClients()
+	if len(res) == 0 {
+		return nil, fmt.Errorf("no download client")
+	}
+	return res, nil
 }

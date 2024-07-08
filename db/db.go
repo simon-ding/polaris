@@ -135,9 +135,15 @@ func (c *Client) SaveTorznabInfo(name string, setting TorznabSetting) error {
 	return nil
 }
 
-func (c *Client) GetAllTorznabInfo() map[string]TorznabSetting {
+type TorznabInfo struct {
+	Name string `json:"name"`
+	TorznabSetting
+}
+
+func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
 	res := c.ent.Indexers.Query().Where(indexers.Implementation(IndexerTorznabImpl)).AllX(context.TODO())
-	var m = make(map[string]TorznabSetting, len(res))
+	
+	var l = make([]*TorznabInfo, 0, len(res))
 	for _, r := range res {
 		var ss TorznabSetting
 		err := json.Unmarshal([]byte(r.Settings), &ss)
@@ -145,9 +151,12 @@ func (c *Client) GetAllTorznabInfo() map[string]TorznabSetting {
 			log.Errorf("unmarshal torznab %s error: %v", r.Name, err)
 			continue
 		}
-		m[r.Name] = ss
+		l = append(l, &TorznabInfo{
+			Name: r.Name,
+			TorznabSetting: ss,
+		})
 	}
-	return m
+	return l
 }
 
 func (c *Client) SaveTransmission(name, url, user, password string) error {
@@ -164,4 +173,13 @@ func (c *Client) GetTransmission() *ent.DownloadClients {
 		return nil
 	}
 	return dc
+}
+
+func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
+	cc, err := c.ent.DownloadClients.Query().All(context.TODO())
+	if err != nil {
+		log.Errorf("no download client")
+		return nil
+	}
+	return cc
 }
