@@ -56,3 +56,40 @@ var tmdbApiSettingProvider = FutureProvider(
   },
 );
 
+var indexersProvider = FutureProvider((ref) async {
+  final dio = Dio();
+  var resp = await dio.get(APIs.allIndexersUrl);
+  var sp = ServerResponse.fromJson(resp.data);
+  if (sp.code != 0) {
+    throw sp.message;
+  }
+  List<Indexer> indexers = List.empty(growable: true);
+  for (final item in sp.data as List) {
+    indexers.add(Indexer.fromJson(item));
+  }
+  print("indexers: ${indexers[0].name}");
+  return indexers;
+});
+
+class Indexer {
+  String? name;
+  String? url;
+  String? apiKey;
+  int? id;
+
+  Indexer({this.name, this.url, this.apiKey});
+
+  Indexer.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    url = json['url'];
+    apiKey = json['api_key'];
+    id = json["id"];
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['url'] = this.url;
+    data['api_key'] = this.apiKey;
+    return data;
+  }
+}

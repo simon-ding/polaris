@@ -127,22 +127,29 @@ func (c *Client) SaveTorznabInfo(name string, setting TorznabSetting) error {
 	if err != nil {
 		return errors.Wrap(err, "marshal json")
 	}
-	_, err = c.ent.Indexers.Create().
-		SetName(name).SetImplementation(IndexerTorznabImpl).SetPriority(1).SetSettings(string(data)).Save(context.TODO())
-	if err != nil {
-		return errors.Wrap(err, "save db")
+	if _, err = c.ent.Indexers.Update().Where(indexers.Name(name)).SetSettings(string(data)).Save(context.TODO()); err != nil {
+		_, err = c.ent.Indexers.Create().
+			SetName(name).SetImplementation(IndexerTorznabImpl).SetPriority(1).SetSettings(string(data)).Save(context.TODO())
+		if err != nil {
+			return errors.Wrap(err, "save db")
+		}
 	}
 	return nil
 }
 
+func (c *Client) DeleteTorznab(id int) {
+	c.ent.Indexers.Delete().Where(indexers.ID(id)).Exec(context.TODO())
+}
+
 type TorznabInfo struct {
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 	TorznabSetting
 }
 
 func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
 	res := c.ent.Indexers.Query().Where(indexers.Implementation(IndexerTorznabImpl)).AllX(context.TODO())
-	
+
 	var l = make([]*TorznabInfo, 0, len(res))
 	for _, r := range res {
 		var ss TorznabSetting
@@ -152,7 +159,8 @@ func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
 			continue
 		}
 		l = append(l, &TorznabInfo{
-			Name: r.Name,
+			ID:             r.ID,
+			Name:           r.Name,
 			TorznabSetting: ss,
 		})
 	}

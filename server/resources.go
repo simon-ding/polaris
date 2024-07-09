@@ -6,6 +6,7 @@ import (
 	"polaris/log"
 	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -46,6 +47,16 @@ func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "add ")
 	}
 	return nil, nil
+}
+
+func (s *Server) DeleteTorznabInfo(c *gin.Context) (interface{}, error) {
+	var ids = c.Param("id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, fmt.Errorf("id is not correct: %v", ids)
+	}
+	s.db.DeleteTorznab(id)
+	return "success", nil
 }
 
 func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {

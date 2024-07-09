@@ -67,6 +67,7 @@ func (s *Server) Serve() error {
 		indexer.GET("/", HttpHandler(s.GetAllIndexers))
 		indexer.POST("/add", HttpHandler(s.AddTorznabInfo))
 		indexer.POST("/download", HttpHandler(s.SearchAndDownload))
+		indexer.DELETE("/del/:id", HttpHandler(s.DeleteTorznabInfo))
 	}
 
 	downloader := api.Group("/downloader")
