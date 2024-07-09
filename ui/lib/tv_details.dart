@@ -73,23 +73,12 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
           }
           List<ExpansionTile> list = List.empty(growable: true);
           for (final k in m.keys.toList().reversed) {
-            bool _customTileExpanded = false;
             var seasonList = ExpansionTile(
               tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
               initiallyExpanded: k == 0 ? false : true,
               title: Text("第 $k 季"),
-              trailing: Icon(
-                _customTileExpanded
-                    ? Icons.arrow_drop_down_circle
-                    : Icons.arrow_drop_down,
-              ),
               children: m[k]!,
-              onExpansionChanged: (bool expanded) {
-                setState(() {
-                  _customTileExpanded = expanded;
-                });
-              },
             );
             list.add(seasonList);
           }
