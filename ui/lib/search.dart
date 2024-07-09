@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/APIs.dart';
+import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/server_response.dart';
 import 'package:ui/utils.dart';
 
-class SearchPage extends StatefulWidget {
+class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
 
   static const route = "/search";
 
   @override
-  State<StatefulWidget> createState() {
+  ConsumerState<ConsumerStatefulWidget> createState() {
     return _SearchPageState();
   }
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends ConsumerState<SearchPage> {
   List<dynamic> list = List.empty();
 
   void _queryResults(BuildContext context, String q) async {
@@ -140,6 +142,7 @@ class _SearchPageState extends State<SearchPage> {
     if (sp.code != 0 && context.mounted) {
       Utils.showAlertDialog(context, sp.message);
     }
+    ref.refresh(welcomePageDataProvider);
   }
 }
 

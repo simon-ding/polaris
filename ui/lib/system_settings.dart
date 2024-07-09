@@ -172,7 +172,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
           initiallyExpanded: true,
-          title: const Text("下载器设置"),
+          title: const Text("下载客户端设置"),
           children: [downloadSetting],
         ),
       ],
@@ -277,7 +277,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         barrierDismissible: true, // user must tap button!
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('下载器'),
+            title: const Text('下载客户端'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[

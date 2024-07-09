@@ -55,6 +55,10 @@ class MyApp extends StatelessWidget {
       },
       routes: [
         GoRoute(
+          path: "/",
+          redirect: (context, state) => WelcomePage.route,
+        ),
+        GoRoute(
           path: WelcomePage.route,
           builder: (context, state) => const WelcomePage(),
         ),
