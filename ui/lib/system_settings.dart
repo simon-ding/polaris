@@ -240,6 +240,9 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
 
   void addIndexer(
       BuildContext context, String name, String url, String apiKey) async {
+    if (name.isEmpty || url.isEmpty || apiKey.isEmpty) {
+      return;
+    }
     var dio = Dio();
     var resp = await dio.post(APIs.addIndexerUrl,
         data: Indexer(name: name, url: url, apiKey: apiKey).toJson());
@@ -261,7 +264,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
       return;
     }
     Navigator.of(context).pop();
-    ref.refresh(dwonloadClientsProvider);
+    ref.refresh(indexersProvider);
   }
 
   Future<void> showDownloadClientDetails(
@@ -274,7 +277,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         barrierDismissible: true, // user must tap button!
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('索引器'),
+            title: const Text('下载器'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
@@ -312,6 +315,9 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
   }
 
   void addDownloadClients(BuildContext context, String name, String url) async {
+    if (name.isEmpty || url.isEmpty) {
+      return;
+    }
     var dio = Dio();
     var resp = await dio.post(APIs.addDownloadClientUrl, data: {
       "name": name,
