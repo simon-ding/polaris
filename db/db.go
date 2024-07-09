@@ -127,13 +127,18 @@ func (c *Client) SaveTorznabInfo(name string, setting TorznabSetting) error {
 	if err != nil {
 		return errors.Wrap(err, "marshal json")
 	}
-	if _, err = c.ent.Indexers.Update().Where(indexers.Name(name)).SetSettings(string(data)).Save(context.TODO()); err != nil {
-		_, err = c.ent.Indexers.Create().
-			SetName(name).SetImplementation(IndexerTorznabImpl).SetPriority(1).SetSettings(string(data)).Save(context.TODO())
-		if err != nil {
-			return errors.Wrap(err, "save db")
-		}
+	count := c.ent.Indexers.Query().Where(indexers.Name(name)).CountX(context.TODO())
+	if count > 0 {
+		c.ent.Indexers.Update().Where(indexers.Name(name)).SetSettings(string(data)).Save(context.TODO())
+		return err
 	}
+
+	_, err = c.ent.Indexers.Create().
+		SetName(name).SetImplementation(IndexerTorznabImpl).SetPriority(1).SetSettings(string(data)).Save(context.TODO())
+	if err != nil {
+		return errors.Wrap(err, "save db")
+	}
+
 	return nil
 }
 
@@ -168,9 +173,15 @@ func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
 }
 
 func (c *Client) SaveTransmission(name, url, user, password string) error {
+	count := c.ent.DownloadClients.Query().Where(downloadclients.Name(name)).CountX(context.TODO())
+	if count != 0 {
+		err := c.ent.DownloadClients.Update().Where(downloadclients.Name(name)).
+			SetURL(url).SetUser(user).SetPassword(password).Exec(context.TODO())
+		return err
+	}
+
 	_, err := c.ent.DownloadClients.Create().SetEnable(true).SetImplementation("transmission").
 		SetName(name).SetURL(url).SetUser(user).SetPassword(password).Save(context.TODO())
-
 	return err
 }
 
@@ -190,4 +201,8 @@ func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
 		return nil
 	}
 	return cc
+}
+
+func (c *Client) DeleteDownloadCLient(id int) {
+	c.ent.DownloadClients.Delete().Where(downloadclients.ID(id)).Exec(context.TODO())
 }

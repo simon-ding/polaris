@@ -67,7 +67,6 @@ var indexersProvider = FutureProvider((ref) async {
   for (final item in sp.data as List) {
     indexers.add(Indexer.fromJson(item));
   }
-  print("indexers: ${indexers[0].name}");
   return indexers;
 });
 
@@ -90,6 +89,61 @@ class Indexer {
     data['name'] = this.name;
     data['url'] = this.url;
     data['api_key'] = this.apiKey;
+    return data;
+  }
+}
+
+var dwonloadClientsProvider = FutureProvider((ref) async {
+  final dio = Dio();
+  var resp = await dio.get(APIs.allDownloadClientsUrl);
+  var sp = ServerResponse.fromJson(resp.data);
+  if (sp.code != 0) {
+    throw sp.message;
+  }
+  List<DownloadClient> indexers = List.empty(growable: true);
+  for (final item in sp.data as List) {
+    indexers.add(DownloadClient.fromJson(item));
+  }
+  return indexers;
+});
+
+class DownloadClient {
+  int? id;
+  bool? enable;
+  String? name;
+  String? implementation;
+  String? url;
+  bool? removeCompletedDownloads;
+  bool? removeFailedDownloads;
+
+  DownloadClient(
+      {this.id,
+      this.enable,
+      this.name,
+      this.implementation,
+      this.url,
+      this.removeCompletedDownloads,
+      this.removeFailedDownloads});
+
+  DownloadClient.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    enable = json['enable'];
+    name = json['name'];
+    implementation = json['implementation'];
+    url = json['url'];
+    removeCompletedDownloads = json['remove_completed_downloads'];
+    removeFailedDownloads = json['remove_failed_downloads'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['enable'] = this.enable;
+    data['name'] = this.name;
+    data['implementation'] = this.implementation;
+    data['url'] = this.url;
+    data['remove_completed_downloads'] = this.removeCompletedDownloads;
+    data['remove_failed_downloads'] = this.removeFailedDownloads;
     return data;
   }
 }

@@ -10,6 +10,9 @@ class APIs {
   static final allIndexersUrl = "$_baseUrl/api/v1/indexer/";
   static final addIndexerUrl = "$_baseUrl/api/v1/indexer/add";
   static final delIndexerUrl = "$_baseUrl/api/v1/indexer/del/";
+  static final allDownloadClientsUrl = "$_baseUrl/api/v1/downloader";
+  static final addDownloadClientUrl = "$_baseUrl/api/v1/downloader/add";
+  static final delDownloadClientUrl = "$_baseUrl/api/v1/downloader/del/";
 
   static const tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/";
 

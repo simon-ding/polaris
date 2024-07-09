@@ -74,6 +74,7 @@ func (s *Server) Serve() error {
 	{
 		downloader.GET("/", HttpHandler(s.GetAllDonloadClients))
 		downloader.POST("/add", HttpHandler(s.AddDownloadClient))
+		downloader.DELETE("/del/:id", HttpHandler(s.DeleteDownloadCLient))
 	}
 
 	s.language = s.db.GetLanguage()

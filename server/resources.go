@@ -136,3 +136,13 @@ func (s *Server) GetAllDonloadClients(c *gin.Context) (interface{}, error) {
 	}
 	return res, nil
 }
+
+func (s *Server) DeleteDownloadCLient(c *gin.Context) (interface{}, error) {
+	var ids = c.Param("id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, fmt.Errorf("id is not correct: %v", ids)
+	}
+	s.db.DeleteDownloadCLient(id)
+	return "success", nil
+}
