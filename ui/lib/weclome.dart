@@ -1,37 +1,26 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/APIs.dart';
-import 'package:ui/server_response.dart';
+import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/tv_details.dart';
 
-class WelcomePage extends StatefulWidget {
-  const WelcomePage({super.key});
+class WelcomePage extends ConsumerWidget {
   static const route = "/welcome";
 
-  @override
-  State<StatefulWidget> createState() {
-    return _WeclomePageState();
-  }
-}
-
-class _WeclomePageState extends State<WelcomePage> {
-  var favList = List.empty(growable: true);
+  const WelcomePage({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _onRefresh();
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final data = ref.watch(welcomePageDataProvider);
 
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-        itemCount: favList.length,
+    return switch (data) {
+      AsyncData(:final value) => GridView.builder(
+        itemCount: value.length,
         gridDelegate:
             const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
         itemBuilder: (context, i) {
-          var item = TvSeries.fromJson(favList[i]);
+          var item = value[i];
           return Card(
               margin: const EdgeInsets.all(4),
               clipBehavior: Clip.hardEdge,
@@ -63,46 +52,9 @@ class _WeclomePageState extends State<WelcomePage> {
                   ],
                 ),
               ));
-        });
-  }
-
-  Future<void> _onRefresh() async {
-    if (favList.isNotEmpty) {
-      return;
-    }
-    var resp = await Dio().get(APIs.watchlistUrl);
-    var sp = ServerResponse.fromJson(resp.data);
-    setState(() {
-      favList = sp.data as List;
-    });
-  }
-}
-
-class TvSeries {
-  int? id;
-  int? tmdbId;
-  String? name;
-  String? originalName;
-  String? overview;
-  String? path;
-  String? posterPath;
-
-  TvSeries(
-      {this.id,
-      this.tmdbId,
-      this.name,
-      this.originalName,
-      this.overview,
-      this.path,
-      this.posterPath});
-
-  TvSeries.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    tmdbId = json['tmdb_id'];
-    name = json['name'];
-    originalName = json['original_name'];
-    overview = json['overview'];
-    path = json['path'];
-    posterPath = json["poster_path"];
+        }),
+      _ => const CircularProgressIndicator(),
+      
+    };
   }
 }
