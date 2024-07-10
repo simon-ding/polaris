@@ -28,8 +28,8 @@ func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
 }
 
 type addWatchlistIn struct {
-	TmdbID         int    `json:"id" binding:"required"`
-	StorageID int `json:"folder"`
+	TmdbID    int `json:"id" binding:"required"`
+	StorageID int `json:"storage_id"`
 }
 
 func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
@@ -52,8 +52,6 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 			}
 		}
 	}
-
-
 
 	var epIds []int
 	for _, season := range detail.Seasons {
@@ -91,7 +89,6 @@ func (s *Server) GetWatchlist(c *gin.Context) (interface{}, error) {
 	list := s.db.GetWatchlist()
 	return list, nil
 }
-
 
 func (s *Server) GetTvDetails(c *gin.Context) (interface{}, error) {
 	ids := c.Param("id")

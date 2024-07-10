@@ -10,12 +10,21 @@ import (
 )
 
 func (s *Server) scheduler() {
-	s.cron.AddFunc("@every 1m", s.checkTasks)
+	s.mustAddCron("@every 1m", s.checkTasks)
+	s.cron.Start()
+}
+
+func (s *Server) mustAddCron(spec string, cmd func()) {
+	if err := s.cron.AddFunc(spec, cmd); err != nil {
+		log.Errorf("add func error: %v", err)
+		panic(err)
+	}
 }
 
 func (s *Server) checkTasks() {
+	log.Infof("begin check tasks...")
 	for id, t := range s.tasks {
-		log.Infof("task %s percentage done: %d%%", t.Name(), t.Progress())
+		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
 			log.Infof("task is done: %v", t.Name())
 			s.moveCompletedTask(id)

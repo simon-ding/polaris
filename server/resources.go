@@ -75,34 +75,29 @@ type searchAndDownloadIn struct {
 	Episode int `json:"episode"`
 }
 
-func (s *Server) SearchAndDownload(c *gin.Context) (interface{}, error) {
-	var in searchAndDownloadIn
-	if err := c.ShouldBindJSON(&in); err != nil {
-		return nil, errors.Wrap(err, "bind json")
-	}
+func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string, error) {
 	tr := s.db.GetTransmission()
 	trc, err := transmission.NewClient(tr.URL, tr.User, tr.Password)
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
-	log.Infof("search episode resources link: %v", in)
-	series := s.db.GetSeriesDetails(in.ID)
+	series := s.db.GetSeriesDetails(seriesId)
 	if series == nil {
-		return nil, fmt.Errorf("no tv series of id %v", in.ID)
+		return nil, fmt.Errorf("no tv series of id %v", seriesId)
 	}
 	var ep *ent.Episode
 	for _, e := range series.Episodes {
-		if e.SeasonNumber == in.Season && e.EpisodeNumber == in.Episode {
+		if e.SeasonNumber == seasonNum && e.EpisodeNumber == episodeNum {
 			ep = e
 		}
 	}
 	if ep == nil {
-		return nil, errors.Errorf("no episode of season %d episode %d", in.Season, in.Episode)
+		return nil, errors.Errorf("no episode of season %d episode %d", seasonNum, episodeNum)
 	}
 
-	res := s.searchTvWithTorznab(series.OriginalName, in.Season, in.Episode)
+	res := s.searchTvWithTorznab(series.OriginalName, seasonNum, episodeNum)
 	if len(res) == 0 {
-		return "", fmt.Errorf("no resource found")
+		return nil, fmt.Errorf("no resource found")
 	}
 	r1 := res[0]
 	log.Infof("found resource to download: %v", r1)
@@ -138,8 +133,22 @@ func (s *Server) SearchAndDownload(c *gin.Context) (interface{}, error) {
 	// 	return nil, errors.Wrap(err, "download torrent")
 	// }
 	log.Errorf("success add %s to download task", r1.Name)
+	return &r1.Name, nil
+}
+
+func (s *Server) SearchAndDownload(c *gin.Context) (interface{}, error) {
+	var in searchAndDownloadIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind json")
+	}
+	log.Infof("search episode resources link: %v", in)
+	name, err := s.searchAndDownload(in.ID, in.Season, in.Episode)
+	if err != nil {
+		return nil, errors.Wrap(err, "download")
+	}
+
 	return gin.H{
-		"name": r1.Name,
+		"name": *name,
 	}, nil
 }
 
