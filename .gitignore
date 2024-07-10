@@ -7,7 +7,7 @@
 *.dll
 *.so
 *.dylib
-*.yml
+config.yml
 .idea/
 .DS_Store
 *.db
