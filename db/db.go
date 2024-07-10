@@ -333,7 +333,7 @@ func (c *Client) DeleteHistory(id int) error {
 func (c *Client) GetDownloadDir() string {
 	r, err := c.ent.Settings.Query().Where(settings.Key(SettingDownloadDir)).First(context.TODO())
 	if err != nil {
-		return "/download"
+		return "/downloads"
 	}
 	return r.Value
 }
