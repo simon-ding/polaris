@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
 
     return ProviderScope(
       child: MaterialApp.router(
-        title: 'Flutter Demo',
+        title: 'Polaris',
         theme: ThemeData(
           // This is the theme of your application.
           //

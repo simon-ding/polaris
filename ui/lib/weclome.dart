@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui/APIs.dart';
+import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/tv_details.dart';
 

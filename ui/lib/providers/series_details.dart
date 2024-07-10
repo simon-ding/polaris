@@ -1,16 +1,40 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui/APIs.dart';
+import 'package:ui/providers/APIs.dart';
 import 'package:ui/server_response.dart';
 
-var seriesDetailsProvider = FutureProvider.family((ref, seriesId) async {
-  var resp = await Dio().get("${APIs.seriesDetailUrl}$seriesId");
-  var rsp = ServerResponse.fromJson(resp.data);
-  if (rsp.code != 0) {
-    throw rsp.message;
+var seriesDetailsProvider = AsyncNotifierProvider.autoDispose
+    .family<SeriesDetailData, SeriesDetails, String>(SeriesDetailData.new);
+
+class SeriesDetailData
+    extends AutoDisposeFamilyAsyncNotifier<SeriesDetails, String> {
+  @override
+  FutureOr<SeriesDetails> build(String arg) async {
+    var resp = await Dio().get("${APIs.seriesDetailUrl}$arg");
+    var rsp = ServerResponse.fromJson(resp.data);
+    if (rsp.code != 0) {
+      throw rsp.message;
+    }
+    return SeriesDetails.fromJson(rsp.data);
   }
-  return SeriesDetails.fromJson(rsp.data);
-});
+
+  Future<String> searchAndDownload(
+      String seriesId, int seasonNum, int episodeNum) async {
+    var resp = await Dio().post(APIs.searchAndDownloadUrl, data: {
+      "id": int.parse(seriesId),
+      "season": seasonNum,
+      "episode": episodeNum,
+    });
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    var name = (sp.data as Map<String, dynamic>)["name"];
+    return name;
+  }
+}
 
 class SeriesDetails {
   int? id;

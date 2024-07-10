@@ -31,4 +31,14 @@ class Utils {
   static showSnakeBar(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
+
+  static bool showError(BuildContext context, AsyncSnapshot snapshot) {
+    final isErrored = snapshot.hasError &&
+        snapshot.connectionState != ConnectionState.waiting;
+    if (isErrored) {
+      Utils.showSnakeBar(context, "当前操作出错: ${snapshot.error}");
+      return true;
+    }
+    return false;
+  }
 }
