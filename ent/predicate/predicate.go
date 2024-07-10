@@ -23,3 +23,6 @@ type Series func(*sql.Selector)
 
 // Settings is the predicate function for settings builders.
 type Settings func(*sql.Selector)
+
+// Storage is the predicate function for storage builders.
+type Storage func(*sql.Selector)

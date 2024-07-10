@@ -4,9 +4,11 @@ package ent
 
 import (
 	"polaris/ent/downloadclients"
+	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/schema"
 	"polaris/ent/series"
+	"polaris/ent/storage"
 	"time"
 )
 
@@ -44,6 +46,12 @@ func init() {
 	downloadclientsDescTags := downloadclientsFields[10].Descriptor()
 	// downloadclients.DefaultTags holds the default value on creation for the tags field.
 	downloadclients.DefaultTags = downloadclientsDescTags.Default.(string)
+	historyFields := schema.History{}.Fields()
+	_ = historyFields
+	// historyDescCompleted is the schema descriptor for completed field.
+	historyDescCompleted := historyFields[5].Descriptor()
+	// history.DefaultCompleted holds the default value on creation for the completed field.
+	history.DefaultCompleted = historyDescCompleted.Default.(bool)
 	indexersFields := schema.Indexers{}.Fields()
 	_ = indexersFields
 	// indexersDescEnableRss is the schema descriptor for enable_rss field.
@@ -60,4 +68,18 @@ func init() {
 	seriesDescAirDate := seriesFields[8].Descriptor()
 	// series.DefaultAirDate holds the default value on creation for the air_date field.
 	series.DefaultAirDate = seriesDescAirDate.Default.(string)
+	// seriesDescResolution is the schema descriptor for resolution field.
+	seriesDescResolution := seriesFields[9].Descriptor()
+	// series.DefaultResolution holds the default value on creation for the resolution field.
+	series.DefaultResolution = seriesDescResolution.Default.(string)
+	storageFields := schema.Storage{}.Fields()
+	_ = storageFields
+	// storageDescDeleted is the schema descriptor for deleted field.
+	storageDescDeleted := storageFields[5].Descriptor()
+	// storage.DefaultDeleted holds the default value on creation for the deleted field.
+	storage.DefaultDeleted = storageDescDeleted.Default.(bool)
+	// storageDescDefault is the schema descriptor for default field.
+	storageDescDefault := storageFields[6].Descriptor()
+	// storage.DefaultDefault holds the default value on creation for the default field.
+	storage.DefaultDefault = storageDescDefault.Default.(bool)
 }

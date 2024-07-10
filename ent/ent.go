@@ -12,6 +12,7 @@ import (
 	"polaris/ent/indexers"
 	"polaris/ent/series"
 	"polaris/ent/settings"
+	"polaris/ent/storage"
 	"reflect"
 	"sync"
 
@@ -84,6 +85,7 @@ func checkColumn(table, column string) error {
 			indexers.Table:        indexers.ValidColumn,
 			series.Table:          series.ValidColumn,
 			settings.Table:        settings.ValidColumn,
+			storage.Table:         storage.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

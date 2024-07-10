@@ -70,6 +70,11 @@ func Name(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldName, v))
 }
 
+// NameEn applies equality check predicate on the "name_en" field. It's identical to NameEnEQ.
+func NameEn(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldNameEn, v))
+}
+
 // OriginalName applies equality check predicate on the "original_name" field. It's identical to OriginalNameEQ.
 func OriginalName(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldOriginalName, v))
@@ -78,11 +83,6 @@ func OriginalName(v string) predicate.Series {
 // Overview applies equality check predicate on the "overview" field. It's identical to OverviewEQ.
 func Overview(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldOverview, v))
-}
-
-// Path applies equality check predicate on the "path" field. It's identical to PathEQ.
-func Path(v string) predicate.Series {
-	return predicate.Series(sql.FieldEQ(FieldPath, v))
 }
 
 // PosterPath applies equality check predicate on the "poster_path" field. It's identical to PosterPathEQ.
@@ -98,6 +98,16 @@ func CreatedAt(v time.Time) predicate.Series {
 // AirDate applies equality check predicate on the "air_date" field. It's identical to AirDateEQ.
 func AirDate(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldAirDate, v))
+}
+
+// Resolution applies equality check predicate on the "resolution" field. It's identical to ResolutionEQ.
+func Resolution(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldResolution, v))
+}
+
+// StorageID applies equality check predicate on the "storage_id" field. It's identical to StorageIDEQ.
+func StorageID(v int) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldStorageID, v))
 }
 
 // TmdbIDEQ applies the EQ predicate on the "tmdb_id" field.
@@ -280,6 +290,81 @@ func NameContainsFold(v string) predicate.Series {
 	return predicate.Series(sql.FieldContainsFold(FieldName, v))
 }
 
+// NameEnEQ applies the EQ predicate on the "name_en" field.
+func NameEnEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldNameEn, v))
+}
+
+// NameEnNEQ applies the NEQ predicate on the "name_en" field.
+func NameEnNEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldNameEn, v))
+}
+
+// NameEnIn applies the In predicate on the "name_en" field.
+func NameEnIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldNameEn, vs...))
+}
+
+// NameEnNotIn applies the NotIn predicate on the "name_en" field.
+func NameEnNotIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldNameEn, vs...))
+}
+
+// NameEnGT applies the GT predicate on the "name_en" field.
+func NameEnGT(v string) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldNameEn, v))
+}
+
+// NameEnGTE applies the GTE predicate on the "name_en" field.
+func NameEnGTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldNameEn, v))
+}
+
+// NameEnLT applies the LT predicate on the "name_en" field.
+func NameEnLT(v string) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldNameEn, v))
+}
+
+// NameEnLTE applies the LTE predicate on the "name_en" field.
+func NameEnLTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldNameEn, v))
+}
+
+// NameEnContains applies the Contains predicate on the "name_en" field.
+func NameEnContains(v string) predicate.Series {
+	return predicate.Series(sql.FieldContains(FieldNameEn, v))
+}
+
+// NameEnHasPrefix applies the HasPrefix predicate on the "name_en" field.
+func NameEnHasPrefix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasPrefix(FieldNameEn, v))
+}
+
+// NameEnHasSuffix applies the HasSuffix predicate on the "name_en" field.
+func NameEnHasSuffix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasSuffix(FieldNameEn, v))
+}
+
+// NameEnIsNil applies the IsNil predicate on the "name_en" field.
+func NameEnIsNil() predicate.Series {
+	return predicate.Series(sql.FieldIsNull(FieldNameEn))
+}
+
+// NameEnNotNil applies the NotNil predicate on the "name_en" field.
+func NameEnNotNil() predicate.Series {
+	return predicate.Series(sql.FieldNotNull(FieldNameEn))
+}
+
+// NameEnEqualFold applies the EqualFold predicate on the "name_en" field.
+func NameEnEqualFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldEqualFold(FieldNameEn, v))
+}
+
+// NameEnContainsFold applies the ContainsFold predicate on the "name_en" field.
+func NameEnContainsFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldContainsFold(FieldNameEn, v))
+}
+
 // OriginalNameEQ applies the EQ predicate on the "original_name" field.
 func OriginalNameEQ(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldOriginalName, v))
@@ -408,71 +493,6 @@ func OverviewEqualFold(v string) predicate.Series {
 // OverviewContainsFold applies the ContainsFold predicate on the "overview" field.
 func OverviewContainsFold(v string) predicate.Series {
 	return predicate.Series(sql.FieldContainsFold(FieldOverview, v))
-}
-
-// PathEQ applies the EQ predicate on the "path" field.
-func PathEQ(v string) predicate.Series {
-	return predicate.Series(sql.FieldEQ(FieldPath, v))
-}
-
-// PathNEQ applies the NEQ predicate on the "path" field.
-func PathNEQ(v string) predicate.Series {
-	return predicate.Series(sql.FieldNEQ(FieldPath, v))
-}
-
-// PathIn applies the In predicate on the "path" field.
-func PathIn(vs ...string) predicate.Series {
-	return predicate.Series(sql.FieldIn(FieldPath, vs...))
-}
-
-// PathNotIn applies the NotIn predicate on the "path" field.
-func PathNotIn(vs ...string) predicate.Series {
-	return predicate.Series(sql.FieldNotIn(FieldPath, vs...))
-}
-
-// PathGT applies the GT predicate on the "path" field.
-func PathGT(v string) predicate.Series {
-	return predicate.Series(sql.FieldGT(FieldPath, v))
-}
-
-// PathGTE applies the GTE predicate on the "path" field.
-func PathGTE(v string) predicate.Series {
-	return predicate.Series(sql.FieldGTE(FieldPath, v))
-}
-
-// PathLT applies the LT predicate on the "path" field.
-func PathLT(v string) predicate.Series {
-	return predicate.Series(sql.FieldLT(FieldPath, v))
-}
-
-// PathLTE applies the LTE predicate on the "path" field.
-func PathLTE(v string) predicate.Series {
-	return predicate.Series(sql.FieldLTE(FieldPath, v))
-}
-
-// PathContains applies the Contains predicate on the "path" field.
-func PathContains(v string) predicate.Series {
-	return predicate.Series(sql.FieldContains(FieldPath, v))
-}
-
-// PathHasPrefix applies the HasPrefix predicate on the "path" field.
-func PathHasPrefix(v string) predicate.Series {
-	return predicate.Series(sql.FieldHasPrefix(FieldPath, v))
-}
-
-// PathHasSuffix applies the HasSuffix predicate on the "path" field.
-func PathHasSuffix(v string) predicate.Series {
-	return predicate.Series(sql.FieldHasSuffix(FieldPath, v))
-}
-
-// PathEqualFold applies the EqualFold predicate on the "path" field.
-func PathEqualFold(v string) predicate.Series {
-	return predicate.Series(sql.FieldEqualFold(FieldPath, v))
-}
-
-// PathContainsFold applies the ContainsFold predicate on the "path" field.
-func PathContainsFold(v string) predicate.Series {
-	return predicate.Series(sql.FieldContainsFold(FieldPath, v))
 }
 
 // PosterPathEQ applies the EQ predicate on the "poster_path" field.
@@ -653,6 +673,121 @@ func AirDateEqualFold(v string) predicate.Series {
 // AirDateContainsFold applies the ContainsFold predicate on the "air_date" field.
 func AirDateContainsFold(v string) predicate.Series {
 	return predicate.Series(sql.FieldContainsFold(FieldAirDate, v))
+}
+
+// ResolutionEQ applies the EQ predicate on the "resolution" field.
+func ResolutionEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldResolution, v))
+}
+
+// ResolutionNEQ applies the NEQ predicate on the "resolution" field.
+func ResolutionNEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldResolution, v))
+}
+
+// ResolutionIn applies the In predicate on the "resolution" field.
+func ResolutionIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldResolution, vs...))
+}
+
+// ResolutionNotIn applies the NotIn predicate on the "resolution" field.
+func ResolutionNotIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldResolution, vs...))
+}
+
+// ResolutionGT applies the GT predicate on the "resolution" field.
+func ResolutionGT(v string) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldResolution, v))
+}
+
+// ResolutionGTE applies the GTE predicate on the "resolution" field.
+func ResolutionGTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldResolution, v))
+}
+
+// ResolutionLT applies the LT predicate on the "resolution" field.
+func ResolutionLT(v string) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldResolution, v))
+}
+
+// ResolutionLTE applies the LTE predicate on the "resolution" field.
+func ResolutionLTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldResolution, v))
+}
+
+// ResolutionContains applies the Contains predicate on the "resolution" field.
+func ResolutionContains(v string) predicate.Series {
+	return predicate.Series(sql.FieldContains(FieldResolution, v))
+}
+
+// ResolutionHasPrefix applies the HasPrefix predicate on the "resolution" field.
+func ResolutionHasPrefix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasPrefix(FieldResolution, v))
+}
+
+// ResolutionHasSuffix applies the HasSuffix predicate on the "resolution" field.
+func ResolutionHasSuffix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasSuffix(FieldResolution, v))
+}
+
+// ResolutionEqualFold applies the EqualFold predicate on the "resolution" field.
+func ResolutionEqualFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldEqualFold(FieldResolution, v))
+}
+
+// ResolutionContainsFold applies the ContainsFold predicate on the "resolution" field.
+func ResolutionContainsFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldContainsFold(FieldResolution, v))
+}
+
+// StorageIDEQ applies the EQ predicate on the "storage_id" field.
+func StorageIDEQ(v int) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldStorageID, v))
+}
+
+// StorageIDNEQ applies the NEQ predicate on the "storage_id" field.
+func StorageIDNEQ(v int) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldStorageID, v))
+}
+
+// StorageIDIn applies the In predicate on the "storage_id" field.
+func StorageIDIn(vs ...int) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldStorageID, vs...))
+}
+
+// StorageIDNotIn applies the NotIn predicate on the "storage_id" field.
+func StorageIDNotIn(vs ...int) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldStorageID, vs...))
+}
+
+// StorageIDGT applies the GT predicate on the "storage_id" field.
+func StorageIDGT(v int) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldStorageID, v))
+}
+
+// StorageIDGTE applies the GTE predicate on the "storage_id" field.
+func StorageIDGTE(v int) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldStorageID, v))
+}
+
+// StorageIDLT applies the LT predicate on the "storage_id" field.
+func StorageIDLT(v int) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldStorageID, v))
+}
+
+// StorageIDLTE applies the LTE predicate on the "storage_id" field.
+func StorageIDLTE(v int) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldStorageID, v))
+}
+
+// StorageIDIsNil applies the IsNil predicate on the "storage_id" field.
+func StorageIDIsNil() predicate.Series {
+	return predicate.Series(sql.FieldIsNull(FieldStorageID))
+}
+
+// StorageIDNotNil applies the NotNil predicate on the "storage_id" field.
+func StorageIDNotNil() predicate.Series {
+	return predicate.Series(sql.FieldNotNull(FieldStorageID))
 }
 
 // HasEpisodes applies the HasEdge predicate on the "episodes" edge.

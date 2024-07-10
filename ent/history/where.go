@@ -74,6 +74,21 @@ func Date(v time.Time) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldDate, v))
 }
 
+// TargetDir applies equality check predicate on the "target_dir" field. It's identical to TargetDirEQ.
+func TargetDir(v string) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldTargetDir, v))
+}
+
+// Completed applies equality check predicate on the "completed" field. It's identical to CompletedEQ.
+func Completed(v bool) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldCompleted, v))
+}
+
+// Saved applies equality check predicate on the "saved" field. It's identical to SavedEQ.
+func Saved(v string) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldSaved, v))
+}
+
 // SeriesIDEQ applies the EQ predicate on the "series_id" field.
 func SeriesIDEQ(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSeriesID, v))
@@ -257,6 +272,156 @@ func DateLT(v time.Time) predicate.History {
 // DateLTE applies the LTE predicate on the "date" field.
 func DateLTE(v time.Time) predicate.History {
 	return predicate.History(sql.FieldLTE(FieldDate, v))
+}
+
+// TargetDirEQ applies the EQ predicate on the "target_dir" field.
+func TargetDirEQ(v string) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldTargetDir, v))
+}
+
+// TargetDirNEQ applies the NEQ predicate on the "target_dir" field.
+func TargetDirNEQ(v string) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldTargetDir, v))
+}
+
+// TargetDirIn applies the In predicate on the "target_dir" field.
+func TargetDirIn(vs ...string) predicate.History {
+	return predicate.History(sql.FieldIn(FieldTargetDir, vs...))
+}
+
+// TargetDirNotIn applies the NotIn predicate on the "target_dir" field.
+func TargetDirNotIn(vs ...string) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldTargetDir, vs...))
+}
+
+// TargetDirGT applies the GT predicate on the "target_dir" field.
+func TargetDirGT(v string) predicate.History {
+	return predicate.History(sql.FieldGT(FieldTargetDir, v))
+}
+
+// TargetDirGTE applies the GTE predicate on the "target_dir" field.
+func TargetDirGTE(v string) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldTargetDir, v))
+}
+
+// TargetDirLT applies the LT predicate on the "target_dir" field.
+func TargetDirLT(v string) predicate.History {
+	return predicate.History(sql.FieldLT(FieldTargetDir, v))
+}
+
+// TargetDirLTE applies the LTE predicate on the "target_dir" field.
+func TargetDirLTE(v string) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldTargetDir, v))
+}
+
+// TargetDirContains applies the Contains predicate on the "target_dir" field.
+func TargetDirContains(v string) predicate.History {
+	return predicate.History(sql.FieldContains(FieldTargetDir, v))
+}
+
+// TargetDirHasPrefix applies the HasPrefix predicate on the "target_dir" field.
+func TargetDirHasPrefix(v string) predicate.History {
+	return predicate.History(sql.FieldHasPrefix(FieldTargetDir, v))
+}
+
+// TargetDirHasSuffix applies the HasSuffix predicate on the "target_dir" field.
+func TargetDirHasSuffix(v string) predicate.History {
+	return predicate.History(sql.FieldHasSuffix(FieldTargetDir, v))
+}
+
+// TargetDirEqualFold applies the EqualFold predicate on the "target_dir" field.
+func TargetDirEqualFold(v string) predicate.History {
+	return predicate.History(sql.FieldEqualFold(FieldTargetDir, v))
+}
+
+// TargetDirContainsFold applies the ContainsFold predicate on the "target_dir" field.
+func TargetDirContainsFold(v string) predicate.History {
+	return predicate.History(sql.FieldContainsFold(FieldTargetDir, v))
+}
+
+// CompletedEQ applies the EQ predicate on the "completed" field.
+func CompletedEQ(v bool) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldCompleted, v))
+}
+
+// CompletedNEQ applies the NEQ predicate on the "completed" field.
+func CompletedNEQ(v bool) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldCompleted, v))
+}
+
+// SavedEQ applies the EQ predicate on the "saved" field.
+func SavedEQ(v string) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldSaved, v))
+}
+
+// SavedNEQ applies the NEQ predicate on the "saved" field.
+func SavedNEQ(v string) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldSaved, v))
+}
+
+// SavedIn applies the In predicate on the "saved" field.
+func SavedIn(vs ...string) predicate.History {
+	return predicate.History(sql.FieldIn(FieldSaved, vs...))
+}
+
+// SavedNotIn applies the NotIn predicate on the "saved" field.
+func SavedNotIn(vs ...string) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldSaved, vs...))
+}
+
+// SavedGT applies the GT predicate on the "saved" field.
+func SavedGT(v string) predicate.History {
+	return predicate.History(sql.FieldGT(FieldSaved, v))
+}
+
+// SavedGTE applies the GTE predicate on the "saved" field.
+func SavedGTE(v string) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldSaved, v))
+}
+
+// SavedLT applies the LT predicate on the "saved" field.
+func SavedLT(v string) predicate.History {
+	return predicate.History(sql.FieldLT(FieldSaved, v))
+}
+
+// SavedLTE applies the LTE predicate on the "saved" field.
+func SavedLTE(v string) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldSaved, v))
+}
+
+// SavedContains applies the Contains predicate on the "saved" field.
+func SavedContains(v string) predicate.History {
+	return predicate.History(sql.FieldContains(FieldSaved, v))
+}
+
+// SavedHasPrefix applies the HasPrefix predicate on the "saved" field.
+func SavedHasPrefix(v string) predicate.History {
+	return predicate.History(sql.FieldHasPrefix(FieldSaved, v))
+}
+
+// SavedHasSuffix applies the HasSuffix predicate on the "saved" field.
+func SavedHasSuffix(v string) predicate.History {
+	return predicate.History(sql.FieldHasSuffix(FieldSaved, v))
+}
+
+// SavedIsNil applies the IsNil predicate on the "saved" field.
+func SavedIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldSaved))
+}
+
+// SavedNotNil applies the NotNil predicate on the "saved" field.
+func SavedNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldSaved))
+}
+
+// SavedEqualFold applies the EqualFold predicate on the "saved" field.
+func SavedEqualFold(v string) predicate.History {
+	return predicate.History(sql.FieldEqualFold(FieldSaved, v))
+}
+
+// SavedContainsFold applies the ContainsFold predicate on the "saved" field.
+func SavedContainsFold(v string) predicate.History {
+	return predicate.History(sql.FieldContainsFold(FieldSaved, v))
 }
 
 // And groups predicates with the AND operator between them.

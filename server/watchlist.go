@@ -1,6 +1,7 @@
 package server
 
 import (
+	"polaris/db"
 	"polaris/ent"
 	"polaris/log"
 	"strconv"
@@ -27,8 +28,8 @@ func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
 }
 
 type addWatchlistIn struct {
-	ID         int    `json:"id" binding:"required"`
-	RootFolder string `json:"folder" binding:"required"`
+	TmdbID         int    `json:"id" binding:"required"`
+	StorageID int `json:"folder"`
 }
 
 func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
@@ -36,11 +37,22 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
-	detail, err := s.MustTMDB().GetTvDetails(in.ID, s.language)
+	detail, err := s.MustTMDB().GetTvDetails(in.TmdbID, s.language)
 	if err != nil {
 		return nil, errors.Wrap(err, "get tv detail")
 	}
-	log.Infof("find detail for tv id %d: %v", in.ID, detail)
+	log.Infof("find detail for tv id %d: %v", in.TmdbID, detail)
+	var nameEn = detail.OriginalName
+	alterTitles, err := s.MustTMDB().GetTVAlternativeTitles(in.TmdbID, s.language)
+	if err == nil {
+		for _, r := range alterTitles.Results {
+			if r.Iso3166_1 == "US" {
+				log.Infof("found en name: %s", r.Title)
+				nameEn = r.Title
+			}
+		}
+	}
+
 
 
 	var epIds []int
@@ -66,7 +78,7 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 			epIds = append(epIds, epid)
 		}
 	}
-	_, err = s.db.AddWatchlist(in.RootFolder, detail, epIds)
+	_, err = s.db.AddWatchlist(in.StorageID, nameEn, detail, epIds, db.R1080p)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}

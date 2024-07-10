@@ -23,18 +23,22 @@ type Series struct {
 	ImdbID string `json:"imdb_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// NameEn holds the value of the "name_en" field.
+	NameEn string `json:"name_en,omitempty"`
 	// OriginalName holds the value of the "original_name" field.
 	OriginalName string `json:"original_name,omitempty"`
 	// Overview holds the value of the "overview" field.
 	Overview string `json:"overview,omitempty"`
-	// Path holds the value of the "path" field.
-	Path string `json:"path,omitempty"`
 	// PosterPath holds the value of the "poster_path" field.
 	PosterPath string `json:"poster_path,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// AirDate holds the value of the "air_date" field.
 	AirDate string `json:"air_date,omitempty"`
+	// Resolution holds the value of the "resolution" field.
+	Resolution string `json:"resolution,omitempty"`
+	// StorageID holds the value of the "storage_id" field.
+	StorageID int `json:"storage_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SeriesQuery when eager-loading is set.
 	Edges        SeriesEdges `json:"edges"`
@@ -64,9 +68,9 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case series.FieldID, series.FieldTmdbID:
+		case series.FieldID, series.FieldTmdbID, series.FieldStorageID:
 			values[i] = new(sql.NullInt64)
-		case series.FieldImdbID, series.FieldName, series.FieldOriginalName, series.FieldOverview, series.FieldPath, series.FieldPosterPath, series.FieldAirDate:
+		case series.FieldImdbID, series.FieldName, series.FieldNameEn, series.FieldOriginalName, series.FieldOverview, series.FieldPosterPath, series.FieldAirDate, series.FieldResolution:
 			values[i] = new(sql.NullString)
 		case series.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -109,6 +113,12 @@ func (s *Series) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Name = value.String
 			}
+		case series.FieldNameEn:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name_en", values[i])
+			} else if value.Valid {
+				s.NameEn = value.String
+			}
 		case series.FieldOriginalName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field original_name", values[i])
@@ -120,12 +130,6 @@ func (s *Series) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field overview", values[i])
 			} else if value.Valid {
 				s.Overview = value.String
-			}
-		case series.FieldPath:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field path", values[i])
-			} else if value.Valid {
-				s.Path = value.String
 			}
 		case series.FieldPosterPath:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -144,6 +148,18 @@ func (s *Series) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field air_date", values[i])
 			} else if value.Valid {
 				s.AirDate = value.String
+			}
+		case series.FieldResolution:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field resolution", values[i])
+			} else if value.Valid {
+				s.Resolution = value.String
+			}
+		case series.FieldStorageID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field storage_id", values[i])
+			} else if value.Valid {
+				s.StorageID = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -195,14 +211,14 @@ func (s *Series) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(s.Name)
 	builder.WriteString(", ")
+	builder.WriteString("name_en=")
+	builder.WriteString(s.NameEn)
+	builder.WriteString(", ")
 	builder.WriteString("original_name=")
 	builder.WriteString(s.OriginalName)
 	builder.WriteString(", ")
 	builder.WriteString("overview=")
 	builder.WriteString(s.Overview)
-	builder.WriteString(", ")
-	builder.WriteString("path=")
-	builder.WriteString(s.Path)
 	builder.WriteString(", ")
 	builder.WriteString("poster_path=")
 	builder.WriteString(s.PosterPath)
@@ -212,6 +228,12 @@ func (s *Series) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("air_date=")
 	builder.WriteString(s.AirDate)
+	builder.WriteString(", ")
+	builder.WriteString("resolution=")
+	builder.WriteString(s.Resolution)
+	builder.WriteString(", ")
+	builder.WriteString("storage_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.StorageID))
 	builder.WriteByte(')')
 	return builder.String()
 }

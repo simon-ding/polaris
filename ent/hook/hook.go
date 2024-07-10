@@ -80,6 +80,18 @@ func (f SettingsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SettingsMutation", m)
 }
 
+// The StorageFunc type is an adapter to allow the use of ordinary
+// function as Storage mutator.
+type StorageFunc func(context.Context, *ent.StorageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StorageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.StorageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StorageMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

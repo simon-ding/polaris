@@ -48,6 +48,10 @@ func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.
 	return c.tmdbClient.GetTVSeasonDetails(id, seasonNumber, withLangOption(language))
 }
 
+func (c *Client) GetTVAlternativeTitles(id int, language string) (*tmdb.TVAlternativeTitles, error) {
+	return c.tmdbClient.GetTVAlternativeTitles(id, withLangOption(language))
+}
+
 func wrapLanguage(lang string) string {
 	if lang == "" {
 		lang = "zh-CN"

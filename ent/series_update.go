@@ -84,6 +84,26 @@ func (su *SeriesUpdate) SetNillableName(s *string) *SeriesUpdate {
 	return su
 }
 
+// SetNameEn sets the "name_en" field.
+func (su *SeriesUpdate) SetNameEn(s string) *SeriesUpdate {
+	su.mutation.SetNameEn(s)
+	return su
+}
+
+// SetNillableNameEn sets the "name_en" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableNameEn(s *string) *SeriesUpdate {
+	if s != nil {
+		su.SetNameEn(*s)
+	}
+	return su
+}
+
+// ClearNameEn clears the value of the "name_en" field.
+func (su *SeriesUpdate) ClearNameEn() *SeriesUpdate {
+	su.mutation.ClearNameEn()
+	return su
+}
+
 // SetOriginalName sets the "original_name" field.
 func (su *SeriesUpdate) SetOriginalName(s string) *SeriesUpdate {
 	su.mutation.SetOriginalName(s)
@@ -108,20 +128,6 @@ func (su *SeriesUpdate) SetOverview(s string) *SeriesUpdate {
 func (su *SeriesUpdate) SetNillableOverview(s *string) *SeriesUpdate {
 	if s != nil {
 		su.SetOverview(*s)
-	}
-	return su
-}
-
-// SetPath sets the "path" field.
-func (su *SeriesUpdate) SetPath(s string) *SeriesUpdate {
-	su.mutation.SetPath(s)
-	return su
-}
-
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (su *SeriesUpdate) SetNillablePath(s *string) *SeriesUpdate {
-	if s != nil {
-		su.SetPath(*s)
 	}
 	return su
 }
@@ -171,6 +177,47 @@ func (su *SeriesUpdate) SetNillableAirDate(s *string) *SeriesUpdate {
 	if s != nil {
 		su.SetAirDate(*s)
 	}
+	return su
+}
+
+// SetResolution sets the "resolution" field.
+func (su *SeriesUpdate) SetResolution(s string) *SeriesUpdate {
+	su.mutation.SetResolution(s)
+	return su
+}
+
+// SetNillableResolution sets the "resolution" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableResolution(s *string) *SeriesUpdate {
+	if s != nil {
+		su.SetResolution(*s)
+	}
+	return su
+}
+
+// SetStorageID sets the "storage_id" field.
+func (su *SeriesUpdate) SetStorageID(i int) *SeriesUpdate {
+	su.mutation.ResetStorageID()
+	su.mutation.SetStorageID(i)
+	return su
+}
+
+// SetNillableStorageID sets the "storage_id" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableStorageID(i *int) *SeriesUpdate {
+	if i != nil {
+		su.SetStorageID(*i)
+	}
+	return su
+}
+
+// AddStorageID adds i to the "storage_id" field.
+func (su *SeriesUpdate) AddStorageID(i int) *SeriesUpdate {
+	su.mutation.AddStorageID(i)
+	return su
+}
+
+// ClearStorageID clears the value of the "storage_id" field.
+func (su *SeriesUpdate) ClearStorageID() *SeriesUpdate {
+	su.mutation.ClearStorageID()
 	return su
 }
 
@@ -266,14 +313,17 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Name(); ok {
 		_spec.SetField(series.FieldName, field.TypeString, value)
 	}
+	if value, ok := su.mutation.NameEn(); ok {
+		_spec.SetField(series.FieldNameEn, field.TypeString, value)
+	}
+	if su.mutation.NameEnCleared() {
+		_spec.ClearField(series.FieldNameEn, field.TypeString)
+	}
 	if value, ok := su.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)
 	}
 	if value, ok := su.mutation.Overview(); ok {
 		_spec.SetField(series.FieldOverview, field.TypeString, value)
-	}
-	if value, ok := su.mutation.Path(); ok {
-		_spec.SetField(series.FieldPath, field.TypeString, value)
 	}
 	if value, ok := su.mutation.PosterPath(); ok {
 		_spec.SetField(series.FieldPosterPath, field.TypeString, value)
@@ -286,6 +336,18 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.AirDate(); ok {
 		_spec.SetField(series.FieldAirDate, field.TypeString, value)
+	}
+	if value, ok := su.mutation.Resolution(); ok {
+		_spec.SetField(series.FieldResolution, field.TypeString, value)
+	}
+	if value, ok := su.mutation.StorageID(); ok {
+		_spec.SetField(series.FieldStorageID, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedStorageID(); ok {
+		_spec.AddField(series.FieldStorageID, field.TypeInt, value)
+	}
+	if su.mutation.StorageIDCleared() {
+		_spec.ClearField(series.FieldStorageID, field.TypeInt)
 	}
 	if su.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -407,6 +469,26 @@ func (suo *SeriesUpdateOne) SetNillableName(s *string) *SeriesUpdateOne {
 	return suo
 }
 
+// SetNameEn sets the "name_en" field.
+func (suo *SeriesUpdateOne) SetNameEn(s string) *SeriesUpdateOne {
+	suo.mutation.SetNameEn(s)
+	return suo
+}
+
+// SetNillableNameEn sets the "name_en" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableNameEn(s *string) *SeriesUpdateOne {
+	if s != nil {
+		suo.SetNameEn(*s)
+	}
+	return suo
+}
+
+// ClearNameEn clears the value of the "name_en" field.
+func (suo *SeriesUpdateOne) ClearNameEn() *SeriesUpdateOne {
+	suo.mutation.ClearNameEn()
+	return suo
+}
+
 // SetOriginalName sets the "original_name" field.
 func (suo *SeriesUpdateOne) SetOriginalName(s string) *SeriesUpdateOne {
 	suo.mutation.SetOriginalName(s)
@@ -431,20 +513,6 @@ func (suo *SeriesUpdateOne) SetOverview(s string) *SeriesUpdateOne {
 func (suo *SeriesUpdateOne) SetNillableOverview(s *string) *SeriesUpdateOne {
 	if s != nil {
 		suo.SetOverview(*s)
-	}
-	return suo
-}
-
-// SetPath sets the "path" field.
-func (suo *SeriesUpdateOne) SetPath(s string) *SeriesUpdateOne {
-	suo.mutation.SetPath(s)
-	return suo
-}
-
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (suo *SeriesUpdateOne) SetNillablePath(s *string) *SeriesUpdateOne {
-	if s != nil {
-		suo.SetPath(*s)
 	}
 	return suo
 }
@@ -494,6 +562,47 @@ func (suo *SeriesUpdateOne) SetNillableAirDate(s *string) *SeriesUpdateOne {
 	if s != nil {
 		suo.SetAirDate(*s)
 	}
+	return suo
+}
+
+// SetResolution sets the "resolution" field.
+func (suo *SeriesUpdateOne) SetResolution(s string) *SeriesUpdateOne {
+	suo.mutation.SetResolution(s)
+	return suo
+}
+
+// SetNillableResolution sets the "resolution" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableResolution(s *string) *SeriesUpdateOne {
+	if s != nil {
+		suo.SetResolution(*s)
+	}
+	return suo
+}
+
+// SetStorageID sets the "storage_id" field.
+func (suo *SeriesUpdateOne) SetStorageID(i int) *SeriesUpdateOne {
+	suo.mutation.ResetStorageID()
+	suo.mutation.SetStorageID(i)
+	return suo
+}
+
+// SetNillableStorageID sets the "storage_id" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableStorageID(i *int) *SeriesUpdateOne {
+	if i != nil {
+		suo.SetStorageID(*i)
+	}
+	return suo
+}
+
+// AddStorageID adds i to the "storage_id" field.
+func (suo *SeriesUpdateOne) AddStorageID(i int) *SeriesUpdateOne {
+	suo.mutation.AddStorageID(i)
+	return suo
+}
+
+// ClearStorageID clears the value of the "storage_id" field.
+func (suo *SeriesUpdateOne) ClearStorageID() *SeriesUpdateOne {
+	suo.mutation.ClearStorageID()
 	return suo
 }
 
@@ -619,14 +728,17 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	if value, ok := suo.mutation.Name(); ok {
 		_spec.SetField(series.FieldName, field.TypeString, value)
 	}
+	if value, ok := suo.mutation.NameEn(); ok {
+		_spec.SetField(series.FieldNameEn, field.TypeString, value)
+	}
+	if suo.mutation.NameEnCleared() {
+		_spec.ClearField(series.FieldNameEn, field.TypeString)
+	}
 	if value, ok := suo.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.Overview(); ok {
 		_spec.SetField(series.FieldOverview, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.Path(); ok {
-		_spec.SetField(series.FieldPath, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.PosterPath(); ok {
 		_spec.SetField(series.FieldPosterPath, field.TypeString, value)
@@ -639,6 +751,18 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	}
 	if value, ok := suo.mutation.AirDate(); ok {
 		_spec.SetField(series.FieldAirDate, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.Resolution(); ok {
+		_spec.SetField(series.FieldResolution, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.StorageID(); ok {
+		_spec.SetField(series.FieldStorageID, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedStorageID(); ok {
+		_spec.AddField(series.FieldStorageID, field.TypeInt, value)
+	}
+	if suo.mutation.StorageIDCleared() {
+		_spec.ClearField(series.FieldStorageID, field.TypeInt)
 	}
 	if suo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{

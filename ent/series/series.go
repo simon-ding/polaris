@@ -20,18 +20,22 @@ const (
 	FieldImdbID = "imdb_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldNameEn holds the string denoting the name_en field in the database.
+	FieldNameEn = "name_en"
 	// FieldOriginalName holds the string denoting the original_name field in the database.
 	FieldOriginalName = "original_name"
 	// FieldOverview holds the string denoting the overview field in the database.
 	FieldOverview = "overview"
-	// FieldPath holds the string denoting the path field in the database.
-	FieldPath = "path"
 	// FieldPosterPath holds the string denoting the poster_path field in the database.
 	FieldPosterPath = "poster_path"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldAirDate holds the string denoting the air_date field in the database.
 	FieldAirDate = "air_date"
+	// FieldResolution holds the string denoting the resolution field in the database.
+	FieldResolution = "resolution"
+	// FieldStorageID holds the string denoting the storage_id field in the database.
+	FieldStorageID = "storage_id"
 	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
 	EdgeEpisodes = "episodes"
 	// Table holds the table name of the series in the database.
@@ -51,12 +55,14 @@ var Columns = []string{
 	FieldTmdbID,
 	FieldImdbID,
 	FieldName,
+	FieldNameEn,
 	FieldOriginalName,
 	FieldOverview,
-	FieldPath,
 	FieldPosterPath,
 	FieldCreatedAt,
 	FieldAirDate,
+	FieldResolution,
+	FieldStorageID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -74,6 +80,8 @@ var (
 	DefaultCreatedAt time.Time
 	// DefaultAirDate holds the default value on creation for the "air_date" field.
 	DefaultAirDate string
+	// DefaultResolution holds the default value on creation for the "resolution" field.
+	DefaultResolution string
 )
 
 // OrderOption defines the ordering options for the Series queries.
@@ -99,6 +107,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// ByNameEn orders the results by the name_en field.
+func ByNameEn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNameEn, opts...).ToFunc()
+}
+
 // ByOriginalName orders the results by the original_name field.
 func ByOriginalName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOriginalName, opts...).ToFunc()
@@ -107,11 +120,6 @@ func ByOriginalName(opts ...sql.OrderTermOption) OrderOption {
 // ByOverview orders the results by the overview field.
 func ByOverview(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOverview, opts...).ToFunc()
-}
-
-// ByPath orders the results by the path field.
-func ByPath(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPath, opts...).ToFunc()
 }
 
 // ByPosterPath orders the results by the poster_path field.
@@ -127,6 +135,16 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByAirDate orders the results by the air_date field.
 func ByAirDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAirDate, opts...).ToFunc()
+}
+
+// ByResolution orders the results by the resolution field.
+func ByResolution(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldResolution, opts...).ToFunc()
+}
+
+// ByStorageID orders the results by the storage_id field.
+func ByStorageID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStorageID, opts...).ToFunc()
 }
 
 // ByEpisodesCount orders the results by episodes count.

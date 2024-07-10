@@ -47,6 +47,20 @@ func (sc *SeriesCreate) SetName(s string) *SeriesCreate {
 	return sc
 }
 
+// SetNameEn sets the "name_en" field.
+func (sc *SeriesCreate) SetNameEn(s string) *SeriesCreate {
+	sc.mutation.SetNameEn(s)
+	return sc
+}
+
+// SetNillableNameEn sets the "name_en" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillableNameEn(s *string) *SeriesCreate {
+	if s != nil {
+		sc.SetNameEn(*s)
+	}
+	return sc
+}
+
 // SetOriginalName sets the "original_name" field.
 func (sc *SeriesCreate) SetOriginalName(s string) *SeriesCreate {
 	sc.mutation.SetOriginalName(s)
@@ -56,12 +70,6 @@ func (sc *SeriesCreate) SetOriginalName(s string) *SeriesCreate {
 // SetOverview sets the "overview" field.
 func (sc *SeriesCreate) SetOverview(s string) *SeriesCreate {
 	sc.mutation.SetOverview(s)
-	return sc
-}
-
-// SetPath sets the "path" field.
-func (sc *SeriesCreate) SetPath(s string) *SeriesCreate {
-	sc.mutation.SetPath(s)
 	return sc
 }
 
@@ -103,6 +111,34 @@ func (sc *SeriesCreate) SetAirDate(s string) *SeriesCreate {
 func (sc *SeriesCreate) SetNillableAirDate(s *string) *SeriesCreate {
 	if s != nil {
 		sc.SetAirDate(*s)
+	}
+	return sc
+}
+
+// SetResolution sets the "resolution" field.
+func (sc *SeriesCreate) SetResolution(s string) *SeriesCreate {
+	sc.mutation.SetResolution(s)
+	return sc
+}
+
+// SetNillableResolution sets the "resolution" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillableResolution(s *string) *SeriesCreate {
+	if s != nil {
+		sc.SetResolution(*s)
+	}
+	return sc
+}
+
+// SetStorageID sets the "storage_id" field.
+func (sc *SeriesCreate) SetStorageID(i int) *SeriesCreate {
+	sc.mutation.SetStorageID(i)
+	return sc
+}
+
+// SetNillableStorageID sets the "storage_id" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillableStorageID(i *int) *SeriesCreate {
+	if i != nil {
+		sc.SetStorageID(*i)
 	}
 	return sc
 }
@@ -165,6 +201,10 @@ func (sc *SeriesCreate) defaults() {
 		v := series.DefaultAirDate
 		sc.mutation.SetAirDate(v)
 	}
+	if _, ok := sc.mutation.Resolution(); !ok {
+		v := series.DefaultResolution
+		sc.mutation.SetResolution(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -181,14 +221,14 @@ func (sc *SeriesCreate) check() error {
 	if _, ok := sc.mutation.Overview(); !ok {
 		return &ValidationError{Name: "overview", err: errors.New(`ent: missing required field "Series.overview"`)}
 	}
-	if _, ok := sc.mutation.Path(); !ok {
-		return &ValidationError{Name: "path", err: errors.New(`ent: missing required field "Series.path"`)}
-	}
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Series.created_at"`)}
 	}
 	if _, ok := sc.mutation.AirDate(); !ok {
 		return &ValidationError{Name: "air_date", err: errors.New(`ent: missing required field "Series.air_date"`)}
+	}
+	if _, ok := sc.mutation.Resolution(); !ok {
+		return &ValidationError{Name: "resolution", err: errors.New(`ent: missing required field "Series.resolution"`)}
 	}
 	return nil
 }
@@ -228,6 +268,10 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 		_spec.SetField(series.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := sc.mutation.NameEn(); ok {
+		_spec.SetField(series.FieldNameEn, field.TypeString, value)
+		_node.NameEn = value
+	}
 	if value, ok := sc.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)
 		_node.OriginalName = value
@@ -235,10 +279,6 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Overview(); ok {
 		_spec.SetField(series.FieldOverview, field.TypeString, value)
 		_node.Overview = value
-	}
-	if value, ok := sc.mutation.Path(); ok {
-		_spec.SetField(series.FieldPath, field.TypeString, value)
-		_node.Path = value
 	}
 	if value, ok := sc.mutation.PosterPath(); ok {
 		_spec.SetField(series.FieldPosterPath, field.TypeString, value)
@@ -251,6 +291,14 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.AirDate(); ok {
 		_spec.SetField(series.FieldAirDate, field.TypeString, value)
 		_node.AirDate = value
+	}
+	if value, ok := sc.mutation.Resolution(); ok {
+		_spec.SetField(series.FieldResolution, field.TypeString, value)
+		_node.Resolution = value
+	}
+	if value, ok := sc.mutation.StorageID(); ok {
+		_spec.SetField(series.FieldStorageID, field.TypeInt, value)
+		_node.StorageID = value
 	}
 	if nodes := sc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

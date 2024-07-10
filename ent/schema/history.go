@@ -17,6 +17,9 @@ func (History) Fields() []ent.Field {
 		field.Int("episode_id"),
 		field.String("source_title"),
 		field.Time("date"),
+		field.String("target_dir"),
+		field.Bool("completed").Default(false),
+		field.String("saved").Optional(),
 	}
 }
 

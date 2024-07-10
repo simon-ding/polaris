@@ -4,7 +4,7 @@ import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
 
 class SystemSettingsPage extends ConsumerStatefulWidget {
-  static const route = "/systemsettings";
+  static const route = "/settings";
 
   const SystemSettingsPage({super.key});
   @override

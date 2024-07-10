@@ -3,11 +3,11 @@ package server
 import (
 	"polaris/db"
 	"polaris/log"
+	"polaris/pkg"
 	"polaris/pkg/tmdb"
 	"polaris/ui"
 
 	"github.com/gin-contrib/static"
-	"github.com/hekmon/transmissionrpc"
 	"github.com/robfig/cron"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +20,7 @@ func NewServer(db *db.Client) *Server {
 		r:     r,
 		db:    db,
 		cron:  cron.New(),
-		tasks: make(map[string]*transmissionrpc.Torrent),
+		tasks: make(map[int]pkg.Torrent),
 	}
 }
 
@@ -29,18 +29,9 @@ type Server struct {
 	db       *db.Client
 	cron     *cron.Cron
 	language string
-	tasks    map[string]*transmissionrpc.Torrent
+	tasks    map[int]pkg.Torrent
 }
 
-func (s *Server) scheduler() {
-	s.cron.AddFunc("@every 1m", s.checkTasks)
-}
-
-func (s *Server) checkTasks() {
-	for name, t := range s.tasks {
-		log.Infof("task %s percentage done: %f", name, *t.PercentDone)
-	}
-}
 
 func (s *Server) Serve() error {
 	s.scheduler()
@@ -75,6 +66,12 @@ func (s *Server) Serve() error {
 		downloader.GET("/", HttpHandler(s.GetAllDonloadClients))
 		downloader.POST("/add", HttpHandler(s.AddDownloadClient))
 		downloader.DELETE("/del/:id", HttpHandler(s.DeleteDownloadCLient))
+	}
+	storage := api.Group("/storage")
+	{
+		storage.GET("/", HttpHandler(s.GetAllStorage))
+		storage.POST("/", HttpHandler(s.AddStorage))
+		storage.DELETE("/:id", HttpHandler(s.DeleteStorage))
 	}
 
 	s.language = s.db.GetLanguage()

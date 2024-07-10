@@ -19,6 +19,12 @@ const (
 	FieldSourceTitle = "source_title"
 	// FieldDate holds the string denoting the date field in the database.
 	FieldDate = "date"
+	// FieldTargetDir holds the string denoting the target_dir field in the database.
+	FieldTargetDir = "target_dir"
+	// FieldCompleted holds the string denoting the completed field in the database.
+	FieldCompleted = "completed"
+	// FieldSaved holds the string denoting the saved field in the database.
+	FieldSaved = "saved"
 	// Table holds the table name of the history in the database.
 	Table = "histories"
 )
@@ -30,6 +36,9 @@ var Columns = []string{
 	FieldEpisodeID,
 	FieldSourceTitle,
 	FieldDate,
+	FieldTargetDir,
+	FieldCompleted,
+	FieldSaved,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -41,6 +50,11 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultCompleted holds the default value on creation for the "completed" field.
+	DefaultCompleted bool
+)
 
 // OrderOption defines the ordering options for the History queries.
 type OrderOption func(*sql.Selector)
@@ -68,4 +82,19 @@ func BySourceTitle(opts ...sql.OrderTermOption) OrderOption {
 // ByDate orders the results by the date field.
 func ByDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDate, opts...).ToFunc()
+}
+
+// ByTargetDir orders the results by the target_dir field.
+func ByTargetDir(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTargetDir, opts...).ToFunc()
+}
+
+// ByCompleted orders the results by the completed field.
+func ByCompleted(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCompleted, opts...).ToFunc()
+}
+
+// BySaved orders the results by the saved field.
+func BySaved(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSaved, opts...).ToFunc()
 }

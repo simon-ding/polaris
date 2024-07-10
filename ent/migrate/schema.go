@@ -60,6 +60,9 @@ var (
 		{Name: "episode_id", Type: field.TypeInt},
 		{Name: "source_title", Type: field.TypeString},
 		{Name: "date", Type: field.TypeTime},
+		{Name: "target_dir", Type: field.TypeString},
+		{Name: "completed", Type: field.TypeBool, Default: false},
+		{Name: "saved", Type: field.TypeString, Nullable: true},
 	}
 	// HistoriesTable holds the schema information for the "histories" table.
 	HistoriesTable = &schema.Table{
@@ -88,12 +91,14 @@ var (
 		{Name: "tmdb_id", Type: field.TypeInt},
 		{Name: "imdb_id", Type: field.TypeString, Nullable: true},
 		{Name: "name", Type: field.TypeString},
+		{Name: "name_en", Type: field.TypeString, Nullable: true},
 		{Name: "original_name", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
-		{Name: "path", Type: field.TypeString},
 		{Name: "poster_path", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "air_date", Type: field.TypeString, Default: ""},
+		{Name: "resolution", Type: field.TypeString, Default: ""},
+		{Name: "storage_id", Type: field.TypeInt, Nullable: true},
 	}
 	// SeriesTable holds the schema information for the "series" table.
 	SeriesTable = &schema.Table{
@@ -113,6 +118,23 @@ var (
 		Columns:    SettingsColumns,
 		PrimaryKey: []*schema.Column{SettingsColumns[0]},
 	}
+	// StoragesColumns holds the columns for the "storages" table.
+	StoragesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "implementation", Type: field.TypeString},
+		{Name: "path", Type: field.TypeString},
+		{Name: "user", Type: field.TypeString, Nullable: true},
+		{Name: "password", Type: field.TypeString, Nullable: true},
+		{Name: "deleted", Type: field.TypeBool, Default: false},
+		{Name: "default", Type: field.TypeBool, Default: false},
+	}
+	// StoragesTable holds the schema information for the "storages" table.
+	StoragesTable = &schema.Table{
+		Name:       "storages",
+		Columns:    StoragesColumns,
+		PrimaryKey: []*schema.Column{StoragesColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		DownloadClientsTable,
@@ -121,6 +143,7 @@ var (
 		IndexersTable,
 		SeriesTable,
 		SettingsTable,
+		StoragesTable,
 	}
 )
 

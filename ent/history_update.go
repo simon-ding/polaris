@@ -98,6 +98,54 @@ func (hu *HistoryUpdate) SetNillableDate(t *time.Time) *HistoryUpdate {
 	return hu
 }
 
+// SetTargetDir sets the "target_dir" field.
+func (hu *HistoryUpdate) SetTargetDir(s string) *HistoryUpdate {
+	hu.mutation.SetTargetDir(s)
+	return hu
+}
+
+// SetNillableTargetDir sets the "target_dir" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableTargetDir(s *string) *HistoryUpdate {
+	if s != nil {
+		hu.SetTargetDir(*s)
+	}
+	return hu
+}
+
+// SetCompleted sets the "completed" field.
+func (hu *HistoryUpdate) SetCompleted(b bool) *HistoryUpdate {
+	hu.mutation.SetCompleted(b)
+	return hu
+}
+
+// SetNillableCompleted sets the "completed" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableCompleted(b *bool) *HistoryUpdate {
+	if b != nil {
+		hu.SetCompleted(*b)
+	}
+	return hu
+}
+
+// SetSaved sets the "saved" field.
+func (hu *HistoryUpdate) SetSaved(s string) *HistoryUpdate {
+	hu.mutation.SetSaved(s)
+	return hu
+}
+
+// SetNillableSaved sets the "saved" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableSaved(s *string) *HistoryUpdate {
+	if s != nil {
+		hu.SetSaved(*s)
+	}
+	return hu
+}
+
+// ClearSaved clears the value of the "saved" field.
+func (hu *HistoryUpdate) ClearSaved() *HistoryUpdate {
+	hu.mutation.ClearSaved()
+	return hu
+}
+
 // Mutation returns the HistoryMutation object of the builder.
 func (hu *HistoryUpdate) Mutation() *HistoryMutation {
 	return hu.mutation
@@ -156,6 +204,18 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := hu.mutation.Date(); ok {
 		_spec.SetField(history.FieldDate, field.TypeTime, value)
+	}
+	if value, ok := hu.mutation.TargetDir(); ok {
+		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
+	}
+	if value, ok := hu.mutation.Completed(); ok {
+		_spec.SetField(history.FieldCompleted, field.TypeBool, value)
+	}
+	if value, ok := hu.mutation.Saved(); ok {
+		_spec.SetField(history.FieldSaved, field.TypeString, value)
+	}
+	if hu.mutation.SavedCleared() {
+		_spec.ClearField(history.FieldSaved, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, hu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -247,6 +307,54 @@ func (huo *HistoryUpdateOne) SetNillableDate(t *time.Time) *HistoryUpdateOne {
 	return huo
 }
 
+// SetTargetDir sets the "target_dir" field.
+func (huo *HistoryUpdateOne) SetTargetDir(s string) *HistoryUpdateOne {
+	huo.mutation.SetTargetDir(s)
+	return huo
+}
+
+// SetNillableTargetDir sets the "target_dir" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableTargetDir(s *string) *HistoryUpdateOne {
+	if s != nil {
+		huo.SetTargetDir(*s)
+	}
+	return huo
+}
+
+// SetCompleted sets the "completed" field.
+func (huo *HistoryUpdateOne) SetCompleted(b bool) *HistoryUpdateOne {
+	huo.mutation.SetCompleted(b)
+	return huo
+}
+
+// SetNillableCompleted sets the "completed" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableCompleted(b *bool) *HistoryUpdateOne {
+	if b != nil {
+		huo.SetCompleted(*b)
+	}
+	return huo
+}
+
+// SetSaved sets the "saved" field.
+func (huo *HistoryUpdateOne) SetSaved(s string) *HistoryUpdateOne {
+	huo.mutation.SetSaved(s)
+	return huo
+}
+
+// SetNillableSaved sets the "saved" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableSaved(s *string) *HistoryUpdateOne {
+	if s != nil {
+		huo.SetSaved(*s)
+	}
+	return huo
+}
+
+// ClearSaved clears the value of the "saved" field.
+func (huo *HistoryUpdateOne) ClearSaved() *HistoryUpdateOne {
+	huo.mutation.ClearSaved()
+	return huo
+}
+
 // Mutation returns the HistoryMutation object of the builder.
 func (huo *HistoryUpdateOne) Mutation() *HistoryMutation {
 	return huo.mutation
@@ -335,6 +443,18 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if value, ok := huo.mutation.Date(); ok {
 		_spec.SetField(history.FieldDate, field.TypeTime, value)
+	}
+	if value, ok := huo.mutation.TargetDir(); ok {
+		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
+	}
+	if value, ok := huo.mutation.Completed(); ok {
+		_spec.SetField(history.FieldCompleted, field.TypeBool, value)
+	}
+	if value, ok := huo.mutation.Saved(); ok {
+		_spec.SetField(history.FieldSaved, field.TypeString, value)
+	}
+	if huo.mutation.SavedCleared() {
+		_spec.ClearField(history.FieldSaved, field.TypeString)
 	}
 	_node = &History{config: huo.config}
 	_spec.Assign = _node.assignValues

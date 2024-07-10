@@ -24,6 +24,8 @@ type Tx struct {
 	Series *SeriesClient
 	// Settings is the client for interacting with the Settings builders.
 	Settings *SettingsClient
+	// Storage is the client for interacting with the Storage builders.
+	Storage *StorageClient
 
 	// lazily loaded.
 	client     *Client
@@ -161,6 +163,7 @@ func (tx *Tx) init() {
 	tx.Indexers = NewIndexersClient(tx.config)
 	tx.Series = NewSeriesClient(tx.config)
 	tx.Settings = NewSettingsClient(tx.config)
+	tx.Storage = NewStorageClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
