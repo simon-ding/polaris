@@ -7,6 +7,7 @@ import (
 	"polaris/log"
 	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -99,7 +100,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	if len(res) == 0 {
 		return nil, fmt.Errorf("no resource found")
 	}
-	r1 := res[0]
+	r1 := s.findBestMatch(res, seasonNum, episodeNum, series)
 	log.Infof("found resource to download: %v", r1)
 	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
 	if err != nil {
@@ -128,12 +129,37 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	}
 	s.tasks[history.ID] = torrent
 
-	// t, err := downloader.DownloadByMagnet(r1.Magnet, "~")
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "download torrent")
-	// }
 	log.Errorf("success add %s to download task", r1.Name)
 	return &r1.Name, nil
+}
+
+func (s *Server) findBestMatch(resources []torznab.Result,season, episode int, series *db.SeriesDetails) torznab.Result {
+	var filtered []torznab.Result
+	for _, r := range resources {
+		if !(series.NameEn != "" && strings.Contains(r.Name,series.NameEn)) && !strings.Contains(r.Name, series.OriginalName) {
+			//name not match
+			continue
+		}
+
+		se := fmt.Sprintf("S%02dE%02d", season, episode)
+		if !strings.Contains(r.Name, se) {
+			//season or episode not match
+			continue
+		}
+		if !strings.Contains(strings.ToLower(r.Name), series.Resolution) {
+			//resolution not match
+			continue
+		}
+		filtered = append(filtered, r)
+	}
+
+	sort.Slice(filtered, func(i, j int) bool {
+		var s1 = filtered[i]
+		var s2 = filtered[2]
+		return s1.Seeders > s2.Seeders
+	})
+
+	return filtered[0]
 }
 
 func (s *Server) SearchAndDownload(c *gin.Context) (interface{}, error) {
