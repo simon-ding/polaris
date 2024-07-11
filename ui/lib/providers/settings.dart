@@ -4,10 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiver/strings.dart';
 import 'package:ui/providers/APIs.dart';
-import 'package:ui/server_response.dart';
+import 'package:ui/providers/server_response.dart';
 
-var tmdbApiSettingProvider =
-    AsyncNotifierProvider<TmdbApiSetting, String>(TmdbApiSetting.new);
+var settingProvider =
+    AsyncNotifierProvider.family<EditSettingData, String, String>(
+        EditSettingData.new);
 
 var indexersProvider =
     AsyncNotifierProvider<IndexerSetting, List<Indexer>>(IndexerSetting.new);
@@ -16,28 +17,38 @@ var dwonloadClientsProvider =
     AsyncNotifierProvider<DownloadClientSetting, List<DownloadClient>>(
         DownloadClientSetting.new);
 
-class TmdbApiSetting extends AsyncNotifier<String> {
+var storageSettingProvider =
+    AsyncNotifierProvider<StorageSettingData, List<Storage>>(
+        StorageSettingData.new);
+
+class EditSettingData extends FamilyAsyncNotifier<String, String> {
+  final dio = Dio();
+  String? key;
+
   @override
-  FutureOr<String> build() async {
-    final dio = Dio();
-    var resp = await dio
-        .get(APIs.settingsUrl, queryParameters: {"key": APIs.tmdbApiKey});
+  FutureOr<String> build(String arg) async {
+    key = arg;
+    var resp = await dio.get(APIs.settingsUrl, queryParameters: {"key": arg});
     var rrr = ServerResponse.fromJson(resp.data);
     if (rrr.code != 0) {
       throw rrr.message;
     }
     var data = rrr.data as Map<String, dynamic>;
-    var key = data[APIs.tmdbApiKey] as String;
+    var value = data[arg] as String;
 
-    return key;
+    return value;
   }
 
-  Future<void> submitSettings(String v) async {
-    var resp = await Dio().post(APIs.settingsUrl, data: {APIs.tmdbApiKey: v});
+  Future<void> updateSettings(String v) async {
+    var resp = await dio.post(APIs.settingsUrl, data: {
+      "key": key,
+      "value": v,
+    });
     var sp = ServerResponse.fromJson(resp.data as Map<String, dynamic>);
     if (sp.code != 0) {
       throw sp.message;
     }
+    ref.invalidateSelf();
   }
 }
 
@@ -188,4 +199,77 @@ class DownloadClient {
     data['remove_failed_downloads'] = this.removeFailedDownloads;
     return data;
   }
+}
+
+class StorageSettingData extends AsyncNotifier<List<Storage>> {
+  final dio = Dio();
+  @override
+  FutureOr<List<Storage>> build() async {
+    var resp = await dio.get(APIs.storageUrl);
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    var data = sp.data as List<dynamic>;
+    List<Storage> list = List.empty(growable: true);
+    for (final d in data) {
+      list.add(Storage.fromJson(d));
+    }
+    return list;
+  }
+
+  Future<void> deleteStorage(int id) async {
+    var resp = await dio.delete("${APIs.storageUrl}$id");
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
+  }
+
+  Future<void> addStorage(Storage s) async {
+    var resp = await dio.post(APIs.storageUrl, data: s.toJson());
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+  }
+}
+
+class Storage {
+  Storage({
+    this.id,
+    this.name,
+    this.implementation,
+    this.path,
+    this.user,
+    this.password,
+  });
+
+  final int? id;
+  final String? name;
+  final String? implementation;
+  final String? path;
+  final String? user;
+  final String? password;
+
+  factory Storage.fromJson(Map<String, dynamic> json) {
+    return Storage(
+      id: json["id"],
+      name: json["name"],
+      implementation: json["implementation"],
+      path: json["path"],
+      user: json["user"],
+      password: json["password"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "implementation": implementation,
+        "path": path,
+        "user": user,
+        "password": password,
+      };
 }

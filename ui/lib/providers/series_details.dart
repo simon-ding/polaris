@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
-import 'package:ui/server_response.dart';
+import 'package:ui/providers/server_response.dart';
 
 var seriesDetailsProvider = AsyncNotifierProvider.autoDispose
     .family<SeriesDetailData, SeriesDetails, String>(SeriesDetailData.new);

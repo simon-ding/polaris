@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quiver/strings.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
+
+import 'providers/APIs.dart';
 
 class SystemSettingsPage extends ConsumerStatefulWidget {
   static const route = "/settings";
@@ -18,73 +21,96 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
   Future<void>? _pendingTmdb;
   Future<void>? _pendingIndexer;
   Future<void>? _pendingDownloadClient;
+  Future<void>? _pendingStorage;
+  final _tmdbApiController = TextEditingController();
+  final _downloadDirController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    var key = ref.watch(tmdbApiSettingProvider);
+    var tmdbKey = ref.watch(settingProvider(APIs.tmdbApiKey));
+    var dirKey = ref.watch(settingProvider(APIs.downloadDirKey));
+
     var tmdbSetting = FutureBuilder(
         // We listen to the pending operation, to update the UI accordingly.
         future: _pendingTmdb,
         builder: (context, snapshot) {
-          return key.when(
-              data: (value) => Container(
-                    padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
-                    child: Form(
-                      key: _formKey, //设置globalKey，用于后面获取FormState
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            autofocus: true,
-                            initialValue: value,
-                            decoration: const InputDecoration(
-                              labelText: "TMDB Api Key",
-                              icon: Icon(Icons.key),
-                            ),
-                            //
-                            validator: (v) {
-                              return v!.trim().isNotEmpty
-                                  ? null
-                                  : "ApiKey 不能为空";
-                            },
-                            onSaved: (newValue) {
-                              var furture = ref
-                                  .read(tmdbApiSettingProvider.notifier)
-                                  .submitSettings(newValue!);
-                              setState(() {
-                                _pendingTmdb = furture;
-                              });
-                              if (!showError(snapshot)) {
-                                Navigator.of(context).pop();
-                              }
-                            },
+          return Container(
+            padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
+            child: Form(
+              key: _formKey, //设置globalKey，用于后面获取FormState
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: Column(
+                children: [
+                  tmdbKey.when(
+                      data: (value) {
+                        _tmdbApiController.text = value;
+                        return TextFormField(
+                          autofocus: true,
+                          controller: _tmdbApiController,
+                          decoration: const InputDecoration(
+                            labelText: "TMDB Api Key",
+                            icon: Icon(Icons.key),
                           ),
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 28.0),
-                              child: ElevatedButton(
-                                child: const Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Text("保存"),
-                                ),
-                                
-                                onPressed: () {
-                                  // 通过_formKey.currentState 获取FormState后，
-                                  // 调用validate()方法校验用户名密码是否合法，校验
-                                  // 通过后再提交数据。
-                                  if ((_formKey.currentState as FormState)
-                                      .validate()) {
-                                    (_formKey.currentState as FormState).save();
-                                  }
-                                },
-                              ),
-                            ),
-                          )
-                        ],
+                          //
+                          validator: (v) {
+                            return v!.trim().isNotEmpty ? null : "ApiKey 不能为空";
+                          },
+                          onSaved: (newValue) {},
+                        );
+                      },
+                      error: (err, trace) => Text("$err"),
+                      loading: () => const CircularProgressIndicator()),
+                  dirKey.when(
+                      data: (data) {
+                        _downloadDirController.text = data;
+                        return TextFormField(
+                          autofocus: true,
+                          controller: _downloadDirController,
+                          decoration: const InputDecoration(
+                            labelText: "下载路径",
+                            icon: Icon(Icons.folder),
+                          ),
+                          //
+                          validator: (v) {
+                            return v!.trim().isNotEmpty ? null : "ApiKey 不能为空";
+                          },
+                          onSaved: (newValue) {},
+                        );
+                      },
+                      error: (err, trace) => Text("$err"),
+                      loading: () => const CircularProgressIndicator()),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 28.0),
+                      child: ElevatedButton(
+                        child: const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text("保存"),
+                        ),
+                        onPressed: () {
+                          // 通过_formKey.currentState 获取FormState后，
+                          // 调用validate()方法校验用户名密码是否合法，校验
+                          // 通过后再提交数据。
+                          if ((_formKey.currentState as FormState).validate()) {
+                            var furture = ref
+                                .read(settingProvider(APIs.tmdbApiKey).notifier)
+                                .updateSettings(_tmdbApiController.text);
+                            ref
+                                .read(settingProvider(APIs.downloadDirKey)
+                                    .notifier)
+                                .updateSettings(_downloadDirController.text);
+                            setState(() {
+                              _pendingTmdb = furture;
+                            });
+                            showError(snapshot);
+                          }
+                        },
                       ),
                     ),
-                  ),
-              error: (err, trace) => Text("$err"),
-              loading: () => const CircularProgressIndicator());
+                  )
+                ],
+              ),
+            ),
+          );
         });
 
     var indexers = ref.watch(indexersProvider);
@@ -171,6 +197,47 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
               loading: () => const CircularProgressIndicator());
         });
 
+    var storageSettingData = ref.watch(storageSettingProvider);
+    var storageSetting = FutureBuilder(
+        // We listen to the pending operation, to update the UI accordingly.
+        future: _pendingStorage,
+        builder: (context, snapshot) {
+          return storageSettingData.when(
+              data: (value) => GridView.builder(
+                  itemCount: value.length + 1,
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 6),
+                  itemBuilder: (context, i) {
+                    if (i < value.length) {
+                      var storage = value[i];
+                      return Card(
+                          margin: const EdgeInsets.all(4),
+                          clipBehavior: Clip.hardEdge,
+                          child: InkWell(
+                              //splashColor: Colors.blue.withAlpha(30),
+                              onTap: () {
+                                showStorageDetails(snapshot, context, storage);
+                              },
+                              child: Center(child: Text(storage.name!))));
+                    }
+                    return Card(
+                        margin: const EdgeInsets.all(4),
+                        clipBehavior: Clip.hardEdge,
+                        child: InkWell(
+                            //splashColor: Colors.blue.withAlpha(30),
+                            onTap: () {
+                              showStorageDetails(snapshot, context, Storage());
+                            },
+                            child: const Center(
+                              child: Icon(Icons.add),
+                            )));
+                  }),
+              error: (err, trace) => Text("$err"),
+              loading: () => const CircularProgressIndicator());
+        });
+
     return ListView(
       children: [
         ExpansionTile(
@@ -193,6 +260,13 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           initiallyExpanded: true,
           title: const Text("下载客户端设置"),
           children: [downloadSetting],
+        ),
+        ExpansionTile(
+          tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+          initiallyExpanded: true,
+          title: const Text("存储设置"),
+          children: [storageSetting],
         ),
       ],
     );
@@ -321,6 +395,89 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                           nameController.text, urlController.text);
                   setState(() {
                     _pendingDownloadClient = f;
+                  });
+                  if (!showError(snapshot)) {
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  Future<void> showStorageDetails(
+      AsyncSnapshot<void> snapshot, BuildContext context, Storage s) {
+    var nameController = TextEditingController(text: s.name);
+    var implController = TextEditingController(
+        text: isBlank(s.implementation) ? "transmission" : s.implementation);
+    var pathController = TextEditingController(text: s.path);
+    var userController = TextEditingController(text: s.user);
+    var passController = TextEditingController(text: s.password);
+
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: true, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('存储'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  TextField(
+                    decoration: const InputDecoration(labelText: "名称"),
+                    controller: nameController,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: "实现"),
+                    controller: implController,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: "路径"),
+                    controller: pathController,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: "用户"),
+                    controller: userController,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: "密码"),
+                    controller: passController,
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              s.id == null
+                  ? const Text("")
+                  : TextButton(
+                      onPressed: () {
+                        var f = ref
+                            .read(storageSettingProvider.notifier)
+                            .deleteStorage(s.id!);
+                        setState(() {
+                          _pendingStorage = f;
+                        });
+                        if (!showError(snapshot)) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: const Text('删除')),
+              TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('取消')),
+              TextButton(
+                child: const Text('确定'),
+                onPressed: () {
+                  var f = ref.read(storageSettingProvider.notifier).addStorage(
+                      Storage(
+                          name: nameController.text,
+                          implementation: implController.text,
+                          path: pathController.text,
+                          user: userController.text,
+                          password: passController.text));
+                  setState(() {
+                    _pendingStorage = f;
                   });
                   if (!showError(snapshot)) {
                     Navigator.of(context).pop();

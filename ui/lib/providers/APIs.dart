@@ -13,10 +13,12 @@ class APIs {
   static final allDownloadClientsUrl = "$_baseUrl/api/v1/downloader";
   static final addDownloadClientUrl = "$_baseUrl/api/v1/downloader/add";
   static final delDownloadClientUrl = "$_baseUrl/api/v1/downloader/del/";
+  static final storageUrl = "$_baseUrl/api/v1/storage/";
 
   static const tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/";
 
   static const tmdbApiKey = "tmdb_api_key";
+  static const downloadDirKey = "download_dir";
 
   static String baseUrl() {
     if (kReleaseMode) {

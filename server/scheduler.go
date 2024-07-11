@@ -24,6 +24,9 @@ func (s *Server) mustAddCron(spec string, cmd func()) {
 func (s *Server) checkTasks() {
 	log.Infof("begin check tasks...")
 	for id, t := range s.tasks {
+		if !t.Exists() {
+			continue
+		}
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
 			log.Infof("task is done: %v", t.Name())

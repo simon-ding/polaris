@@ -7,6 +7,7 @@ type Torrent interface {
 	Start() error
 	Remove() error
 	Save() string
+	Exists() bool
 }
 
 

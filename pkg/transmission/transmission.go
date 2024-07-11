@@ -59,6 +59,14 @@ func (t *Torrent) getTorrent() transmissionrpc.Torrent {
 	return r[0]
 }
 
+func (t *Torrent) Exists() bool {
+	r, err := t.c.TorrentGetAllFor(context.TODO(), []int64{t.id})
+	if err != nil {
+		log.Errorf("get torrent info for error: %v", err)
+	}
+	return len(r) > 0
+}
+
 func (t *Torrent) Name() string {
 	return *t.getTorrent().Name
 }
@@ -91,3 +99,4 @@ func (t *Torrent) Remove() error {
 func (t *Torrent) Save() string {
 	return strconv.Itoa(int(t.id))
 }
+
