@@ -13,6 +13,7 @@ import (
 	"github.com/emersion/go-webdav"
 	"github.com/pkg/errors"
 )
+
 type FileInfo struct {
 	Path     string
 	Size     int64
@@ -21,7 +22,6 @@ type FileInfo struct {
 	MIMEType string
 	ETag     string
 }
-
 
 type WebdavStorage struct {
 	fs *webdav.Client
@@ -32,27 +32,22 @@ func NewWebdavStorage(url, user, password string) (*WebdavStorage, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "new webdav")
 	}
-	fs, _ := c.ReadDir(context.TODO(), "./", false)
-	for _, f := range fs {
-		log.Infof("file: %v", f)
-	}
 	return &WebdavStorage{
 		fs: c,
 	}, nil
 }
-
 
 func (w *WebdavStorage) Move(local, remote string) error {
 
 	err := filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
 		name := filepath.Join(remote, info.Name())
 		if info.IsDir() {
-			
+
 			if err := w.fs.Mkdir(context.TODO(), name); err != nil {
 				return errors.Wrapf(err, "mkdir %v", name)
 			}
 
-		} else {//is file
+		} else { //is file
 			if writer, err := w.fs.Create(context.TODO(), name); err != nil {
 				return errors.Wrapf(err, "create file %s", name)
 			} else {
@@ -68,6 +63,7 @@ func (w *WebdavStorage) Move(local, remote string) error {
 				}
 			}
 		}
+		log.Infof("file copy complete: %d", name)
 		return nil
 	})
 	if err != nil {
@@ -76,7 +72,7 @@ func (w *WebdavStorage) Move(local, remote string) error {
 	return os.RemoveAll(local)
 }
 
-func (w *WebdavStorage) ReadDir(dir string) ([]FileInfo,error) {
+func (w *WebdavStorage) ReadDir(dir string) ([]FileInfo, error) {
 	fi, err := w.fs.ReadDir(context.TODO(), dir, false)
 	if err != nil {
 		return nil, err
@@ -84,15 +80,13 @@ func (w *WebdavStorage) ReadDir(dir string) ([]FileInfo,error) {
 	var res []FileInfo = make([]FileInfo, 0, len(fi))
 	for _, f := range fi {
 		res = append(res, FileInfo{
-			Path: f.Path,
-			Size : f.Size,
-			ModTime  : f.ModTime,
-			IsDir : f.IsDir,
-			MIMEType : f.MIMEType,
-			ETag  : f.ETag,
-		
+			Path:     f.Path,
+			Size:     f.Size,
+			ModTime:  f.ModTime,
+			IsDir:    f.IsDir,
+			MIMEType: f.MIMEType,
+			ETag:     f.ETag,
 		})
 	}
 	return res, nil
 }
-

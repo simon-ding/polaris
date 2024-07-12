@@ -52,6 +52,11 @@ func (s *Server) Serve() error {
 		setting.POST("/auth", HttpHandler(s.EnableAuth))
 		setting.GET("/auth", HttpHandler(s.GetAuthSetting))
 	}
+	activity := api.Group("/activity")
+	{
+		activity.GET("/", HttpHandler(s.GetAllActivities))
+		activity.DELETE("/:id", HttpHandler(s.RemoveActivity))
+	}
 
 	tv := api.Group("/tv")
 	{
