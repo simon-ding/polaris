@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/ent/history"
@@ -26,7 +27,8 @@ type Client struct {
 }
 
 func Open() (*Client, error) {
-	client, err := ent.Open(dialect.SQLite, "file:polaris.db?cache=shared&_fk=1")
+	os.Mkdir("./db", 0666)
+	client, err := ent.Open(dialect.SQLite, "file:./db/polaris.db?cache=shared&_fk=1")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed opening connection to sqlite")
 	}
