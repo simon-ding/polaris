@@ -7,7 +7,7 @@ RUN flutter build web
 
 
 # 打包依赖阶段使用golang作为基础镜像
-FROM golang:1.20 as builder
+FROM golang:1.22 as builder
 
 # 启用go module
 ENV GO111MODULE=on \
