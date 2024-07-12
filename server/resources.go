@@ -65,7 +65,7 @@ func (s *Server) DeleteTorznabInfo(c *gin.Context) (interface{}, error) {
 func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
 	indexers := s.db.GetAllTorznabInfo()
 	if len(indexers) == 0 {
-		return nil, fmt.Errorf("no indexer found")
+		return nil, nil
 	}
 	return indexers, nil
 }
@@ -200,7 +200,7 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 func (s *Server) GetAllDonloadClients(c *gin.Context) (interface{}, error) {
 	res := s.db.GetAllDonloadClients()
 	if len(res) == 0 {
-		return nil, fmt.Errorf("no download client")
+		return nil, nil
 	}
 	return res, nil
 }
