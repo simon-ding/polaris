@@ -5,7 +5,7 @@ type Torrent interface {
 	Progress() int
 	Stop() error
 	Start() error
-	Remove(deleteData bool) error
+	Remove() error
 	Save() string
 	Exists() bool
 }

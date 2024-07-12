@@ -27,7 +27,7 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	}
 	torrent := s.tasks[his.ID]
 	if torrent != nil {
-		if err := torrent.Remove(true); err != nil {
+		if err := torrent.Remove(); err != nil {
 			return nil, errors.Wrap(err, "remove torrent")
 		}
 		delete(s.tasks, his.ID)

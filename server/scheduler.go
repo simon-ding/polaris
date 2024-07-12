@@ -43,8 +43,7 @@ func (s *Server) moveCompletedTask(id int) error {
 	torrent := s.tasks[id]
 	r := s.db.GetHistory(id)
 	s.db.SetHistoryComplete(r.ID)
-	tt := s.tasks[r.ID]
-	tt.Remove(false)
+
 	delete(s.tasks, r.ID)
 
 	series := s.db.GetSeriesDetails(r.SeriesID)
@@ -67,5 +66,6 @@ func (s *Server) moveCompletedTask(id int) error {
 
 	}
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)
+	torrent.Remove()
 	return nil
 }

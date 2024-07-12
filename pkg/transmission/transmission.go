@@ -106,10 +106,10 @@ func (t *Torrent) Start() error {
 	return t.c.TorrentStartIDs(context.TODO(), []int64{t.ID})
 }
 
-func (t *Torrent) Remove(deleteData bool) error {
+func (t *Torrent) Remove() error {
 	return t.c.TorrentRemove(context.TODO(), transmissionrpc.TorrentRemovePayload{
 		IDs:             []int64{t.ID},
-		DeleteLocalData: deleteData,
+		DeleteLocalData: true,
 	})
 }
 
