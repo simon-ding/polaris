@@ -245,12 +245,19 @@ func (c *Client) AddStorage(s StorageInfo) error {
 			SetImplementation(s.Implementation).
 			SetPath(s.Path).
 			SetUser(s.User).
+			SetDefault(s.Default).
 			SetPassword(s.Password).Exec(context.TODO())
+	}
+	countAll := c.ent.Storage.Query().CountX(context.TODO())
+	if countAll == 0 {
+		log.Infof("first storage, make it default: %s", s.Name)
+		s.Default = true
 	}
 	_, err := c.ent.Storage.Create().SetName(s.Name).
 		SetImplementation(s.Implementation).
 		SetPath(s.Path).
 		SetUser(s.User).
+		SetDefault(s.Default).
 		SetPassword(s.Password).Save(context.TODO())
 	if err != nil {
 		return err

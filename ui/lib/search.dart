@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
+import 'package:ui/providers/settings.dart';
 import 'package:ui/providers/welcome_data.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -89,12 +90,42 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Future<void> _showSubmitDialog(BuildContext context, SearchResult item) {
+    TextEditingController resolutionController =
+        TextEditingController(text: "1080p");
+    TextEditingController storageController = TextEditingController();
+    var storage = ref.watch(storageSettingProvider);
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('添加剧集'),
-            content: Text("是否添加剧集: ${item.name}"),
+            title: Text('添加剧集: ${item.name}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownMenu(
+                  label: const Text("清晰度"),
+                  controller: resolutionController,
+                  dropdownMenuEntries: const [
+                    DropdownMenuEntry(value: "720p", label: "720p"),
+                    DropdownMenuEntry(value: "1080p", label: "1080p"),
+                    DropdownMenuEntry(value: "4k", label: "4k"),
+                  ],
+                ),
+                storage.when(
+                    data: (v) {
+                      return DropdownMenu(
+                        label: const Text("存储位置"),
+                        controller: storageController,
+                        dropdownMenuEntries: v
+                            .map((s) =>
+                                DropdownMenuEntry(label: s.name!, value: s.id))
+                            .toList(),
+                      );
+                    },
+                    error: (err, trace) => Text("$err"),
+                    loading: () => const CircularProgressIndicator()),
+              ],
+            ),
             actions: <Widget>[
               TextButton(
                 style: TextButton.styleFrom(

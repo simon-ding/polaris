@@ -72,8 +72,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               });
                               if (!Utils.showError(context, snapshot)) {
                                 var name = await f;
-                                Utils.showSnakeBar(
-                                    context, "开始下载: $name");
+                                Utils.showSnakeBar(context, "开始下载: $name");
                               }
                             },
                             icon: const Icon(Icons.search))
@@ -140,7 +139,11 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               error: (err, trace) {
                 return Text("$err");
               },
-              loading: () => const CircularProgressIndicator());
+              loading: () => const Center(
+                  child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator())));
         });
   }
 }

@@ -16,7 +16,7 @@ class WelcomePage extends ConsumerWidget {
 
     return switch (data) {
       AsyncData(:final value) => GridView.builder(
-        padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(30),
           itemCount: value.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 6),
@@ -48,7 +48,9 @@ class WelcomePage extends ConsumerWidget {
                   ),
                 ));
           }),
-      _ => const CircularProgressIndicator(),
+      _ => const Center(
+          child: SizedBox(
+              width: 30, height: 30, child: CircularProgressIndicator())),
     };
   }
 }

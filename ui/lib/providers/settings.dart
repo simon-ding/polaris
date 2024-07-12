@@ -63,6 +63,9 @@ class IndexerSetting extends AsyncNotifier<List<Indexer>> {
       throw sp.message;
     }
     List<Indexer> indexers = List.empty(growable: true);
+    if (sp.data == null) {
+      return indexers;
+    }
     for (final item in sp.data as List) {
       indexers.add(Indexer.fromJson(item));
     }
@@ -128,6 +131,9 @@ class DownloadClientSetting extends AsyncNotifier<List<DownloadClient>> {
       throw sp.message;
     }
     List<DownloadClient> indexers = List.empty(growable: true);
+    if (sp.data == null) {
+      return indexers;
+    }
     for (final item in sp.data as List) {
       indexers.add(DownloadClient.fromJson(item));
     }
@@ -203,7 +209,6 @@ class DownloadClient {
 }
 
 class StorageSettingData extends AsyncNotifier<List<Storage>> {
-  
   @override
   FutureOr<List<Storage>> build() async {
     final dio = await APIs.getDio();
@@ -237,6 +242,7 @@ class StorageSettingData extends AsyncNotifier<List<Storage>> {
     if (sp.code != 0) {
       throw sp.message;
     }
+    ref.invalidateSelf();
   }
 }
 
