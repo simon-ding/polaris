@@ -38,23 +38,32 @@ func NewWebdavStorage(url, user, password string) (*WebdavStorage, error) {
 }
 
 func (w *WebdavStorage) Move(local, remote string) error {
+	baseLocal := filepath.Base(local)
 
 	err := filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
-		name := filepath.Join(remote, info.Name())
-		localName := filepath.Join(local, info.Name())
+		if err != nil {
+			return errors.Wrapf(err, "read file %v", path)
+		}
+		
+		rel, err := filepath.Rel(local, path)
+		if err != nil {
+			return errors.Wrap(err, "path relation")
+		}
+		remoteName := filepath.Join(remote, baseLocal, rel)
+
 		if info.IsDir() {
 
-			if err := w.fs.Mkdir(context.TODO(), name); err != nil {
-				return errors.Wrapf(err, "mkdir %v", name)
+			if err := w.fs.Mkdir(context.TODO(), remoteName); err != nil {
+				return errors.Wrapf(err, "mkdir %v", remoteName)
 			}
 
 		} else { //is file
-			if writer, err := w.fs.Create(context.TODO(), name); err != nil {
-				return errors.Wrapf(err, "create file %s", name)
+			if writer, err := w.fs.Create(context.TODO(), remoteName); err != nil {
+				return errors.Wrapf(err, "create file %s", remoteName)
 			} else {
 				defer writer.Close()
-				if f, err := os.OpenFile(localName, os.O_RDONLY, 0666); err != nil {
-					return errors.Wrapf(err, "read file %v", localName)
+				if f, err := os.OpenFile(path, os.O_RDONLY, 0666); err != nil {
+					return errors.Wrapf(err, "read file %v", path)
 				} else { //open success
 					defer f.Close()
 					_, err := io.Copy(writer, f)
@@ -64,7 +73,7 @@ func (w *WebdavStorage) Move(local, remote string) error {
 				}
 			}
 		}
-		log.Infof("file copy complete: %d", name)
+		log.Infof("file copy complete: %d", remoteName)
 		return nil
 	})
 	if err != nil {
