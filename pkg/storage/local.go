@@ -11,7 +11,7 @@ import (
 
 type Storage interface {
 	Move(src, dest string) error
-	ReadDir(dir string) ([]FileInfo, error)
+	ReadDir(dir string) ([]fs.FileInfo, error)
 }
 
 func NewLocalStorage(dir string) *LocalStorage {
