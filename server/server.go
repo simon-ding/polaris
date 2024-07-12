@@ -5,6 +5,7 @@ import (
 	"polaris/log"
 	"polaris/pkg"
 	"polaris/pkg/tmdb"
+	"polaris/pkg/transmission"
 	"polaris/ui"
 
 	"github.com/gin-contrib/static"
@@ -35,6 +36,7 @@ type Server struct {
 
 func (s *Server) Serve() error {
 	s.scheduler()
+	s.reloadTasks()
 	//st, _ := fs.Sub(ui.Web, "build/web")
 	s.r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
 
@@ -98,4 +100,21 @@ func (s *Server) MustTMDB() *tmdb.Client {
 		log.Panicf("get tmdb: %v", err)
 	}
 	return t
+}
+
+
+func (s *Server) reloadTasks() {
+	runningTasks := s.db.GetRunningHistories()
+	if len(runningTasks) == 0 {
+		return
+	}
+	for _, t := range runningTasks {
+		log.Infof("reloading task: %s", t.SourceTitle)
+		torrent, err := transmission.ReloadTorrent(t.Saved)
+		if err != nil {
+			log.Errorf("relaod task %s failed: %v", t.SourceTitle, err)
+			continue
+		}
+		s.tasks[t.ID] = torrent
+	}
 }

@@ -328,6 +328,15 @@ func (c *Client) GetHistories() ent.Histories {
 	return h
 }
 
+func (c *Client) GetRunningHistories() ent.Histories {
+	h, err := c.ent.History.Query().Where(history.Completed(false)).All(context.TODO())
+	if err != nil {
+		return nil
+	}
+	return h
+}
+
+
 func (c *Client) GetHistory(id int) *ent.History {
 	return c.ent.History.Query().Where(history.ID(id)).FirstX(context.TODO())
 }

@@ -78,7 +78,11 @@ type searchAndDownloadIn struct {
 
 func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string, error) {
 	tr := s.db.GetTransmission()
-	trc, err := transmission.NewClient(tr.URL, tr.User, tr.Password)
+	trc, err := transmission.NewClient(transmission.Config{
+		URL: tr.URL,
+		User: tr.User,
+		Password: tr.Password,
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}

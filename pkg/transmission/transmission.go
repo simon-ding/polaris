@@ -2,34 +2,40 @@ package transmission
 
 import (
 	"context"
+	"encoding/json"
 	"net/url"
 	"polaris/log"
-	"strconv"
 
 	"github.com/hekmon/transmissionrpc/v3"
 	"github.com/pkg/errors"
 )
 
-func NewClient(url1, user, password string) (*Client, error) {
-	u, err := url.Parse(url1)
+func NewClient(c Config) (*Client, error) {
+	u, err := url.Parse(c.URL)
 	if err != nil {
 		return nil, errors.Wrap(err, "parse url")
 	}
-	if user != "" {
-		log.Info("transmission login with user: ", user)
-		u.User = url.UserPassword(user, password)
+	if c.User != "" {
+		log.Info("transmission login with user: ", c.User)
+		u.User = url.UserPassword(c.User, c.Password)
 	}
 	u.Path = "/transmission/rpc"
-	
+
 	tbt, err := transmissionrpc.New(u, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
-	return &Client{c: tbt}, nil
+	return &Client{c: tbt, cfg: c}, nil
 }
 
+type Config struct {
+	URL      string `json:"url"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
 type Client struct {
 	c *transmissionrpc.Client
+	cfg Config
 }
 
 func (c *Client) Download(magnet, dir string) (*Torrent, error) {
@@ -40,19 +46,30 @@ func (c *Client) Download(magnet, dir string) (*Torrent, error) {
 	log.Infof("get torrent info: %+v", t)
 
 	return &Torrent{
-		id: *t.ID,
+		ID: *t.ID,
 		c:  c.c,
+		Config: c.cfg,
 	}, err
 }
 
 type Torrent struct {
 	//t *transmissionrpc.Torrent
 	c  *transmissionrpc.Client
-	id int64
+	ID int64 `json: "id"`
+	Config
+}
+
+func (t *Torrent) reloadClient() error {
+	c, err := NewClient(t.Config)
+	if err != nil {
+		return err
+	}
+	t.c = c.c
+	return nil
 }
 
 func (t *Torrent) getTorrent() transmissionrpc.Torrent {
-	r, err := t.c.TorrentGetAllFor(context.TODO(), []int64{t.id})
+	r, err := t.c.TorrentGetAllFor(context.TODO(), []int64{t.ID})
 	if err != nil {
 		log.Errorf("get torrent info for error: %v", err)
 	}
@@ -60,7 +77,7 @@ func (t *Torrent) getTorrent() transmissionrpc.Torrent {
 }
 
 func (t *Torrent) Exists() bool {
-	r, err := t.c.TorrentGetAllFor(context.TODO(), []int64{t.id})
+	r, err := t.c.TorrentGetAllFor(context.TODO(), []int64{t.ID})
 	if err != nil {
 		log.Errorf("get torrent info for error: %v", err)
 	}
@@ -82,21 +99,36 @@ func (t *Torrent) Progress() int {
 }
 
 func (t *Torrent) Stop() error {
-	return t.c.TorrentStopIDs(context.TODO(), []int64{t.id})
+	return t.c.TorrentStopIDs(context.TODO(), []int64{t.ID})
 }
 
 func (t *Torrent) Start() error {
-	return t.c.TorrentStartIDs(context.TODO(), []int64{t.id})
+	return t.c.TorrentStartIDs(context.TODO(), []int64{t.ID})
 }
 
 func (t *Torrent) Remove() error {
 	return t.c.TorrentRemove(context.TODO(), transmissionrpc.TorrentRemovePayload{
-		IDs:             []int64{t.id},
+		IDs:             []int64{t.ID},
 		DeleteLocalData: true,
 	})
 }
 
 func (t *Torrent) Save() string {
-	return strconv.Itoa(int(t.id))
+
+	d, _ := json.Marshal(*t)
+	return string(d)
 }
 
+func ReloadTorrent(s string) (*Torrent, error) {
+	var torrent = Torrent{}
+	err := json.Unmarshal([]byte(s), &torrent)
+	if err != nil {
+		return nil, err
+	}
+
+	err = torrent.reloadClient()
+	if err != nil {
+		return nil, errors.Wrap(err, "reload client")
+	}
+	return &torrent, nil
+}
