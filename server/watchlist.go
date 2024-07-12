@@ -43,16 +43,8 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "get tv detail")
 	}
 	log.Infof("find detail for tv id %d: %v", in.TmdbID, detail)
-	var nameEn = detail.OriginalName
-	alterTitles, err := s.MustTMDB().GetTVAlternativeTitles(in.TmdbID, s.language)
-	if err == nil {
-		for _, r := range alterTitles.Results {
-			if r.Iso3166_1 == "US" {
-				log.Infof("found en name: %s", r.Title)
-				nameEn = r.Title
-			}
-		}
-	}
+	detailEn, _ := s.MustTMDB().GetTvDetails(in.TmdbID, "en-US")
+	var nameEn = detailEn.Name
 
 	var epIds []int
 	for _, season := range detail.Seasons {
