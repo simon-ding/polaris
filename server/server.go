@@ -33,7 +33,6 @@ type Server struct {
 	tasks    map[int]pkg.Torrent
 }
 
-
 func (s *Server) Serve() error {
 	s.scheduler()
 	s.reloadTasks()
@@ -107,14 +106,13 @@ func (s *Server) MustTMDB() *tmdb.Client {
 	return t
 }
 
-
 func (s *Server) reloadTasks() {
 	runningTasks := s.db.GetRunningHistories()
 	if len(runningTasks) == 0 {
 		return
 	}
 	for _, t := range runningTasks {
-		log.Infof("reloading task: %s", t.SourceTitle)
+		log.Infof("reloading task: %d %s", t.ID, t.SourceTitle)
 		torrent, err := transmission.ReloadTorrent(t.Saved)
 		if err != nil {
 			log.Errorf("relaod task %s failed: %v", t.SourceTitle, err)
