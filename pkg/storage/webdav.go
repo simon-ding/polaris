@@ -26,7 +26,10 @@ func NewWebdavStorage(url, user, password string) (*WebdavStorage, error) {
 
 func (w *WebdavStorage) Move(local, remote string) error {
 	baseLocal := filepath.Base(local)
+	remoteBase := filepath.Join(remote, baseLocal)
 
+	log.Infof("remove all content in %s", remoteBase)
+	w.fs.RemoveAll(remoteBase)
 	err := filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return errors.Wrapf(err, "read file %v", path)
@@ -36,7 +39,7 @@ func (w *WebdavStorage) Move(local, remote string) error {
 		if err != nil {
 			return errors.Wrap(err, "path relation")
 		}
-		remoteName := filepath.Join(remote, baseLocal, rel)
+		remoteName := filepath.Join(remoteBase, rel)
 
 		if info.IsDir() {
 
