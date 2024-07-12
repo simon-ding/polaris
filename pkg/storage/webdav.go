@@ -52,7 +52,7 @@ func (w *WebdavStorage) Move(local, remote string) error {
 				return errors.Wrapf(err, "create file %s", name)
 			} else {
 				defer writer.Close()
-				if f, err := os.OpenFile(name, os.O_RDONLY, 0666); err != nil {
+				if f, err := os.OpenFile(name, os.O_RDWR, 0666); err != nil {
 					return errors.Wrapf(err, "read file %v", name)
 				} else { //open success
 					defer f.Close()
