@@ -41,6 +41,7 @@ func (w *WebdavStorage) Move(local, remote string) error {
 
 	err := filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
 		name := filepath.Join(remote, info.Name())
+		localName := filepath.Join(local, info.Name())
 		if info.IsDir() {
 
 			if err := w.fs.Mkdir(context.TODO(), name); err != nil {
@@ -52,8 +53,8 @@ func (w *WebdavStorage) Move(local, remote string) error {
 				return errors.Wrapf(err, "create file %s", name)
 			} else {
 				defer writer.Close()
-				if f, err := os.OpenFile(name, os.O_RDWR, 0666); err != nil {
-					return errors.Wrapf(err, "read file %v", name)
+				if f, err := os.OpenFile(localName, os.O_RDONLY, 0666); err != nil {
+					return errors.Wrapf(err, "read file %v", localName)
 				} else { //open success
 					defer f.Close()
 					_, err := io.Copy(writer, f)
