@@ -58,7 +58,7 @@ func (w *WebdavStorage) Move(local, remote string) error {
 				}
 			}
 		}
-		log.Infof("file copy complete: %d", remoteName)
+		log.Infof("file copy complete: %v", remoteName)
 		return nil
 	})
 	if err != nil {
