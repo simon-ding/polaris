@@ -28,8 +28,9 @@ func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
 }
 
 type addWatchlistIn struct {
-	TmdbID    int `json:"id" binding:"required"`
-	StorageID int `json:"storage_id"`
+	TmdbID    int `json:"tmdb_id" binding:"required"`
+	StorageID int `json:"storage_id" binding:"required"`
+	Resolution db.ResolutionType `json:"resolution" binding:"required"`
 }
 
 func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
@@ -98,4 +99,12 @@ func (s *Server) GetTvDetails(c *gin.Context) (interface{}, error) {
 	}
 	detail := s.db.GetSeriesDetails(id)
 	return detail, nil
+}
+
+func (s *Server) GetAvailableResolutions(c *gin.Context) (interface{}, error) {
+	return []db.ResolutionType{
+		db.R720p,
+		db.R1080p,
+		db.R4k,
+	}, nil
 }

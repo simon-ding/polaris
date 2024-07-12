@@ -57,6 +57,7 @@ func (s *Server) Serve() error {
 		tv.POST("/watchlist", HttpHandler(s.AddWatchlist))
 		tv.GET("/watchlist", HttpHandler(s.GetWatchlist))
 		tv.GET("/series/:id", HttpHandler(s.GetTvDetails))
+		tv.GET("/resolutions", HttpHandler(s.GetAvailableResolutions))
 	}
 	indexer := api.Group("/indexer")
 	{

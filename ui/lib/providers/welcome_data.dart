@@ -28,10 +28,14 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
     return list;
   }
 
-  Future<void> submit2Watchlist(int id) async {
+  Future<void> submit2Watchlist(int tmdbId, int storageId, String resolution) async {
     final dio = await APIs.getDio();
     var resp = await dio
-        .post(APIs.watchlistUrl, data: {"id": id, "folder": "/downloads"});
+        .post(APIs.watchlistUrl, data: {
+          "tmdb_id": tmdbId,
+          "storage_id": storageId,
+          "resolution": resolution
+        });
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;

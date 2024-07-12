@@ -90,9 +90,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Future<void> _showSubmitDialog(BuildContext context, SearchResult item) {
-    TextEditingController resolutionController =
-        TextEditingController(text: "1080p");
-    TextEditingController storageController = TextEditingController();
+    String _resSelected = "1080p";
+    int _storageSelected = 0;
     var storage = ref.watch(storageSettingProvider);
     return showDialog<void>(
         context: context,
@@ -104,22 +103,32 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               children: [
                 DropdownMenu(
                   label: const Text("清晰度"),
-                  controller: resolutionController,
+                  initialSelection: _resSelected,
                   dropdownMenuEntries: const [
                     DropdownMenuEntry(value: "720p", label: "720p"),
                     DropdownMenuEntry(value: "1080p", label: "1080p"),
                     DropdownMenuEntry(value: "4k", label: "4k"),
                   ],
+                  onSelected: (value) {
+                    setState(() {
+                      _resSelected = value!;
+                    });
+                  },
                 ),
                 storage.when(
                     data: (v) {
                       return DropdownMenu(
                         label: const Text("存储位置"),
-                        controller: storageController,
+                        initialSelection: _storageSelected,
                         dropdownMenuEntries: v
                             .map((s) =>
                                 DropdownMenuEntry(label: s.name!, value: s.id))
                             .toList(),
+                        onSelected: (value) {
+                          setState(() {
+                            _storageSelected = value!;
+                          });
+                        },
                       );
                     },
                     error: (err, trace) => Text("$err"),
@@ -144,7 +153,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 onPressed: () {
                   ref
                       .read(searchPageDataProvider.notifier)
-                      .submit2Watchlist(item.id!);
+                      .submit2Watchlist(item.id!, _storageSelected, _resSelected);
                   Navigator.of(context).pop();
                 },
               ),
