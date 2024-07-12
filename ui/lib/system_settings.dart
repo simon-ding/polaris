@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiver/strings.dart';
+import 'package:ui/providers/login.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
 
@@ -24,6 +25,8 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
   Future<void>? _pendingStorage;
   final _tmdbApiController = TextEditingController();
   final _downloadDirController = TextEditingController();
+  bool? _enableAuth;
+
   @override
   Widget build(BuildContext context) {
     var tmdbKey = ref.watch(settingProvider(APIs.tmdbApiKey));
@@ -238,6 +241,60 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
               loading: () => const CircularProgressIndicator());
         });
 
+    var authData = ref.watch(authSettingProvider);
+    TextEditingController _userController = TextEditingController();
+    TextEditingController _passController = TextEditingController();
+    var authSetting = authData.when(
+        data: (data) {
+          if (_enableAuth == null) {
+            setState(() {
+              _enableAuth = data.enable;
+            });
+          }
+          _userController.text = data.user;
+          return Column(
+            children: [
+              SwitchListTile(
+                  title: const Text("开启认证"),
+                  value: _enableAuth!,
+                  onChanged: (v) {
+                    setState(() {
+                      _enableAuth = v;
+                    });
+                  }),
+              _enableAuth!
+                  ? Column(
+                      children: [
+                        TextFormField(
+                            controller: _userController,
+                            decoration: const InputDecoration(
+                              labelText: "用户名",
+                              icon: Icon(Icons.verified_user),
+                            )),
+                        TextFormField(
+                            controller: _passController,
+                            decoration: const InputDecoration(
+                              labelText: "密码",
+                              icon: Icon(Icons.verified_user),
+                            ))
+                      ],
+                    )
+                  : const Column(),
+              Center(
+                  child: ElevatedButton(
+                      child: const Text("保存"),
+                      onPressed: () {
+                        ref
+                            .read(authSettingProvider.notifier)
+                            .updateAuthSetting(_enableAuth!,
+                                _userController.text, _passController.text);
+                      }))
+            ],
+          );
+        },
+        error: (err, trace) => Text("$err"),
+        loading: () => const CircularProgressIndicator());
+
     return ListView(
       children: [
         ExpansionTile(
@@ -267,6 +324,13 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           initiallyExpanded: true,
           title: const Text("存储设置"),
           children: [storageSetting],
+        ),
+        ExpansionTile(
+          tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+          initiallyExpanded: true,
+          title: const Text("认证设置"),
+          children: [authSetting],
         ),
       ],
     );

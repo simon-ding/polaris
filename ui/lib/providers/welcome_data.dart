@@ -6,7 +6,8 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
 final welcomePageDataProvider = FutureProvider((ref) async {
-  var resp = await Dio().get(APIs.watchlistUrl);
+  final dio = await APIs.getDio();
+  var resp = await dio.get(APIs.watchlistUrl);
   var sp = ServerResponse.fromJson(resp.data);
   List<TvSeries> favList = List.empty(growable: true);
   for (var item in sp.data as List) {
@@ -39,7 +40,7 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
   }
 
   void queryResults(String q) async {
-    final dio = Dio();
+    final dio = await APIs.getDio();
     var resp = await dio.get(APIs.searchUrl, queryParameters: {"query": q});
     //var dy = jsonDecode(resp.data.toString());
 

@@ -22,11 +22,11 @@ var storageSettingProvider =
         StorageSettingData.new);
 
 class EditSettingData extends FamilyAsyncNotifier<String, String> {
-  final dio = Dio();
   String? key;
 
   @override
   FutureOr<String> build(String arg) async {
+    final dio = await APIs.getDio();
     key = arg;
     var resp = await dio.get(APIs.settingsUrl, queryParameters: {"key": arg});
     var rrr = ServerResponse.fromJson(resp.data);
@@ -40,6 +40,7 @@ class EditSettingData extends FamilyAsyncNotifier<String, String> {
   }
 
   Future<void> updateSettings(String v) async {
+    final dio = await APIs.getDio();
     var resp = await dio.post(APIs.settingsUrl, data: {
       "key": key,
       "value": v,
@@ -53,10 +54,9 @@ class EditSettingData extends FamilyAsyncNotifier<String, String> {
 }
 
 class IndexerSetting extends AsyncNotifier<List<Indexer>> {
-  final dio = Dio();
-
   @override
   FutureOr<List<Indexer>> build() async {
+    final dio = await APIs.getDio();
     var resp = await dio.get(APIs.allIndexersUrl);
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -75,6 +75,7 @@ class IndexerSetting extends AsyncNotifier<List<Indexer>> {
         isBlank(indexer.apiKey)) {
       return;
     }
+    final dio = await APIs.getDio();
     var resp = await dio.post(APIs.addIndexerUrl, data: indexer.toJson());
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -84,6 +85,7 @@ class IndexerSetting extends AsyncNotifier<List<Indexer>> {
   }
 
   Future<void> deleteIndexer(int id) async {
+    final dio = await APIs.getDio();
     var resp = await dio.delete("${APIs.delIndexerUrl}$id");
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -117,10 +119,9 @@ class Indexer {
 }
 
 class DownloadClientSetting extends AsyncNotifier<List<DownloadClient>> {
-  final dio = Dio();
-
   @override
   FutureOr<List<DownloadClient>> build() async {
+    final dio = await APIs.getDio();
     var resp = await dio.get(APIs.allDownloadClientsUrl);
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -137,7 +138,7 @@ class DownloadClientSetting extends AsyncNotifier<List<DownloadClient>> {
     if (name.isEmpty || url.isEmpty) {
       return;
     }
-    var dio = Dio();
+    final dio = await APIs.getDio();
     var resp = await dio.post(APIs.addDownloadClientUrl, data: {
       "name": name,
       "url": url,
@@ -150,7 +151,7 @@ class DownloadClientSetting extends AsyncNotifier<List<DownloadClient>> {
   }
 
   Future<void> deleteDownloadClients(int id) async {
-    var dio = Dio();
+    final dio = await APIs.getDio();
     var resp = await dio.delete("${APIs.delDownloadClientUrl}$id");
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -202,9 +203,10 @@ class DownloadClient {
 }
 
 class StorageSettingData extends AsyncNotifier<List<Storage>> {
-  final dio = Dio();
+  
   @override
   FutureOr<List<Storage>> build() async {
+    final dio = await APIs.getDio();
     var resp = await dio.get(APIs.storageUrl);
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -219,6 +221,7 @@ class StorageSettingData extends AsyncNotifier<List<Storage>> {
   }
 
   Future<void> deleteStorage(int id) async {
+    final dio = await APIs.getDio();
     var resp = await dio.delete("${APIs.storageUrl}$id");
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -228,6 +231,7 @@ class StorageSettingData extends AsyncNotifier<List<Storage>> {
   }
 
   Future<void> addStorage(Storage s) async {
+    final dio = await APIs.getDio();
     var resp = await dio.post(APIs.storageUrl, data: s.toJson());
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {

@@ -38,12 +38,17 @@ func (s *Server) Serve() error {
 	//st, _ := fs.Sub(ui.Web, "build/web")
 	s.r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
 
+	s.r.POST("/api/login", HttpHandler(s.Login))
+
 	api := s.r.Group("/api/v1")
+	api.Use(s.authModdleware)
 
 	setting := api.Group("/setting")
 	{
 		setting.POST("/do", HttpHandler(s.SetSetting))
 		setting.GET("/do", HttpHandler(s.GetSetting))
+		setting.POST("/auth", HttpHandler(s.EnableAuth))
+		setting.GET("/auth", HttpHandler(s.GetAuthSetting))
 	}
 
 	tv := api.Group("/tv")

@@ -12,7 +12,8 @@ class SeriesDetailData
     extends AutoDisposeFamilyAsyncNotifier<SeriesDetails, String> {
   @override
   FutureOr<SeriesDetails> build(String arg) async {
-    var resp = await Dio().get("${APIs.seriesDetailUrl}$arg");
+    final dio = await APIs.getDio();
+    var resp = await dio.get("${APIs.seriesDetailUrl}$arg");
     var rsp = ServerResponse.fromJson(resp.data);
     if (rsp.code != 0) {
       throw rsp.message;
@@ -22,7 +23,8 @@ class SeriesDetailData
 
   Future<String> searchAndDownload(
       String seriesId, int seasonNum, int episodeNum) async {
-    var resp = await Dio().post(APIs.searchAndDownloadUrl, data: {
+        final dio = await APIs.getDio();
+    var resp = await dio.post(APIs.searchAndDownloadUrl, data: {
       "id": int.parse(seriesId),
       "season": seasonNum,
       "episode": episodeNum,

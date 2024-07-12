@@ -9,6 +9,12 @@ const (
 )
 
 const (
+	SettingAuthEnabled = "auth_enbled"
+	SettingUsername = "auth_username"
+	SettingPassword = "auth_password"
+)
+
+const (
 	IndexerTorznabImpl = "torznab"
 )
 

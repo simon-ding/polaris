@@ -39,6 +39,8 @@ dependencies:
   go_router: ^14.2.0
   flutter_riverpod: ^2.5.1
   quiver: ^3.2.1
+  flutter_login: ^5.0.0
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
