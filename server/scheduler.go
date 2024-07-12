@@ -30,7 +30,11 @@ func (s *Server) checkTasks() {
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
 			log.Infof("task is done: %v", t.Name())
-			go s.moveCompletedTask(id)
+			go func() {
+				if err := s.moveCompletedTask(id); err != nil {
+					log.Infof("post tasks for id %v fail: %v", id, err)
+				}
+			}()
 		}
 	}
 }
@@ -45,6 +49,7 @@ func (s *Server) moveCompletedTask(id int) error {
 
 	series := s.db.GetSeriesDetails(r.SeriesID)
 	st := s.db.GetStorage(series.StorageID)
+	log.Infof("move task files to target dir: %v", r.TargetDir)
 	if st.Implementation == db.ImplWebdav {
 		storageImpl, err := storage.NewWebdavStorage(st.Path, st.User, st.Password)
 		if err != nil {
