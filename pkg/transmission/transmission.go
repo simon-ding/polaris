@@ -93,7 +93,11 @@ func (t *Torrent) Progress() int {
 		return 100
 	}
 	if t.getTorrent().PercentDone != nil {
-		return int(*t.getTorrent().PercentDone * 100)
+		p := int(*t.getTorrent().PercentDone * 100)
+		if p == 100 {
+			p = 99
+		}
+		return p
 	}
 	return 0
 }
