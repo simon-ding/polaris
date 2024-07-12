@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
@@ -21,7 +20,7 @@ var searchPageDataProvider = AsyncNotifierProvider.autoDispose
     <SearchPageData, List<SearchResult>>(SearchPageData.new);
 
 class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
-  final dio = Dio();
+  
   List<SearchResult> list = List.empty(growable: true);
 
   @override
@@ -30,7 +29,8 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
   }
 
   Future<void> submit2Watchlist(int id) async {
-    var resp = await Dio()
+    final dio = await APIs.getDio();
+    var resp = await dio
         .post(APIs.watchlistUrl, data: {"id": id, "folder": "/downloads"});
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
