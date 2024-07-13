@@ -127,11 +127,11 @@ func (c *Client) GetSeriesDetails(id int) *SeriesDetails {
 }
 
 func (c *Client) DeleteSeries(id int) error {
-	_, err := c.ent.Series.Delete().Where(series.ID(id)).Exec(context.TODO())
+	_, err := c.ent.Episode.Delete().Where(episode.SeriesID(id)).Exec(context.TODO())
 	if err != nil {
 		return err
 	}
-	_, err = c.ent.Episode.Delete().Where(episode.SeriesID(id)).Exec(context.TODO())
+	_, err = c.ent.Series.Delete().Where(series.ID(id)).Exec(context.TODO())
 	return err
 }
 
