@@ -2,12 +2,14 @@ package storage
 
 import (
 	"io/fs"
+	"net/http"
 	"os"
 	"path/filepath"
 	"polaris/log"
+	"polaris/pkg/gowebdav"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/pkg/errors"
-	"github.com/studio-b12/gowebdav"
 )
 
 type WebdavStorage struct {
@@ -52,8 +54,17 @@ func (w *WebdavStorage) Move(local, remote string) error {
 				return errors.Wrapf(err, "read file %v", path)
 			} else { //open success
 				defer f.Close()
+				mtype, err := mimetype.DetectFile(path)
+				if err != nil {
+					return errors.Wrap(err, "mime type error")
+				}
 
-				if err := w.fs.WriteStream(remoteName, f, 0666); err != nil {
+				callback := func(r *http.Request) {
+					r.Header.Set("Content-Type", mtype.String())
+					r.ContentLength = info.Size()
+				}
+			
+				if err := w.fs.WriteStream(remoteName, f, 0666, callback); err != nil {
 					return errors.Wrap(err, "transmitting data error")
 				}
 			}

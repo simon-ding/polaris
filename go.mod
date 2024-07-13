@@ -7,7 +7,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/robfig/cron v1.2.0
-	github.com/studio-b12/gowebdav v0.9.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.25.0
 )
@@ -21,7 +20,7 @@ require (
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-contrib/static v1.1.2
 	github.com/go-openapi/inflect v0.19.0 // indirect
