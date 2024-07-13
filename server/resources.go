@@ -133,7 +133,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	}
 	s.tasks[history.ID] = torrent
 
-	log.Errorf("success add %s to download task", r1.Name)
+	log.Infof("success add %s to download task", r1.Name)
 	return &r1.Name, nil
 }
 
