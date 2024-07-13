@@ -93,7 +93,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                     childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
                     initiallyExpanded: k == 0 ? false : true,
-                    title: Text("第 $k 季"),
+                    title:  k == 0 ? const Text("特集") :Text("第 $k 季"),
                     children: m[k]!,
                   );
                   list.add(seasonList);
