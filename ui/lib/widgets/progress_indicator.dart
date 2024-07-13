@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class MyProgressIndicator extends StatelessWidget {
-  double size;
-  Color? color;
-  double? value;
+  final double size;
+  final Color? color;
+  final double? value;
 
-  MyProgressIndicator({super.key, this.size = 30, this.color, this.value});
+  const MyProgressIndicator({super.key, this.size = 30, this.color, this.value});
   @override
   Widget build(BuildContext context) {
     return Center(

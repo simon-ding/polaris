@@ -23,7 +23,7 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 			History: h,
 		}
 		for id, task := range s.tasks {
-			if h.ID == id {
+			if h.ID == id && task.Exists() {
 				a.Progress = task.Progress()
 			}
 			if h.ID == id && task.Processing {
