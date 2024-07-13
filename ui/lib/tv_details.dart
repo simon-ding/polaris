@@ -140,7 +140,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                                       seriesId)
                                                   .notifier)
                                               .delete();
-                                          context.pop();
+                                          context.go(WelcomePage.route);
                                         },
                                         icon: const Icon(Icons.delete))
                                   ],
