@@ -17,18 +17,18 @@ class ActivityPage extends ConsumerWidget {
               columns: const [
                 DataColumn(label: Text("id"), numeric: true),
                 DataColumn(label: Text("名称")),
-                // DataColumn(label: Text("目标路径")),
+                DataColumn(label: Text("开始时间")),
                 DataColumn(label: Text("是否完成")),
                 DataColumn(label: Text("后台操作")),
                 DataColumn(label: Text("操作"))
               ],
               rows: List<DataRow>.generate(activities.length, (i) {
-                var activity = activities[i];
+                var activity = activities[activities.length - i -1];
 
                 return DataRow(cells: [
                   DataCell(Text("${activity.id}")),
                   DataCell(Text("${activity.sourceTitle}")),
-                  //DataCell(Text("${activity.targetDir}")),
+                  DataCell(Text("${activity.date!.toLocal()}")),
                   DataCell(Text("${activity.completed}")),
                   DataCell(Text("${activity.inBackgroud}")),
                   DataCell(IconButton(
