@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/tv_details.dart';
+import 'package:ui/widgets/progress_indicator.dart';
 
 class WelcomePage extends ConsumerWidget {
   static const route = "/series";
@@ -48,9 +49,7 @@ class WelcomePage extends ConsumerWidget {
                   ),
                 ));
           }),
-      _ => const Center(
-          child: SizedBox(
-              width: 30, height: 30, child: CircularProgressIndicator())),
+      _ => MyProgressIndicator(),
     };
   }
 }

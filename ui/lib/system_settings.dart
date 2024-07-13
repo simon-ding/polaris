@@ -4,6 +4,7 @@ import 'package:quiver/strings.dart';
 import 'package:ui/providers/login.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
+import 'package:ui/widgets/progress_indicator.dart';
 
 import 'providers/APIs.dart';
 
@@ -61,7 +62,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                         );
                       },
                       error: (err, trace) => Text("$err"),
-                      loading: () => const CircularProgressIndicator()),
+                      loading: () => MyProgressIndicator()),
                   dirKey.when(
                       data: (data) {
                         _downloadDirController.text = data;
@@ -80,7 +81,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                         );
                       },
                       error: (err, trace) => Text("$err"),
-                      loading: () => const CircularProgressIndicator()),
+                      loading: () => MyProgressIndicator()),
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 28.0),
@@ -154,7 +155,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                             )));
                   }),
               error: (err, trace) => Text("$err"),
-              loading: () => const CircularProgressIndicator());
+              loading: () => MyProgressIndicator());
         });
 
     var downloadClients = ref.watch(dwonloadClientsProvider);
@@ -197,7 +198,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                             )));
                   }),
               error: (err, trace) => Text("$err"),
-              loading: () => const CircularProgressIndicator());
+              loading: () => MyProgressIndicator());
         });
 
     var storageSettingData = ref.watch(storageSettingProvider);
@@ -238,7 +239,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                             )));
                   }),
               error: (err, trace) => Text("$err"),
-              loading: () => const CircularProgressIndicator());
+              loading: () => MyProgressIndicator());
         });
 
     var authData = ref.watch(authSettingProvider);
@@ -293,7 +294,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           );
         },
         error: (err, trace) => Text("$err"),
-        loading: () => const CircularProgressIndicator());
+        loading: () => MyProgressIndicator());
 
     return ListView(
       children: [

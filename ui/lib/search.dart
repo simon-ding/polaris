@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/providers/welcome_data.dart';
+import 'package:ui/widgets/progress_indicator.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -69,7 +70,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           return cards;
         },
         error: (err, trace) => [Text("$err")],
-        loading: () => [const CircularProgressIndicator()]);
+        loading: () => [MyProgressIndicator()]);
 
     var f = FutureBuilder(
         // We listen to the pending operation, to update the UI accordingly.
@@ -77,9 +78,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done &&
               snapshot.connectionState != ConnectionState.none) {
-            return const Center(
-                child: SizedBox(
-                    width: 30, height: 30, child: CircularProgressIndicator()));
+            return MyProgressIndicator();
           }
           return ListView(
             children: res,
@@ -149,7 +148,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       );
                     },
                     error: (err, trace) => Text("$err"),
-                    loading: () => const CircularProgressIndicator()),
+                    loading: () => MyProgressIndicator()),
               ],
             ),
             actions: <Widget>[

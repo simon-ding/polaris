@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/activity.dart';
+import 'package:ui/widgets/progress_indicator.dart';
 
 class ActivityPage extends ConsumerWidget {
   static const route = "/activities";
@@ -18,8 +19,7 @@ class ActivityPage extends ConsumerWidget {
                 DataColumn(label: Text("id"), numeric: true),
                 DataColumn(label: Text("名称")),
                 DataColumn(label: Text("开始时间")),
-                DataColumn(label: Text("是否完成")),
-                DataColumn(label: Text("后台操作")),
+                DataColumn(label: Text("状态")),
                 DataColumn(label: Text("操作"))
               ],
               rows: List<DataRow>.generate(activities.length, (i) {
@@ -29,8 +29,24 @@ class ActivityPage extends ConsumerWidget {
                   DataCell(Text("${activity.id}")),
                   DataCell(Text("${activity.sourceTitle}")),
                   DataCell(Text("${activity.date!.toLocal()}")),
-                  DataCell(Text("${activity.completed}")),
-                  DataCell(Text("${activity.inBackgroud}")),
+                  DataCell(() {
+                    if (activity.inBackgroud == true) {
+                      return MyProgressIndicator(size: 20,);
+                    }
+
+                    if (activity.completed != true && activity.progress == 0) {
+                      return MyProgressIndicator(
+                        value: 1,
+                        color: Colors.red,
+                        size: 20,
+                      );
+                    }
+
+                    return MyProgressIndicator(
+                      value: activity.progress!.toDouble() / 100,
+                      size: 20,
+                    );
+                  }()),
                   DataCell(IconButton(
                       onPressed: () {
                         ref
@@ -44,8 +60,6 @@ class ActivityPage extends ConsumerWidget {
           );
         },
         error: (err, trace) => Text("$err"),
-        loading: () => const Center(
-            child: SizedBox(
-                width: 30, height: 30, child: CircularProgressIndicator())));
+        loading: () => MyProgressIndicator());
   }
 }

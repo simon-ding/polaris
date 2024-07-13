@@ -5,6 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/utils.dart';
 import 'package:ui/weclome.dart';
+import 'package:ui/widgets/progress_indicator.dart';
 
 class TvDetailsPage extends ConsumerStatefulWidget {
   static const route = "/series/:id";
@@ -160,11 +161,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               error: (err, trace) {
                 return Text("$err");
               },
-              loading: () => const Center(
-                  child: SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: CircularProgressIndicator())));
+              loading: () => MyProgressIndicator());
         });
   }
 }

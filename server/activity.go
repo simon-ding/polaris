@@ -12,6 +12,7 @@ import (
 type Activity struct {
 	*ent.History
 	InBackgroud bool `json:"in_backgroud"`
+	Progress    int  `json:"progress"`
 }
 
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
@@ -22,9 +23,15 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 			History: h,
 		}
 		for id, task := range s.tasks {
+			if h.ID == id {
+				a.Progress = task.Progress()
+			}
 			if h.ID == id && task.Processing {
 				a.InBackgroud = true
-			}	
+			}
+		}
+		if a.Completed {
+			a.Progress = 100
 		}
 		activities = append(activities, a)
 	}
@@ -50,7 +57,7 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		}
 		delete(s.tasks, his.ID)
 	}
-	
+
 	err = s.db.DeleteHistory(id)
 	if err != nil {
 		return nil, errors.Wrap(err, "db")
