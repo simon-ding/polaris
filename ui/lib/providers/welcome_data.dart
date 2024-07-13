@@ -43,7 +43,8 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
     ref.invalidate(welcomePageDataProvider);
   }
 
-  void queryResults(String q) async {
+  Future<void> queryResults(String q) async {
+    list = List.empty(growable: true);
     final dio = await APIs.getDio();
     var resp = await dio.get(APIs.searchUrl, queryParameters: {"query": q});
     //var dy = jsonDecode(resp.data.toString());

@@ -1,11 +1,11 @@
-import 'dart:js_interop_unsafe';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/activity.dart';
 
 class ActivityPage extends ConsumerWidget {
   static const route = "/activities";
+
+  const ActivityPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var activitiesWatcher = ref.watch(activitiesDataProvider);
@@ -23,7 +23,7 @@ class ActivityPage extends ConsumerWidget {
                 DataColumn(label: Text("操作"))
               ],
               rows: List<DataRow>.generate(activities.length, (i) {
-                var activity = activities[activities.length - i -1];
+                var activity = activities[activities.length - i - 1];
 
                 return DataRow(cells: [
                   DataCell(Text("${activity.id}")),

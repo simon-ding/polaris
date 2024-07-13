@@ -124,7 +124,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                     Text(
                                       "${details!.name}",
                                       style: const TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 20,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     const Text(""),

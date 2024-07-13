@@ -18,6 +18,7 @@ class SearchPage extends ConsumerStatefulWidget {
 class _SearchPageState extends ConsumerState<SearchPage> {
   List<dynamic> list = List.empty();
 
+  Future<void>? _pendingFuture;
   @override
   Widget build(BuildContext context) {
     var searchList = ref.watch(searchPageDataProvider);
@@ -69,22 +70,38 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         },
         error: (err, trace) => [Text("$err")],
         loading: () => [const CircularProgressIndicator()]);
+
+    var f = FutureBuilder(
+        // We listen to the pending operation, to update the UI accordingly.
+        future: _pendingFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done &&
+              snapshot.connectionState != ConnectionState.none) {
+            return const Center(
+                child: SizedBox(
+                    width: 30, height: 30, child: CircularProgressIndicator()));
+          }
+          return ListView(
+            children: res,
+          );
+        });
     return Column(
       children: [
         TextField(
           autofocus: true,
-          onSubmitted: (value) {
-            ref.read(searchPageDataProvider.notifier).queryResults(value);
+          onSubmitted: (value) async {
+            var f =
+                ref.read(searchPageDataProvider.notifier).queryResults(value);
+            setState(() {
+              _pendingFuture = f;
+            });
           },
           decoration: const InputDecoration(
               labelText: "搜索",
               hintText: "搜索剧集名称",
               prefixIcon: Icon(Icons.search)),
         ),
-        Expanded(
-            child: ListView(
-          children: res,
-        ))
+        Expanded(child: f)
       ],
     );
   }
@@ -151,9 +168,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 ),
                 child: const Text('确定'),
                 onPressed: () {
-                  ref
-                      .read(searchPageDataProvider.notifier)
-                      .submit2Watchlist(item.id!, _storageSelected, _resSelected);
+                  ref.read(searchPageDataProvider.notifier).submit2Watchlist(
+                      item.id!, _storageSelected, _resSelected);
                   Navigator.of(context).pop();
                 },
               ),
