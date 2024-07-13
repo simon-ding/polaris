@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
-final welcomePageDataProvider = FutureProvider((ref) async {
+final welcomePageDataProvider = FutureProvider.autoDispose((ref) async {
   final dio = await APIs.getDio();
   var resp = await dio.get(APIs.watchlistUrl);
   var sp = ServerResponse.fromJson(resp.data);

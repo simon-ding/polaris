@@ -100,3 +100,15 @@ func (s *Server) GetAvailableResolutions(c *gin.Context) (interface{}, error) {
 		db.R4k,
 	}, nil
 }
+
+func (s *Server) DeleteFromWatchlist(c *gin.Context) (interface{}, error) {
+	ids := c.Param("id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, errors.Wrap(err, "convert")
+	}
+	if err := s.db.DeleteSeries(id); err != nil {
+		return nil, errors.Wrap(err, "delete db")
+	}
+	return "success", nil
+}

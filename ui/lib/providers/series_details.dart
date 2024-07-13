@@ -10,8 +10,10 @@ var seriesDetailsProvider = AsyncNotifierProvider.autoDispose
 
 class SeriesDetailData
     extends AutoDisposeFamilyAsyncNotifier<SeriesDetails, String> {
+  String? id;
   @override
   FutureOr<SeriesDetails> build(String arg) async {
+    id = arg;
     final dio = await APIs.getDio();
     var resp = await dio.get("${APIs.seriesDetailUrl}$arg");
     var rsp = ServerResponse.fromJson(resp.data);
@@ -21,9 +23,18 @@ class SeriesDetailData
     return SeriesDetails.fromJson(rsp.data);
   }
 
+  Future<void> delete() async {
+    final dio = await APIs.getDio();
+    var resp = await dio.delete("${APIs.seriesDetailUrl}$id");
+    var rsp = ServerResponse.fromJson(resp.data);
+    if (rsp.code != 0) {
+      throw rsp.message;
+    }
+  }
+
   Future<String> searchAndDownload(
       String seriesId, int seasonNum, int episodeNum) async {
-        final dio = await APIs.getDio();
+    final dio = await APIs.getDio();
     var resp = await dio.post(APIs.searchAndDownloadUrl, data: {
       "id": int.parse(seriesId),
       "season": seasonNum,

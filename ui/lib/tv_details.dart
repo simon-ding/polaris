@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/utils.dart';
+import 'package:ui/weclome.dart';
 
 class TvDetailsPage extends ConsumerStatefulWidget {
   static const route = "/series/:id";
@@ -112,18 +114,37 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               ),
                             ),
                           ),
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          Expanded(
+                            child: Row(
                               children: [
-                                Text(
-                                  "${details!.name}",
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const Text(""),
-                                Text(details!.overview!)
+                                Expanded(
+                                    child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "${details!.name}",
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const Text(""),
+                                    Text(details!.overview!)
+                                  ],
+                                )),
+                                Column(
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          ref
+                                              .read(seriesDetailsProvider(
+                                                      seriesId)
+                                                  .notifier)
+                                              .delete();
+                                          context.pop();
+                                        },
+                                        icon: const Icon(Icons.delete))
+                                  ],
+                                )
                               ],
                             ),
                           ),

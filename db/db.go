@@ -7,6 +7,7 @@ import (
 	"os"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
+	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/series"
@@ -123,6 +124,15 @@ func (c *Client) GetSeriesDetails(id int) *SeriesDetails {
 		Series:   se,
 		Episodes: ep,
 	}
+}
+
+func (c *Client) DeleteSeries(id int) error {
+	_, err := c.ent.Series.Delete().Where(series.ID(id)).Exec(context.TODO())
+	if err != nil {
+		return err
+	}
+	_, err = c.ent.Episode.Delete().Where(episode.SeriesID(id)).Exec(context.TODO())
+	return err
 }
 
 func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
