@@ -20,6 +20,7 @@ class APIs {
   static final storageUrl = "$_baseUrl/api/v1/storage/";
   static final loginUrl = "$_baseUrl/api/login";
   static final loginSettingUrl = "$_baseUrl/api/v1/setting/auth";
+  static final activityUrl = "$_baseUrl/api/v1/activity/";
 
   static const tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/";
 

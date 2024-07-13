@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"polaris/db"
 	"polaris/log"
+	"polaris/pkg"
 	"polaris/pkg/storage"
 
 	"github.com/pkg/errors"
@@ -28,9 +29,14 @@ func (s *Server) checkTasks() {
 			log.Infof("task no longer exists: %v", id)
 			continue
 		}
+		if t.Processing {
+			continue
+		}
+
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
 			log.Infof("task is done: %v", t.Name())
+			t.Processing = true
 			go func() {
 				if err := s.moveCompletedTask(id); err != nil {
 					log.Infof("post tasks for id %v fail: %v", id, err)
@@ -43,9 +49,6 @@ func (s *Server) checkTasks() {
 func (s *Server) moveCompletedTask(id int) error {
 	torrent := s.tasks[id]
 	r := s.db.GetHistory(id)
-	s.db.SetHistoryComplete(r.ID)
-
-	delete(s.tasks, r.ID)
 
 	series := s.db.GetSeriesDetails(r.SeriesID)
 	st := s.db.GetStorage(series.StorageID)
@@ -68,5 +71,12 @@ func (s *Server) moveCompletedTask(id int) error {
 	}
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)
 	torrent.Remove()
+	delete(s.tasks, r.ID)
+	s.db.SetHistoryComplete(r.ID)
 	return nil
+}
+
+type Task struct {
+	Processing bool
+	pkg.Torrent
 }

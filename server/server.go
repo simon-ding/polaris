@@ -3,7 +3,6 @@ package server
 import (
 	"polaris/db"
 	"polaris/log"
-	"polaris/pkg"
 	"polaris/pkg/tmdb"
 	"polaris/pkg/transmission"
 	"polaris/ui"
@@ -21,7 +20,7 @@ func NewServer(db *db.Client) *Server {
 		r:     r,
 		db:    db,
 		cron:  cron.New(),
-		tasks: make(map[int]pkg.Torrent),
+		tasks: make(map[int]*Task),
 	}
 }
 
@@ -30,7 +29,7 @@ type Server struct {
 	db       *db.Client
 	cron     *cron.Cron
 	language string
-	tasks    map[int]pkg.Torrent
+	tasks    map[int]*Task
 }
 
 func (s *Server) Serve() error {
@@ -118,6 +117,6 @@ func (s *Server) reloadTasks() {
 			log.Errorf("relaod task %s failed: %v", t.SourceTitle, err)
 			continue
 		}
-		s.tasks[t.ID] = torrent
+		s.tasks[t.ID] = &Task{Torrent: torrent}
 	}
 }

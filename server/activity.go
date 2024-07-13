@@ -1,6 +1,7 @@
 package server
 
 import (
+	"polaris/ent"
 	"polaris/log"
 	"strconv"
 
@@ -8,10 +9,27 @@ import (
 	"github.com/pkg/errors"
 )
 
+type Activity struct {
+	*ent.History
+	InBackgroud bool `json:"in_backgroud"`
+}
+
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 	his := s.db.GetHistories()
+	var activities = make([]Activity, 0, len(his))
+	for _, h := range his {
+		a := Activity{
+			History: h,
+		}
+		for id, task := range s.tasks {
+			if h.ID == id && task.Processing {
+				a.InBackgroud = true
+			}	
+		}
+		activities = append(activities, a)
+	}
 
-	return his, nil
+	return activities, nil
 }
 
 func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {

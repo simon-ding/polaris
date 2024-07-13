@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ui/activity.dart';
 import 'package:ui/login_page.dart';
 import 'package:ui/navdrawer.dart';
 import 'package:ui/providers/APIs.dart';
@@ -34,12 +36,19 @@ class MyApp extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                 // Here we take the value from the MyHomePage object that was created by
                 // the App.build method, and use it to set our appbar title.
-                title: const Text("Polaris追剧"),
+                title: Row(
+                  children: [
+                    const Text("Polaris 追剧"),
+                    const SizedBox(
+                      width: 100,
+                    ),
+                    IconButton(
+                        tooltip: "搜索剧集",
+                        onPressed: () => context.go(SearchPage.route),
+                        icon: const Icon(Icons.search)),
+                  ],
+                ),
                 actions: [
-                  IconButton(
-                      tooltip: "搜索剧集",
-                      onPressed: () => context.go(SearchPage.route),
-                      icon: const Icon(Icons.search)),
                   IconButton(
                       onPressed: () => context.go(SystemSettingsPage.route),
                       icon: const Icon(Icons.settings))
@@ -77,6 +86,10 @@ class MyApp extends StatelessWidget {
           builder: (context, state) =>
               TvDetailsPage(seriesId: state.pathParameters['id']!),
         ),
+        GoRoute(
+          path: ActivityPage.route,
+          builder: (context, state) => ActivityPage(),
+        )
       ],
     );
 
@@ -87,7 +100,7 @@ class MyApp extends StatelessWidget {
         _shellRoute,
         GoRoute(
           path: LoginScreen.route,
-          builder: (context, state) =>const LoginScreen(),
+          builder: (context, state) => const LoginScreen(),
         )
       ],
     );

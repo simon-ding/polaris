@@ -131,7 +131,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
 	}
-	s.tasks[history.ID] = torrent
+	s.tasks[history.ID] = &Task{Torrent: torrent}
 
 	log.Infof("success add %s to download task", r1.Name)
 	return &r1.Name, nil

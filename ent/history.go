@@ -28,7 +28,7 @@ type History struct {
 	// TargetDir holds the value of the "target_dir" field.
 	TargetDir string `json:"target_dir,omitempty"`
 	// Completed holds the value of the "completed" field.
-	Completed bool `json:"completed,omitempty"`
+	Completed bool `json:"completed"`
 	// Saved holds the value of the "saved" field.
 	Saved        string `json:"saved,omitempty"`
 	selectValues sql.SelectValues

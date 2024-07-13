@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ui/activity.dart';
 import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
 import 'package:ui/weclome.dart';
@@ -34,7 +35,7 @@ class _NavDrawerState extends State<NavDrawer> {
                   if (value == 0) {
                     context.go(WelcomePage.route);
                   } else if (value == 1) {
-                    context.go(SearchPage.route);
+                    context.go(ActivityPage.route);
                   } else if (value == 2) {
                     context.go(SystemSettingsPage.route);
                   }
