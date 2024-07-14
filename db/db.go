@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
@@ -89,15 +88,12 @@ func (c *Client) AddWatchlist(storageId int, nameCn, nameEn string, detail *tmdb
 			storageId = r.ID
 		}
 	}
-	st := c.GetStorage(storageId)
 
 	targetDir := fmt.Sprintf("%s %s (%v)", nameCn, nameEn, strings.Split(detail.FirstAirDate, "-")[0])
 	if !utils.IsChineseChar(nameCn) {
 		log.Warnf("name cn is not chinese name: %v", nameCn)
 		targetDir = fmt.Sprintf("%s (%v)", nameEn, strings.Split(detail.FirstAirDate, "-")[0])
 	}
-
-	targetDir = filepath.Join(st.GetPath(), targetDir)
 
 	r, err := c.ent.Series.Create().
 		SetTmdbID(int(detail.ID)).
