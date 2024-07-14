@@ -56,6 +56,9 @@ func (s *Server) moveCompletedTask(id int) error {
 	r := s.db.GetHistory(id)
 
 	series := s.db.GetSeriesDetails(r.SeriesID)
+	if series == nil {
+		return nil
+	}
 	st := s.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
 	if st.Implementation == storage1.ImplementationWebdav {

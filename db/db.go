@@ -126,8 +126,16 @@ type SeriesDetails struct {
 }
 
 func (c *Client) GetSeriesDetails(id int) *SeriesDetails {
-	se := c.ent.Series.Query().Where(series.ID(id)).FirstX(context.TODO())
-	ep := se.QueryEpisodes().AllX(context.Background())
+	se, err := c.ent.Series.Query().Where(series.ID(id)).First(context.TODO())
+	if err != nil {
+		log.Errorf("get series %d: %v", id, err)
+		return nil
+	}
+	ep, err  := se.QueryEpisodes().All(context.Background())
+	if err != nil {
+		log.Errorf("get episodes %d: %v", id, err)
+		return nil
+	}
 	return &SeriesDetails{
 		Series:   se,
 		Episodes: ep,
