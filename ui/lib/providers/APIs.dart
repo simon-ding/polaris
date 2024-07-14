@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiver/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class APIs {
@@ -40,6 +41,7 @@ class APIs {
 
   static Dio? dio1;
   static Map<String, String> authHeaders = {};
+  static bool isLoggedIn = false;
 
   static Future<Dio> getDio() async {
     if (dio1 != null) {
@@ -47,8 +49,10 @@ class APIs {
     }
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString("token");
-
-    authHeaders["Authorization"] = "Bearer $token";
+    if (isNotBlank(token)) {
+      authHeaders["Authorization"] = "Bearer $token";
+      isLoggedIn = true;
+    }
 
     var dio = Dio();
     dio.interceptors.add(InterceptorsWrapper(
