@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
+import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
 import 'package:ui/weclome.dart';
 import 'package:ui/widgets/progress_indicator.dart';
@@ -38,6 +39,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
   @override
   Widget build(BuildContext context) {
     var seriesDetails = ref.watch(seriesDetailsProvider(seriesId));
+    var storage = ref.watch(storageSettingProvider);
     return FutureBuilder(
         // We listen to the pending operation, to update the UI accordingly.
         future: _pendingFuture,
@@ -93,7 +95,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                     childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
                     initiallyExpanded: k == 0 ? false : true,
-                    title:  k == 0 ? const Text("特集") :Text("第 $k 季"),
+                    title: k == 0 ? const Text("特集") : Text("第 $k 季"),
                     children: m[k]!,
                   );
                   list.add(seasonList);
@@ -123,8 +125,32 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                     child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      children: [
+                                        Text("${details.resolution}"),
+                                        const SizedBox(
+                                          width: 30,
+                                        ),
+                                        storage.when(
+                                            data: (value) {
+                                              for (final s in value) {
+                                                if (s.id == details.storageId) {
+                                                  return Text(
+                                                      "${s.name}(${s.implementation})");
+                                                }
+                                              }
+                                              return const Text("未知存储");
+                                            },
+                                            error: (error, stackTrace) =>
+                                                Text("$error"),
+                                            loading: () =>
+                                                const MyProgressIndicator()),
+                                        
+                                      ],
+                                    ),
+                                    const Divider(thickness: 1, height: 1),
                                     Text(
-                                      "${details!.name}",
+                                      "${details.name} (${details.airDate!.split("-")[0]})",
                                       style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),

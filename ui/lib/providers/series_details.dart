@@ -54,10 +54,12 @@ class SeriesDetails {
   String? name;
   String? originalName;
   String? overview;
-  String? path;
   String? posterPath;
   String? createdAt;
   List<Episodes>? episodes;
+  String? resolution;
+  int? storageId;
+  String? airDate;
 
   SeriesDetails(
       {this.id,
@@ -65,9 +67,11 @@ class SeriesDetails {
       this.name,
       this.originalName,
       this.overview,
-      this.path,
       this.posterPath,
       this.createdAt,
+      this.resolution,
+      this.storageId,
+      this.airDate,
       this.episodes});
 
   SeriesDetails.fromJson(Map<String, dynamic> json) {
@@ -76,9 +80,11 @@ class SeriesDetails {
     name = json['name_cn'];
     originalName = json['original_name'];
     overview = json['overview'];
-    path = json['path'];
     posterPath = json['poster_path'];
     createdAt = json['created_at'];
+    resolution = json["resolution"];
+    storageId = json["storage_id"];
+    airDate = json["air_date"];
     if (json['episodes'] != null) {
       episodes = <Episodes>[];
       json['episodes'].forEach((v) {
