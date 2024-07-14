@@ -31,8 +31,15 @@ func (l *LocalStorage) Move(src, dest string) error {
 	targetDir := filepath.Join(l.dir, dest)
 	os.MkdirAll(targetDir, 0655)
 	err := filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
-		destName := filepath.Join(targetDir, info.Name())
-		srcName := filepath.Join(src, info.Name())
+		if err != nil {
+			return err
+		}
+		rel, err  := filepath.Rel(src, path)
+		if err != nil {
+			return errors.Wrapf(err, "relation between %s and %s", src, path)
+		}
+		destName := filepath.Join(targetDir, rel, info.Name())
+
 		if info.IsDir() {
 
 			if err := os.Mkdir(destName, 0666); err != nil {
@@ -44,8 +51,8 @@ func (l *LocalStorage) Move(src, dest string) error {
 				return errors.Wrapf(err, "create file %s", destName)
 			} else {
 				defer writer.Close()
-				if f, err := os.OpenFile(srcName, os.O_RDONLY, 0666); err != nil {
-					return errors.Wrapf(err, "read file %v", srcName)
+				if f, err := os.OpenFile(path, os.O_RDONLY, 0666); err != nil {
+					return errors.Wrapf(err, "read file %v", path)
 				} else { //open success
 					defer f.Close()
 					_, err := io.Copy(writer, f)
