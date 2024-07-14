@@ -112,7 +112,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           return StatefulBuilder(
             builder: (context, setState) {
               String _resSelected = "1080p";
-              Storage? _storageSelected;
+              int _storageSelected = 0;
               var storage = ref.watch(storageSettingProvider);
 
               return AlertDialog(
@@ -140,12 +140,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                             label: const Text("存储位置"),
                             initialSelection: _storageSelected,
                             dropdownMenuEntries: v
-                                .map((s) =>
-                                    DropdownMenuEntry(label: s.name!, value: s))
+                                .map((s) => DropdownMenuEntry(
+                                    label: s.name!, value: s.id))
                                 .toList(),
                             onSelected: (value) {
                               setState(() {
-                                _storageSelected = value;
+                                _storageSelected = value!;
                               });
                             },
                           );
@@ -170,10 +170,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     ),
                     child: const Text('确定'),
                     onPressed: () {
+                      print(_storageSelected);
                       ref
                           .read(searchPageDataProvider.notifier)
                           .submit2Watchlist(
-                              item.id!, _storageSelected!.id!, _resSelected);
+                              item.id!, _storageSelected, _resSelected);
                       Navigator.of(context).pop();
                     },
                   ),

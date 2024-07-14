@@ -83,21 +83,20 @@ func (c *Client) AddWatchlist(storageId int, nameCn, nameEn string, detail *tmdb
 		res = R1080p
 	}
 	if storageId == 0 {
-		r, err := c.ent.Storage.Query().Where(storage.Default(true)).First(context.TODO())
+		r, err := c.ent.Storage.Query().Where(storage.And(storage.Default(true), storage.Deleted(false))).First(context.TODO())
 		if err == nil {
 			log.Infof("use default storage: %v", r.Name)
 			storageId = r.ID
 		}
 	}
 	st := c.GetStorage(storageId)
-	
+
 	targetDir := fmt.Sprintf("%s %s (%v)", nameCn, nameEn, strings.Split(detail.FirstAirDate, "-")[0])
 	if !utils.IsChineseChar(nameCn) {
 		log.Warnf("name cn is not chinese name: %v", nameCn)
 		targetDir = fmt.Sprintf("%s (%v)", nameEn, strings.Split(detail.FirstAirDate, "-")[0])
 	}
 
-	
 	targetDir = filepath.Join(st.GetPath(), targetDir)
 
 	r, err := c.ent.Series.Create().
@@ -282,7 +281,7 @@ func (c *Client) AddStorage(st *StorageInfo) error {
 			SetImplementation(storage.Implementation(st.Implementation)).
 			SetSettings(string(data)).Exec(context.TODO())
 	}
-	countAll := c.ent.Storage.Query().CountX(context.TODO())
+	countAll := c.ent.Storage.Query().Where(storage.Deleted(false)).CountX(context.TODO())
 	if countAll == 0 {
 		log.Infof("first storage, make it default: %s", st.Name)
 		st.Default = true

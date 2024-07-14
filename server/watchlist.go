@@ -35,7 +35,7 @@ func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
 
 type addWatchlistIn struct {
 	TmdbID    int `json:"tmdb_id" binding:"required"`
-	StorageID int `json:"storage_id" binding:"required"`
+	StorageID int `json:"storage_id" `
 	Resolution db.ResolutionType `json:"resolution" binding:"required"`
 }
 
