@@ -105,6 +105,8 @@ func (s *Server) checkAllFiles() {
 func (s *Server) checkFileExists(series *ent.Series) error{
 	log.Infof("check files in directory: %s", series.TargetDir)
 	st := s.db.GetStorage(series.StorageID)
+
+	targetDir := filepath.Join(st.GetPath(), series.TargetDir)
 	var storageImpl storage.Storage
 
 	switch st.Implementation {
@@ -124,9 +126,9 @@ func (s *Server) checkFileExists(series *ent.Series) error{
 		}
 		storageImpl = storageImpl1
 	} 
-	files, err := storageImpl.ReadDir(series.TargetDir)
+	files, err := storageImpl.ReadDir(targetDir)
 	if err != nil {
-		return errors.Wrapf(err, "read dir %s", series.TargetDir)
+		return errors.Wrapf(err, "read dir %s", targetDir)
 	}
 	numRe := regexp.MustCompile("[0-9]+")
 	epRe := regexp.MustCompile("E[0-9]+")
