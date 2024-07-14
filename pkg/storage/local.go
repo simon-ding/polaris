@@ -24,6 +24,7 @@ type LocalStorage struct {
 
 func (l *LocalStorage) Move(src, dest string) error {
 	targetDir := filepath.Join(l.dir, dest)
+	os.MkdirAll(targetDir, 0655)
 	err := filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
 		destName := filepath.Join(targetDir, info.Name())
 		srcName := filepath.Join(src, info.Name())
