@@ -31,14 +31,15 @@ class ActivityPage extends ConsumerWidget {
                   DataCell(Text("${activity.date!.toLocal()}")),
                   DataCell(() {
                     if (activity.inBackgroud == true) {
-                      return const MyProgressIndicator(size: 20,);
+                      return const MyProgressIndicator(
+                        size: 20,
+                      );
                     }
 
                     if (activity.completed != true && activity.progress == 0) {
-                      return const MyProgressIndicator(
-                        value: 1,
+                      return const Icon(
+                        Icons.close,
                         color: Colors.red,
-                        size: 20,
                       );
                     }
 
