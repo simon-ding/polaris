@@ -27,6 +27,7 @@ func (Series) Fields() []ent.Field {
 		field.String("air_date").Default(""),
 		field.String("resolution").Default(""),
 		field.Int("storage_id").Optional(),
+		field.String("target_dir").Optional(),
 	}
 }
 

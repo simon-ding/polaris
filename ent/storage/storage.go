@@ -3,6 +3,8 @@
 package storage
 
 import (
+	"fmt"
+
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -15,12 +17,8 @@ const (
 	FieldName = "name"
 	// FieldImplementation holds the string denoting the implementation field in the database.
 	FieldImplementation = "implementation"
-	// FieldPath holds the string denoting the path field in the database.
-	FieldPath = "path"
-	// FieldUser holds the string denoting the user field in the database.
-	FieldUser = "user"
-	// FieldPassword holds the string denoting the password field in the database.
-	FieldPassword = "password"
+	// FieldSettings holds the string denoting the settings field in the database.
+	FieldSettings = "settings"
 	// FieldDeleted holds the string denoting the deleted field in the database.
 	FieldDeleted = "deleted"
 	// FieldDefault holds the string denoting the default field in the database.
@@ -34,9 +32,7 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldImplementation,
-	FieldPath,
-	FieldUser,
-	FieldPassword,
+	FieldSettings,
 	FieldDeleted,
 	FieldDefault,
 }
@@ -58,6 +54,29 @@ var (
 	DefaultDefault bool
 )
 
+// Implementation defines the type for the "implementation" enum field.
+type Implementation string
+
+// Implementation values.
+const (
+	ImplementationWebdav Implementation = "webdav"
+	ImplementationLocal  Implementation = "local"
+)
+
+func (i Implementation) String() string {
+	return string(i)
+}
+
+// ImplementationValidator is a validator for the "implementation" field enum values. It is called by the builders before save.
+func ImplementationValidator(i Implementation) error {
+	switch i {
+	case ImplementationWebdav, ImplementationLocal:
+		return nil
+	default:
+		return fmt.Errorf("storage: invalid enum value for implementation field: %q", i)
+	}
+}
+
 // OrderOption defines the ordering options for the Storage queries.
 type OrderOption func(*sql.Selector)
 
@@ -76,19 +95,9 @@ func ByImplementation(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldImplementation, opts...).ToFunc()
 }
 
-// ByPath orders the results by the path field.
-func ByPath(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPath, opts...).ToFunc()
-}
-
-// ByUser orders the results by the user field.
-func ByUser(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUser, opts...).ToFunc()
-}
-
-// ByPassword orders the results by the password field.
-func ByPassword(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPassword, opts...).ToFunc()
+// BySettings orders the results by the settings field.
+func BySettings(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSettings, opts...).ToFunc()
 }
 
 // ByDeleted orders the results by the deleted field.

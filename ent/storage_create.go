@@ -26,41 +26,21 @@ func (sc *StorageCreate) SetName(s string) *StorageCreate {
 }
 
 // SetImplementation sets the "implementation" field.
-func (sc *StorageCreate) SetImplementation(s string) *StorageCreate {
+func (sc *StorageCreate) SetImplementation(s storage.Implementation) *StorageCreate {
 	sc.mutation.SetImplementation(s)
 	return sc
 }
 
-// SetPath sets the "path" field.
-func (sc *StorageCreate) SetPath(s string) *StorageCreate {
-	sc.mutation.SetPath(s)
+// SetSettings sets the "settings" field.
+func (sc *StorageCreate) SetSettings(s string) *StorageCreate {
+	sc.mutation.SetSettings(s)
 	return sc
 }
 
-// SetUser sets the "user" field.
-func (sc *StorageCreate) SetUser(s string) *StorageCreate {
-	sc.mutation.SetUser(s)
-	return sc
-}
-
-// SetNillableUser sets the "user" field if the given value is not nil.
-func (sc *StorageCreate) SetNillableUser(s *string) *StorageCreate {
+// SetNillableSettings sets the "settings" field if the given value is not nil.
+func (sc *StorageCreate) SetNillableSettings(s *string) *StorageCreate {
 	if s != nil {
-		sc.SetUser(*s)
-	}
-	return sc
-}
-
-// SetPassword sets the "password" field.
-func (sc *StorageCreate) SetPassword(s string) *StorageCreate {
-	sc.mutation.SetPassword(s)
-	return sc
-}
-
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (sc *StorageCreate) SetNillablePassword(s *string) *StorageCreate {
-	if s != nil {
-		sc.SetPassword(*s)
+		sc.SetSettings(*s)
 	}
 	return sc
 }
@@ -146,8 +126,10 @@ func (sc *StorageCreate) check() error {
 	if _, ok := sc.mutation.Implementation(); !ok {
 		return &ValidationError{Name: "implementation", err: errors.New(`ent: missing required field "Storage.implementation"`)}
 	}
-	if _, ok := sc.mutation.Path(); !ok {
-		return &ValidationError{Name: "path", err: errors.New(`ent: missing required field "Storage.path"`)}
+	if v, ok := sc.mutation.Implementation(); ok {
+		if err := storage.ImplementationValidator(v); err != nil {
+			return &ValidationError{Name: "implementation", err: fmt.Errorf(`ent: validator failed for field "Storage.implementation": %w`, err)}
+		}
 	}
 	if _, ok := sc.mutation.Deleted(); !ok {
 		return &ValidationError{Name: "deleted", err: errors.New(`ent: missing required field "Storage.deleted"`)}
@@ -186,20 +168,12 @@ func (sc *StorageCreate) createSpec() (*Storage, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := sc.mutation.Implementation(); ok {
-		_spec.SetField(storage.FieldImplementation, field.TypeString, value)
+		_spec.SetField(storage.FieldImplementation, field.TypeEnum, value)
 		_node.Implementation = value
 	}
-	if value, ok := sc.mutation.Path(); ok {
-		_spec.SetField(storage.FieldPath, field.TypeString, value)
-		_node.Path = value
-	}
-	if value, ok := sc.mutation.User(); ok {
-		_spec.SetField(storage.FieldUser, field.TypeString, value)
-		_node.User = value
-	}
-	if value, ok := sc.mutation.Password(); ok {
-		_spec.SetField(storage.FieldPassword, field.TypeString, value)
-		_node.Password = value
+	if value, ok := sc.mutation.Settings(); ok {
+		_spec.SetField(storage.FieldSettings, field.TypeString, value)
+		_node.Settings = value
 	}
 	if value, ok := sc.mutation.Deleted(); ok {
 		_spec.SetField(storage.FieldDeleted, field.TypeBool, value)

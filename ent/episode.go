@@ -22,13 +22,15 @@ type Episode struct {
 	// SeasonNumber holds the value of the "season_number" field.
 	SeasonNumber int `json:"season_number"`
 	// EpisodeNumber holds the value of the "episode_number" field.
-	EpisodeNumber int `json:"episode_number,omitempty"`
+	EpisodeNumber int `json:"episode_number"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Overview holds the value of the "overview" field.
 	Overview string `json:"overview,omitempty"`
 	// AirDate holds the value of the "air_date" field.
 	AirDate string `json:"air_date,omitempty"`
+	// FileInStorage holds the value of the "file_in_storage" field.
+	FileInStorage string `json:"file_in_storage,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EpisodeQuery when eager-loading is set.
 	Edges        EpisodeEdges `json:"edges"`
@@ -62,7 +64,7 @@ func (*Episode) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case episode.FieldID, episode.FieldSeriesID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
 			values[i] = new(sql.NullInt64)
-		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate:
+		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldFileInStorage:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -120,6 +122,12 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field air_date", values[i])
 			} else if value.Valid {
 				e.AirDate = value.String
+			}
+		case episode.FieldFileInStorage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field file_in_storage", values[i])
+			} else if value.Valid {
+				e.FileInStorage = value.String
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -179,6 +187,9 @@ func (e *Episode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("air_date=")
 	builder.WriteString(e.AirDate)
+	builder.WriteString(", ")
+	builder.WriteString("file_in_storage=")
+	builder.WriteString(e.FileInStorage)
 	builder.WriteByte(')')
 	return builder.String()
 }

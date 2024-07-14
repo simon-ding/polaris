@@ -19,13 +19,9 @@ type Storage struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Implementation holds the value of the "implementation" field.
-	Implementation string `json:"implementation,omitempty"`
-	// Path holds the value of the "path" field.
-	Path string `json:"path,omitempty"`
-	// User holds the value of the "user" field.
-	User string `json:"user,omitempty"`
-	// Password holds the value of the "password" field.
-	Password string `json:"password,omitempty"`
+	Implementation storage.Implementation `json:"implementation,omitempty"`
+	// Settings holds the value of the "settings" field.
+	Settings string `json:"settings,omitempty"`
 	// Deleted holds the value of the "deleted" field.
 	Deleted bool `json:"deleted,omitempty"`
 	// Default holds the value of the "default" field.
@@ -42,7 +38,7 @@ func (*Storage) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case storage.FieldID:
 			values[i] = new(sql.NullInt64)
-		case storage.FieldName, storage.FieldImplementation, storage.FieldPath, storage.FieldUser, storage.FieldPassword:
+		case storage.FieldName, storage.FieldImplementation, storage.FieldSettings:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -75,25 +71,13 @@ func (s *Storage) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field implementation", values[i])
 			} else if value.Valid {
-				s.Implementation = value.String
+				s.Implementation = storage.Implementation(value.String)
 			}
-		case storage.FieldPath:
+		case storage.FieldSettings:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field path", values[i])
+				return fmt.Errorf("unexpected type %T for field settings", values[i])
 			} else if value.Valid {
-				s.Path = value.String
-			}
-		case storage.FieldUser:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user", values[i])
-			} else if value.Valid {
-				s.User = value.String
-			}
-		case storage.FieldPassword:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field password", values[i])
-			} else if value.Valid {
-				s.Password = value.String
+				s.Settings = value.String
 			}
 		case storage.FieldDeleted:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -147,16 +131,10 @@ func (s *Storage) String() string {
 	builder.WriteString(s.Name)
 	builder.WriteString(", ")
 	builder.WriteString("implementation=")
-	builder.WriteString(s.Implementation)
+	builder.WriteString(fmt.Sprintf("%v", s.Implementation))
 	builder.WriteString(", ")
-	builder.WriteString("path=")
-	builder.WriteString(s.Path)
-	builder.WriteString(", ")
-	builder.WriteString("user=")
-	builder.WriteString(s.User)
-	builder.WriteString(", ")
-	builder.WriteString("password=")
-	builder.WriteString(s.Password)
+	builder.WriteString("settings=")
+	builder.WriteString(s.Settings)
 	builder.WriteString(", ")
 	builder.WriteString("deleted=")
 	builder.WriteString(fmt.Sprintf("%v", s.Deleted))

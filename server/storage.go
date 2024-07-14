@@ -22,7 +22,7 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 	}
 
 	log.Infof("received add storage input: %v", in)
-	err := s.db.AddStorage(in)
+	err := s.db.AddStorage(&in)
 	return nil, err
 }
 

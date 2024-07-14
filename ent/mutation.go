@@ -918,6 +918,7 @@ type EpisodeMutation struct {
 	title             *string
 	overview          *string
 	air_date          *string
+	file_in_storage   *string
 	clearedFields     map[string]struct{}
 	series            *int
 	clearedseries     bool
@@ -1293,6 +1294,55 @@ func (m *EpisodeMutation) ResetAirDate() {
 	m.air_date = nil
 }
 
+// SetFileInStorage sets the "file_in_storage" field.
+func (m *EpisodeMutation) SetFileInStorage(s string) {
+	m.file_in_storage = &s
+}
+
+// FileInStorage returns the value of the "file_in_storage" field in the mutation.
+func (m *EpisodeMutation) FileInStorage() (r string, exists bool) {
+	v := m.file_in_storage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFileInStorage returns the old "file_in_storage" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EpisodeMutation) OldFileInStorage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFileInStorage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFileInStorage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFileInStorage: %w", err)
+	}
+	return oldValue.FileInStorage, nil
+}
+
+// ClearFileInStorage clears the value of the "file_in_storage" field.
+func (m *EpisodeMutation) ClearFileInStorage() {
+	m.file_in_storage = nil
+	m.clearedFields[episode.FieldFileInStorage] = struct{}{}
+}
+
+// FileInStorageCleared returns if the "file_in_storage" field was cleared in this mutation.
+func (m *EpisodeMutation) FileInStorageCleared() bool {
+	_, ok := m.clearedFields[episode.FieldFileInStorage]
+	return ok
+}
+
+// ResetFileInStorage resets all changes to the "file_in_storage" field.
+func (m *EpisodeMutation) ResetFileInStorage() {
+	m.file_in_storage = nil
+	delete(m.clearedFields, episode.FieldFileInStorage)
+}
+
 // ClearSeries clears the "series" edge to the Series entity.
 func (m *EpisodeMutation) ClearSeries() {
 	m.clearedseries = true
@@ -1354,7 +1404,7 @@ func (m *EpisodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EpisodeMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.series != nil {
 		fields = append(fields, episode.FieldSeriesID)
 	}
@@ -1372,6 +1422,9 @@ func (m *EpisodeMutation) Fields() []string {
 	}
 	if m.air_date != nil {
 		fields = append(fields, episode.FieldAirDate)
+	}
+	if m.file_in_storage != nil {
+		fields = append(fields, episode.FieldFileInStorage)
 	}
 	return fields
 }
@@ -1393,6 +1446,8 @@ func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Overview()
 	case episode.FieldAirDate:
 		return m.AirDate()
+	case episode.FieldFileInStorage:
+		return m.FileInStorage()
 	}
 	return nil, false
 }
@@ -1414,6 +1469,8 @@ func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldOverview(ctx)
 	case episode.FieldAirDate:
 		return m.OldAirDate(ctx)
+	case episode.FieldFileInStorage:
+		return m.OldFileInStorage(ctx)
 	}
 	return nil, fmt.Errorf("unknown Episode field %s", name)
 }
@@ -1464,6 +1521,13 @@ func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAirDate(v)
+		return nil
+	case episode.FieldFileInStorage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFileInStorage(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
@@ -1525,6 +1589,9 @@ func (m *EpisodeMutation) ClearedFields() []string {
 	if m.FieldCleared(episode.FieldSeriesID) {
 		fields = append(fields, episode.FieldSeriesID)
 	}
+	if m.FieldCleared(episode.FieldFileInStorage) {
+		fields = append(fields, episode.FieldFileInStorage)
+	}
 	return fields
 }
 
@@ -1541,6 +1608,9 @@ func (m *EpisodeMutation) ClearField(name string) error {
 	switch name {
 	case episode.FieldSeriesID:
 		m.ClearSeriesID()
+		return nil
+	case episode.FieldFileInStorage:
+		m.ClearFileInStorage()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode nullable field %s", name)
@@ -1567,6 +1637,9 @@ func (m *EpisodeMutation) ResetField(name string) error {
 		return nil
 	case episode.FieldAirDate:
 		m.ResetAirDate()
+		return nil
+	case episode.FieldFileInStorage:
+		m.ResetFileInStorage()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
@@ -2984,6 +3057,7 @@ type SeriesMutation struct {
 	resolution      *string
 	storage_id      *int
 	addstorage_id   *int
+	target_dir      *string
 	clearedFields   map[string]struct{}
 	episodes        map[int]struct{}
 	removedepisodes map[int]struct{}
@@ -3567,6 +3641,55 @@ func (m *SeriesMutation) ResetStorageID() {
 	delete(m.clearedFields, series.FieldStorageID)
 }
 
+// SetTargetDir sets the "target_dir" field.
+func (m *SeriesMutation) SetTargetDir(s string) {
+	m.target_dir = &s
+}
+
+// TargetDir returns the value of the "target_dir" field in the mutation.
+func (m *SeriesMutation) TargetDir() (r string, exists bool) {
+	v := m.target_dir
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTargetDir returns the old "target_dir" field's value of the Series entity.
+// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeriesMutation) OldTargetDir(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTargetDir is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTargetDir requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTargetDir: %w", err)
+	}
+	return oldValue.TargetDir, nil
+}
+
+// ClearTargetDir clears the value of the "target_dir" field.
+func (m *SeriesMutation) ClearTargetDir() {
+	m.target_dir = nil
+	m.clearedFields[series.FieldTargetDir] = struct{}{}
+}
+
+// TargetDirCleared returns if the "target_dir" field was cleared in this mutation.
+func (m *SeriesMutation) TargetDirCleared() bool {
+	_, ok := m.clearedFields[series.FieldTargetDir]
+	return ok
+}
+
+// ResetTargetDir resets all changes to the "target_dir" field.
+func (m *SeriesMutation) ResetTargetDir() {
+	m.target_dir = nil
+	delete(m.clearedFields, series.FieldTargetDir)
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
 func (m *SeriesMutation) AddEpisodeIDs(ids ...int) {
 	if m.episodes == nil {
@@ -3655,7 +3778,7 @@ func (m *SeriesMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SeriesMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.tmdb_id != nil {
 		fields = append(fields, series.FieldTmdbID)
 	}
@@ -3689,6 +3812,9 @@ func (m *SeriesMutation) Fields() []string {
 	if m.storage_id != nil {
 		fields = append(fields, series.FieldStorageID)
 	}
+	if m.target_dir != nil {
+		fields = append(fields, series.FieldTargetDir)
+	}
 	return fields
 }
 
@@ -3719,6 +3845,8 @@ func (m *SeriesMutation) Field(name string) (ent.Value, bool) {
 		return m.Resolution()
 	case series.FieldStorageID:
 		return m.StorageID()
+	case series.FieldTargetDir:
+		return m.TargetDir()
 	}
 	return nil, false
 }
@@ -3750,6 +3878,8 @@ func (m *SeriesMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldResolution(ctx)
 	case series.FieldStorageID:
 		return m.OldStorageID(ctx)
+	case series.FieldTargetDir:
+		return m.OldTargetDir(ctx)
 	}
 	return nil, fmt.Errorf("unknown Series field %s", name)
 }
@@ -3836,6 +3966,13 @@ func (m *SeriesMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStorageID(v)
 		return nil
+	case series.FieldTargetDir:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTargetDir(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Series field %s", name)
 }
@@ -3902,6 +4039,9 @@ func (m *SeriesMutation) ClearedFields() []string {
 	if m.FieldCleared(series.FieldStorageID) {
 		fields = append(fields, series.FieldStorageID)
 	}
+	if m.FieldCleared(series.FieldTargetDir) {
+		fields = append(fields, series.FieldTargetDir)
+	}
 	return fields
 }
 
@@ -3924,6 +4064,9 @@ func (m *SeriesMutation) ClearField(name string) error {
 		return nil
 	case series.FieldStorageID:
 		m.ClearStorageID()
+		return nil
+	case series.FieldTargetDir:
+		m.ClearTargetDir()
 		return nil
 	}
 	return fmt.Errorf("unknown Series nullable field %s", name)
@@ -3965,6 +4108,9 @@ func (m *SeriesMutation) ResetField(name string) error {
 		return nil
 	case series.FieldStorageID:
 		m.ResetStorageID()
+		return nil
+	case series.FieldTargetDir:
+		m.ResetTargetDir()
 		return nil
 	}
 	return fmt.Errorf("unknown Series field %s", name)
@@ -4441,10 +4587,8 @@ type StorageMutation struct {
 	typ            string
 	id             *int
 	name           *string
-	implementation *string
-	_path          *string
-	user           *string
-	password       *string
+	implementation *storage.Implementation
+	settings       *string
 	deleted        *bool
 	_default       *bool
 	clearedFields  map[string]struct{}
@@ -4588,12 +4732,12 @@ func (m *StorageMutation) ResetName() {
 }
 
 // SetImplementation sets the "implementation" field.
-func (m *StorageMutation) SetImplementation(s string) {
+func (m *StorageMutation) SetImplementation(s storage.Implementation) {
 	m.implementation = &s
 }
 
 // Implementation returns the value of the "implementation" field in the mutation.
-func (m *StorageMutation) Implementation() (r string, exists bool) {
+func (m *StorageMutation) Implementation() (r storage.Implementation, exists bool) {
 	v := m.implementation
 	if v == nil {
 		return
@@ -4604,7 +4748,7 @@ func (m *StorageMutation) Implementation() (r string, exists bool) {
 // OldImplementation returns the old "implementation" field's value of the Storage entity.
 // If the Storage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StorageMutation) OldImplementation(ctx context.Context) (v string, err error) {
+func (m *StorageMutation) OldImplementation(ctx context.Context) (v storage.Implementation, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldImplementation is only allowed on UpdateOne operations")
 	}
@@ -4623,138 +4767,53 @@ func (m *StorageMutation) ResetImplementation() {
 	m.implementation = nil
 }
 
-// SetPath sets the "path" field.
-func (m *StorageMutation) SetPath(s string) {
-	m._path = &s
+// SetSettings sets the "settings" field.
+func (m *StorageMutation) SetSettings(s string) {
+	m.settings = &s
 }
 
-// Path returns the value of the "path" field in the mutation.
-func (m *StorageMutation) Path() (r string, exists bool) {
-	v := m._path
+// Settings returns the value of the "settings" field in the mutation.
+func (m *StorageMutation) Settings() (r string, exists bool) {
+	v := m.settings
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPath returns the old "path" field's value of the Storage entity.
+// OldSettings returns the old "settings" field's value of the Storage entity.
 // If the Storage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StorageMutation) OldPath(ctx context.Context) (v string, err error) {
+func (m *StorageMutation) OldSettings(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPath is only allowed on UpdateOne operations")
+		return v, errors.New("OldSettings is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPath requires an ID field in the mutation")
+		return v, errors.New("OldSettings requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPath: %w", err)
+		return v, fmt.Errorf("querying old value for OldSettings: %w", err)
 	}
-	return oldValue.Path, nil
+	return oldValue.Settings, nil
 }
 
-// ResetPath resets all changes to the "path" field.
-func (m *StorageMutation) ResetPath() {
-	m._path = nil
+// ClearSettings clears the value of the "settings" field.
+func (m *StorageMutation) ClearSettings() {
+	m.settings = nil
+	m.clearedFields[storage.FieldSettings] = struct{}{}
 }
 
-// SetUser sets the "user" field.
-func (m *StorageMutation) SetUser(s string) {
-	m.user = &s
-}
-
-// User returns the value of the "user" field in the mutation.
-func (m *StorageMutation) User() (r string, exists bool) {
-	v := m.user
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUser returns the old "user" field's value of the Storage entity.
-// If the Storage object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StorageMutation) OldUser(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUser is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUser requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUser: %w", err)
-	}
-	return oldValue.User, nil
-}
-
-// ClearUser clears the value of the "user" field.
-func (m *StorageMutation) ClearUser() {
-	m.user = nil
-	m.clearedFields[storage.FieldUser] = struct{}{}
-}
-
-// UserCleared returns if the "user" field was cleared in this mutation.
-func (m *StorageMutation) UserCleared() bool {
-	_, ok := m.clearedFields[storage.FieldUser]
+// SettingsCleared returns if the "settings" field was cleared in this mutation.
+func (m *StorageMutation) SettingsCleared() bool {
+	_, ok := m.clearedFields[storage.FieldSettings]
 	return ok
 }
 
-// ResetUser resets all changes to the "user" field.
-func (m *StorageMutation) ResetUser() {
-	m.user = nil
-	delete(m.clearedFields, storage.FieldUser)
-}
-
-// SetPassword sets the "password" field.
-func (m *StorageMutation) SetPassword(s string) {
-	m.password = &s
-}
-
-// Password returns the value of the "password" field in the mutation.
-func (m *StorageMutation) Password() (r string, exists bool) {
-	v := m.password
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPassword returns the old "password" field's value of the Storage entity.
-// If the Storage object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StorageMutation) OldPassword(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPassword requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPassword: %w", err)
-	}
-	return oldValue.Password, nil
-}
-
-// ClearPassword clears the value of the "password" field.
-func (m *StorageMutation) ClearPassword() {
-	m.password = nil
-	m.clearedFields[storage.FieldPassword] = struct{}{}
-}
-
-// PasswordCleared returns if the "password" field was cleared in this mutation.
-func (m *StorageMutation) PasswordCleared() bool {
-	_, ok := m.clearedFields[storage.FieldPassword]
-	return ok
-}
-
-// ResetPassword resets all changes to the "password" field.
-func (m *StorageMutation) ResetPassword() {
-	m.password = nil
-	delete(m.clearedFields, storage.FieldPassword)
+// ResetSettings resets all changes to the "settings" field.
+func (m *StorageMutation) ResetSettings() {
+	m.settings = nil
+	delete(m.clearedFields, storage.FieldSettings)
 }
 
 // SetDeleted sets the "deleted" field.
@@ -4863,21 +4922,15 @@ func (m *StorageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StorageMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 5)
 	if m.name != nil {
 		fields = append(fields, storage.FieldName)
 	}
 	if m.implementation != nil {
 		fields = append(fields, storage.FieldImplementation)
 	}
-	if m._path != nil {
-		fields = append(fields, storage.FieldPath)
-	}
-	if m.user != nil {
-		fields = append(fields, storage.FieldUser)
-	}
-	if m.password != nil {
-		fields = append(fields, storage.FieldPassword)
+	if m.settings != nil {
+		fields = append(fields, storage.FieldSettings)
 	}
 	if m.deleted != nil {
 		fields = append(fields, storage.FieldDeleted)
@@ -4897,12 +4950,8 @@ func (m *StorageMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case storage.FieldImplementation:
 		return m.Implementation()
-	case storage.FieldPath:
-		return m.Path()
-	case storage.FieldUser:
-		return m.User()
-	case storage.FieldPassword:
-		return m.Password()
+	case storage.FieldSettings:
+		return m.Settings()
 	case storage.FieldDeleted:
 		return m.Deleted()
 	case storage.FieldDefault:
@@ -4920,12 +4969,8 @@ func (m *StorageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case storage.FieldImplementation:
 		return m.OldImplementation(ctx)
-	case storage.FieldPath:
-		return m.OldPath(ctx)
-	case storage.FieldUser:
-		return m.OldUser(ctx)
-	case storage.FieldPassword:
-		return m.OldPassword(ctx)
+	case storage.FieldSettings:
+		return m.OldSettings(ctx)
 	case storage.FieldDeleted:
 		return m.OldDeleted(ctx)
 	case storage.FieldDefault:
@@ -4947,32 +4992,18 @@ func (m *StorageMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case storage.FieldImplementation:
-		v, ok := value.(string)
+		v, ok := value.(storage.Implementation)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImplementation(v)
 		return nil
-	case storage.FieldPath:
+	case storage.FieldSettings:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPath(v)
-		return nil
-	case storage.FieldUser:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUser(v)
-		return nil
-	case storage.FieldPassword:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPassword(v)
+		m.SetSettings(v)
 		return nil
 	case storage.FieldDeleted:
 		v, ok := value.(bool)
@@ -5018,11 +5049,8 @@ func (m *StorageMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *StorageMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(storage.FieldUser) {
-		fields = append(fields, storage.FieldUser)
-	}
-	if m.FieldCleared(storage.FieldPassword) {
-		fields = append(fields, storage.FieldPassword)
+	if m.FieldCleared(storage.FieldSettings) {
+		fields = append(fields, storage.FieldSettings)
 	}
 	return fields
 }
@@ -5038,11 +5066,8 @@ func (m *StorageMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *StorageMutation) ClearField(name string) error {
 	switch name {
-	case storage.FieldUser:
-		m.ClearUser()
-		return nil
-	case storage.FieldPassword:
-		m.ClearPassword()
+	case storage.FieldSettings:
+		m.ClearSettings()
 		return nil
 	}
 	return fmt.Errorf("unknown Storage nullable field %s", name)
@@ -5058,14 +5083,8 @@ func (m *StorageMutation) ResetField(name string) error {
 	case storage.FieldImplementation:
 		m.ResetImplementation()
 		return nil
-	case storage.FieldPath:
-		m.ResetPath()
-		return nil
-	case storage.FieldUser:
-		m.ResetUser()
-		return nil
-	case storage.FieldPassword:
-		m.ResetPassword()
+	case storage.FieldSettings:
+		m.ResetSettings()
 		return nil
 	case storage.FieldDeleted:
 		m.ResetDeleted()

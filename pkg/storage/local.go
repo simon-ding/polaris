@@ -14,8 +14,12 @@ type Storage interface {
 	ReadDir(dir string) ([]fs.FileInfo, error)
 }
 
-func NewLocalStorage(dir string) *LocalStorage {
-	return &LocalStorage{dir: dir}
+func NewLocalStorage(dir string) (*LocalStorage, error) {
+	if _, err := os.Stat(dir); err != nil {
+		return nil, errors.Wrap(err, "stat")
+	}
+	
+	return &LocalStorage{dir: dir}, nil
 }
 
 type LocalStorage struct {

@@ -37,15 +37,3 @@ const (
 func (r ResolutionType) String() string {
 	return string(r)
 }
-
-const (
-	ImplLocal = "local"
-	ImplWebdav = "webdav"
-)
-
-func StorageImplementations() []string {
-	return []string{
-		ImplLocal,
-		ImplWebdav,
-	}
-}

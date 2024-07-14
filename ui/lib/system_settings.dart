@@ -473,84 +473,121 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
 
   Future<void> showStorageDetails(
       AsyncSnapshot<void> snapshot, BuildContext context, Storage s) {
-    var nameController = TextEditingController(text: s.name);
-    var implController = TextEditingController(
-        text: isBlank(s.implementation) ? "transmission" : s.implementation);
-    var pathController = TextEditingController(text: s.path);
-    var userController = TextEditingController(text: s.user);
-    var passController = TextEditingController(text: s.password);
 
     return showDialog<void>(
         context: context,
         barrierDismissible: true, // user must tap button!
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('存储'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  TextField(
-                    decoration: const InputDecoration(labelText: "名称"),
-                    controller: nameController,
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: "实现"),
-                    controller: implController,
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: "路径"),
-                    controller: pathController,
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: "用户"),
-                    controller: userController,
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: "密码"),
-                    controller: passController,
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              s.id == null
-                  ? const Text("")
-                  : TextButton(
-                      onPressed: () {
-                        var f = ref
-                            .read(storageSettingProvider.notifier)
-                            .deleteStorage(s.id!);
+          var nameController = TextEditingController(text: s.name);
+          var pathController = TextEditingController();
+          var urlController = TextEditingController();
+          var userController = TextEditingController();
+          var passController = TextEditingController();
+          if (s.settings != null) {
+            pathController.text = s.settings!["path"];
+            urlController.text = s.settings!["url"];
+            userController.text = s.settings!["user"];
+            passController.text = s.settings!["password"];
+          }
+
+          String _selectImpl = s.implementation == null? "local": s.implementation!;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('存储'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    DropdownMenu(
+                      label: const Text("实现"),
+                      onSelected: (value) {
                         setState(() {
-                          _pendingStorage = f;
+                          _selectImpl = value!;
                         });
-                        if (!showError(snapshot)) {
-                          Navigator.of(context).pop();
-                        }
                       },
-                      child: const Text('删除')),
-              TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('取消')),
-              TextButton(
-                child: const Text('确定'),
-                onPressed: () {
-                  var f = ref.read(storageSettingProvider.notifier).addStorage(
-                      Storage(
-                          name: nameController.text,
-                          implementation: implController.text,
-                          path: pathController.text,
-                          user: userController.text,
-                          password: passController.text));
-                  setState(() {
-                    _pendingStorage = f;
-                  });
-                  if (!showError(snapshot)) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                      initialSelection: _selectImpl,
+                      dropdownMenuEntries: const [
+                        DropdownMenuEntry(value: "local", label: "本地存储"),
+                        DropdownMenuEntry(value: "webdav", label: "webdav")
+                      ],
+                    ),
+                    TextField(
+                      decoration: const InputDecoration(labelText: "名称"),
+                      controller: nameController,
+                    ),
+                    _selectImpl == "local"
+                        ? TextField(
+                            decoration: const InputDecoration(labelText: "路径"),
+                            controller: pathController,
+                          )
+                        : Column(
+                            children: [
+                              TextField(
+                                decoration: const InputDecoration(
+                                    labelText: "Webdav网址"),
+                                controller: urlController,
+                              ),
+                              TextField(
+                                decoration:
+                                    const InputDecoration(labelText: "用户"),
+                                controller: userController,
+                              ),
+                              TextField(
+                                decoration:
+                                    const InputDecoration(labelText: "密码"),
+                                controller: passController,
+                              ),
+                              TextField(
+                                decoration:
+                                    const InputDecoration(labelText: "路径"),
+                                controller: pathController,
+                              ),
+                            ],
+                          )
+                  ],
+                ),
               ),
-            ],
-          );
+              actions: <Widget>[
+                s.id == null
+                    ? const Text("")
+                    : TextButton(
+                        onPressed: () {
+                          var f = ref
+                              .read(storageSettingProvider.notifier)
+                              .deleteStorage(s.id!);
+                          setState(() {
+                            _pendingStorage = f;
+                          });
+                          if (!showError(snapshot)) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: const Text('删除')),
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('取消')),
+                TextButton(
+                  child: const Text('确定'),
+                  onPressed: () async {
+                    ref
+                        .read(storageSettingProvider.notifier)
+                        .addStorage(Storage(
+                          name: nameController.text,
+                          implementation: _selectImpl,
+                          settings: {
+                            "path": pathController.text,
+                            "url": urlController.text,
+                            "user": userController.text,
+                            "password": passController.text
+                          },
+                        ));
+                    if (!showError(snapshot)) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            );
+          });
         });
   }
 

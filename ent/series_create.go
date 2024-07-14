@@ -135,6 +135,20 @@ func (sc *SeriesCreate) SetNillableStorageID(i *int) *SeriesCreate {
 	return sc
 }
 
+// SetTargetDir sets the "target_dir" field.
+func (sc *SeriesCreate) SetTargetDir(s string) *SeriesCreate {
+	sc.mutation.SetTargetDir(s)
+	return sc
+}
+
+// SetNillableTargetDir sets the "target_dir" field if the given value is not nil.
+func (sc *SeriesCreate) SetNillableTargetDir(s *string) *SeriesCreate {
+	if s != nil {
+		sc.SetTargetDir(*s)
+	}
+	return sc
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (sc *SeriesCreate) AddEpisodeIDs(ids ...int) *SeriesCreate {
 	sc.mutation.AddEpisodeIDs(ids...)
@@ -294,6 +308,10 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.StorageID(); ok {
 		_spec.SetField(series.FieldStorageID, field.TypeInt, value)
 		_node.StorageID = value
+	}
+	if value, ok := sc.mutation.TargetDir(); ok {
+		_spec.SetField(series.FieldTargetDir, field.TypeString, value)
+		_node.TargetDir = value
 	}
 	if nodes := sc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

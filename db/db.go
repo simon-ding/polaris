@@ -14,7 +14,6 @@ import (
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"polaris/log"
-	"slices"
 	"time"
 
 	"entgo.io/ent/dialect"
@@ -238,44 +237,47 @@ func (c *Client) DeleteDownloadCLient(id int) {
 
 // Storage is the model entity for the Storage schema.
 type StorageInfo struct {
-	Name           string `json:"name"`
-	Implementation string `json:"implementation"`
-	Path           string `json:"path"`
-	User           string `json:"user"`
-	Password       string `json:"password"`
-	Default        bool   `json:"default"`
+	Name           string            `json:"name"`
+	Implementation string            `json:"implementation"`
+	Settings       map[string]string `json:"settings"`
+	Default        bool              `json:"default"`
 }
 
-func (c *Client) AddStorage(s StorageInfo) error {
-	if !slices.Contains(StorageImplementations(), s.Implementation) {
-		return fmt.Errorf("implementation not supported: %v", s.Implementation)
+type LocalDirSetting struct {
+	Path string `json:"path"`
+}
+
+type WebdavSetting struct {
+	URL      string `json:"url"`
+	Path     string `json:"path"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
+
+func (c *Client) AddStorage(st *StorageInfo) error {
+
+	data, err := json.Marshal(st.Settings)
+	if err != nil {
+		return errors.Wrap(err, "json marshal")
 	}
-	count := c.ent.Storage.Query().Where(storage.Name(s.Name)).CountX(context.TODO())
+
+	count := c.ent.Storage.Query().Where(storage.Name(st.Name)).CountX(context.TODO())
 	if count > 0 {
 		//storage already exist, edit exist one
-		return c.ent.Storage.Update().Where(storage.Name(s.Name)).
-			SetImplementation(s.Implementation).
-			SetPath(s.Path).
-			SetUser(s.User).
-			SetDefault(s.Default).
-			SetPassword(s.Password).Exec(context.TODO())
+		return c.ent.Storage.Update().Where(storage.Name(st.Name)).
+			SetImplementation(storage.Implementation(st.Implementation)).
+			SetSettings(string(data)).Exec(context.TODO())
 	}
 	countAll := c.ent.Storage.Query().CountX(context.TODO())
 	if countAll == 0 {
-		log.Infof("first storage, make it default: %s", s.Name)
-		s.Default = true
+		log.Infof("first storage, make it default: %s", st.Name)
+		st.Default = true
 	}
-	_, err := c.ent.Storage.Create().SetName(s.Name).
-		SetImplementation(s.Implementation).
-		SetPath(s.Path).
-		SetUser(s.User).
-		SetDefault(s.Default).
-		SetPassword(s.Password).Save(context.TODO())
+	_, err = c.ent.Storage.Create().SetName(st.Name).
+		SetImplementation(storage.Implementation(st.Implementation)).
+		SetSettings(string(data)).SetDefault(st.Default).Save(context.TODO())
 	if err != nil {
 		return err
-	}
-	if s.Default {
-		return c.SetDefaultStorageByName(s.Name)
 	}
 	return nil
 }
@@ -289,13 +291,37 @@ func (c *Client) GetAllStorage() []*ent.Storage {
 	return data
 }
 
-func (c *Client) GetStorage(id int) *ent.Storage {
+type Storage struct {
+	ent.Storage
+}
+
+func (s *Storage) ToLocalSetting() LocalDirSetting {
+	if s.Implementation != storage.ImplementationLocal {
+		panic("not local storage")
+	}
+	var localSetting LocalDirSetting
+	json.Unmarshal([]byte(s.Settings), &localSetting)
+	return localSetting
+}
+
+func (s *Storage) ToWebDavSetting() WebdavSetting {
+	if s.Implementation != storage.ImplementationWebdav {
+		panic("not webdav storage")
+	}
+	var webdavSetting WebdavSetting
+	json.Unmarshal([]byte(s.Settings), &webdavSetting)
+	return webdavSetting
+
+}
+
+func (c *Client) GetStorage(id int) *Storage {
 	r, err := c.ent.Storage.Query().Where(storage.ID(id)).First(context.TODO())
 	if err != nil {
 		//use default storage
-		return c.ent.Storage.Query().Where(storage.Default(true)).FirstX(context.TODO())
+		r := c.ent.Storage.Query().Where(storage.Default(true)).FirstX(context.TODO())
+		return &Storage{*r}
 	}
-	return r
+	return &Storage{*r}
 }
 
 func (c *Client) DeleteStorage(id int) error {

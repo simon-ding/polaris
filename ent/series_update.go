@@ -215,6 +215,26 @@ func (su *SeriesUpdate) ClearStorageID() *SeriesUpdate {
 	return su
 }
 
+// SetTargetDir sets the "target_dir" field.
+func (su *SeriesUpdate) SetTargetDir(s string) *SeriesUpdate {
+	su.mutation.SetTargetDir(s)
+	return su
+}
+
+// SetNillableTargetDir sets the "target_dir" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableTargetDir(s *string) *SeriesUpdate {
+	if s != nil {
+		su.SetTargetDir(*s)
+	}
+	return su
+}
+
+// ClearTargetDir clears the value of the "target_dir" field.
+func (su *SeriesUpdate) ClearTargetDir() *SeriesUpdate {
+	su.mutation.ClearTargetDir()
+	return su
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (su *SeriesUpdate) AddEpisodeIDs(ids ...int) *SeriesUpdate {
 	su.mutation.AddEpisodeIDs(ids...)
@@ -339,6 +359,12 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.StorageIDCleared() {
 		_spec.ClearField(series.FieldStorageID, field.TypeInt)
+	}
+	if value, ok := su.mutation.TargetDir(); ok {
+		_spec.SetField(series.FieldTargetDir, field.TypeString, value)
+	}
+	if su.mutation.TargetDirCleared() {
+		_spec.ClearField(series.FieldTargetDir, field.TypeString)
 	}
 	if su.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -591,6 +617,26 @@ func (suo *SeriesUpdateOne) ClearStorageID() *SeriesUpdateOne {
 	return suo
 }
 
+// SetTargetDir sets the "target_dir" field.
+func (suo *SeriesUpdateOne) SetTargetDir(s string) *SeriesUpdateOne {
+	suo.mutation.SetTargetDir(s)
+	return suo
+}
+
+// SetNillableTargetDir sets the "target_dir" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableTargetDir(s *string) *SeriesUpdateOne {
+	if s != nil {
+		suo.SetTargetDir(*s)
+	}
+	return suo
+}
+
+// ClearTargetDir clears the value of the "target_dir" field.
+func (suo *SeriesUpdateOne) ClearTargetDir() *SeriesUpdateOne {
+	suo.mutation.ClearTargetDir()
+	return suo
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (suo *SeriesUpdateOne) AddEpisodeIDs(ids ...int) *SeriesUpdateOne {
 	suo.mutation.AddEpisodeIDs(ids...)
@@ -745,6 +791,12 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	}
 	if suo.mutation.StorageIDCleared() {
 		_spec.ClearField(series.FieldStorageID, field.TypeInt)
+	}
+	if value, ok := suo.mutation.TargetDir(); ok {
+		_spec.SetField(series.FieldTargetDir, field.TypeString, value)
+	}
+	if suo.mutation.TargetDirCleared() {
+		_spec.ClearField(series.FieldTargetDir, field.TypeString)
 	}
 	if suo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{

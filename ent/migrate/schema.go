@@ -37,6 +37,7 @@ var (
 		{Name: "title", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
 		{Name: "air_date", Type: field.TypeString},
+		{Name: "file_in_storage", Type: field.TypeString, Nullable: true},
 		{Name: "series_id", Type: field.TypeInt, Nullable: true},
 	}
 	// EpisodesTable holds the schema information for the "episodes" table.
@@ -47,7 +48,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "episodes_series_episodes",
-				Columns:    []*schema.Column{EpisodesColumns[6]},
+				Columns:    []*schema.Column{EpisodesColumns[7]},
 				RefColumns: []*schema.Column{SeriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -99,6 +100,7 @@ var (
 		{Name: "air_date", Type: field.TypeString, Default: ""},
 		{Name: "resolution", Type: field.TypeString, Default: ""},
 		{Name: "storage_id", Type: field.TypeInt, Nullable: true},
+		{Name: "target_dir", Type: field.TypeString, Nullable: true},
 	}
 	// SeriesTable holds the schema information for the "series" table.
 	SeriesTable = &schema.Table{
@@ -122,10 +124,8 @@ var (
 	StoragesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
-		{Name: "implementation", Type: field.TypeString},
-		{Name: "path", Type: field.TypeString},
-		{Name: "user", Type: field.TypeString, Nullable: true},
-		{Name: "password", Type: field.TypeString, Nullable: true},
+		{Name: "implementation", Type: field.TypeEnum, Enums: []string{"webdav", "local"}},
+		{Name: "settings", Type: field.TypeString, Nullable: true},
 		{Name: "deleted", Type: field.TypeBool, Default: false},
 		{Name: "default", Type: field.TypeBool, Default: false},
 	}

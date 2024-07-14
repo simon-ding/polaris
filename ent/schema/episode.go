@@ -16,10 +16,11 @@ func (Episode) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("series_id").Optional(),
 		field.Int("season_number").StructTag("json:\"season_number\""),
-		field.Int("episode_number"),
+		field.Int("episode_number").StructTag("json:\"episode_number\""),
 		field.String("title"),
 		field.String("overview"),
 		field.String("air_date"),
+		field.String("file_in_storage").Optional(),
 	}
 }
 

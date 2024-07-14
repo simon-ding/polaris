@@ -132,6 +132,26 @@ func (eu *EpisodeUpdate) SetNillableAirDate(s *string) *EpisodeUpdate {
 	return eu
 }
 
+// SetFileInStorage sets the "file_in_storage" field.
+func (eu *EpisodeUpdate) SetFileInStorage(s string) *EpisodeUpdate {
+	eu.mutation.SetFileInStorage(s)
+	return eu
+}
+
+// SetNillableFileInStorage sets the "file_in_storage" field if the given value is not nil.
+func (eu *EpisodeUpdate) SetNillableFileInStorage(s *string) *EpisodeUpdate {
+	if s != nil {
+		eu.SetFileInStorage(*s)
+	}
+	return eu
+}
+
+// ClearFileInStorage clears the value of the "file_in_storage" field.
+func (eu *EpisodeUpdate) ClearFileInStorage() *EpisodeUpdate {
+	eu.mutation.ClearFileInStorage()
+	return eu
+}
+
 // SetSeries sets the "series" edge to the Series entity.
 func (eu *EpisodeUpdate) SetSeries(s *Series) *EpisodeUpdate {
 	return eu.SetSeriesID(s.ID)
@@ -204,6 +224,12 @@ func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.AirDate(); ok {
 		_spec.SetField(episode.FieldAirDate, field.TypeString, value)
+	}
+	if value, ok := eu.mutation.FileInStorage(); ok {
+		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
+	}
+	if eu.mutation.FileInStorageCleared() {
+		_spec.ClearField(episode.FieldFileInStorage, field.TypeString)
 	}
 	if eu.mutation.SeriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -358,6 +384,26 @@ func (euo *EpisodeUpdateOne) SetNillableAirDate(s *string) *EpisodeUpdateOne {
 	return euo
 }
 
+// SetFileInStorage sets the "file_in_storage" field.
+func (euo *EpisodeUpdateOne) SetFileInStorage(s string) *EpisodeUpdateOne {
+	euo.mutation.SetFileInStorage(s)
+	return euo
+}
+
+// SetNillableFileInStorage sets the "file_in_storage" field if the given value is not nil.
+func (euo *EpisodeUpdateOne) SetNillableFileInStorage(s *string) *EpisodeUpdateOne {
+	if s != nil {
+		euo.SetFileInStorage(*s)
+	}
+	return euo
+}
+
+// ClearFileInStorage clears the value of the "file_in_storage" field.
+func (euo *EpisodeUpdateOne) ClearFileInStorage() *EpisodeUpdateOne {
+	euo.mutation.ClearFileInStorage()
+	return euo
+}
+
 // SetSeries sets the "series" edge to the Series entity.
 func (euo *EpisodeUpdateOne) SetSeries(s *Series) *EpisodeUpdateOne {
 	return euo.SetSeriesID(s.ID)
@@ -460,6 +506,12 @@ func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err e
 	}
 	if value, ok := euo.mutation.AirDate(); ok {
 		_spec.SetField(episode.FieldAirDate, field.TypeString, value)
+	}
+	if value, ok := euo.mutation.FileInStorage(); ok {
+		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
+	}
+	if euo.mutation.FileInStorageCleared() {
+		_spec.ClearField(episode.FieldFileInStorage, field.TypeString)
 	}
 	if euo.mutation.SeriesCleared() {
 		edge := &sqlgraph.EdgeSpec{

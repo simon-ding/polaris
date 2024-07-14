@@ -58,24 +58,9 @@ func Name(v string) predicate.Storage {
 	return predicate.Storage(sql.FieldEQ(FieldName, v))
 }
 
-// Implementation applies equality check predicate on the "implementation" field. It's identical to ImplementationEQ.
-func Implementation(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEQ(FieldImplementation, v))
-}
-
-// Path applies equality check predicate on the "path" field. It's identical to PathEQ.
-func Path(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEQ(FieldPath, v))
-}
-
-// User applies equality check predicate on the "user" field. It's identical to UserEQ.
-func User(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEQ(FieldUser, v))
-}
-
-// Password applies equality check predicate on the "password" field. It's identical to PasswordEQ.
-func Password(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEQ(FieldPassword, v))
+// Settings applies equality check predicate on the "settings" field. It's identical to SettingsEQ.
+func Settings(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldSettings, v))
 }
 
 // Deleted applies equality check predicate on the "deleted" field. It's identical to DeletedEQ.
@@ -154,283 +139,98 @@ func NameContainsFold(v string) predicate.Storage {
 }
 
 // ImplementationEQ applies the EQ predicate on the "implementation" field.
-func ImplementationEQ(v string) predicate.Storage {
+func ImplementationEQ(v Implementation) predicate.Storage {
 	return predicate.Storage(sql.FieldEQ(FieldImplementation, v))
 }
 
 // ImplementationNEQ applies the NEQ predicate on the "implementation" field.
-func ImplementationNEQ(v string) predicate.Storage {
+func ImplementationNEQ(v Implementation) predicate.Storage {
 	return predicate.Storage(sql.FieldNEQ(FieldImplementation, v))
 }
 
 // ImplementationIn applies the In predicate on the "implementation" field.
-func ImplementationIn(vs ...string) predicate.Storage {
+func ImplementationIn(vs ...Implementation) predicate.Storage {
 	return predicate.Storage(sql.FieldIn(FieldImplementation, vs...))
 }
 
 // ImplementationNotIn applies the NotIn predicate on the "implementation" field.
-func ImplementationNotIn(vs ...string) predicate.Storage {
+func ImplementationNotIn(vs ...Implementation) predicate.Storage {
 	return predicate.Storage(sql.FieldNotIn(FieldImplementation, vs...))
 }
 
-// ImplementationGT applies the GT predicate on the "implementation" field.
-func ImplementationGT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGT(FieldImplementation, v))
+// SettingsEQ applies the EQ predicate on the "settings" field.
+func SettingsEQ(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldSettings, v))
 }
 
-// ImplementationGTE applies the GTE predicate on the "implementation" field.
-func ImplementationGTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGTE(FieldImplementation, v))
+// SettingsNEQ applies the NEQ predicate on the "settings" field.
+func SettingsNEQ(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldNEQ(FieldSettings, v))
 }
 
-// ImplementationLT applies the LT predicate on the "implementation" field.
-func ImplementationLT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLT(FieldImplementation, v))
+// SettingsIn applies the In predicate on the "settings" field.
+func SettingsIn(vs ...string) predicate.Storage {
+	return predicate.Storage(sql.FieldIn(FieldSettings, vs...))
 }
 
-// ImplementationLTE applies the LTE predicate on the "implementation" field.
-func ImplementationLTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLTE(FieldImplementation, v))
+// SettingsNotIn applies the NotIn predicate on the "settings" field.
+func SettingsNotIn(vs ...string) predicate.Storage {
+	return predicate.Storage(sql.FieldNotIn(FieldSettings, vs...))
 }
 
-// ImplementationContains applies the Contains predicate on the "implementation" field.
-func ImplementationContains(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContains(FieldImplementation, v))
+// SettingsGT applies the GT predicate on the "settings" field.
+func SettingsGT(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldGT(FieldSettings, v))
 }
 
-// ImplementationHasPrefix applies the HasPrefix predicate on the "implementation" field.
-func ImplementationHasPrefix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasPrefix(FieldImplementation, v))
+// SettingsGTE applies the GTE predicate on the "settings" field.
+func SettingsGTE(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldGTE(FieldSettings, v))
 }
 
-// ImplementationHasSuffix applies the HasSuffix predicate on the "implementation" field.
-func ImplementationHasSuffix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasSuffix(FieldImplementation, v))
+// SettingsLT applies the LT predicate on the "settings" field.
+func SettingsLT(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldLT(FieldSettings, v))
 }
 
-// ImplementationEqualFold applies the EqualFold predicate on the "implementation" field.
-func ImplementationEqualFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEqualFold(FieldImplementation, v))
+// SettingsLTE applies the LTE predicate on the "settings" field.
+func SettingsLTE(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldLTE(FieldSettings, v))
 }
 
-// ImplementationContainsFold applies the ContainsFold predicate on the "implementation" field.
-func ImplementationContainsFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContainsFold(FieldImplementation, v))
+// SettingsContains applies the Contains predicate on the "settings" field.
+func SettingsContains(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldContains(FieldSettings, v))
 }
 
-// PathEQ applies the EQ predicate on the "path" field.
-func PathEQ(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEQ(FieldPath, v))
+// SettingsHasPrefix applies the HasPrefix predicate on the "settings" field.
+func SettingsHasPrefix(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldHasPrefix(FieldSettings, v))
 }
 
-// PathNEQ applies the NEQ predicate on the "path" field.
-func PathNEQ(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldNEQ(FieldPath, v))
+// SettingsHasSuffix applies the HasSuffix predicate on the "settings" field.
+func SettingsHasSuffix(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldHasSuffix(FieldSettings, v))
 }
 
-// PathIn applies the In predicate on the "path" field.
-func PathIn(vs ...string) predicate.Storage {
-	return predicate.Storage(sql.FieldIn(FieldPath, vs...))
+// SettingsIsNil applies the IsNil predicate on the "settings" field.
+func SettingsIsNil() predicate.Storage {
+	return predicate.Storage(sql.FieldIsNull(FieldSettings))
 }
 
-// PathNotIn applies the NotIn predicate on the "path" field.
-func PathNotIn(vs ...string) predicate.Storage {
-	return predicate.Storage(sql.FieldNotIn(FieldPath, vs...))
+// SettingsNotNil applies the NotNil predicate on the "settings" field.
+func SettingsNotNil() predicate.Storage {
+	return predicate.Storage(sql.FieldNotNull(FieldSettings))
 }
 
-// PathGT applies the GT predicate on the "path" field.
-func PathGT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGT(FieldPath, v))
+// SettingsEqualFold applies the EqualFold predicate on the "settings" field.
+func SettingsEqualFold(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEqualFold(FieldSettings, v))
 }
 
-// PathGTE applies the GTE predicate on the "path" field.
-func PathGTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGTE(FieldPath, v))
-}
-
-// PathLT applies the LT predicate on the "path" field.
-func PathLT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLT(FieldPath, v))
-}
-
-// PathLTE applies the LTE predicate on the "path" field.
-func PathLTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLTE(FieldPath, v))
-}
-
-// PathContains applies the Contains predicate on the "path" field.
-func PathContains(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContains(FieldPath, v))
-}
-
-// PathHasPrefix applies the HasPrefix predicate on the "path" field.
-func PathHasPrefix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasPrefix(FieldPath, v))
-}
-
-// PathHasSuffix applies the HasSuffix predicate on the "path" field.
-func PathHasSuffix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasSuffix(FieldPath, v))
-}
-
-// PathEqualFold applies the EqualFold predicate on the "path" field.
-func PathEqualFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEqualFold(FieldPath, v))
-}
-
-// PathContainsFold applies the ContainsFold predicate on the "path" field.
-func PathContainsFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContainsFold(FieldPath, v))
-}
-
-// UserEQ applies the EQ predicate on the "user" field.
-func UserEQ(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEQ(FieldUser, v))
-}
-
-// UserNEQ applies the NEQ predicate on the "user" field.
-func UserNEQ(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldNEQ(FieldUser, v))
-}
-
-// UserIn applies the In predicate on the "user" field.
-func UserIn(vs ...string) predicate.Storage {
-	return predicate.Storage(sql.FieldIn(FieldUser, vs...))
-}
-
-// UserNotIn applies the NotIn predicate on the "user" field.
-func UserNotIn(vs ...string) predicate.Storage {
-	return predicate.Storage(sql.FieldNotIn(FieldUser, vs...))
-}
-
-// UserGT applies the GT predicate on the "user" field.
-func UserGT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGT(FieldUser, v))
-}
-
-// UserGTE applies the GTE predicate on the "user" field.
-func UserGTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGTE(FieldUser, v))
-}
-
-// UserLT applies the LT predicate on the "user" field.
-func UserLT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLT(FieldUser, v))
-}
-
-// UserLTE applies the LTE predicate on the "user" field.
-func UserLTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLTE(FieldUser, v))
-}
-
-// UserContains applies the Contains predicate on the "user" field.
-func UserContains(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContains(FieldUser, v))
-}
-
-// UserHasPrefix applies the HasPrefix predicate on the "user" field.
-func UserHasPrefix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasPrefix(FieldUser, v))
-}
-
-// UserHasSuffix applies the HasSuffix predicate on the "user" field.
-func UserHasSuffix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasSuffix(FieldUser, v))
-}
-
-// UserIsNil applies the IsNil predicate on the "user" field.
-func UserIsNil() predicate.Storage {
-	return predicate.Storage(sql.FieldIsNull(FieldUser))
-}
-
-// UserNotNil applies the NotNil predicate on the "user" field.
-func UserNotNil() predicate.Storage {
-	return predicate.Storage(sql.FieldNotNull(FieldUser))
-}
-
-// UserEqualFold applies the EqualFold predicate on the "user" field.
-func UserEqualFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEqualFold(FieldUser, v))
-}
-
-// UserContainsFold applies the ContainsFold predicate on the "user" field.
-func UserContainsFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContainsFold(FieldUser, v))
-}
-
-// PasswordEQ applies the EQ predicate on the "password" field.
-func PasswordEQ(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEQ(FieldPassword, v))
-}
-
-// PasswordNEQ applies the NEQ predicate on the "password" field.
-func PasswordNEQ(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldNEQ(FieldPassword, v))
-}
-
-// PasswordIn applies the In predicate on the "password" field.
-func PasswordIn(vs ...string) predicate.Storage {
-	return predicate.Storage(sql.FieldIn(FieldPassword, vs...))
-}
-
-// PasswordNotIn applies the NotIn predicate on the "password" field.
-func PasswordNotIn(vs ...string) predicate.Storage {
-	return predicate.Storage(sql.FieldNotIn(FieldPassword, vs...))
-}
-
-// PasswordGT applies the GT predicate on the "password" field.
-func PasswordGT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGT(FieldPassword, v))
-}
-
-// PasswordGTE applies the GTE predicate on the "password" field.
-func PasswordGTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldGTE(FieldPassword, v))
-}
-
-// PasswordLT applies the LT predicate on the "password" field.
-func PasswordLT(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLT(FieldPassword, v))
-}
-
-// PasswordLTE applies the LTE predicate on the "password" field.
-func PasswordLTE(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldLTE(FieldPassword, v))
-}
-
-// PasswordContains applies the Contains predicate on the "password" field.
-func PasswordContains(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContains(FieldPassword, v))
-}
-
-// PasswordHasPrefix applies the HasPrefix predicate on the "password" field.
-func PasswordHasPrefix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasPrefix(FieldPassword, v))
-}
-
-// PasswordHasSuffix applies the HasSuffix predicate on the "password" field.
-func PasswordHasSuffix(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldHasSuffix(FieldPassword, v))
-}
-
-// PasswordIsNil applies the IsNil predicate on the "password" field.
-func PasswordIsNil() predicate.Storage {
-	return predicate.Storage(sql.FieldIsNull(FieldPassword))
-}
-
-// PasswordNotNil applies the NotNil predicate on the "password" field.
-func PasswordNotNil() predicate.Storage {
-	return predicate.Storage(sql.FieldNotNull(FieldPassword))
-}
-
-// PasswordEqualFold applies the EqualFold predicate on the "password" field.
-func PasswordEqualFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldEqualFold(FieldPassword, v))
-}
-
-// PasswordContainsFold applies the ContainsFold predicate on the "password" field.
-func PasswordContainsFold(v string) predicate.Storage {
-	return predicate.Storage(sql.FieldContainsFold(FieldPassword, v))
+// SettingsContainsFold applies the ContainsFold predicate on the "settings" field.
+func SettingsContainsFold(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldContainsFold(FieldSettings, v))
 }
 
 // DeletedEQ applies the EQ predicate on the "deleted" field.

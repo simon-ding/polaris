@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiver/strings.dart';
@@ -246,30 +247,21 @@ class StorageSettingData extends AsyncNotifier<List<Storage>> {
 }
 
 class Storage {
-  Storage({
-    this.id,
-    this.name,
-    this.implementation,
-    this.path,
-    this.user,
-    this.password,
-  });
+  Storage({this.id, this.name, this.implementation, this.settings, this.isDefault});
 
   final int? id;
   final String? name;
   final String? implementation;
-  final String? path;
-  final String? user;
-  final String? password;
+  final Map<String, dynamic>? settings;
+  final bool? isDefault;
 
-  factory Storage.fromJson(Map<String, dynamic> json) {
+  factory Storage.fromJson(Map<String, dynamic> json1) {
     return Storage(
-      id: json["id"],
-      name: json["name"],
-      implementation: json["implementation"],
-      path: json["path"],
-      user: json["user"],
-      password: json["password"],
+      id: json1["id"],
+      name: json1["name"],
+      implementation: json1["implementation"],
+      settings: json.decode(json1["settings"]),
+      isDefault: json1["default"]
     );
   }
 
@@ -277,8 +269,7 @@ class Storage {
         "id": id,
         "name": name,
         "implementation": implementation,
-        "path": path,
-        "user": user,
-        "password": password,
+        "settings": settings,
+        "default": isDefault,
       };
 }

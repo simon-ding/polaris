@@ -36,6 +36,8 @@ const (
 	FieldResolution = "resolution"
 	// FieldStorageID holds the string denoting the storage_id field in the database.
 	FieldStorageID = "storage_id"
+	// FieldTargetDir holds the string denoting the target_dir field in the database.
+	FieldTargetDir = "target_dir"
 	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
 	EdgeEpisodes = "episodes"
 	// Table holds the table name of the series in the database.
@@ -63,6 +65,7 @@ var Columns = []string{
 	FieldAirDate,
 	FieldResolution,
 	FieldStorageID,
+	FieldTargetDir,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -145,6 +148,11 @@ func ByResolution(opts ...sql.OrderTermOption) OrderOption {
 // ByStorageID orders the results by the storage_id field.
 func ByStorageID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStorageID, opts...).ToFunc()
+}
+
+// ByTargetDir orders the results by the target_dir field.
+func ByTargetDir(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTargetDir, opts...).ToFunc()
 }
 
 // ByEpisodesCount orders the results by episodes count.

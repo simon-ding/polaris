@@ -106,73 +106,80 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Future<void> _showSubmitDialog(BuildContext context, SearchResult item) {
-    String _resSelected = "1080p";
-    int _storageSelected = 0;
-    var storage = ref.watch(storageSettingProvider);
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('添加剧集: ${item.name}'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownMenu(
-                  label: const Text("清晰度"),
-                  initialSelection: _resSelected,
-                  dropdownMenuEntries: const [
-                    DropdownMenuEntry(value: "720p", label: "720p"),
-                    DropdownMenuEntry(value: "1080p", label: "1080p"),
-                    DropdownMenuEntry(value: "4k", label: "4k"),
-                  ],
-                  onSelected: (value) {
-                    setState(() {
-                      _resSelected = value!;
-                    });
-                  },
-                ),
-                storage.when(
-                    data: (v) {
-                      return DropdownMenu(
-                        label: const Text("存储位置"),
-                        initialSelection: _storageSelected,
-                        dropdownMenuEntries: v
-                            .map((s) =>
-                                DropdownMenuEntry(label: s.name!, value: s.id))
-                            .toList(),
-                        onSelected: (value) {
-                          setState(() {
-                            _storageSelected = value!;
-                          });
+          return StatefulBuilder(
+            builder: (context, setState) {
+              String _resSelected = "1080p";
+              Storage? _storageSelected;
+              var storage = ref.watch(storageSettingProvider);
+
+              return AlertDialog(
+                title: Text('添加剧集: ${item.name}'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownMenu(
+                      label: const Text("清晰度"),
+                      initialSelection: _resSelected,
+                      dropdownMenuEntries: const [
+                        DropdownMenuEntry(value: "720p", label: "720p"),
+                        DropdownMenuEntry(value: "1080p", label: "1080p"),
+                        DropdownMenuEntry(value: "4k", label: "4k"),
+                      ],
+                      onSelected: (value) {
+                        setState(() {
+                          _resSelected = value!;
+                        });
+                      },
+                    ),
+                    storage.when(
+                        data: (v) {
+                          return DropdownMenu(
+                            label: const Text("存储位置"),
+                            initialSelection: _storageSelected,
+                            dropdownMenuEntries: v
+                                .map((s) =>
+                                    DropdownMenuEntry(label: s.name!, value: s))
+                                .toList(),
+                            onSelected: (value) {
+                              setState(() {
+                                _storageSelected = value;
+                              });
+                            },
+                          );
                         },
-                      );
+                        error: (err, trace) => Text("$err"),
+                        loading: () => const MyProgressIndicator()),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      textStyle: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    child: const Text('取消'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
                     },
-                    error: (err, trace) => Text("$err"),
-                    loading: () => MyProgressIndicator()),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge,
-                ),
-                child: const Text('取消'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge,
-                ),
-                child: const Text('确定'),
-                onPressed: () {
-                  ref.read(searchPageDataProvider.notifier).submit2Watchlist(
-                      item.id!, _storageSelected, _resSelected);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      textStyle: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    child: const Text('确定'),
+                    onPressed: () {
+                      ref
+                          .read(searchPageDataProvider.notifier)
+                          .submit2Watchlist(
+                              item.id!, _storageSelected!.id!, _resSelected);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
           );
         });
   }

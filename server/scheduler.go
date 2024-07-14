@@ -2,10 +2,10 @@ package server
 
 import (
 	"path/filepath"
-	"polaris/db"
 	"polaris/log"
 	"polaris/pkg"
 	"polaris/pkg/storage"
+	storage1 "polaris/ent/storage"
 
 	"github.com/pkg/errors"
 )
@@ -53,16 +53,21 @@ func (s *Server) moveCompletedTask(id int) error {
 	series := s.db.GetSeriesDetails(r.SeriesID)
 	st := s.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
-	if st.Implementation == db.ImplWebdav {
-		storageImpl, err := storage.NewWebdavStorage(st.Path, st.User, st.Password)
+	if st.Implementation == storage1.ImplementationWebdav {
+		ws := st.ToWebDavSetting()
+		storageImpl, err := storage.NewWebdavStorage(ws.Path, ws.User, ws.Password)
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}
 		if err := storageImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
 			return errors.Wrap(err, "move webdav")
 		}
-	} else if st.Implementation == db.ImplLocal {
-		storageImpl := storage.NewLocalStorage(st.Path)
+	} else if st.Implementation == storage1.ImplementationLocal {
+		ls := st.ToLocalSetting()
+		storageImpl, err := storage.NewLocalStorage(ls.Path)
+		if err != nil {
+			return errors.Wrap(err, "new storage")
+		}
 
 		if err := storageImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
 			return errors.Wrap(err, "move webdav")
@@ -75,6 +80,12 @@ func (s *Server) moveCompletedTask(id int) error {
 	s.db.SetHistoryComplete(r.ID)
 	return nil
 }
+
+func (s *Server) updateSeriesEpisodes(seriesId int) {
+
+}
+
+func (s *Server) checkFileExists() {}
 
 type Task struct {
 	Processing bool

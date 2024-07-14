@@ -42,70 +42,36 @@ func (su *StorageUpdate) SetNillableName(s *string) *StorageUpdate {
 }
 
 // SetImplementation sets the "implementation" field.
-func (su *StorageUpdate) SetImplementation(s string) *StorageUpdate {
+func (su *StorageUpdate) SetImplementation(s storage.Implementation) *StorageUpdate {
 	su.mutation.SetImplementation(s)
 	return su
 }
 
 // SetNillableImplementation sets the "implementation" field if the given value is not nil.
-func (su *StorageUpdate) SetNillableImplementation(s *string) *StorageUpdate {
+func (su *StorageUpdate) SetNillableImplementation(s *storage.Implementation) *StorageUpdate {
 	if s != nil {
 		su.SetImplementation(*s)
 	}
 	return su
 }
 
-// SetPath sets the "path" field.
-func (su *StorageUpdate) SetPath(s string) *StorageUpdate {
-	su.mutation.SetPath(s)
+// SetSettings sets the "settings" field.
+func (su *StorageUpdate) SetSettings(s string) *StorageUpdate {
+	su.mutation.SetSettings(s)
 	return su
 }
 
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (su *StorageUpdate) SetNillablePath(s *string) *StorageUpdate {
+// SetNillableSettings sets the "settings" field if the given value is not nil.
+func (su *StorageUpdate) SetNillableSettings(s *string) *StorageUpdate {
 	if s != nil {
-		su.SetPath(*s)
+		su.SetSettings(*s)
 	}
 	return su
 }
 
-// SetUser sets the "user" field.
-func (su *StorageUpdate) SetUser(s string) *StorageUpdate {
-	su.mutation.SetUser(s)
-	return su
-}
-
-// SetNillableUser sets the "user" field if the given value is not nil.
-func (su *StorageUpdate) SetNillableUser(s *string) *StorageUpdate {
-	if s != nil {
-		su.SetUser(*s)
-	}
-	return su
-}
-
-// ClearUser clears the value of the "user" field.
-func (su *StorageUpdate) ClearUser() *StorageUpdate {
-	su.mutation.ClearUser()
-	return su
-}
-
-// SetPassword sets the "password" field.
-func (su *StorageUpdate) SetPassword(s string) *StorageUpdate {
-	su.mutation.SetPassword(s)
-	return su
-}
-
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (su *StorageUpdate) SetNillablePassword(s *string) *StorageUpdate {
-	if s != nil {
-		su.SetPassword(*s)
-	}
-	return su
-}
-
-// ClearPassword clears the value of the "password" field.
-func (su *StorageUpdate) ClearPassword() *StorageUpdate {
-	su.mutation.ClearPassword()
+// ClearSettings clears the value of the "settings" field.
+func (su *StorageUpdate) ClearSettings() *StorageUpdate {
+	su.mutation.ClearSettings()
 	return su
 }
 
@@ -169,7 +135,20 @@ func (su *StorageUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (su *StorageUpdate) check() error {
+	if v, ok := su.mutation.Implementation(); ok {
+		if err := storage.ImplementationValidator(v); err != nil {
+			return &ValidationError{Name: "implementation", err: fmt.Errorf(`ent: validator failed for field "Storage.implementation": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (su *StorageUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := su.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(storage.Table, storage.Columns, sqlgraph.NewFieldSpec(storage.FieldID, field.TypeInt))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -182,22 +161,13 @@ func (su *StorageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(storage.FieldName, field.TypeString, value)
 	}
 	if value, ok := su.mutation.Implementation(); ok {
-		_spec.SetField(storage.FieldImplementation, field.TypeString, value)
+		_spec.SetField(storage.FieldImplementation, field.TypeEnum, value)
 	}
-	if value, ok := su.mutation.Path(); ok {
-		_spec.SetField(storage.FieldPath, field.TypeString, value)
+	if value, ok := su.mutation.Settings(); ok {
+		_spec.SetField(storage.FieldSettings, field.TypeString, value)
 	}
-	if value, ok := su.mutation.User(); ok {
-		_spec.SetField(storage.FieldUser, field.TypeString, value)
-	}
-	if su.mutation.UserCleared() {
-		_spec.ClearField(storage.FieldUser, field.TypeString)
-	}
-	if value, ok := su.mutation.Password(); ok {
-		_spec.SetField(storage.FieldPassword, field.TypeString, value)
-	}
-	if su.mutation.PasswordCleared() {
-		_spec.ClearField(storage.FieldPassword, field.TypeString)
+	if su.mutation.SettingsCleared() {
+		_spec.ClearField(storage.FieldSettings, field.TypeString)
 	}
 	if value, ok := su.mutation.Deleted(); ok {
 		_spec.SetField(storage.FieldDeleted, field.TypeBool, value)
@@ -240,70 +210,36 @@ func (suo *StorageUpdateOne) SetNillableName(s *string) *StorageUpdateOne {
 }
 
 // SetImplementation sets the "implementation" field.
-func (suo *StorageUpdateOne) SetImplementation(s string) *StorageUpdateOne {
+func (suo *StorageUpdateOne) SetImplementation(s storage.Implementation) *StorageUpdateOne {
 	suo.mutation.SetImplementation(s)
 	return suo
 }
 
 // SetNillableImplementation sets the "implementation" field if the given value is not nil.
-func (suo *StorageUpdateOne) SetNillableImplementation(s *string) *StorageUpdateOne {
+func (suo *StorageUpdateOne) SetNillableImplementation(s *storage.Implementation) *StorageUpdateOne {
 	if s != nil {
 		suo.SetImplementation(*s)
 	}
 	return suo
 }
 
-// SetPath sets the "path" field.
-func (suo *StorageUpdateOne) SetPath(s string) *StorageUpdateOne {
-	suo.mutation.SetPath(s)
+// SetSettings sets the "settings" field.
+func (suo *StorageUpdateOne) SetSettings(s string) *StorageUpdateOne {
+	suo.mutation.SetSettings(s)
 	return suo
 }
 
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (suo *StorageUpdateOne) SetNillablePath(s *string) *StorageUpdateOne {
+// SetNillableSettings sets the "settings" field if the given value is not nil.
+func (suo *StorageUpdateOne) SetNillableSettings(s *string) *StorageUpdateOne {
 	if s != nil {
-		suo.SetPath(*s)
+		suo.SetSettings(*s)
 	}
 	return suo
 }
 
-// SetUser sets the "user" field.
-func (suo *StorageUpdateOne) SetUser(s string) *StorageUpdateOne {
-	suo.mutation.SetUser(s)
-	return suo
-}
-
-// SetNillableUser sets the "user" field if the given value is not nil.
-func (suo *StorageUpdateOne) SetNillableUser(s *string) *StorageUpdateOne {
-	if s != nil {
-		suo.SetUser(*s)
-	}
-	return suo
-}
-
-// ClearUser clears the value of the "user" field.
-func (suo *StorageUpdateOne) ClearUser() *StorageUpdateOne {
-	suo.mutation.ClearUser()
-	return suo
-}
-
-// SetPassword sets the "password" field.
-func (suo *StorageUpdateOne) SetPassword(s string) *StorageUpdateOne {
-	suo.mutation.SetPassword(s)
-	return suo
-}
-
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (suo *StorageUpdateOne) SetNillablePassword(s *string) *StorageUpdateOne {
-	if s != nil {
-		suo.SetPassword(*s)
-	}
-	return suo
-}
-
-// ClearPassword clears the value of the "password" field.
-func (suo *StorageUpdateOne) ClearPassword() *StorageUpdateOne {
-	suo.mutation.ClearPassword()
+// ClearSettings clears the value of the "settings" field.
+func (suo *StorageUpdateOne) ClearSettings() *StorageUpdateOne {
+	suo.mutation.ClearSettings()
 	return suo
 }
 
@@ -380,7 +316,20 @@ func (suo *StorageUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (suo *StorageUpdateOne) check() error {
+	if v, ok := suo.mutation.Implementation(); ok {
+		if err := storage.ImplementationValidator(v); err != nil {
+			return &ValidationError{Name: "implementation", err: fmt.Errorf(`ent: validator failed for field "Storage.implementation": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (suo *StorageUpdateOne) sqlSave(ctx context.Context) (_node *Storage, err error) {
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(storage.Table, storage.Columns, sqlgraph.NewFieldSpec(storage.FieldID, field.TypeInt))
 	id, ok := suo.mutation.ID()
 	if !ok {
@@ -410,22 +359,13 @@ func (suo *StorageUpdateOne) sqlSave(ctx context.Context) (_node *Storage, err e
 		_spec.SetField(storage.FieldName, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.Implementation(); ok {
-		_spec.SetField(storage.FieldImplementation, field.TypeString, value)
+		_spec.SetField(storage.FieldImplementation, field.TypeEnum, value)
 	}
-	if value, ok := suo.mutation.Path(); ok {
-		_spec.SetField(storage.FieldPath, field.TypeString, value)
+	if value, ok := suo.mutation.Settings(); ok {
+		_spec.SetField(storage.FieldSettings, field.TypeString, value)
 	}
-	if value, ok := suo.mutation.User(); ok {
-		_spec.SetField(storage.FieldUser, field.TypeString, value)
-	}
-	if suo.mutation.UserCleared() {
-		_spec.ClearField(storage.FieldUser, field.TypeString)
-	}
-	if value, ok := suo.mutation.Password(); ok {
-		_spec.SetField(storage.FieldPassword, field.TypeString, value)
-	}
-	if suo.mutation.PasswordCleared() {
-		_spec.ClearField(storage.FieldPassword, field.TypeString)
+	if suo.mutation.SettingsCleared() {
+		_spec.ClearField(storage.FieldSettings, field.TypeString)
 	}
 	if value, ok := suo.mutation.Deleted(); ok {
 		_spec.SetField(storage.FieldDeleted, field.TypeBool, value)

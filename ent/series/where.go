@@ -110,6 +110,11 @@ func StorageID(v int) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldStorageID, v))
 }
 
+// TargetDir applies equality check predicate on the "target_dir" field. It's identical to TargetDirEQ.
+func TargetDir(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldTargetDir, v))
+}
+
 // TmdbIDEQ applies the EQ predicate on the "tmdb_id" field.
 func TmdbIDEQ(v int) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldTmdbID, v))
@@ -778,6 +783,81 @@ func StorageIDIsNil() predicate.Series {
 // StorageIDNotNil applies the NotNil predicate on the "storage_id" field.
 func StorageIDNotNil() predicate.Series {
 	return predicate.Series(sql.FieldNotNull(FieldStorageID))
+}
+
+// TargetDirEQ applies the EQ predicate on the "target_dir" field.
+func TargetDirEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldTargetDir, v))
+}
+
+// TargetDirNEQ applies the NEQ predicate on the "target_dir" field.
+func TargetDirNEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldTargetDir, v))
+}
+
+// TargetDirIn applies the In predicate on the "target_dir" field.
+func TargetDirIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldTargetDir, vs...))
+}
+
+// TargetDirNotIn applies the NotIn predicate on the "target_dir" field.
+func TargetDirNotIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldTargetDir, vs...))
+}
+
+// TargetDirGT applies the GT predicate on the "target_dir" field.
+func TargetDirGT(v string) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldTargetDir, v))
+}
+
+// TargetDirGTE applies the GTE predicate on the "target_dir" field.
+func TargetDirGTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldTargetDir, v))
+}
+
+// TargetDirLT applies the LT predicate on the "target_dir" field.
+func TargetDirLT(v string) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldTargetDir, v))
+}
+
+// TargetDirLTE applies the LTE predicate on the "target_dir" field.
+func TargetDirLTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldTargetDir, v))
+}
+
+// TargetDirContains applies the Contains predicate on the "target_dir" field.
+func TargetDirContains(v string) predicate.Series {
+	return predicate.Series(sql.FieldContains(FieldTargetDir, v))
+}
+
+// TargetDirHasPrefix applies the HasPrefix predicate on the "target_dir" field.
+func TargetDirHasPrefix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasPrefix(FieldTargetDir, v))
+}
+
+// TargetDirHasSuffix applies the HasSuffix predicate on the "target_dir" field.
+func TargetDirHasSuffix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasSuffix(FieldTargetDir, v))
+}
+
+// TargetDirIsNil applies the IsNil predicate on the "target_dir" field.
+func TargetDirIsNil() predicate.Series {
+	return predicate.Series(sql.FieldIsNull(FieldTargetDir))
+}
+
+// TargetDirNotNil applies the NotNil predicate on the "target_dir" field.
+func TargetDirNotNil() predicate.Series {
+	return predicate.Series(sql.FieldNotNull(FieldTargetDir))
+}
+
+// TargetDirEqualFold applies the EqualFold predicate on the "target_dir" field.
+func TargetDirEqualFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldEqualFold(FieldTargetDir, v))
+}
+
+// TargetDirContainsFold applies the ContainsFold predicate on the "target_dir" field.
+func TargetDirContainsFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldContainsFold(FieldTargetDir, v))
 }
 
 // HasEpisodes applies the HasEdge predicate on the "episodes" edge.

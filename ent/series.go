@@ -39,6 +39,8 @@ type Series struct {
 	Resolution string `json:"resolution,omitempty"`
 	// StorageID holds the value of the "storage_id" field.
 	StorageID int `json:"storage_id,omitempty"`
+	// TargetDir holds the value of the "target_dir" field.
+	TargetDir string `json:"target_dir,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SeriesQuery when eager-loading is set.
 	Edges        SeriesEdges `json:"edges"`
@@ -70,7 +72,7 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case series.FieldID, series.FieldTmdbID, series.FieldStorageID:
 			values[i] = new(sql.NullInt64)
-		case series.FieldImdbID, series.FieldNameCn, series.FieldNameEn, series.FieldOriginalName, series.FieldOverview, series.FieldPosterPath, series.FieldAirDate, series.FieldResolution:
+		case series.FieldImdbID, series.FieldNameCn, series.FieldNameEn, series.FieldOriginalName, series.FieldOverview, series.FieldPosterPath, series.FieldAirDate, series.FieldResolution, series.FieldTargetDir:
 			values[i] = new(sql.NullString)
 		case series.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -161,6 +163,12 @@ func (s *Series) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.StorageID = int(value.Int64)
 			}
+		case series.FieldTargetDir:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field target_dir", values[i])
+			} else if value.Valid {
+				s.TargetDir = value.String
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -234,6 +242,9 @@ func (s *Series) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("storage_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.StorageID))
+	builder.WriteString(", ")
+	builder.WriteString("target_dir=")
+	builder.WriteString(s.TargetDir)
 	builder.WriteByte(')')
 	return builder.String()
 }

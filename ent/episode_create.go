@@ -64,6 +64,20 @@ func (ec *EpisodeCreate) SetAirDate(s string) *EpisodeCreate {
 	return ec
 }
 
+// SetFileInStorage sets the "file_in_storage" field.
+func (ec *EpisodeCreate) SetFileInStorage(s string) *EpisodeCreate {
+	ec.mutation.SetFileInStorage(s)
+	return ec
+}
+
+// SetNillableFileInStorage sets the "file_in_storage" field if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableFileInStorage(s *string) *EpisodeCreate {
+	if s != nil {
+		ec.SetFileInStorage(*s)
+	}
+	return ec
+}
+
 // SetSeries sets the "series" edge to the Series entity.
 func (ec *EpisodeCreate) SetSeries(s *Series) *EpisodeCreate {
 	return ec.SetSeriesID(s.ID)
@@ -163,6 +177,10 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.AirDate(); ok {
 		_spec.SetField(episode.FieldAirDate, field.TypeString, value)
 		_node.AirDate = value
+	}
+	if value, ok := ec.mutation.FileInStorage(); ok {
+		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
+		_node.FileInStorage = value
 	}
 	if nodes := ec.mutation.SeriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
