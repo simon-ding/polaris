@@ -39,6 +39,7 @@ class APIs {
   }
 
   static Dio? dio1;
+  static Map<String, String> authHeaders = {};
 
   static Future<Dio> getDio() async {
     if (dio1 != null) {
@@ -46,6 +47,9 @@ class APIs {
     }
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString("token");
+
+    authHeaders["Authorization"] = "Bearer $token";
+
     var dio = Dio();
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {

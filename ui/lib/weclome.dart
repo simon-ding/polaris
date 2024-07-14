@@ -38,6 +38,7 @@ class WelcomePage extends ConsumerWidget {
                         child: Image.network(
                           "${APIs.imagesUrl}/${item.id}/poster.jpg" ,
                           fit: BoxFit.contain,
+                          headers: APIs.authHeaders,
                         ),
                       ),
                       Text(

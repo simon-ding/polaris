@@ -112,6 +112,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               child: Image.network(
                                 "${APIs.imagesUrl}/${details.id}/poster.jpg",
                                 fit: BoxFit.contain,
+                                headers: APIs.authHeaders,
                               ),
                             ),
                           ),
