@@ -112,13 +112,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	}
 	torrent.Start()
 
-	var name = series.NameEn
-	if name == "" {
-		name = series.OriginalName
-	}
-	var year = strings.Split(series.AirDate, "-")[0]
-
-	dir := fmt.Sprintf("%s (%s)/Season %02d", name, year, ep.SeasonNumber)
+	dir := fmt.Sprintf("%s/Season %02d", series.TargetDir, ep.SeasonNumber)
 
 	history, err :=s.db.SaveHistoryRecord(ent.History{
 		SeriesID: ep.SeriesID,

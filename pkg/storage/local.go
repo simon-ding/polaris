@@ -3,6 +3,7 @@ package storage
 import (
 	"io"
 	"io/fs"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -61,4 +62,9 @@ func (l *LocalStorage) Move(src, dest string) error {
 	}
 	return os.RemoveAll(src)
 
+}
+
+
+func (l *LocalStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
+	 return ioutil.ReadDir(dir)
 }

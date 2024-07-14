@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
@@ -14,6 +15,8 @@ import (
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"polaris/log"
+	"polaris/pkg/utils"
+	"strings"
 	"time"
 
 	"entgo.io/ent/dialect"
@@ -86,6 +89,16 @@ func (c *Client) AddWatchlist(storageId int, nameCn, nameEn string, detail *tmdb
 			storageId = r.ID
 		}
 	}
+	st := c.GetStorage(storageId)
+	
+	targetDir := fmt.Sprintf("%s %s (%v)", nameCn, nameEn, strings.Split(detail.FirstAirDate, "-")[0])
+	if !utils.IsChineseChar(nameCn) {
+		log.Warnf("name cn is not chinese name: %v", nameCn)
+		targetDir = fmt.Sprintf("%s (%v)", nameEn, strings.Split(detail.FirstAirDate, "-")[0])
+	}
+
+	
+	targetDir = filepath.Join(st.GetPath(), targetDir)
 
 	r, err := c.ent.Series.Create().
 		SetTmdbID(int(detail.ID)).
@@ -97,6 +110,7 @@ func (c *Client) AddWatchlist(storageId int, nameCn, nameEn string, detail *tmdb
 		SetPosterPath(detail.PosterPath).
 		SetAirDate(detail.FirstAirDate).
 		SetResolution(res.String()).
+		SetTargetDir(targetDir).
 		AddEpisodeIDs(episodes...).
 		Save(context.TODO())
 	return r, err
@@ -311,7 +325,12 @@ func (s *Storage) ToWebDavSetting() WebdavSetting {
 	var webdavSetting WebdavSetting
 	json.Unmarshal([]byte(s.Settings), &webdavSetting)
 	return webdavSetting
+}
 
+func (s *Storage) GetPath() string {
+	var m map[string]string
+	json.Unmarshal([]byte(s.Settings), &m)
+	return m["path"]
 }
 
 func (c *Client) GetStorage(id int) *Storage {
@@ -386,4 +405,13 @@ func (c *Client) GetDownloadDir() string {
 		return "/downloads"
 	}
 	return r.Value
+}
+
+func (c *Client) UpdateEpisodeFile(seriesID int, seasonNum, episodeNum int, file string) error {
+	ep, err := c.ent.Episode.Query().Where(episode.SeriesID(seriesID)).Where(episode.EpisodeNumber(episodeNum)).
+		Where(episode.SeasonNumber(seasonNum)).First(context.TODO())
+	if err != nil {
+		return errors.Wrap(err, "finding episode")
+	}
+	return ep.Update().SetFileInStorage(file).Exec(context.TODO())
 }
