@@ -16,6 +16,13 @@ const (
 
 const (
 	IndexerTorznabImpl = "torznab"
+	DataPath = "./data"
+	ImgPath = DataPath + "/img"
+)
+
+const (
+	LanguageEN = "en-US"
+	LanguageCN = "zh-CN"
 )
 
 type ResolutionType string

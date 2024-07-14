@@ -41,23 +41,15 @@ func (sc *SeriesCreate) SetNillableImdbID(s *string) *SeriesCreate {
 	return sc
 }
 
-// SetName sets the "name" field.
-func (sc *SeriesCreate) SetName(s string) *SeriesCreate {
-	sc.mutation.SetName(s)
+// SetNameCn sets the "name_cn" field.
+func (sc *SeriesCreate) SetNameCn(s string) *SeriesCreate {
+	sc.mutation.SetNameCn(s)
 	return sc
 }
 
 // SetNameEn sets the "name_en" field.
 func (sc *SeriesCreate) SetNameEn(s string) *SeriesCreate {
 	sc.mutation.SetNameEn(s)
-	return sc
-}
-
-// SetNillableNameEn sets the "name_en" field if the given value is not nil.
-func (sc *SeriesCreate) SetNillableNameEn(s *string) *SeriesCreate {
-	if s != nil {
-		sc.SetNameEn(*s)
-	}
 	return sc
 }
 
@@ -212,8 +204,11 @@ func (sc *SeriesCreate) check() error {
 	if _, ok := sc.mutation.TmdbID(); !ok {
 		return &ValidationError{Name: "tmdb_id", err: errors.New(`ent: missing required field "Series.tmdb_id"`)}
 	}
-	if _, ok := sc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Series.name"`)}
+	if _, ok := sc.mutation.NameCn(); !ok {
+		return &ValidationError{Name: "name_cn", err: errors.New(`ent: missing required field "Series.name_cn"`)}
+	}
+	if _, ok := sc.mutation.NameEn(); !ok {
+		return &ValidationError{Name: "name_en", err: errors.New(`ent: missing required field "Series.name_en"`)}
 	}
 	if _, ok := sc.mutation.OriginalName(); !ok {
 		return &ValidationError{Name: "original_name", err: errors.New(`ent: missing required field "Series.original_name"`)}
@@ -264,9 +259,9 @@ func (sc *SeriesCreate) createSpec() (*Series, *sqlgraph.CreateSpec) {
 		_spec.SetField(series.FieldImdbID, field.TypeString, value)
 		_node.ImdbID = value
 	}
-	if value, ok := sc.mutation.Name(); ok {
-		_spec.SetField(series.FieldName, field.TypeString, value)
-		_node.Name = value
+	if value, ok := sc.mutation.NameCn(); ok {
+		_spec.SetField(series.FieldNameCn, field.TypeString, value)
+		_node.NameCn = value
 	}
 	if value, ok := sc.mutation.NameEn(); ok {
 		_spec.SetField(series.FieldNameEn, field.TypeString, value)

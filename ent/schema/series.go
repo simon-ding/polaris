@@ -18,8 +18,8 @@ func (Series) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("tmdb_id"),
 		field.String("imdb_id").Optional(),
-		field.String("name"),
-		field.String("name_en").Optional(),
+		field.String("name_cn"),
+		field.String("name_en"),
 		field.String("original_name"),
 		field.String("overview"),
 		field.String("poster_path").Optional(),

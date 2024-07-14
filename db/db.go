@@ -28,8 +28,8 @@ type Client struct {
 }
 
 func Open() (*Client, error) {
-	os.Mkdir("./db", 0666)
-	client, err := ent.Open(dialect.SQLite, "file:./db/polaris.db?cache=shared&_fk=1")
+	os.Mkdir(DataPath, 0777)
+	client, err := ent.Open(dialect.SQLite, fmt.Sprintf("file:%v/polaris.db?cache=shared&_fk=1", DataPath))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed opening connection to sqlite")
 	}
@@ -72,7 +72,7 @@ func (c *Client) GetLanguage() string {
 	return lang
 }
 
-func (c *Client) AddWatchlist(storageId int, nameEn string, detail *tmdb.TVDetails, episodes []int, res ResolutionType) (*ent.Series, error) {
+func (c *Client) AddWatchlist(storageId int, nameCn, nameEn string, detail *tmdb.TVDetails, episodes []int, res ResolutionType) (*ent.Series, error) {
 	count := c.ent.Series.Query().Where(series.TmdbID(int(detail.ID))).CountX(context.Background())
 	if count > 0 {
 		return nil, fmt.Errorf("tv series %s already in watchlist", detail.Name)
@@ -92,7 +92,7 @@ func (c *Client) AddWatchlist(storageId int, nameEn string, detail *tmdb.TVDetai
 		SetTmdbID(int(detail.ID)).
 		SetStorageID(storageId).
 		SetOverview(detail.Overview).
-		SetName(detail.Name).
+		SetNameCn(nameCn).
 		SetNameEn(nameEn).
 		SetOriginalName(detail.OriginalName).
 		SetPosterPath(detail.PosterPath).
@@ -320,9 +320,8 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 	return err
 }
 
-
-func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History,error) {
-	return c.ent.History.Create().SetSeriesID(h.SeriesID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()). 
+func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
+	return c.ent.History.Create().SetSeriesID(h.SeriesID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
 		SetCompleted(h.Completed).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetSaved(h.Saved).Save(context.TODO())
 }
 
@@ -346,17 +345,14 @@ func (c *Client) GetRunningHistories() ent.Histories {
 	return h
 }
 
-
 func (c *Client) GetHistory(id int) *ent.History {
 	return c.ent.History.Query().Where(history.ID(id)).FirstX(context.TODO())
 }
-
 
 func (c *Client) DeleteHistory(id int) error {
 	_, err := c.ent.History.Delete().Where(history.ID(id)).Exec(context.Background())
 	return err
 }
-
 
 func (c *Client) GetDownloadDir() string {
 	r, err := c.ent.Settings.Query().Where(settings.Key(SettingDownloadDir)).First(context.TODO())

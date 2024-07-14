@@ -21,8 +21,8 @@ type Series struct {
 	TmdbID int `json:"tmdb_id,omitempty"`
 	// ImdbID holds the value of the "imdb_id" field.
 	ImdbID string `json:"imdb_id,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
+	// NameCn holds the value of the "name_cn" field.
+	NameCn string `json:"name_cn,omitempty"`
 	// NameEn holds the value of the "name_en" field.
 	NameEn string `json:"name_en,omitempty"`
 	// OriginalName holds the value of the "original_name" field.
@@ -70,7 +70,7 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case series.FieldID, series.FieldTmdbID, series.FieldStorageID:
 			values[i] = new(sql.NullInt64)
-		case series.FieldImdbID, series.FieldName, series.FieldNameEn, series.FieldOriginalName, series.FieldOverview, series.FieldPosterPath, series.FieldAirDate, series.FieldResolution:
+		case series.FieldImdbID, series.FieldNameCn, series.FieldNameEn, series.FieldOriginalName, series.FieldOverview, series.FieldPosterPath, series.FieldAirDate, series.FieldResolution:
 			values[i] = new(sql.NullString)
 		case series.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -107,11 +107,11 @@ func (s *Series) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.ImdbID = value.String
 			}
-		case series.FieldName:
+		case series.FieldNameCn:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
+				return fmt.Errorf("unexpected type %T for field name_cn", values[i])
 			} else if value.Valid {
-				s.Name = value.String
+				s.NameCn = value.String
 			}
 		case series.FieldNameEn:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -208,8 +208,8 @@ func (s *Series) String() string {
 	builder.WriteString("imdb_id=")
 	builder.WriteString(s.ImdbID)
 	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(s.Name)
+	builder.WriteString("name_cn=")
+	builder.WriteString(s.NameCn)
 	builder.WriteString(", ")
 	builder.WriteString("name_en=")
 	builder.WriteString(s.NameEn)

@@ -12,14 +12,11 @@ import 'package:ui/tv_details.dart';
 import 'package:ui/weclome.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final GlobalKey<NavigatorState> _rootNavigatorKey =
-      GlobalKey<NavigatorState>();
-
-  MyApp({super.key});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override

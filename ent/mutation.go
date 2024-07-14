@@ -2974,7 +2974,7 @@ type SeriesMutation struct {
 	tmdb_id         *int
 	addtmdb_id      *int
 	imdb_id         *string
-	name            *string
+	name_cn         *string
 	name_en         *string
 	original_name   *string
 	overview        *string
@@ -3196,40 +3196,40 @@ func (m *SeriesMutation) ResetImdbID() {
 	delete(m.clearedFields, series.FieldImdbID)
 }
 
-// SetName sets the "name" field.
-func (m *SeriesMutation) SetName(s string) {
-	m.name = &s
+// SetNameCn sets the "name_cn" field.
+func (m *SeriesMutation) SetNameCn(s string) {
+	m.name_cn = &s
 }
 
-// Name returns the value of the "name" field in the mutation.
-func (m *SeriesMutation) Name() (r string, exists bool) {
-	v := m.name
+// NameCn returns the value of the "name_cn" field in the mutation.
+func (m *SeriesMutation) NameCn() (r string, exists bool) {
+	v := m.name_cn
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the Series entity.
+// OldNameCn returns the old "name_cn" field's value of the Series entity.
 // If the Series object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *SeriesMutation) OldNameCn(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
+		return v, errors.New("OldNameCn is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
+		return v, errors.New("OldNameCn requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
+		return v, fmt.Errorf("querying old value for OldNameCn: %w", err)
 	}
-	return oldValue.Name, nil
+	return oldValue.NameCn, nil
 }
 
-// ResetName resets all changes to the "name" field.
-func (m *SeriesMutation) ResetName() {
-	m.name = nil
+// ResetNameCn resets all changes to the "name_cn" field.
+func (m *SeriesMutation) ResetNameCn() {
+	m.name_cn = nil
 }
 
 // SetNameEn sets the "name_en" field.
@@ -3263,22 +3263,9 @@ func (m *SeriesMutation) OldNameEn(ctx context.Context) (v string, err error) {
 	return oldValue.NameEn, nil
 }
 
-// ClearNameEn clears the value of the "name_en" field.
-func (m *SeriesMutation) ClearNameEn() {
-	m.name_en = nil
-	m.clearedFields[series.FieldNameEn] = struct{}{}
-}
-
-// NameEnCleared returns if the "name_en" field was cleared in this mutation.
-func (m *SeriesMutation) NameEnCleared() bool {
-	_, ok := m.clearedFields[series.FieldNameEn]
-	return ok
-}
-
 // ResetNameEn resets all changes to the "name_en" field.
 func (m *SeriesMutation) ResetNameEn() {
 	m.name_en = nil
-	delete(m.clearedFields, series.FieldNameEn)
 }
 
 // SetOriginalName sets the "original_name" field.
@@ -3675,8 +3662,8 @@ func (m *SeriesMutation) Fields() []string {
 	if m.imdb_id != nil {
 		fields = append(fields, series.FieldImdbID)
 	}
-	if m.name != nil {
-		fields = append(fields, series.FieldName)
+	if m.name_cn != nil {
+		fields = append(fields, series.FieldNameCn)
 	}
 	if m.name_en != nil {
 		fields = append(fields, series.FieldNameEn)
@@ -3714,8 +3701,8 @@ func (m *SeriesMutation) Field(name string) (ent.Value, bool) {
 		return m.TmdbID()
 	case series.FieldImdbID:
 		return m.ImdbID()
-	case series.FieldName:
-		return m.Name()
+	case series.FieldNameCn:
+		return m.NameCn()
 	case series.FieldNameEn:
 		return m.NameEn()
 	case series.FieldOriginalName:
@@ -3745,8 +3732,8 @@ func (m *SeriesMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldTmdbID(ctx)
 	case series.FieldImdbID:
 		return m.OldImdbID(ctx)
-	case series.FieldName:
-		return m.OldName(ctx)
+	case series.FieldNameCn:
+		return m.OldNameCn(ctx)
 	case series.FieldNameEn:
 		return m.OldNameEn(ctx)
 	case series.FieldOriginalName:
@@ -3786,12 +3773,12 @@ func (m *SeriesMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetImdbID(v)
 		return nil
-	case series.FieldName:
+	case series.FieldNameCn:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetName(v)
+		m.SetNameCn(v)
 		return nil
 	case series.FieldNameEn:
 		v, ok := value.(string)
@@ -3909,9 +3896,6 @@ func (m *SeriesMutation) ClearedFields() []string {
 	if m.FieldCleared(series.FieldImdbID) {
 		fields = append(fields, series.FieldImdbID)
 	}
-	if m.FieldCleared(series.FieldNameEn) {
-		fields = append(fields, series.FieldNameEn)
-	}
 	if m.FieldCleared(series.FieldPosterPath) {
 		fields = append(fields, series.FieldPosterPath)
 	}
@@ -3935,9 +3919,6 @@ func (m *SeriesMutation) ClearField(name string) error {
 	case series.FieldImdbID:
 		m.ClearImdbID()
 		return nil
-	case series.FieldNameEn:
-		m.ClearNameEn()
-		return nil
 	case series.FieldPosterPath:
 		m.ClearPosterPath()
 		return nil
@@ -3958,8 +3939,8 @@ func (m *SeriesMutation) ResetField(name string) error {
 	case series.FieldImdbID:
 		m.ResetImdbID()
 		return nil
-	case series.FieldName:
-		m.ResetName()
+	case series.FieldNameCn:
+		m.ResetNameCn()
 		return nil
 	case series.FieldNameEn:
 		m.ResetNameEn()

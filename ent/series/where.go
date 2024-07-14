@@ -65,9 +65,9 @@ func ImdbID(v string) predicate.Series {
 	return predicate.Series(sql.FieldEQ(FieldImdbID, v))
 }
 
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.Series {
-	return predicate.Series(sql.FieldEQ(FieldName, v))
+// NameCn applies equality check predicate on the "name_cn" field. It's identical to NameCnEQ.
+func NameCn(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldNameCn, v))
 }
 
 // NameEn applies equality check predicate on the "name_en" field. It's identical to NameEnEQ.
@@ -225,69 +225,69 @@ func ImdbIDContainsFold(v string) predicate.Series {
 	return predicate.Series(sql.FieldContainsFold(FieldImdbID, v))
 }
 
-// NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.Series {
-	return predicate.Series(sql.FieldEQ(FieldName, v))
+// NameCnEQ applies the EQ predicate on the "name_cn" field.
+func NameCnEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldEQ(FieldNameCn, v))
 }
 
-// NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.Series {
-	return predicate.Series(sql.FieldNEQ(FieldName, v))
+// NameCnNEQ applies the NEQ predicate on the "name_cn" field.
+func NameCnNEQ(v string) predicate.Series {
+	return predicate.Series(sql.FieldNEQ(FieldNameCn, v))
 }
 
-// NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.Series {
-	return predicate.Series(sql.FieldIn(FieldName, vs...))
+// NameCnIn applies the In predicate on the "name_cn" field.
+func NameCnIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldIn(FieldNameCn, vs...))
 }
 
-// NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.Series {
-	return predicate.Series(sql.FieldNotIn(FieldName, vs...))
+// NameCnNotIn applies the NotIn predicate on the "name_cn" field.
+func NameCnNotIn(vs ...string) predicate.Series {
+	return predicate.Series(sql.FieldNotIn(FieldNameCn, vs...))
 }
 
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.Series {
-	return predicate.Series(sql.FieldGT(FieldName, v))
+// NameCnGT applies the GT predicate on the "name_cn" field.
+func NameCnGT(v string) predicate.Series {
+	return predicate.Series(sql.FieldGT(FieldNameCn, v))
 }
 
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.Series {
-	return predicate.Series(sql.FieldGTE(FieldName, v))
+// NameCnGTE applies the GTE predicate on the "name_cn" field.
+func NameCnGTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldGTE(FieldNameCn, v))
 }
 
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.Series {
-	return predicate.Series(sql.FieldLT(FieldName, v))
+// NameCnLT applies the LT predicate on the "name_cn" field.
+func NameCnLT(v string) predicate.Series {
+	return predicate.Series(sql.FieldLT(FieldNameCn, v))
 }
 
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.Series {
-	return predicate.Series(sql.FieldLTE(FieldName, v))
+// NameCnLTE applies the LTE predicate on the "name_cn" field.
+func NameCnLTE(v string) predicate.Series {
+	return predicate.Series(sql.FieldLTE(FieldNameCn, v))
 }
 
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.Series {
-	return predicate.Series(sql.FieldContains(FieldName, v))
+// NameCnContains applies the Contains predicate on the "name_cn" field.
+func NameCnContains(v string) predicate.Series {
+	return predicate.Series(sql.FieldContains(FieldNameCn, v))
 }
 
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.Series {
-	return predicate.Series(sql.FieldHasPrefix(FieldName, v))
+// NameCnHasPrefix applies the HasPrefix predicate on the "name_cn" field.
+func NameCnHasPrefix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasPrefix(FieldNameCn, v))
 }
 
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.Series {
-	return predicate.Series(sql.FieldHasSuffix(FieldName, v))
+// NameCnHasSuffix applies the HasSuffix predicate on the "name_cn" field.
+func NameCnHasSuffix(v string) predicate.Series {
+	return predicate.Series(sql.FieldHasSuffix(FieldNameCn, v))
 }
 
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.Series {
-	return predicate.Series(sql.FieldEqualFold(FieldName, v))
+// NameCnEqualFold applies the EqualFold predicate on the "name_cn" field.
+func NameCnEqualFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldEqualFold(FieldNameCn, v))
 }
 
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.Series {
-	return predicate.Series(sql.FieldContainsFold(FieldName, v))
+// NameCnContainsFold applies the ContainsFold predicate on the "name_cn" field.
+func NameCnContainsFold(v string) predicate.Series {
+	return predicate.Series(sql.FieldContainsFold(FieldNameCn, v))
 }
 
 // NameEnEQ applies the EQ predicate on the "name_en" field.
@@ -343,16 +343,6 @@ func NameEnHasPrefix(v string) predicate.Series {
 // NameEnHasSuffix applies the HasSuffix predicate on the "name_en" field.
 func NameEnHasSuffix(v string) predicate.Series {
 	return predicate.Series(sql.FieldHasSuffix(FieldNameEn, v))
-}
-
-// NameEnIsNil applies the IsNil predicate on the "name_en" field.
-func NameEnIsNil() predicate.Series {
-	return predicate.Series(sql.FieldIsNull(FieldNameEn))
-}
-
-// NameEnNotNil applies the NotNil predicate on the "name_en" field.
-func NameEnNotNil() predicate.Series {
-	return predicate.Series(sql.FieldNotNull(FieldNameEn))
 }
 
 // NameEnEqualFold applies the EqualFold predicate on the "name_en" field.

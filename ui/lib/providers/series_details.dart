@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
@@ -74,7 +73,7 @@ class SeriesDetails {
   SeriesDetails.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     tmdbId = json['tmdb_id'];
-    name = json['name'];
+    name = json['name_cn'];
     originalName = json['original_name'];
     overview = json['overview'];
     path = json['path'];

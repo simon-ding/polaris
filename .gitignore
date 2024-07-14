@@ -11,6 +11,7 @@ config.yml
 .idea/
 .DS_Store
 *.db
+data/
 
 ui/node_modules/
 ui/dist/

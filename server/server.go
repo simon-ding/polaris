@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net/http"
 	"polaris/db"
 	"polaris/log"
 	"polaris/pkg/tmdb"
@@ -42,6 +43,7 @@ func (s *Server) Serve() error {
 
 	api := s.r.Group("/api/v1")
 	api.Use(s.authModdleware)
+	api.StaticFS("/img", http.Dir(db.ImgPath))
 
 	setting := api.Group("/setting")
 	{

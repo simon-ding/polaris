@@ -36,7 +36,7 @@ class WelcomePage extends ConsumerWidget {
                     children: <Widget>[
                       Flexible(
                         child: Image.network(
-                          APIs.tmdbImgBaseUrl + item.posterPath!,
+                          "${APIs.imagesUrl}/${item.id}/poster.jpg" ,
                           fit: BoxFit.contain,
                         ),
                       ),

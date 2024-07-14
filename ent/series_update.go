@@ -70,16 +70,16 @@ func (su *SeriesUpdate) ClearImdbID() *SeriesUpdate {
 	return su
 }
 
-// SetName sets the "name" field.
-func (su *SeriesUpdate) SetName(s string) *SeriesUpdate {
-	su.mutation.SetName(s)
+// SetNameCn sets the "name_cn" field.
+func (su *SeriesUpdate) SetNameCn(s string) *SeriesUpdate {
+	su.mutation.SetNameCn(s)
 	return su
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (su *SeriesUpdate) SetNillableName(s *string) *SeriesUpdate {
+// SetNillableNameCn sets the "name_cn" field if the given value is not nil.
+func (su *SeriesUpdate) SetNillableNameCn(s *string) *SeriesUpdate {
 	if s != nil {
-		su.SetName(*s)
+		su.SetNameCn(*s)
 	}
 	return su
 }
@@ -95,12 +95,6 @@ func (su *SeriesUpdate) SetNillableNameEn(s *string) *SeriesUpdate {
 	if s != nil {
 		su.SetNameEn(*s)
 	}
-	return su
-}
-
-// ClearNameEn clears the value of the "name_en" field.
-func (su *SeriesUpdate) ClearNameEn() *SeriesUpdate {
-	su.mutation.ClearNameEn()
 	return su
 }
 
@@ -310,14 +304,11 @@ func (su *SeriesUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.ImdbIDCleared() {
 		_spec.ClearField(series.FieldImdbID, field.TypeString)
 	}
-	if value, ok := su.mutation.Name(); ok {
-		_spec.SetField(series.FieldName, field.TypeString, value)
+	if value, ok := su.mutation.NameCn(); ok {
+		_spec.SetField(series.FieldNameCn, field.TypeString, value)
 	}
 	if value, ok := su.mutation.NameEn(); ok {
 		_spec.SetField(series.FieldNameEn, field.TypeString, value)
-	}
-	if su.mutation.NameEnCleared() {
-		_spec.ClearField(series.FieldNameEn, field.TypeString)
 	}
 	if value, ok := su.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)
@@ -455,16 +446,16 @@ func (suo *SeriesUpdateOne) ClearImdbID() *SeriesUpdateOne {
 	return suo
 }
 
-// SetName sets the "name" field.
-func (suo *SeriesUpdateOne) SetName(s string) *SeriesUpdateOne {
-	suo.mutation.SetName(s)
+// SetNameCn sets the "name_cn" field.
+func (suo *SeriesUpdateOne) SetNameCn(s string) *SeriesUpdateOne {
+	suo.mutation.SetNameCn(s)
 	return suo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (suo *SeriesUpdateOne) SetNillableName(s *string) *SeriesUpdateOne {
+// SetNillableNameCn sets the "name_cn" field if the given value is not nil.
+func (suo *SeriesUpdateOne) SetNillableNameCn(s *string) *SeriesUpdateOne {
 	if s != nil {
-		suo.SetName(*s)
+		suo.SetNameCn(*s)
 	}
 	return suo
 }
@@ -480,12 +471,6 @@ func (suo *SeriesUpdateOne) SetNillableNameEn(s *string) *SeriesUpdateOne {
 	if s != nil {
 		suo.SetNameEn(*s)
 	}
-	return suo
-}
-
-// ClearNameEn clears the value of the "name_en" field.
-func (suo *SeriesUpdateOne) ClearNameEn() *SeriesUpdateOne {
-	suo.mutation.ClearNameEn()
 	return suo
 }
 
@@ -725,14 +710,11 @@ func (suo *SeriesUpdateOne) sqlSave(ctx context.Context) (_node *Series, err err
 	if suo.mutation.ImdbIDCleared() {
 		_spec.ClearField(series.FieldImdbID, field.TypeString)
 	}
-	if value, ok := suo.mutation.Name(); ok {
-		_spec.SetField(series.FieldName, field.TypeString, value)
+	if value, ok := suo.mutation.NameCn(); ok {
+		_spec.SetField(series.FieldNameCn, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.NameEn(); ok {
 		_spec.SetField(series.FieldNameEn, field.TypeString, value)
-	}
-	if suo.mutation.NameEnCleared() {
-		_spec.ClearField(series.FieldNameEn, field.TypeString)
 	}
 	if value, ok := suo.mutation.OriginalName(); ok {
 		_spec.SetField(series.FieldOriginalName, field.TypeString, value)

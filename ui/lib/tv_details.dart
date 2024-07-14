@@ -110,7 +110,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               width: 150,
                               height: 200,
                               child: Image.network(
-                                APIs.tmdbImgBaseUrl + details!.posterPath!,
+                                "${APIs.imagesUrl}/${details.id}/poster.jpg",
                                 fit: BoxFit.contain,
                               ),
                             ),

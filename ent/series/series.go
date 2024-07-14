@@ -18,8 +18,8 @@ const (
 	FieldTmdbID = "tmdb_id"
 	// FieldImdbID holds the string denoting the imdb_id field in the database.
 	FieldImdbID = "imdb_id"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
+	// FieldNameCn holds the string denoting the name_cn field in the database.
+	FieldNameCn = "name_cn"
 	// FieldNameEn holds the string denoting the name_en field in the database.
 	FieldNameEn = "name_en"
 	// FieldOriginalName holds the string denoting the original_name field in the database.
@@ -54,7 +54,7 @@ var Columns = []string{
 	FieldID,
 	FieldTmdbID,
 	FieldImdbID,
-	FieldName,
+	FieldNameCn,
 	FieldNameEn,
 	FieldOriginalName,
 	FieldOverview,
@@ -102,9 +102,9 @@ func ByImdbID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldImdbID, opts...).ToFunc()
 }
 
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
+// ByNameCn orders the results by the name_cn field.
+func ByNameCn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNameCn, opts...).ToFunc()
 }
 
 // ByNameEn orders the results by the name_en field.

@@ -1,11 +1,17 @@
 package server
 
 import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
 	"polaris/db"
 	"polaris/ent"
 	"polaris/log"
 	"strconv"
 
+	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -38,13 +44,21 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
-	detail, err := s.MustTMDB().GetTvDetails(in.TmdbID, s.language)
+	detailCn, err := s.MustTMDB().GetTvDetails(in.TmdbID, db.LanguageCN)
 	if err != nil {
 		return nil, errors.Wrap(err, "get tv detail")
 	}
-	log.Infof("find detail for tv id %d: %v", in.TmdbID, detail)
-	detailEn, _ := s.MustTMDB().GetTvDetails(in.TmdbID, "en-US")
+	var nameCn = detailCn.Name
+
+	detailEn, _ := s.MustTMDB().GetTvDetails(in.TmdbID, db.LanguageEN)
 	var nameEn = detailEn.Name
+	var detail *tmdb.TVDetails
+	if s.language == "" || s.language ==db.LanguageCN {
+		detail = detailCn
+	} else {
+		detail = detailEn
+	}
+	log.Infof("find detail for tv id %d: %v", in.TmdbID, detail)
 
 	var epIds []int
 	for _, season := range detail.Seasons {
@@ -69,13 +83,43 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 			epIds = append(epIds, epid)
 		}
 	}
-	_, err = s.db.AddWatchlist(in.StorageID, nameEn, detail, epIds, db.R1080p)
+	r, err := s.db.AddWatchlist(in.StorageID, nameCn, nameEn, detail, epIds, db.R1080p)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}
+	go func ()  {
+		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
+			log.Errorf("download poster error: %v", err)
+		}	
+	}()
 
 	log.Infof("add tv %s to watchlist success", detail.Name)
 	return nil, nil
+}
+
+func (s *Server) downloadPoster(path string, seriesId int)  error{
+	var tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/"
+	url := tmdbImgBaseUrl + path
+	log.Infof("try to download poster: %v", url)
+	var resp, err = http.Get(url)
+	if err != nil {
+		return errors.Wrap(err, "http get")
+	}
+	targetDir := fmt.Sprintf("%v/%d", db.ImgPath, seriesId)
+	os.MkdirAll(targetDir, 0777)
+	ext := filepath.Ext(path)
+	targetFile := filepath.Join(targetDir, "poster"+ ext)
+	f, err := os.Create(targetFile)
+	if err != nil {
+		return errors.Wrap(err, "new file")
+	}
+	defer f.Close()
+	_, err = io.Copy(f, resp.Body)
+	if err != nil {
+		return errors.Wrap(err, "copy http response")
+	}
+	log.Infof("poster successfully downlaoded: %v", targetFile)
+	return nil
 }
 
 func (s *Server) GetWatchlist(c *gin.Context) (interface{}, error) {
