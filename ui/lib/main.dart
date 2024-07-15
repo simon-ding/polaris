@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: ActivityPage.route,
-          builder: (context, state) => ActivityPage(),
+          builder: (context, state) => const ActivityPage(),
         )
       ],
     );

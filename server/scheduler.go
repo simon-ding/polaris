@@ -155,7 +155,9 @@ func (s *Server) checkFileExists(series *ent.Series) error{
 			}
 			epNum := strings.TrimPrefix(match[0], "E")
 			epNum1, _ := strconv.Atoi(epNum)
-			err := s.db.UpdateEpisodeFile(series.ID, seasonNum1, epNum1, filepath.Join(in.Name(), ep.Name()))
+			var dirname = filepath.Join(in.Name(), ep.Name())
+			log.Infof("found match: %v", dirname)
+			err := s.db.UpdateEpisodeFile(series.ID, seasonNum1, epNum1, dirname)
 			if err != nil {
 				log.Error("update episode: %v", err)
 			}

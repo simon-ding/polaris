@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quiver/strings.dart';
 import 'package:ui/providers/login.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';

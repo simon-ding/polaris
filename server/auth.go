@@ -26,11 +26,12 @@ func (s *Server) authModdleware(c *gin.Context) {
 
 	auth := c.GetHeader("Authorization")
 	if auth == "" {
+		log.Infof("token is not present, abort")
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 	auth = strings.TrimPrefix(auth, "Bearer ")
-	log.Infof("current token: %v", auth)
+	//log.Infof("current token: %v", auth)
 	token, err := jwt.ParseWithClaims(auth, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {	
 		return []byte(s.jwtSerect), nil
 	})
