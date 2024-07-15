@@ -46,10 +46,11 @@ func (w *WebdavStorage) Move(local, remote string) error {
 		remoteName := filepath.Join(remoteBase, rel)
 
 		if info.IsDir() {
+			log.Infof("skip dir %v, webdav will mkdir automatically", info.Name())
 
-			if err := w.fs.Mkdir(remoteName, 0666); err != nil {
-				return errors.Wrapf(err, "mkdir %v", remoteName)
-			}
+			// if err := w.fs.Mkdir(remoteName, 0666); err != nil {
+			// 	return errors.Wrapf(err, "mkdir %v", remoteName)
+			// }
 
 		} else { //is file
 			if f, err := os.OpenFile(path, os.O_RDONLY, 0666); err != nil {
