@@ -73,5 +73,5 @@ func (l *LocalStorage) Move(src, dest string) error {
 
 
 func (l *LocalStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
-	 return ioutil.ReadDir(dir)
+	 return ioutil.ReadDir(filepath.Join(l.dir, dir))
 }

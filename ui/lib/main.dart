@@ -55,7 +55,9 @@ class MyApp extends StatelessWidget {
                             final SharedPreferences prefs =
                                 await SharedPreferences.getInstance();
                             await prefs.remove('token');
-                            context.go(LoginScreen.route);
+                            if (context.mounted) {
+                              context.go(LoginScreen.route);
+                            }
                           },
                           icon: const Icon(Icons.exit_to_app))
                       : Container()
@@ -115,22 +117,20 @@ class MyApp extends StatelessWidget {
     return ProviderScope(
       child: MaterialApp.router(
         title: 'Polaris',
-        
         theme: ThemeData(
-
-    // Define the default TextTheme. Use this to specify the default
-    // text styling for headlines, titles, bodies of text, and more.
-    // textTheme: const TextTheme(
-    //   bodyLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]), 
-    //   bodyMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]), 
-    //   bodySmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]), 
-    //   titleLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]), 
-    //   titleMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]), 
-    //   titleSmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]), 
-    //   labelLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]), 
-    //   labelMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-    //   labelSmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-    // ),
+          // Define the default TextTheme. Use this to specify the default
+          // text styling for headlines, titles, bodies of text, and more.
+          // textTheme: const TextTheme(
+          //   bodyLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   bodyMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   bodySmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   titleLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   titleMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   titleSmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   labelLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   labelMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          //   labelSmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
+          // ),
 
           colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.blue, brightness: Brightness.dark),

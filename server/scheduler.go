@@ -61,27 +61,28 @@ func (s *Server) moveCompletedTask(id int) error {
 	}
 	st := s.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
+	var stImpl storage.Storage
 	if st.Implementation == storage1.ImplementationWebdav {
 		ws := st.ToWebDavSetting()
-		storageImpl, err := storage.NewWebdavStorage(ws.Path, ws.User, ws.Password)
+		storageImpl, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, ws.Path)
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}
-		if err := storageImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
-			return errors.Wrap(err, "move webdav")
-		}
+		stImpl = storageImpl
+
 	} else if st.Implementation == storage1.ImplementationLocal {
 		ls := st.ToLocalSetting()
 		storageImpl, err := storage.NewLocalStorage(ls.Path)
 		if err != nil {
 			return errors.Wrap(err, "new storage")
 		}
-
-		if err := storageImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
-			return errors.Wrap(err, "move webdav")
-		}
+		stImpl = storageImpl
 
 	}
+	if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
+		return errors.Wrap(err, "move file")
+	}
+
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)
 	torrent.Remove()
 	delete(s.tasks, r.ID)
@@ -102,11 +103,10 @@ func (s *Server) checkAllFiles() {
 	}
 }
 
-func (s *Server) checkFileExists(series *ent.Series) error{
+func (s *Server) checkFileExists(series *ent.Series) error {
 	log.Infof("check files in directory: %s", series.TargetDir)
 	st := s.db.GetStorage(series.StorageID)
 
-	targetDir := filepath.Join(st.GetPath(), series.TargetDir)
 	var storageImpl storage.Storage
 
 	switch st.Implementation {
@@ -120,20 +120,20 @@ func (s *Server) checkFileExists(series *ent.Series) error{
 
 	case storage1.ImplementationWebdav:
 		ws := st.ToWebDavSetting()
-		storageImpl1, err := storage.NewWebdavStorage(ws.Path, ws.User, ws.Password)
+		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, ws.Path)
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}
 		storageImpl = storageImpl1
-	} 
-	files, err := storageImpl.ReadDir(targetDir)
+	}
+	files, err := storageImpl.ReadDir(series.TargetDir)
 	if err != nil {
-		return errors.Wrapf(err, "read dir %s", targetDir)
+		return errors.Wrapf(err, "read dir %s", series.TargetDir)
 	}
 	numRe := regexp.MustCompile("[0-9]+")
 	epRe := regexp.MustCompile("E[0-9]+")
 	for _, in := range files {
-		if !in.IsDir() {//season dir, ignore file
+		if !in.IsDir() { //season dir, ignore file
 			continue
 		}
 		nums := numRe.FindAllString(in.Name(), -1)

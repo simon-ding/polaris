@@ -14,21 +14,23 @@ import (
 
 type WebdavStorage struct {
 	fs *gowebdav.Client
+	dir string
 }
 
-func NewWebdavStorage(url, user, password string) (*WebdavStorage, error) {
+func NewWebdavStorage(url, user, password, path string) (*WebdavStorage, error) {
 	c := gowebdav.NewClient(url, user, password)
 	if err := c.Connect(); err != nil {
 		return nil, errors.Wrap(err, "connect webdav")
 	}
 	return &WebdavStorage{
 		fs: c,
+		dir: path,
 	}, nil
 }
 
 func (w *WebdavStorage) Move(local, remote string) error {
 	baseLocal := filepath.Base(local)
-	remoteBase := filepath.Join(remote, baseLocal)
+	remoteBase := filepath.Join(w.dir,remote, baseLocal)
 
 	log.Infof("remove all content in %s", remoteBase)
 	w.fs.RemoveAll(remoteBase)
@@ -79,5 +81,5 @@ func (w *WebdavStorage) Move(local, remote string) error {
 }
 
 func (w *WebdavStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
-	return w.fs.ReadDir(dir)
+	return w.fs.ReadDir(filepath.Join(w.dir, dir))
 }
