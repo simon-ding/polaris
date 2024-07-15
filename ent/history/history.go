@@ -3,6 +3,8 @@
 package history
 
 import (
+	"fmt"
+
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -21,8 +23,8 @@ const (
 	FieldDate = "date"
 	// FieldTargetDir holds the string denoting the target_dir field in the database.
 	FieldTargetDir = "target_dir"
-	// FieldCompleted holds the string denoting the completed field in the database.
-	FieldCompleted = "completed"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldSaved holds the string denoting the saved field in the database.
 	FieldSaved = "saved"
 	// Table holds the table name of the history in the database.
@@ -37,7 +39,7 @@ var Columns = []string{
 	FieldSourceTitle,
 	FieldDate,
 	FieldTargetDir,
-	FieldCompleted,
+	FieldStatus,
 	FieldSaved,
 }
 
@@ -51,10 +53,30 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-var (
-	// DefaultCompleted holds the default value on creation for the "completed" field.
-	DefaultCompleted bool
+// Status defines the type for the "status" enum field.
+type Status string
+
+// Status values.
+const (
+	StatusRunning   Status = "running"
+	StatusSuccess   Status = "success"
+	StatusFail      Status = "fail"
+	StatusUploading Status = "uploading"
 )
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusRunning, StatusSuccess, StatusFail, StatusUploading:
+		return nil
+	default:
+		return fmt.Errorf("history: invalid enum value for status field: %q", s)
+	}
+}
 
 // OrderOption defines the ordering options for the History queries.
 type OrderOption func(*sql.Selector)
@@ -89,9 +111,9 @@ func ByTargetDir(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTargetDir, opts...).ToFunc()
 }
 
-// ByCompleted orders the results by the completed field.
-func ByCompleted(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCompleted, opts...).ToFunc()
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // BySaved orders the results by the saved field.

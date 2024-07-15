@@ -27,8 +27,8 @@ type History struct {
 	Date time.Time `json:"date,omitempty"`
 	// TargetDir holds the value of the "target_dir" field.
 	TargetDir string `json:"target_dir,omitempty"`
-	// Completed holds the value of the "completed" field.
-	Completed bool `json:"completed"`
+	// Status holds the value of the "status" field.
+	Status history.Status `json:"status,omitempty"`
 	// Saved holds the value of the "saved" field.
 	Saved        string `json:"saved,omitempty"`
 	selectValues sql.SelectValues
@@ -39,11 +39,9 @@ func (*History) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case history.FieldCompleted:
-			values[i] = new(sql.NullBool)
 		case history.FieldID, history.FieldSeriesID, history.FieldEpisodeID:
 			values[i] = new(sql.NullInt64)
-		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldSaved:
+		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldStatus, history.FieldSaved:
 			values[i] = new(sql.NullString)
 		case history.FieldDate:
 			values[i] = new(sql.NullTime)
@@ -98,11 +96,11 @@ func (h *History) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				h.TargetDir = value.String
 			}
-		case history.FieldCompleted:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field completed", values[i])
+		case history.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				h.Completed = value.Bool
+				h.Status = history.Status(value.String)
 			}
 		case history.FieldSaved:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -161,8 +159,8 @@ func (h *History) String() string {
 	builder.WriteString("target_dir=")
 	builder.WriteString(h.TargetDir)
 	builder.WriteString(", ")
-	builder.WriteString("completed=")
-	builder.WriteString(fmt.Sprintf("%v", h.Completed))
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", h.Status))
 	builder.WriteString(", ")
 	builder.WriteString("saved=")
 	builder.WriteString(h.Saved)

@@ -11,7 +11,6 @@ import (
 
 type Activity struct {
 	*ent.History
-	InBackgroud bool `json:"in_backgroud"`
 	Progress    int  `json:"progress"`
 }
 
@@ -26,12 +25,6 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 			if h.ID == id && task.Exists() {
 				a.Progress = task.Progress()
 			}
-			if h.ID == id && task.Processing {
-				a.InBackgroud = true
-			}
-		}
-		if a.Completed {
-			a.Progress = 100
 		}
 		activities = append(activities, a)
 	}

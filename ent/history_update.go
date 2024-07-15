@@ -112,16 +112,16 @@ func (hu *HistoryUpdate) SetNillableTargetDir(s *string) *HistoryUpdate {
 	return hu
 }
 
-// SetCompleted sets the "completed" field.
-func (hu *HistoryUpdate) SetCompleted(b bool) *HistoryUpdate {
-	hu.mutation.SetCompleted(b)
+// SetStatus sets the "status" field.
+func (hu *HistoryUpdate) SetStatus(h history.Status) *HistoryUpdate {
+	hu.mutation.SetStatus(h)
 	return hu
 }
 
-// SetNillableCompleted sets the "completed" field if the given value is not nil.
-func (hu *HistoryUpdate) SetNillableCompleted(b *bool) *HistoryUpdate {
-	if b != nil {
-		hu.SetCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableStatus(h *history.Status) *HistoryUpdate {
+	if h != nil {
+		hu.SetStatus(*h)
 	}
 	return hu
 }
@@ -178,7 +178,20 @@ func (hu *HistoryUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (hu *HistoryUpdate) check() error {
+	if v, ok := hu.mutation.Status(); ok {
+		if err := history.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "History.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := hu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(history.Table, history.Columns, sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt))
 	if ps := hu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -208,8 +221,8 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := hu.mutation.TargetDir(); ok {
 		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
 	}
-	if value, ok := hu.mutation.Completed(); ok {
-		_spec.SetField(history.FieldCompleted, field.TypeBool, value)
+	if value, ok := hu.mutation.Status(); ok {
+		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := hu.mutation.Saved(); ok {
 		_spec.SetField(history.FieldSaved, field.TypeString, value)
@@ -321,16 +334,16 @@ func (huo *HistoryUpdateOne) SetNillableTargetDir(s *string) *HistoryUpdateOne {
 	return huo
 }
 
-// SetCompleted sets the "completed" field.
-func (huo *HistoryUpdateOne) SetCompleted(b bool) *HistoryUpdateOne {
-	huo.mutation.SetCompleted(b)
+// SetStatus sets the "status" field.
+func (huo *HistoryUpdateOne) SetStatus(h history.Status) *HistoryUpdateOne {
+	huo.mutation.SetStatus(h)
 	return huo
 }
 
-// SetNillableCompleted sets the "completed" field if the given value is not nil.
-func (huo *HistoryUpdateOne) SetNillableCompleted(b *bool) *HistoryUpdateOne {
-	if b != nil {
-		huo.SetCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableStatus(h *history.Status) *HistoryUpdateOne {
+	if h != nil {
+		huo.SetStatus(*h)
 	}
 	return huo
 }
@@ -400,7 +413,20 @@ func (huo *HistoryUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (huo *HistoryUpdateOne) check() error {
+	if v, ok := huo.mutation.Status(); ok {
+		if err := history.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "History.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err error) {
+	if err := huo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(history.Table, history.Columns, sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt))
 	id, ok := huo.mutation.ID()
 	if !ok {
@@ -447,8 +473,8 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	if value, ok := huo.mutation.TargetDir(); ok {
 		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
 	}
-	if value, ok := huo.mutation.Completed(); ok {
-		_spec.SetField(history.FieldCompleted, field.TypeBool, value)
+	if value, ok := huo.mutation.Status(); ok {
+		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := huo.mutation.Saved(); ok {
 		_spec.SetField(history.FieldSaved, field.TypeString, value)

@@ -382,11 +382,11 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 
 func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
 	return c.ent.History.Create().SetSeriesID(h.SeriesID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
-		SetCompleted(h.Completed).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetSaved(h.Saved).Save(context.TODO())
+		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetSaved(h.Saved).Save(context.TODO())
 }
 
-func (c *Client) SetHistoryComplete(id int) error {
-	return c.ent.History.Update().Where(history.ID(id)).SetCompleted(true).Exec(context.TODO())
+func (c *Client) SetHistoryStatus(id int, status history.Status) error {
+	return c.ent.History.Update().Where(history.ID(id)).SetStatus(status).Exec(context.TODO())
 }
 
 func (c *Client) GetHistories() ent.Histories {
@@ -398,7 +398,8 @@ func (c *Client) GetHistories() ent.Histories {
 }
 
 func (c *Client) GetRunningHistories() ent.Histories {
-	h, err := c.ent.History.Query().Where(history.Completed(false)).All(context.TODO())
+	h, err := c.ent.History.Query().Where(history.Or(history.StatusEQ(history.StatusRunning), 
+		history.StatusEQ(history.StatusUploading))).All(context.TODO())
 	if err != nil {
 		return nil
 	}

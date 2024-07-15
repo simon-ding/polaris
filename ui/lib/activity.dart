@@ -30,21 +30,25 @@ class ActivityPage extends ConsumerWidget {
                   DataCell(Text("${activity.sourceTitle}")),
                   DataCell(Text("${activity.date!.toLocal()}")),
                   DataCell(() {
-                    if (activity.inBackgroud == true) {
+                    if (activity.status == "uploading") {
                       return const MyProgressIndicator(
                         size: 20,
                       );
-                    }
-
-                    if (activity.completed != true && activity.progress == 0) {
+                    }else if (activity.status == "fail") {
                       return const Icon(
                         Icons.close,
                         color: Colors.red,
                       );
+                    } else if (activity.status == "success") {
+                      return const Icon(
+                        Icons.check,
+                        color: Colors.green,
+                      );
                     }
 
+                    double p = activity.progress == null ? 0:activity.progress!.toDouble() / 100;
                     return MyProgressIndicator(
-                      value: activity.progress!.toDouble() / 100,
+                      value: p,
                       size: 20,
                     );
                   }()),

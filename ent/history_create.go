@@ -50,17 +50,9 @@ func (hc *HistoryCreate) SetTargetDir(s string) *HistoryCreate {
 	return hc
 }
 
-// SetCompleted sets the "completed" field.
-func (hc *HistoryCreate) SetCompleted(b bool) *HistoryCreate {
-	hc.mutation.SetCompleted(b)
-	return hc
-}
-
-// SetNillableCompleted sets the "completed" field if the given value is not nil.
-func (hc *HistoryCreate) SetNillableCompleted(b *bool) *HistoryCreate {
-	if b != nil {
-		hc.SetCompleted(*b)
-	}
+// SetStatus sets the "status" field.
+func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
+	hc.mutation.SetStatus(h)
 	return hc
 }
 
@@ -85,7 +77,6 @@ func (hc *HistoryCreate) Mutation() *HistoryMutation {
 
 // Save creates the History in the database.
 func (hc *HistoryCreate) Save(ctx context.Context) (*History, error) {
-	hc.defaults()
 	return withHooks(ctx, hc.sqlSave, hc.mutation, hc.hooks)
 }
 
@@ -111,14 +102,6 @@ func (hc *HistoryCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (hc *HistoryCreate) defaults() {
-	if _, ok := hc.mutation.Completed(); !ok {
-		v := history.DefaultCompleted
-		hc.mutation.SetCompleted(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (hc *HistoryCreate) check() error {
 	if _, ok := hc.mutation.SeriesID(); !ok {
@@ -136,8 +119,13 @@ func (hc *HistoryCreate) check() error {
 	if _, ok := hc.mutation.TargetDir(); !ok {
 		return &ValidationError{Name: "target_dir", err: errors.New(`ent: missing required field "History.target_dir"`)}
 	}
-	if _, ok := hc.mutation.Completed(); !ok {
-		return &ValidationError{Name: "completed", err: errors.New(`ent: missing required field "History.completed"`)}
+	if _, ok := hc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "History.status"`)}
+	}
+	if v, ok := hc.mutation.Status(); ok {
+		if err := history.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "History.status": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -185,9 +173,9 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
 		_node.TargetDir = value
 	}
-	if value, ok := hc.mutation.Completed(); ok {
-		_spec.SetField(history.FieldCompleted, field.TypeBool, value)
-		_node.Completed = value
+	if value, ok := hc.mutation.Status(); ok {
+		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
 	if value, ok := hc.mutation.Saved(); ok {
 		_spec.SetField(history.FieldSaved, field.TypeString, value)
@@ -214,7 +202,6 @@ func (hcb *HistoryCreateBulk) Save(ctx context.Context) ([]*History, error) {
 	for i := range hcb.builders {
 		func(i int, root context.Context) {
 			builder := hcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*HistoryMutation)
 				if !ok {

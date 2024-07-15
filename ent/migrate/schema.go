@@ -62,7 +62,7 @@ var (
 		{Name: "source_title", Type: field.TypeString},
 		{Name: "date", Type: field.TypeTime},
 		{Name: "target_dir", Type: field.TypeString},
-		{Name: "completed", Type: field.TypeBool, Default: false},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"running", "success", "fail", "uploading"}},
 		{Name: "saved", Type: field.TypeString, Nullable: true},
 	}
 	// HistoriesTable holds the schema information for the "histories" table.

@@ -43,9 +43,8 @@ class Activity {
     required this.sourceTitle,
     required this.date,
     required this.targetDir,
-    required this.completed,
+    required this.status,
     required this.saved,
-    required this.inBackgroud,
     required this.progress
   });
 
@@ -55,9 +54,8 @@ class Activity {
   final String? sourceTitle;
   final DateTime? date;
   final String? targetDir;
-  final bool? completed;
+  final String? status;
   final String? saved;
-  final bool? inBackgroud;
   final int? progress;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
@@ -68,9 +66,8 @@ class Activity {
       sourceTitle: json["source_title"],
       date: DateTime.tryParse(json["date"] ?? ""),
       targetDir: json["target_dir"],
-      completed: json["completed"],
+      status: json["status"],
       saved: json["saved"],
-      inBackgroud: json["in_backgroud"],
       progress: json["progress"]
     );
   }

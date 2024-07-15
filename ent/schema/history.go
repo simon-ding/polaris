@@ -18,7 +18,7 @@ func (History) Fields() []ent.Field {
 		field.String("source_title"),
 		field.Time("date"),
 		field.String("target_dir"),
-		field.Bool("completed").Default(false).StructTag("json:\"completed\""),
+		field.Enum("status").Values("running", "success", "fail", "uploading"),
 		field.String("saved").Optional(),
 	}
 }

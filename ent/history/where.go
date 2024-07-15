@@ -79,11 +79,6 @@ func TargetDir(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldTargetDir, v))
 }
 
-// Completed applies equality check predicate on the "completed" field. It's identical to CompletedEQ.
-func Completed(v bool) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldCompleted, v))
-}
-
 // Saved applies equality check predicate on the "saved" field. It's identical to SavedEQ.
 func Saved(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSaved, v))
@@ -339,14 +334,24 @@ func TargetDirContainsFold(v string) predicate.History {
 	return predicate.History(sql.FieldContainsFold(FieldTargetDir, v))
 }
 
-// CompletedEQ applies the EQ predicate on the "completed" field.
-func CompletedEQ(v bool) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldCompleted, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldStatus, v))
 }
 
-// CompletedNEQ applies the NEQ predicate on the "completed" field.
-func CompletedNEQ(v bool) predicate.History {
-	return predicate.History(sql.FieldNEQ(FieldCompleted, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.History {
+	return predicate.History(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // SavedEQ applies the EQ predicate on the "saved" field.

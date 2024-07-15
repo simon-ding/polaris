@@ -1732,7 +1732,7 @@ type HistoryMutation struct {
 	source_title  *string
 	date          *time.Time
 	target_dir    *string
-	completed     *bool
+	status        *history.Status
 	saved         *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -2058,40 +2058,40 @@ func (m *HistoryMutation) ResetTargetDir() {
 	m.target_dir = nil
 }
 
-// SetCompleted sets the "completed" field.
-func (m *HistoryMutation) SetCompleted(b bool) {
-	m.completed = &b
+// SetStatus sets the "status" field.
+func (m *HistoryMutation) SetStatus(h history.Status) {
+	m.status = &h
 }
 
-// Completed returns the value of the "completed" field in the mutation.
-func (m *HistoryMutation) Completed() (r bool, exists bool) {
-	v := m.completed
+// Status returns the value of the "status" field in the mutation.
+func (m *HistoryMutation) Status() (r history.Status, exists bool) {
+	v := m.status
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCompleted returns the old "completed" field's value of the History entity.
+// OldStatus returns the old "status" field's value of the History entity.
 // If the History object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *HistoryMutation) OldCompleted(ctx context.Context) (v bool, err error) {
+func (m *HistoryMutation) OldStatus(ctx context.Context) (v history.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCompleted is only allowed on UpdateOne operations")
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCompleted requires an ID field in the mutation")
+		return v, errors.New("OldStatus requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCompleted: %w", err)
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
 	}
-	return oldValue.Completed, nil
+	return oldValue.Status, nil
 }
 
-// ResetCompleted resets all changes to the "completed" field.
-func (m *HistoryMutation) ResetCompleted() {
-	m.completed = nil
+// ResetStatus resets all changes to the "status" field.
+func (m *HistoryMutation) ResetStatus() {
+	m.status = nil
 }
 
 // SetSaved sets the "saved" field.
@@ -2193,8 +2193,8 @@ func (m *HistoryMutation) Fields() []string {
 	if m.target_dir != nil {
 		fields = append(fields, history.FieldTargetDir)
 	}
-	if m.completed != nil {
-		fields = append(fields, history.FieldCompleted)
+	if m.status != nil {
+		fields = append(fields, history.FieldStatus)
 	}
 	if m.saved != nil {
 		fields = append(fields, history.FieldSaved)
@@ -2217,8 +2217,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Date()
 	case history.FieldTargetDir:
 		return m.TargetDir()
-	case history.FieldCompleted:
-		return m.Completed()
+	case history.FieldStatus:
+		return m.Status()
 	case history.FieldSaved:
 		return m.Saved()
 	}
@@ -2240,8 +2240,8 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDate(ctx)
 	case history.FieldTargetDir:
 		return m.OldTargetDir(ctx)
-	case history.FieldCompleted:
-		return m.OldCompleted(ctx)
+	case history.FieldStatus:
+		return m.OldStatus(ctx)
 	case history.FieldSaved:
 		return m.OldSaved(ctx)
 	}
@@ -2288,12 +2288,12 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTargetDir(v)
 		return nil
-	case history.FieldCompleted:
-		v, ok := value.(bool)
+	case history.FieldStatus:
+		v, ok := value.(history.Status)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCompleted(v)
+		m.SetStatus(v)
 		return nil
 	case history.FieldSaved:
 		v, ok := value.(string)
@@ -2402,8 +2402,8 @@ func (m *HistoryMutation) ResetField(name string) error {
 	case history.FieldTargetDir:
 		m.ResetTargetDir()
 		return nil
-	case history.FieldCompleted:
-		m.ResetCompleted()
+	case history.FieldStatus:
+		m.ResetStatus()
 		return nil
 	case history.FieldSaved:
 		m.ResetSaved()
