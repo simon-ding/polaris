@@ -32,8 +32,8 @@ func (w *WebdavStorage) Move(local, remote string) error {
 	baseLocal := filepath.Base(local)
 	remoteBase := filepath.Join(w.dir,remote, baseLocal)
 
-	log.Infof("remove all content in %s", remoteBase)
-	w.fs.RemoveAll(remoteBase)
+	//log.Infof("remove all content in %s", remoteBase)
+	//w.fs.RemoveAll(remoteBase)
 	err := filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return errors.Wrapf(err, "read file %v", path)

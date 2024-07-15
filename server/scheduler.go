@@ -51,7 +51,7 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	torrent := s.tasks[id]
 	r := s.db.GetHistory(id)
 	if r.Status == history.StatusUploading {
-		log.Infof("task %d is laready uploading, skip", id)
+		log.Infof("task %d is already uploading, skip", id)
 		return nil
 	}
 	s.db.SetHistoryStatus(r.ID, history.StatusUploading)
@@ -60,6 +60,8 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 		if err != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
 		} else {
+			torrent.Remove()
+			delete(s.tasks, r.ID)	
 			s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 		}
 	}()
@@ -93,9 +95,6 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	}
 
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)
-	torrent.Remove()
-	delete(s.tasks, r.ID)
-	s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 	return nil
 }
 
