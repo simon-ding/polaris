@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:ui/providers/activity.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
@@ -34,7 +35,7 @@ class ActivityPage extends ConsumerWidget {
                       return const MyProgressIndicator(
                         size: 20,
                       );
-                    }else if (activity.status == "fail") {
+                    } else if (activity.status == "fail") {
                       return const Icon(
                         Icons.close,
                         color: Colors.red,
@@ -46,10 +47,15 @@ class ActivityPage extends ConsumerWidget {
                       );
                     }
 
-                    double p = activity.progress == null ? 0:activity.progress!.toDouble() / 100;
-                    return MyProgressIndicator(
-                      value: p,
-                      size: 20,
+                    double p = activity.progress == null
+                        ? 0
+                        : activity.progress!.toDouble() / 100;
+                    return CircularPercentIndicator(
+                      radius: 15.0,
+                      lineWidth: 5.0,
+                      percent: p,
+                      center: Text("${p * 100}"),
+                      progressColor: Colors.green,
                     );
                   }()),
                   DataCell(IconButton(

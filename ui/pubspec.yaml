@@ -41,6 +41,7 @@ dependencies:
   quiver: ^3.2.1
   flutter_login: ^5.0.0
   shared_preferences: ^2.2.3
+  percent_indicator: ^4.2.3
 
 dev_dependencies:
   flutter_test:

@@ -36,17 +36,16 @@ class ActivityData extends AutoDisposeAsyncNotifier<List<Activity>> {
 }
 
 class Activity {
-  Activity({
-    required this.id,
-    required this.seriesId,
-    required this.episodeId,
-    required this.sourceTitle,
-    required this.date,
-    required this.targetDir,
-    required this.status,
-    required this.saved,
-    required this.progress
-  });
+  Activity(
+      {required this.id,
+      required this.seriesId,
+      required this.episodeId,
+      required this.sourceTitle,
+      required this.date,
+      required this.targetDir,
+      required this.status,
+      required this.saved,
+      required this.progress});
 
   final int? id;
   final int? seriesId;
@@ -60,15 +59,14 @@ class Activity {
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
-      id: json["id"],
-      seriesId: json["series_id"],
-      episodeId: json["episode_id"],
-      sourceTitle: json["source_title"],
-      date: DateTime.tryParse(json["date"] ?? ""),
-      targetDir: json["target_dir"],
-      status: json["status"],
-      saved: json["saved"],
-      progress: json["progress"]
-    );
+        id: json["id"],
+        seriesId: json["series_id"],
+        episodeId: json["episode_id"],
+        sourceTitle: json["source_title"],
+        date: DateTime.tryParse(json["date"] ?? ""),
+        targetDir: json["target_dir"],
+        status: json["status"],
+        saved: json["saved"],
+        progress: json["progress"]);
   }
 }
