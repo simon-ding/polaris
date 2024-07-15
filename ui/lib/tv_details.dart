@@ -55,11 +55,15 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                       opacity: 0.5,
                       child: Text("${ep.airDate}"),
                     )),
-                    DataCell(ep.status == "dwnloading"
-                        ? const Icon(Icons.cloud_download)
-                        : (ep.status == "dwnloaded"
-                            ? const Icon(Icons.cloud_done)
-                            : const Icon(Icons.cloud_off))),
+                    DataCell(
+                      Opacity(
+                          opacity: 0.7,
+                          child: ep.status == "downloading"
+                              ? const Icon(Icons.cloud_download)
+                              : (ep.status == "downloaded"
+                                  ? const Icon(Icons.cloud_done)
+                                  : const Icon(Icons.cloud_off))),
+                    ),
                     DataCell(IconButton(
                         onPressed: () async {
                           var f = ref
@@ -94,10 +98,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                       DataTable(columns: const [
                         DataColumn(label: Text("#")),
                         DataColumn(
-                            label: SizedBox(
-                              width: 500,
-                          child: Text("标题"),
-                        )),
+                          label: Text("标题"),
+                        ),
                         DataColumn(label: Text("播出时间")),
                         DataColumn(label: Text("状态")),
                         DataColumn(label: Text("操作"))
@@ -108,21 +110,17 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                 }
                 return ListView(
                   children: [
-                    
                     Card(
                       margin: const EdgeInsets.all(4),
                       clipBehavior: Clip.hardEdge,
                       child: Row(
                         children: <Widget>[
                           Flexible(
-                            child: SizedBox(
-                              width: 150,
-                              height: 200,
-                              child: Image.network(
-                                "${APIs.imagesUrl}/${details.id}/poster.jpg",
-                                fit: BoxFit.contain,
-                                headers: APIs.authHeaders,
-                              ),
+                            flex: 1,
+                            child: Image.network(
+                              "${APIs.imagesUrl}/${details.id}/poster.jpg",
+                              fit: BoxFit.contain,
+                              headers: APIs.authHeaders,
                             ),
                           ),
                           Expanded(
