@@ -29,7 +29,7 @@ class Utils {
   }
 
   static showSnakeBar(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), showCloseIcon: true,));
   }
 
   static bool showError(BuildContext context, AsyncSnapshot snapshot) {

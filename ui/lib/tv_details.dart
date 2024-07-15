@@ -59,26 +59,37 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                       Opacity(
                           opacity: 0.7,
                           child: ep.status == "downloading"
-                              ? const Icon(Icons.cloud_download)
+                              ? const Icon(Icons.downloading)
                               : (ep.status == "downloaded"
-                                  ? const Icon(Icons.cloud_done)
+                                  ? const Icon(Icons.download_done)
                                   : const Icon(Icons.cloud_off))),
                     ),
-                    DataCell(IconButton(
-                        onPressed: () async {
-                          var f = ref
-                              .read(seriesDetailsProvider(seriesId).notifier)
-                              .searchAndDownload(seriesId, ep.seasonNumber!,
-                                  ep.episodeNumber!);
-                          setState(() {
-                            _pendingFuture = f;
-                          });
-                          if (!Utils.showError(context, snapshot)) {
-                            var name = await f;
-                            Utils.showSnakeBar(context, "开始下载: $name");
-                          }
-                        },
-                        icon: const Icon(Icons.search)))
+                    DataCell(Row(
+                      children: [
+                        IconButton.filledTonal(
+                            onPressed: () async {
+                              var f = ref
+                                  .read(
+                                      seriesDetailsProvider(seriesId).notifier)
+                                  .searchAndDownload(seriesId, ep.seasonNumber!,
+                                      ep.episodeNumber!);
+                              setState(() {
+                                _pendingFuture = f;
+                              });
+                              if (!Utils.showError(context, snapshot)) {
+                                var name = await f;
+                                if (context.mounted) {
+                                  Utils.showSnakeBar(context, "开始下载: $name");
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.search)),
+                            const SizedBox(width: 10,),
+                        IconButton.filledTonal(
+                            onPressed: () {},
+                            icon: const Icon(Icons.manage_search))
+                      ],
+                    ))
                   ]);
 
                   if (m[ep.seasonNumber] == null) {
