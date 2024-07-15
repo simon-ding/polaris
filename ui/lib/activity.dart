@@ -17,7 +17,7 @@ class ActivityPage extends ConsumerWidget {
           return SingleChildScrollView(
             child: DataTable(
               columns: const [
-                DataColumn(label: Text("id"), numeric: true),
+                DataColumn(label: Text("#"), numeric: true),
                 DataColumn(label: Text("名称")),
                 DataColumn(label: Text("开始时间")),
                 DataColumn(label: Text("状态")),

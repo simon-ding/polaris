@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/activity.dart';
+import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
 import 'package:ui/weclome.dart';
 
@@ -34,8 +35,10 @@ class _NavDrawerState extends State<NavDrawer> {
                   if (value == 0) {
                     context.go(WelcomePage.route);
                   } else if (value == 1) {
-                    context.go(ActivityPage.route);
+                    context.go(SearchPage.route);
                   } else if (value == 2) {
+                    context.go(ActivityPage.route);
+                  } else if (value == 3) {
                     context.go(SystemSettingsPage.route);
                   }
                 },
@@ -45,6 +48,10 @@ class _NavDrawerState extends State<NavDrawer> {
                   NavigationRailDestination(
                     icon: Icon(Icons.live_tv),
                     label: Text('电视剧'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.search),
+                    label: Text('搜索'),
                   ),
                   NavigationRailDestination(
                     icon: Icon(Icons.download),
