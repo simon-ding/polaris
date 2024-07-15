@@ -93,7 +93,11 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     children: [
                       DataTable(columns: const [
                         DataColumn(label: Text("#")),
-                        DataColumn(label: SizedBox(width: 500, child: Text("标题"),)),
+                        DataColumn(
+                            label: SizedBox(
+                              width: 500,
+                          child: Text("标题"),
+                        )),
                         DataColumn(label: Text("播出时间")),
                         DataColumn(label: Text("状态")),
                         DataColumn(label: Text("操作"))
@@ -104,6 +108,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                 }
                 return ListView(
                   children: [
+                    
                     Card(
                       margin: const EdgeInsets.all(4),
                       clipBehavior: Clip.hardEdge,
@@ -121,6 +126,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                             ),
                           ),
                           Expanded(
+                            flex: 6,
                             child: Row(
                               children: [
                                 Expanded(
@@ -157,7 +163,9 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     const Text(""),
-                                    Text(details!.overview!)
+                                    Text(
+                                      details!.overview!,
+                                    ),
                                   ],
                                 )),
                                 Column(
