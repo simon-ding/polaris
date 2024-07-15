@@ -112,6 +112,27 @@ func (hu *HistoryUpdate) SetNillableTargetDir(s *string) *HistoryUpdate {
 	return hu
 }
 
+// SetSize sets the "size" field.
+func (hu *HistoryUpdate) SetSize(i int) *HistoryUpdate {
+	hu.mutation.ResetSize()
+	hu.mutation.SetSize(i)
+	return hu
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableSize(i *int) *HistoryUpdate {
+	if i != nil {
+		hu.SetSize(*i)
+	}
+	return hu
+}
+
+// AddSize adds i to the "size" field.
+func (hu *HistoryUpdate) AddSize(i int) *HistoryUpdate {
+	hu.mutation.AddSize(i)
+	return hu
+}
+
 // SetStatus sets the "status" field.
 func (hu *HistoryUpdate) SetStatus(h history.Status) *HistoryUpdate {
 	hu.mutation.SetStatus(h)
@@ -220,6 +241,12 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := hu.mutation.TargetDir(); ok {
 		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
+	}
+	if value, ok := hu.mutation.Size(); ok {
+		_spec.SetField(history.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := hu.mutation.AddedSize(); ok {
+		_spec.AddField(history.FieldSize, field.TypeInt, value)
 	}
 	if value, ok := hu.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
@@ -331,6 +358,27 @@ func (huo *HistoryUpdateOne) SetNillableTargetDir(s *string) *HistoryUpdateOne {
 	if s != nil {
 		huo.SetTargetDir(*s)
 	}
+	return huo
+}
+
+// SetSize sets the "size" field.
+func (huo *HistoryUpdateOne) SetSize(i int) *HistoryUpdateOne {
+	huo.mutation.ResetSize()
+	huo.mutation.SetSize(i)
+	return huo
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableSize(i *int) *HistoryUpdateOne {
+	if i != nil {
+		huo.SetSize(*i)
+	}
+	return huo
+}
+
+// AddSize adds i to the "size" field.
+func (huo *HistoryUpdateOne) AddSize(i int) *HistoryUpdateOne {
+	huo.mutation.AddSize(i)
 	return huo
 }
 
@@ -472,6 +520,12 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if value, ok := huo.mutation.TargetDir(); ok {
 		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
+	}
+	if value, ok := huo.mutation.Size(); ok {
+		_spec.SetField(history.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := huo.mutation.AddedSize(); ok {
+		_spec.AddField(history.FieldSize, field.TypeInt, value)
 	}
 	if value, ok := huo.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)

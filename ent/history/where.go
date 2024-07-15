@@ -79,6 +79,11 @@ func TargetDir(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldTargetDir, v))
 }
 
+// Size applies equality check predicate on the "size" field. It's identical to SizeEQ.
+func Size(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldSize, v))
+}
+
 // Saved applies equality check predicate on the "saved" field. It's identical to SavedEQ.
 func Saved(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSaved, v))
@@ -332,6 +337,46 @@ func TargetDirEqualFold(v string) predicate.History {
 // TargetDirContainsFold applies the ContainsFold predicate on the "target_dir" field.
 func TargetDirContainsFold(v string) predicate.History {
 	return predicate.History(sql.FieldContainsFold(FieldTargetDir, v))
+}
+
+// SizeEQ applies the EQ predicate on the "size" field.
+func SizeEQ(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldSize, v))
+}
+
+// SizeNEQ applies the NEQ predicate on the "size" field.
+func SizeNEQ(v int) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldSize, v))
+}
+
+// SizeIn applies the In predicate on the "size" field.
+func SizeIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldIn(FieldSize, vs...))
+}
+
+// SizeNotIn applies the NotIn predicate on the "size" field.
+func SizeNotIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldSize, vs...))
+}
+
+// SizeGT applies the GT predicate on the "size" field.
+func SizeGT(v int) predicate.History {
+	return predicate.History(sql.FieldGT(FieldSize, v))
+}
+
+// SizeGTE applies the GTE predicate on the "size" field.
+func SizeGTE(v int) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldSize, v))
+}
+
+// SizeLT applies the LT predicate on the "size" field.
+func SizeLT(v int) predicate.History {
+	return predicate.History(sql.FieldLT(FieldSize, v))
+}
+
+// SizeLTE applies the LTE predicate on the "size" field.
+func SizeLTE(v int) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldSize, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

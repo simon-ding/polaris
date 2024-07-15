@@ -1786,6 +1786,8 @@ type HistoryMutation struct {
 	source_title  *string
 	date          *time.Time
 	target_dir    *string
+	size          *int
+	addsize       *int
 	status        *history.Status
 	saved         *string
 	clearedFields map[string]struct{}
@@ -2112,6 +2114,62 @@ func (m *HistoryMutation) ResetTargetDir() {
 	m.target_dir = nil
 }
 
+// SetSize sets the "size" field.
+func (m *HistoryMutation) SetSize(i int) {
+	m.size = &i
+	m.addsize = nil
+}
+
+// Size returns the value of the "size" field in the mutation.
+func (m *HistoryMutation) Size() (r int, exists bool) {
+	v := m.size
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSize returns the old "size" field's value of the History entity.
+// If the History object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *HistoryMutation) OldSize(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSize is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSize requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSize: %w", err)
+	}
+	return oldValue.Size, nil
+}
+
+// AddSize adds i to the "size" field.
+func (m *HistoryMutation) AddSize(i int) {
+	if m.addsize != nil {
+		*m.addsize += i
+	} else {
+		m.addsize = &i
+	}
+}
+
+// AddedSize returns the value that was added to the "size" field in this mutation.
+func (m *HistoryMutation) AddedSize() (r int, exists bool) {
+	v := m.addsize
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSize resets all changes to the "size" field.
+func (m *HistoryMutation) ResetSize() {
+	m.size = nil
+	m.addsize = nil
+}
+
 // SetStatus sets the "status" field.
 func (m *HistoryMutation) SetStatus(h history.Status) {
 	m.status = &h
@@ -2231,7 +2289,7 @@ func (m *HistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.series_id != nil {
 		fields = append(fields, history.FieldSeriesID)
 	}
@@ -2246,6 +2304,9 @@ func (m *HistoryMutation) Fields() []string {
 	}
 	if m.target_dir != nil {
 		fields = append(fields, history.FieldTargetDir)
+	}
+	if m.size != nil {
+		fields = append(fields, history.FieldSize)
 	}
 	if m.status != nil {
 		fields = append(fields, history.FieldStatus)
@@ -2271,6 +2332,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Date()
 	case history.FieldTargetDir:
 		return m.TargetDir()
+	case history.FieldSize:
+		return m.Size()
 	case history.FieldStatus:
 		return m.Status()
 	case history.FieldSaved:
@@ -2294,6 +2357,8 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDate(ctx)
 	case history.FieldTargetDir:
 		return m.OldTargetDir(ctx)
+	case history.FieldSize:
+		return m.OldSize(ctx)
 	case history.FieldStatus:
 		return m.OldStatus(ctx)
 	case history.FieldSaved:
@@ -2342,6 +2407,13 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTargetDir(v)
 		return nil
+	case history.FieldSize:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSize(v)
+		return nil
 	case history.FieldStatus:
 		v, ok := value.(history.Status)
 		if !ok {
@@ -2370,6 +2442,9 @@ func (m *HistoryMutation) AddedFields() []string {
 	if m.addepisode_id != nil {
 		fields = append(fields, history.FieldEpisodeID)
 	}
+	if m.addsize != nil {
+		fields = append(fields, history.FieldSize)
+	}
 	return fields
 }
 
@@ -2382,6 +2457,8 @@ func (m *HistoryMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedSeriesID()
 	case history.FieldEpisodeID:
 		return m.AddedEpisodeID()
+	case history.FieldSize:
+		return m.AddedSize()
 	}
 	return nil, false
 }
@@ -2404,6 +2481,13 @@ func (m *HistoryMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddEpisodeID(v)
+		return nil
+	case history.FieldSize:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSize(v)
 		return nil
 	}
 	return fmt.Errorf("unknown History numeric field %s", name)
@@ -2455,6 +2539,9 @@ func (m *HistoryMutation) ResetField(name string) error {
 		return nil
 	case history.FieldTargetDir:
 		m.ResetTargetDir()
+		return nil
+	case history.FieldSize:
+		m.ResetSize()
 		return nil
 	case history.FieldStatus:
 		m.ResetStatus()

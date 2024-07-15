@@ -27,6 +27,8 @@ type History struct {
 	Date time.Time `json:"date,omitempty"`
 	// TargetDir holds the value of the "target_dir" field.
 	TargetDir string `json:"target_dir,omitempty"`
+	// Size holds the value of the "size" field.
+	Size int `json:"size,omitempty"`
 	// Status holds the value of the "status" field.
 	Status history.Status `json:"status,omitempty"`
 	// Saved holds the value of the "saved" field.
@@ -39,7 +41,7 @@ func (*History) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case history.FieldID, history.FieldSeriesID, history.FieldEpisodeID:
+		case history.FieldID, history.FieldSeriesID, history.FieldEpisodeID, history.FieldSize:
 			values[i] = new(sql.NullInt64)
 		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldStatus, history.FieldSaved:
 			values[i] = new(sql.NullString)
@@ -95,6 +97,12 @@ func (h *History) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field target_dir", values[i])
 			} else if value.Valid {
 				h.TargetDir = value.String
+			}
+		case history.FieldSize:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field size", values[i])
+			} else if value.Valid {
+				h.Size = int(value.Int64)
 			}
 		case history.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -158,6 +166,9 @@ func (h *History) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("target_dir=")
 	builder.WriteString(h.TargetDir)
+	builder.WriteString(", ")
+	builder.WriteString("size=")
+	builder.WriteString(fmt.Sprintf("%v", h.Size))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", h.Status))

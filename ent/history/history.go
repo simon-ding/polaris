@@ -23,6 +23,8 @@ const (
 	FieldDate = "date"
 	// FieldTargetDir holds the string denoting the target_dir field in the database.
 	FieldTargetDir = "target_dir"
+	// FieldSize holds the string denoting the size field in the database.
+	FieldSize = "size"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldSaved holds the string denoting the saved field in the database.
@@ -39,6 +41,7 @@ var Columns = []string{
 	FieldSourceTitle,
 	FieldDate,
 	FieldTargetDir,
+	FieldSize,
 	FieldStatus,
 	FieldSaved,
 }
@@ -52,6 +55,11 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultSize holds the default value on creation for the "size" field.
+	DefaultSize int
+)
 
 // Status defines the type for the "status" enum field.
 type Status string
@@ -109,6 +117,11 @@ func ByDate(opts ...sql.OrderTermOption) OrderOption {
 // ByTargetDir orders the results by the target_dir field.
 func ByTargetDir(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTargetDir, opts...).ToFunc()
+}
+
+// BySize orders the results by the size field.
+func BySize(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSize, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

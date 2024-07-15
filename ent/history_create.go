@@ -50,6 +50,20 @@ func (hc *HistoryCreate) SetTargetDir(s string) *HistoryCreate {
 	return hc
 }
 
+// SetSize sets the "size" field.
+func (hc *HistoryCreate) SetSize(i int) *HistoryCreate {
+	hc.mutation.SetSize(i)
+	return hc
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableSize(i *int) *HistoryCreate {
+	if i != nil {
+		hc.SetSize(*i)
+	}
+	return hc
+}
+
 // SetStatus sets the "status" field.
 func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
 	hc.mutation.SetStatus(h)
@@ -77,6 +91,7 @@ func (hc *HistoryCreate) Mutation() *HistoryMutation {
 
 // Save creates the History in the database.
 func (hc *HistoryCreate) Save(ctx context.Context) (*History, error) {
+	hc.defaults()
 	return withHooks(ctx, hc.sqlSave, hc.mutation, hc.hooks)
 }
 
@@ -102,6 +117,14 @@ func (hc *HistoryCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (hc *HistoryCreate) defaults() {
+	if _, ok := hc.mutation.Size(); !ok {
+		v := history.DefaultSize
+		hc.mutation.SetSize(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (hc *HistoryCreate) check() error {
 	if _, ok := hc.mutation.SeriesID(); !ok {
@@ -118,6 +141,9 @@ func (hc *HistoryCreate) check() error {
 	}
 	if _, ok := hc.mutation.TargetDir(); !ok {
 		return &ValidationError{Name: "target_dir", err: errors.New(`ent: missing required field "History.target_dir"`)}
+	}
+	if _, ok := hc.mutation.Size(); !ok {
+		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "History.size"`)}
 	}
 	if _, ok := hc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "History.status"`)}
@@ -173,6 +199,10 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 		_spec.SetField(history.FieldTargetDir, field.TypeString, value)
 		_node.TargetDir = value
 	}
+	if value, ok := hc.mutation.Size(); ok {
+		_spec.SetField(history.FieldSize, field.TypeInt, value)
+		_node.Size = value
+	}
 	if value, ok := hc.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
@@ -202,6 +232,7 @@ func (hcb *HistoryCreateBulk) Save(ctx context.Context) ([]*History, error) {
 	for i := range hcb.builders {
 		func(i int, root context.Context) {
 			builder := hcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*HistoryMutation)
 				if !ok {

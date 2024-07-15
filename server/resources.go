@@ -122,6 +122,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 		SourceTitle: r1.Name,
 		TargetDir: dir,
 		Status: history.StatusRunning,
+		Size: r1.Size,
 		Saved: torrent.Save(),
 	})
 	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
