@@ -2,6 +2,7 @@ package server
 
 import (
 	"polaris/ent"
+	"polaris/ent/episode"
 	"polaris/log"
 	"strconv"
 
@@ -50,6 +51,7 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		}
 		delete(s.tasks, his.ID)
 	}
+	s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
 
 	err = s.db.DeleteHistory(id)
 	if err != nil {
