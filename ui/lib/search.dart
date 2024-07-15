@@ -109,8 +109,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
+          return Consumer(
+            builder: (context, ref, _) {
               String _resSelected = "1080p";
               int _storageSelected = 0;
               var storage = ref.watch(storageSettingProvider);

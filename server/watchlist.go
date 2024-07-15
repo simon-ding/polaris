@@ -154,5 +154,6 @@ func (s *Server) DeleteFromWatchlist(c *gin.Context) (interface{}, error) {
 	if err := s.db.DeleteSeries(id); err != nil {
 		return nil, errors.Wrap(err, "delete db")
 	}
+	os.RemoveAll(filepath.Join(db.ImgPath, ids)) //delete image related
 	return "success", nil
 }

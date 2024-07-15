@@ -32,7 +32,7 @@ func (s *Server) authModdleware(c *gin.Context) {
 	auth = strings.TrimPrefix(auth, "Bearer ")
 	log.Infof("current token: %v", auth)
 	token, err := jwt.ParseWithClaims(auth, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {	
-		return []byte(secretKey), nil
+		return []byte(s.jwtSerect), nil
 	})
 	if err != nil {
 		log.Errorf("parse token error: %v", err)
@@ -60,7 +60,6 @@ type LoginIn struct {
 	Password string `json:"password"`
 }
 
-const secretKey = "r1OF7nhpNjnYiGKtTLuKEVq7YznzT"
 
 func (s *Server) Login(c *gin.Context) (interface{}, error) {
 	var in LoginIn
@@ -89,7 +88,7 @@ func (s *Server) Login(c *gin.Context) (interface{}, error) {
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		NotBefore: jwt.NewNumericDate(time.Now()),
 	})
-	sig, err := token.SignedString([]byte(secretKey))
+	sig, err := token.SignedString([]byte(s.jwtSerect))
 	if err != nil {
 		return nil, errors.Wrap(err, "sign")
 	}

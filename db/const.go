@@ -37,3 +37,6 @@ const (
 func (r ResolutionType) String() string {
 	return string(r)
 }
+
+
+const JwtSerectKey = "jwt_secrect_key"

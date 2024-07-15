@@ -39,9 +39,21 @@ func Open() (*Client, error) {
 	if err := client.Schema.Create(context.Background()); err != nil {
 		return nil, errors.Wrap(err, "failed creating schema resources")
 	}
-	return &Client{
+	c := &Client{
 		ent: client,
-	}, nil
+	}
+
+	c.generateJwtSerectIfNotExist()
+	return c, nil
+}
+
+func (c *Client) generateJwtSerectIfNotExist() {
+	v := c.GetSetting(JwtSerectKey)
+	if v == "" {
+		log.Infof("generate jwt serect")
+		key := utils.RandString(32)
+		c.SetSetting(JwtSerectKey, key)
+	}
 }
 
 func (c *Client) GetSetting(key string) string {

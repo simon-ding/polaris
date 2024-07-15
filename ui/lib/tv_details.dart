@@ -188,7 +188,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               error: (err, trace) {
                 return Text("$err");
               },
-              loading: () => MyProgressIndicator());
+              loading: () => const MyProgressIndicator());
         });
   }
 }
