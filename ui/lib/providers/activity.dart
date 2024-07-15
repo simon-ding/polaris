@@ -11,6 +11,8 @@ var activitiesDataProvider =
 class ActivityData extends AutoDisposeAsyncNotifier<List<Activity>> {
   @override
   FutureOr<List<Activity>> build() async {
+    Timer(const Duration(seconds: 5), ref.invalidateSelf);//Periodically Refresh
+
     final dio = await APIs.getDio();
     var resp = await dio.get(APIs.activityUrl);
     final sp = ServerResponse.fromJson(resp.data);

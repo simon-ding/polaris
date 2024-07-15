@@ -113,77 +113,85 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     Card(
                       margin: const EdgeInsets.all(4),
                       clipBehavior: Clip.hardEdge,
-                      child: Row(
-                        children: <Widget>[
-                          Flexible(
-                            flex: 1,
-                            child: Image.network(
-                              "${APIs.imagesUrl}/${details.id}/poster.jpg",
-                              fit: BoxFit.contain,
-                              headers: APIs.authHeaders,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
+                          children: <Widget>[
+                            Flexible(
+                              flex: 1,
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Image.network(
+                                  "${APIs.imagesUrl}/${details.id}/poster.jpg",
+                                  fit: BoxFit.contain,
+                                  headers: APIs.authHeaders,
+                                ),
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            flex: 6,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                    child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text("${details.resolution}"),
-                                        const SizedBox(
-                                          width: 30,
-                                        ),
-                                        storage.when(
-                                            data: (value) {
-                                              for (final s in value) {
-                                                if (s.id == details.storageId) {
-                                                  return Text(
-                                                      "${s.name}(${s.implementation})");
+                            Expanded(
+                              flex: 6,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                      child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text("${details.resolution}"),
+                                          const SizedBox(
+                                            width: 30,
+                                          ),
+                                          storage.when(
+                                              data: (value) {
+                                                for (final s in value) {
+                                                  if (s.id ==
+                                                      details.storageId) {
+                                                    return Text(
+                                                        "${s.name}(${s.implementation})");
+                                                  }
                                                 }
-                                              }
-                                              return const Text("未知存储");
-                                            },
-                                            error: (error, stackTrace) =>
-                                                Text("$error"),
-                                            loading: () =>
-                                                const MyProgressIndicator()),
-                                      ],
-                                    ),
-                                    const Divider(thickness: 1, height: 1),
-                                    Text(
-                                      "${details.name} (${details.airDate!.split("-")[0]})",
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    const Text(""),
-                                    Text(
-                                      details!.overview!,
-                                    ),
-                                  ],
-                                )),
-                                Column(
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {
-                                          ref
-                                              .read(seriesDetailsProvider(
-                                                      seriesId)
-                                                  .notifier)
-                                              .delete();
-                                          context.go(WelcomePage.route);
-                                        },
-                                        icon: const Icon(Icons.delete))
-                                  ],
-                                )
-                              ],
+                                                return const Text("未知存储");
+                                              },
+                                              error: (error, stackTrace) =>
+                                                  Text("$error"),
+                                              loading: () =>
+                                                  const MyProgressIndicator()),
+                                        ],
+                                      ),
+                                      const Divider(thickness: 1, height: 1),
+                                      Text(
+                                        "${details.name} (${details.airDate!.split("-")[0]})",
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const Text(""),
+                                      Text(
+                                        details!.overview!,
+                                      ),
+                                    ],
+                                  )),
+                                  Column(
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {
+                                            ref
+                                                .read(seriesDetailsProvider(
+                                                        seriesId)
+                                                    .notifier)
+                                                .delete();
+                                            context.go(WelcomePage.route);
+                                          },
+                                          icon: const Icon(Icons.delete))
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     Column(
