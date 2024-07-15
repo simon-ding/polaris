@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"polaris/db"
 	"polaris/ent"
+	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/log"
 	"polaris/pkg/torznab"
@@ -123,6 +124,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 		Status: history.StatusRunning,
 		Saved: torrent.Save(),
 	})
+	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
 	}

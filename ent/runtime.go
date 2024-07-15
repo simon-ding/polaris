@@ -45,6 +45,8 @@ func init() {
 	downloadclientsDescTags := downloadclientsFields[10].Descriptor()
 	// downloadclients.DefaultTags holds the default value on creation for the tags field.
 	downloadclients.DefaultTags = downloadclientsDescTags.Default.(string)
+	episodeFields := schema.Episode{}.Fields()
+	_ = episodeFields
 	indexersFields := schema.Indexers{}.Fields()
 	_ = indexersFields
 	// indexersDescEnableRss is the schema descriptor for enable_rss field.

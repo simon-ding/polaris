@@ -132,6 +132,20 @@ func (eu *EpisodeUpdate) SetNillableAirDate(s *string) *EpisodeUpdate {
 	return eu
 }
 
+// SetStatus sets the "status" field.
+func (eu *EpisodeUpdate) SetStatus(e episode.Status) *EpisodeUpdate {
+	eu.mutation.SetStatus(e)
+	return eu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (eu *EpisodeUpdate) SetNillableStatus(e *episode.Status) *EpisodeUpdate {
+	if e != nil {
+		eu.SetStatus(*e)
+	}
+	return eu
+}
+
 // SetFileInStorage sets the "file_in_storage" field.
 func (eu *EpisodeUpdate) SetFileInStorage(s string) *EpisodeUpdate {
 	eu.mutation.SetFileInStorage(s)
@@ -195,7 +209,20 @@ func (eu *EpisodeUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (eu *EpisodeUpdate) check() error {
+	if v, ok := eu.mutation.Status(); ok {
+		if err := episode.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Episode.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := eu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(episode.Table, episode.Columns, sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt))
 	if ps := eu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -224,6 +251,9 @@ func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.AirDate(); ok {
 		_spec.SetField(episode.FieldAirDate, field.TypeString, value)
+	}
+	if value, ok := eu.mutation.Status(); ok {
+		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := eu.mutation.FileInStorage(); ok {
 		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
@@ -384,6 +414,20 @@ func (euo *EpisodeUpdateOne) SetNillableAirDate(s *string) *EpisodeUpdateOne {
 	return euo
 }
 
+// SetStatus sets the "status" field.
+func (euo *EpisodeUpdateOne) SetStatus(e episode.Status) *EpisodeUpdateOne {
+	euo.mutation.SetStatus(e)
+	return euo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (euo *EpisodeUpdateOne) SetNillableStatus(e *episode.Status) *EpisodeUpdateOne {
+	if e != nil {
+		euo.SetStatus(*e)
+	}
+	return euo
+}
+
 // SetFileInStorage sets the "file_in_storage" field.
 func (euo *EpisodeUpdateOne) SetFileInStorage(s string) *EpisodeUpdateOne {
 	euo.mutation.SetFileInStorage(s)
@@ -460,7 +504,20 @@ func (euo *EpisodeUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (euo *EpisodeUpdateOne) check() error {
+	if v, ok := euo.mutation.Status(); ok {
+		if err := episode.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Episode.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err error) {
+	if err := euo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(episode.Table, episode.Columns, sqlgraph.NewFieldSpec(episode.FieldID, field.TypeInt))
 	id, ok := euo.mutation.ID()
 	if !ok {
@@ -506,6 +563,9 @@ func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err e
 	}
 	if value, ok := euo.mutation.AirDate(); ok {
 		_spec.SetField(episode.FieldAirDate, field.TypeString, value)
+	}
+	if value, ok := euo.mutation.Status(); ok {
+		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := euo.mutation.FileInStorage(); ok {
 		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)

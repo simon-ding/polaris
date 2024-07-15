@@ -3,6 +3,8 @@
 package episode
 
 import (
+	"fmt"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -24,6 +26,8 @@ const (
 	FieldOverview = "overview"
 	// FieldAirDate holds the string denoting the air_date field in the database.
 	FieldAirDate = "air_date"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldFileInStorage holds the string denoting the file_in_storage field in the database.
 	FieldFileInStorage = "file_in_storage"
 	// EdgeSeries holds the string denoting the series edge name in mutations.
@@ -48,6 +52,7 @@ var Columns = []string{
 	FieldTitle,
 	FieldOverview,
 	FieldAirDate,
+	FieldStatus,
 	FieldFileInStorage,
 }
 
@@ -59,6 +64,33 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
+}
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusMissing is the default value of the Status enum.
+const DefaultStatus = StatusMissing
+
+// Status values.
+const (
+	StatusMissing     Status = "missing"
+	StatusDownloading Status = "downloading"
+	StatusDownloaded  Status = "downloaded"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusMissing, StatusDownloading, StatusDownloaded:
+		return nil
+	default:
+		return fmt.Errorf("episode: invalid enum value for status field: %q", s)
+	}
 }
 
 // OrderOption defines the ordering options for the Episode queries.
@@ -97,6 +129,11 @@ func ByOverview(opts ...sql.OrderTermOption) OrderOption {
 // ByAirDate orders the results by the air_date field.
 func ByAirDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAirDate, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByFileInStorage orders the results by the file_in_storage field.

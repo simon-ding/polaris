@@ -431,3 +431,8 @@ func (c *Client) UpdateEpisodeFile(seriesID int, seasonNum, episodeNum int, file
 	}
 	return ep.Update().SetFileInStorage(file).Exec(context.TODO())
 }
+
+
+func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {
+	return c.ent.Episode.Update().Where(episode.ID(id)).SetStatus(status).Exec(context.TODO())
+}

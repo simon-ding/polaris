@@ -3,6 +3,7 @@ package server
 import (
 	"path/filepath"
 	"polaris/ent"
+	"polaris/ent/episode"
 	"polaris/ent/history"
 	storage1 "polaris/ent/storage"
 	"polaris/log"
@@ -17,7 +18,7 @@ import (
 
 func (s *Server) scheduler() {
 	s.mustAddCron("@every 1m", s.checkTasks)
-	s.mustAddCron("@every 10m", s.checkAllFiles)
+	//s.mustAddCron("@every 1h", s.checkAllFiles)
 	s.cron.Start()
 }
 
@@ -59,10 +60,13 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	defer func ()  {
 		if err != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
+			s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
 		} else {
-			torrent.Remove()
 			delete(s.tasks, r.ID)	
 			s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
+			s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
+
+			torrent.Remove()
 		}
 	}()
 

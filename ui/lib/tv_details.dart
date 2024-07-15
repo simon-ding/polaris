@@ -46,57 +46,59 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
         builder: (context, snapshot) {
           return seriesDetails.when(
               data: (details) {
-                Map<int, List<Widget>> m = Map();
+                Map<int, List<DataRow>> m = Map();
                 for (final ep in details.episodes!) {
-                  var w = Container(
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 70,
-                          child: Text("第 ${ep.episodeNumber} 集"),
-                        ),
-                        SizedBox(
-                          width: 100,
-                          child: Opacity(
-                            opacity: 0.5,
-                            child: Text("${ep.airDate}"),
-                          ),
-                        ),
-                        Text("${ep.title}", textAlign: TextAlign.left),
-                        const Expanded(child: Text("")),
-                        IconButton(
-                            onPressed: () async {
-                              var f = ref
-                                  .read(
-                                      seriesDetailsProvider(seriesId).notifier)
-                                  .searchAndDownload(seriesId, ep.seasonNumber!,
-                                      ep.episodeNumber!);
-                              setState(() {
-                                _pendingFuture = f;
-                              });
-                              if (!Utils.showError(context, snapshot)) {
-                                var name = await f;
-                                Utils.showSnakeBar(context, "开始下载: $name");
-                              }
-                            },
-                            icon: const Icon(Icons.search))
-                      ],
-                    ),
-                  );
+                  var row = DataRow(cells: [
+                    DataCell(Text("${ep.episodeNumber}")),
+                    DataCell(Text("${ep.title}")),
+                    DataCell(Opacity(
+                      opacity: 0.5,
+                      child: Text("${ep.airDate}"),
+                    )),
+                    DataCell(ep.status == "dwnloading"
+                        ? const Icon(Icons.cloud_download)
+                        : (ep.status == "dwnloaded"
+                            ? const Icon(Icons.cloud_done)
+                            : const Icon(Icons.cloud_off))),
+                    DataCell(IconButton(
+                        onPressed: () async {
+                          var f = ref
+                              .read(seriesDetailsProvider(seriesId).notifier)
+                              .searchAndDownload(seriesId, ep.seasonNumber!,
+                                  ep.episodeNumber!);
+                          setState(() {
+                            _pendingFuture = f;
+                          });
+                          if (!Utils.showError(context, snapshot)) {
+                            var name = await f;
+                            Utils.showSnakeBar(context, "开始下载: $name");
+                          }
+                        },
+                        icon: const Icon(Icons.search)))
+                  ]);
+
                   if (m[ep.seasonNumber] == null) {
                     m[ep.seasonNumber!] = List.empty(growable: true);
                   }
-                  m[ep.seasonNumber!]!.add(w);
+                  m[ep.seasonNumber!]!.add(row);
                 }
                 List<ExpansionTile> list = List.empty(growable: true);
                 for (final k in m.keys.toList().reversed) {
                   var seasonList = ExpansionTile(
                     tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-                    initiallyExpanded: k == 0 ? false : true,
+                    //childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+                    initiallyExpanded: false,
                     title: k == 0 ? const Text("特集") : Text("第 $k 季"),
-                    children: m[k]!,
+                    expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DataTable(columns: const [
+                        DataColumn(label: Text("#")),
+                        DataColumn(label: SizedBox(width: 500, child: Text("标题"),)),
+                        DataColumn(label: Text("播出时间")),
+                        DataColumn(label: Text("状态")),
+                        DataColumn(label: Text("操作"))
+                      ], rows: m[k]!),
+                    ],
                   );
                   list.add(seasonList);
                 }
@@ -145,7 +147,6 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                                 Text("$error"),
                                             loading: () =>
                                                 const MyProgressIndicator()),
-                                        
                                       ],
                                     ),
                                     const Divider(thickness: 1, height: 1),

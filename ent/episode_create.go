@@ -64,6 +64,20 @@ func (ec *EpisodeCreate) SetAirDate(s string) *EpisodeCreate {
 	return ec
 }
 
+// SetStatus sets the "status" field.
+func (ec *EpisodeCreate) SetStatus(e episode.Status) *EpisodeCreate {
+	ec.mutation.SetStatus(e)
+	return ec
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableStatus(e *episode.Status) *EpisodeCreate {
+	if e != nil {
+		ec.SetStatus(*e)
+	}
+	return ec
+}
+
 // SetFileInStorage sets the "file_in_storage" field.
 func (ec *EpisodeCreate) SetFileInStorage(s string) *EpisodeCreate {
 	ec.mutation.SetFileInStorage(s)
@@ -90,6 +104,7 @@ func (ec *EpisodeCreate) Mutation() *EpisodeMutation {
 
 // Save creates the Episode in the database.
 func (ec *EpisodeCreate) Save(ctx context.Context) (*Episode, error) {
+	ec.defaults()
 	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
@@ -115,6 +130,14 @@ func (ec *EpisodeCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ec *EpisodeCreate) defaults() {
+	if _, ok := ec.mutation.Status(); !ok {
+		v := episode.DefaultStatus
+		ec.mutation.SetStatus(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ec *EpisodeCreate) check() error {
 	if _, ok := ec.mutation.SeasonNumber(); !ok {
@@ -131,6 +154,14 @@ func (ec *EpisodeCreate) check() error {
 	}
 	if _, ok := ec.mutation.AirDate(); !ok {
 		return &ValidationError{Name: "air_date", err: errors.New(`ent: missing required field "Episode.air_date"`)}
+	}
+	if _, ok := ec.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Episode.status"`)}
+	}
+	if v, ok := ec.mutation.Status(); ok {
+		if err := episode.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Episode.status": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -178,6 +209,10 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 		_spec.SetField(episode.FieldAirDate, field.TypeString, value)
 		_node.AirDate = value
 	}
+	if value, ok := ec.mutation.Status(); ok {
+		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
+	}
 	if value, ok := ec.mutation.FileInStorage(); ok {
 		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
 		_node.FileInStorage = value
@@ -220,6 +255,7 @@ func (ecb *EpisodeCreateBulk) Save(ctx context.Context) ([]*Episode, error) {
 	for i := range ecb.builders {
 		func(i int, root context.Context) {
 			builder := ecb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EpisodeMutation)
 				if !ok {

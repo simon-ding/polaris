@@ -918,6 +918,7 @@ type EpisodeMutation struct {
 	title             *string
 	overview          *string
 	air_date          *string
+	status            *episode.Status
 	file_in_storage   *string
 	clearedFields     map[string]struct{}
 	series            *int
@@ -1294,6 +1295,42 @@ func (m *EpisodeMutation) ResetAirDate() {
 	m.air_date = nil
 }
 
+// SetStatus sets the "status" field.
+func (m *EpisodeMutation) SetStatus(e episode.Status) {
+	m.status = &e
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *EpisodeMutation) Status() (r episode.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EpisodeMutation) OldStatus(ctx context.Context) (v episode.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *EpisodeMutation) ResetStatus() {
+	m.status = nil
+}
+
 // SetFileInStorage sets the "file_in_storage" field.
 func (m *EpisodeMutation) SetFileInStorage(s string) {
 	m.file_in_storage = &s
@@ -1404,7 +1441,7 @@ func (m *EpisodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EpisodeMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.series != nil {
 		fields = append(fields, episode.FieldSeriesID)
 	}
@@ -1422,6 +1459,9 @@ func (m *EpisodeMutation) Fields() []string {
 	}
 	if m.air_date != nil {
 		fields = append(fields, episode.FieldAirDate)
+	}
+	if m.status != nil {
+		fields = append(fields, episode.FieldStatus)
 	}
 	if m.file_in_storage != nil {
 		fields = append(fields, episode.FieldFileInStorage)
@@ -1446,6 +1486,8 @@ func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Overview()
 	case episode.FieldAirDate:
 		return m.AirDate()
+	case episode.FieldStatus:
+		return m.Status()
 	case episode.FieldFileInStorage:
 		return m.FileInStorage()
 	}
@@ -1469,6 +1511,8 @@ func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldOverview(ctx)
 	case episode.FieldAirDate:
 		return m.OldAirDate(ctx)
+	case episode.FieldStatus:
+		return m.OldStatus(ctx)
 	case episode.FieldFileInStorage:
 		return m.OldFileInStorage(ctx)
 	}
@@ -1521,6 +1565,13 @@ func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAirDate(v)
+		return nil
+	case episode.FieldStatus:
+		v, ok := value.(episode.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
 		return nil
 	case episode.FieldFileInStorage:
 		v, ok := value.(string)
@@ -1637,6 +1688,9 @@ func (m *EpisodeMutation) ResetField(name string) error {
 		return nil
 	case episode.FieldAirDate:
 		m.ResetAirDate()
+		return nil
+	case episode.FieldStatus:
+		m.ResetStatus()
 		return nil
 	case episode.FieldFileInStorage:
 		m.ResetFileInStorage()

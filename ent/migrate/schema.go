@@ -37,6 +37,7 @@ var (
 		{Name: "title", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
 		{Name: "air_date", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"missing", "downloading", "downloaded"}, Default: "missing"},
 		{Name: "file_in_storage", Type: field.TypeString, Nullable: true},
 		{Name: "series_id", Type: field.TypeInt, Nullable: true},
 	}
@@ -48,7 +49,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "episodes_series_episodes",
-				Columns:    []*schema.Column{EpisodesColumns[7]},
+				Columns:    []*schema.Column{EpisodesColumns[8]},
 				RefColumns: []*schema.Column{SeriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

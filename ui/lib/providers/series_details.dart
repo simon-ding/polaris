@@ -102,6 +102,7 @@ class Episodes {
   String? airDate;
   int? seasonNumber;
   String? overview;
+  String? status;
 
   Episodes(
       {this.id,
@@ -110,6 +111,7 @@ class Episodes {
       this.title,
       this.airDate,
       this.seasonNumber,
+      this.status,
       this.overview});
 
   Episodes.fromJson(Map<String, dynamic> json) {
@@ -119,6 +121,7 @@ class Episodes {
     title = json['title'];
     airDate = json['air_date'];
     seasonNumber = json['season_number'];
+    status = json['status'];
     overview = json['overview'];
   }
 }

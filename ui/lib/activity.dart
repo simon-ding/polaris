@@ -32,9 +32,10 @@ class ActivityPage extends ConsumerWidget {
                   DataCell(Text("${activity.date!.toLocal()}")),
                   DataCell(() {
                     if (activity.status == "uploading") {
-                      return const MyProgressIndicator(
-                        size: 20,
-                      );
+                      return const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator());
                     } else if (activity.status == "fail") {
                       return const Icon(
                         Icons.close,
