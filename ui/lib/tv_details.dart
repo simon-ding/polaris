@@ -131,7 +131,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                             Flexible(
                               flex: 1,
                               child: Padding(
-                                padding: EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(10),
                                 child: Image.network(
                                   "${APIs.imagesUrl}/${details.id}/poster.jpg",
                                   fit: BoxFit.contain,
@@ -139,14 +139,13 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                 ),
                               ),
                             ),
-                            Expanded(
+                            Flexible(
                               flex: 6,
                               child: Row(
                                 children: [
                                   Expanded(
                                       child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -173,7 +172,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                       ),
                                       const Divider(thickness: 1, height: 1),
                                       Text(
-                                        "${details.name} (${details.airDate!.split("-")[0]})",
+                                        "${details.name} ${details.name != details.originalName ? details.originalName: ''} (${details.airDate!.split("-")[0]})",
                                         style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold),

@@ -9,7 +9,7 @@ import 'package:ui/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class MovieWatchlistPage extends ConsumerWidget {
-  static const route = "/movie";
+  static const route = "/movies";
 
   const MovieWatchlistPage({super.key});
 

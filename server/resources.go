@@ -225,6 +225,9 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 		if !strings.Contains(r.Name, strconv.Itoa(year)) && !strings.Contains(r.Name, strconv.Itoa(year+1)) && !strings.Contains(r.Name, strconv.Itoa(year-1)) {
 			continue //not the same movie, if year is not correct
 		}
+		if !strings.Contains(r.Name, movieDetail.NameCn) && !strings.Contains(r.Name, movieDetail.NameEn) {
+			continue //name not match
+		}
 		searchResults = append(searchResults, TorznabSearchResult{
 			Name: r.Name,
 			Size: r.Size,

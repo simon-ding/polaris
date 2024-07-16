@@ -57,16 +57,23 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                             Row(
                               children: [
                                 Text(
-                                  "${item.name} (${item.firstAirDate?.year})",
+                                  "${item.name} ${item.name != item.originalName ? item.originalName : ''} (${item.firstAirDate?.year})",
                                   style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                const SizedBox(width: 10,),
-                                item.mediaType == "tv" ? const Icon(Icons.live_tv): const Icon(Icons.movie)
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                item.mediaType == "tv"
+                                    ? const Icon(Icons.live_tv)
+                                    : const Icon(Icons.movie)
                               ],
                             ),
                             const Text(""),
+                            item.originCountry.isNotEmpty
+                                ? Text("国家：${item.originCountry[0]}")
+                                : Container(),
                             Text("${item.overview}")
                           ],
                         ),
