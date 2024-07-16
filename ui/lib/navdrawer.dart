@@ -20,56 +20,48 @@ class _NavDrawerState extends State<NavDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                  child: NavigationRail(
-                selectedIndex: _counter,
-                onDestinationSelected: (value) {
-                  setState(() {
-                    _counter = value;
-                  });
-                  if (value == 0) {
-                    context.go(MovieWatchlistPage.route);
-                  } else if (value == 1) {
-                    context.go(TvWatchlistPage.route);
-                  } else if (value == 2) {
-                    context.go(SearchPage.route);
-                  } else if (value == 3) {
-                    context.go(ActivityPage.route);
-                  } else if (value == 4) {
-                    context.go(SystemSettingsPage.route);
-                  }
-                },
-                extended: MediaQuery.of(context).size.width >= 850,
-                unselectedIconTheme: const IconThemeData(color: Colors.grey),
-                destinations: const <NavigationRailDestination>[
-                  NavigationRailDestination(
-                    icon: Icon(Icons.movie),
-                    label: Text('电影'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.live_tv),
-                    label: Text('电视剧'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.search),
-                    label: Text('搜索'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.download),
-                    label: Text('活动'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.settings),
-                    label: Text('设置'),
-                  ),
-                ],
-                //groupAlignment: -1,
-                minWidth: 56,
-              ))
-            ]);
+    return NavigationRail(
+      selectedIndex: _counter,
+      onDestinationSelected: (value) {
+        setState(() {
+          _counter = value;
+        });
+        if (value == 0) {
+          context.go(MovieWatchlistPage.route);
+        } else if (value == 1) {
+          context.go(TvWatchlistPage.route);
+        } else if (value == 2) {
+          context.go(SearchPage.route);
+        } else if (value == 3) {
+          context.go(ActivityPage.route);
+        } else if (value == 4) {
+          context.go(SystemSettingsPage.route);
+        }
+      },
+      extended: MediaQuery.of(context).size.width >= 850,
+      unselectedIconTheme: const IconThemeData(color: Colors.grey),
+      destinations: const <NavigationRailDestination>[
+        NavigationRailDestination(
+          icon: Icon(Icons.movie),
+          label: Text('电影'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.live_tv),
+          label: Text('电视剧'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.search),
+          label: Text('搜索'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.download),
+          label: Text('活动'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.settings),
+          label: Text('设置'),
+        ),
+      ],
+    );
   }
 }
