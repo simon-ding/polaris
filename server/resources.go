@@ -217,10 +217,14 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 	if len(res) == 0 {
 		return nil, fmt.Errorf("no resource found")
 	}
+	ss := strings.Split(movieDetail.AirDate, "-")[0]
+	year, _ := strconv.Atoi(ss)
 
 	var searchResults []TorznabSearchResult
 	for _, r := range res {
-
+		if !strings.Contains(r.Name, strconv.Itoa(year)) && !strings.Contains(r.Name, strconv.Itoa(year+1)) && !strings.Contains(r.Name, strconv.Itoa(year-1)) {
+			continue //not the same movie, if year is not correct
+		}
 		searchResults = append(searchResults, TorznabSearchResult{
 			Name: r.Name,
 			Size: r.Size,

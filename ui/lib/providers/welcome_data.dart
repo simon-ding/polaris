@@ -208,7 +208,7 @@ class MovieTorrentResource
     if (rsp.code != 0) {
       throw rsp.message;
     }
-    return (resp.data as List).map((v) => TorrentResource.fromJson(v)).toList();
+    return (rsp.data as List).map((v) => TorrentResource.fromJson(v)).toList();
   }
 
   Future<void> download(String link) async {
