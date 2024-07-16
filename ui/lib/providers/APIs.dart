@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiver/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ui/providers/server_response.dart';
 
 class APIs {
   static final _baseUrl = baseUrl();
@@ -49,17 +50,21 @@ class APIs {
     if (dio1 != null) {
       return dio1!;
     }
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString("token");
-    if (isNotBlank(token)) {
-      authHeaders["Authorization"] = "Bearer $token";
-      isLoggedIn = true;
+    var token = authHeaders["token"];
+    if (isBlank(token)) {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      var t = prefs.getString("token");
+      if (isNotBlank(t)) {
+        authHeaders["Authorization"] = t!;
+        isLoggedIn = true;
+        token = t;
+      }
     }
 
     var dio = Dio();
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
-        options.headers['Authorization'] = "Bearer $token";
+        options.headers['Authorization'] = token;
         return handler.next(options);
       },
       onError: (error, handler) {
@@ -75,5 +80,20 @@ class APIs {
     ));
     dio1 = dio;
     return dio;
+  }
+
+  static Future<void> login(String user, String password) async {
+    var resp = await Dio()
+        .post(APIs.loginUrl, data: {"user": user, "password": password});
+
+    var sp = ServerResponse.fromJson(resp.data);
+
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var t = sp.data["token"];
+    authHeaders["token"] = "Bearer $t";
+    prefs.setString("token", "Bearer $t");
   }
 }

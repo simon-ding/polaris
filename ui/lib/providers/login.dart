@@ -36,16 +36,7 @@ class AuthSettingData extends AutoDisposeAsyncNotifier<AuthSetting> {
   }
 
   Future<void> login(String user, String password) async {
-    var resp = await Dio()
-        .post(APIs.loginUrl, data: {"user": user, "password": password});
-
-    var sp = ServerResponse.fromJson(resp.data);
-
-    if (sp.code != 0) {
-      throw sp.message;
-    }
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("token", sp.data["token"]);
+    return APIs.login(user, password);
   }
 }
 
