@@ -55,7 +55,7 @@ func (c *Client) Download(magnet, dir string) (*Torrent, error) {
 type Torrent struct {
 	//t *transmissionrpc.Torrent
 	c  *transmissionrpc.Client
-	ID int64 `json: "id"`
+	ID int64 `json:"id"`
 	Config
 }
 

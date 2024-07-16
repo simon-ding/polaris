@@ -85,7 +85,11 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	var stImpl storage.Storage
 	if st.Implementation == storage1.ImplementationWebdav {
 		ws := st.ToWebDavSetting()
-		storageImpl, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, ws.Path)
+		targetPath := ws.TvPath
+		if series.MediaType == media.MediaTypeMovie {
+			targetPath = ws.MoviePath
+		}
+		storageImpl, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath)
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}
@@ -93,7 +97,12 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 
 	} else if st.Implementation == storage1.ImplementationLocal {
 		ls := st.ToLocalSetting()
-		storageImpl, err := storage.NewLocalStorage(ls.Path)
+		targetPath := ls.TvPath
+		if series.MediaType == media.MediaTypeMovie {
+			targetPath = ls.MoviePath
+		}
+
+		storageImpl, err := storage.NewLocalStorage(targetPath)
 		if err != nil {
 			return errors.Wrap(err, "new storage")
 		}
@@ -130,7 +139,12 @@ func (s *Server) checkFileExists(series *ent.Media) error {
 	switch st.Implementation {
 	case storage1.ImplementationLocal:
 		ls := st.ToLocalSetting()
-		storageImpl1, err := storage.NewLocalStorage(ls.Path)
+		targetPath := ls.TvPath
+		if series.MediaType == media.MediaTypeMovie {
+			targetPath = ls.MoviePath
+		}
+
+		storageImpl1, err := storage.NewLocalStorage(targetPath)
 		if err != nil {
 			return errors.Wrap(err, "new local")
 		}
@@ -138,7 +152,12 @@ func (s *Server) checkFileExists(series *ent.Media) error {
 
 	case storage1.ImplementationWebdav:
 		ws := st.ToWebDavSetting()
-		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, ws.Path)
+		targetPath := ws.TvPath
+		if series.MediaType == media.MediaTypeMovie {
+			targetPath = ws.MoviePath
+		}
+
+		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath)
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}

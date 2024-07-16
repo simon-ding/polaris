@@ -472,24 +472,26 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
 
   Future<void> showStorageDetails(
       AsyncSnapshot<void> snapshot, BuildContext context, Storage s) {
-
     return showDialog<void>(
         context: context,
         barrierDismissible: true, // user must tap button!
         builder: (BuildContext context) {
           var nameController = TextEditingController(text: s.name);
-          var pathController = TextEditingController();
+          var tvPathController = TextEditingController();
+          var moviePathController = TextEditingController();
           var urlController = TextEditingController();
           var userController = TextEditingController();
           var passController = TextEditingController();
           if (s.settings != null) {
-            pathController.text = s.settings!["path"];
-            urlController.text = s.settings!["url"];
-            userController.text = s.settings!["user"];
-            passController.text = s.settings!["password"];
+            tvPathController.text =  s.settings!["tv_path"] ?? "";
+            moviePathController.text = s.settings!["movie_path"] ?? "";
+            urlController.text = s.settings!["url"]?? "";
+            userController.text = s.settings!["user"] ?? "";
+            passController.text = s.settings!["password"] ?? "";
           }
 
-          String _selectImpl = s.implementation == null? "local": s.implementation!;
+          String _selectImpl =
+              s.implementation == null ? "local" : s.implementation!;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: const Text('存储'),
@@ -513,12 +515,9 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                       decoration: const InputDecoration(labelText: "名称"),
                       controller: nameController,
                     ),
-                    _selectImpl == "local"
-                        ? TextField(
-                            decoration: const InputDecoration(labelText: "路径"),
-                            controller: pathController,
-                          )
-                        : Column(
+                    _selectImpl != "local"
+                        ? 
+                        Column(
                             children: [
                               TextField(
                                 decoration: const InputDecoration(
@@ -535,12 +534,15 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                                     const InputDecoration(labelText: "密码"),
                                 controller: passController,
                               ),
-                              TextField(
-                                decoration:
-                                    const InputDecoration(labelText: "路径"),
-                                controller: pathController,
-                              ),
                             ],
+                          ): Container(),
+                          TextField(
+                            decoration: const InputDecoration(labelText: "电视剧路径"),
+                            controller: tvPathController,
+                          ),
+                          TextField(
+                            decoration: const InputDecoration(labelText: "电影路径"),
+                            controller: moviePathController,
                           )
                   ],
                 ),
@@ -573,7 +575,8 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                           name: nameController.text,
                           implementation: _selectImpl,
                           settings: {
-                            "path": pathController.text,
+                            "tv_path": tvPathController.text,
+                            "movie_path": moviePathController.text,
                             "url": urlController.text,
                             "user": userController.text,
                             "password": passController.text

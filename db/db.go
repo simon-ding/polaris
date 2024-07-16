@@ -274,14 +274,16 @@ type StorageInfo struct {
 }
 
 type LocalDirSetting struct {
-	Path string `json:"path"`
+	TvPath    string `json:"tv_path"`
+	MoviePath string `json:"movie_path"`
 }
 
 type WebdavSetting struct {
-	URL      string `json:"url"`
-	Path     string `json:"path"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+	URL       string `json:"url"`
+	TvPath    string `json:"tv_path"`
+	MoviePath string `json:"movie_path"`
+	User      string `json:"user"`
+	Password  string `json:"password"`
 }
 
 func (c *Client) AddStorage(st *StorageInfo) error {
@@ -343,10 +345,10 @@ func (s *Storage) ToWebDavSetting() WebdavSetting {
 	return webdavSetting
 }
 
-func (s *Storage) GetPath() string {
+func (s *Storage) GetPath() (tvPath string, moviePath string) {
 	var m map[string]string
 	json.Unmarshal([]byte(s.Settings), &m)
-	return m["path"]
+	return m["tv_path"], m["movie_path"]
 }
 
 func (c *Client) GetStorage(id int) *Storage {
