@@ -66,8 +66,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                   width: 10,
                                 ),
                                 item.mediaType == "tv"
-                                    ? const Icon(Icons.live_tv)
-                                    : const Icon(Icons.movie)
+                                    ? const Chip(avatar: Icon(Icons.live_tv),label: Text("电视剧",))
+                                    : const Chip(avatar: Icon(Icons.movie),label: Text("电影"))
                               ],
                             ),
                             const Text(""),
