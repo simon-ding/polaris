@@ -67,10 +67,13 @@ class MyApp extends StatelessWidget {
               body: Center(
                   // Center is a layout widget. It takes a single child and positions it
                   // in the middle of the parent.
-                  child: Row(children: <Widget>[
-                const NavDrawer(),
+                  child: Flex(direction: Axis.horizontal, children: <Widget>[
+                const Flexible(
+                  flex: 1,
+                  child: NavDrawer(),
+                ),
                 const VerticalDivider(thickness: 1, width: 1),
-                Expanded(child: child)
+                Flexible(flex: 7, child: child)
               ]))),
         );
       },

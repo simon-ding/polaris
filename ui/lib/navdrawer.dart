@@ -20,9 +20,7 @@ class _NavDrawerState extends State<NavDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 220),
-        child: Row(
+    return Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -68,14 +66,10 @@ class _NavDrawerState extends State<NavDrawer> {
                     icon: Icon(Icons.settings),
                     label: Text('设置'),
                   ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.computer),
-                    label: Text('系统'),
-                  ),
                 ],
                 //groupAlignment: -1,
                 minWidth: 56,
               ))
-            ]));
+            ]);
   }
 }
