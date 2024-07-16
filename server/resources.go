@@ -9,12 +9,11 @@ import (
 	"polaris/log"
 	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
+	"polaris/pkg/utils"
 	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/adrg/strutil"
-	"github.com/adrg/strutil/metrics"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -226,9 +225,8 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 		if !strings.Contains(r.Name, strconv.Itoa(year)) && !strings.Contains(r.Name, strconv.Itoa(year+1)) && !strings.Contains(r.Name, strconv.Itoa(year-1)) {
 			continue //not the same movie, if year is not correct
 		}
-		distCn := strutil.Similarity(strings.ToLower(r.Name), movieDetail.NameCn, metrics.NewHamming())
-		distEn := strutil.Similarity(strings.ToLower(r.Name), strings.ToLower(movieDetail.NameEn), metrics.NewHamming())
-		if distCn == 0 && distEn == 0 {
+
+		if !utils.IsNameAcceptable(r.Name, movieDetail.NameCn) && !utils.IsNameAcceptable(r.Name, movieDetail.NameEn) {
 			continue //name not match
 		}
 		searchResults = append(searchResults, TorznabSearchResult{

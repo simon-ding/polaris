@@ -2,8 +2,11 @@ package utils
 
 import (
 	"regexp"
+	"strings"
 	"unicode"
 
+	"github.com/adrg/strutil"
+	"github.com/adrg/strutil/metrics"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
 )
@@ -47,4 +50,12 @@ func RandString(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+func IsNameAcceptable(name1, name2 string) bool {
+
+	re := regexp.MustCompile(`[^\p{L}\w\s]`)
+	name1 = re.ReplaceAllString(strings.ToLower(name1), "")
+	name2 = re.ReplaceAllString(strings.ToLower(name2), "")
+	return strutil.Similarity(name1, name2, metrics.NewHamming()) > 0.1
 }
