@@ -54,9 +54,9 @@ func IDLTE(id int) predicate.History {
 	return predicate.History(sql.FieldLTE(FieldID, id))
 }
 
-// SeriesID applies equality check predicate on the "series_id" field. It's identical to SeriesIDEQ.
-func SeriesID(v int) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldSeriesID, v))
+// MediaID applies equality check predicate on the "media_id" field. It's identical to MediaIDEQ.
+func MediaID(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldMediaID, v))
 }
 
 // EpisodeID applies equality check predicate on the "episode_id" field. It's identical to EpisodeIDEQ.
@@ -89,44 +89,44 @@ func Saved(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSaved, v))
 }
 
-// SeriesIDEQ applies the EQ predicate on the "series_id" field.
-func SeriesIDEQ(v int) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldSeriesID, v))
+// MediaIDEQ applies the EQ predicate on the "media_id" field.
+func MediaIDEQ(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldMediaID, v))
 }
 
-// SeriesIDNEQ applies the NEQ predicate on the "series_id" field.
-func SeriesIDNEQ(v int) predicate.History {
-	return predicate.History(sql.FieldNEQ(FieldSeriesID, v))
+// MediaIDNEQ applies the NEQ predicate on the "media_id" field.
+func MediaIDNEQ(v int) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldMediaID, v))
 }
 
-// SeriesIDIn applies the In predicate on the "series_id" field.
-func SeriesIDIn(vs ...int) predicate.History {
-	return predicate.History(sql.FieldIn(FieldSeriesID, vs...))
+// MediaIDIn applies the In predicate on the "media_id" field.
+func MediaIDIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldIn(FieldMediaID, vs...))
 }
 
-// SeriesIDNotIn applies the NotIn predicate on the "series_id" field.
-func SeriesIDNotIn(vs ...int) predicate.History {
-	return predicate.History(sql.FieldNotIn(FieldSeriesID, vs...))
+// MediaIDNotIn applies the NotIn predicate on the "media_id" field.
+func MediaIDNotIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldMediaID, vs...))
 }
 
-// SeriesIDGT applies the GT predicate on the "series_id" field.
-func SeriesIDGT(v int) predicate.History {
-	return predicate.History(sql.FieldGT(FieldSeriesID, v))
+// MediaIDGT applies the GT predicate on the "media_id" field.
+func MediaIDGT(v int) predicate.History {
+	return predicate.History(sql.FieldGT(FieldMediaID, v))
 }
 
-// SeriesIDGTE applies the GTE predicate on the "series_id" field.
-func SeriesIDGTE(v int) predicate.History {
-	return predicate.History(sql.FieldGTE(FieldSeriesID, v))
+// MediaIDGTE applies the GTE predicate on the "media_id" field.
+func MediaIDGTE(v int) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldMediaID, v))
 }
 
-// SeriesIDLT applies the LT predicate on the "series_id" field.
-func SeriesIDLT(v int) predicate.History {
-	return predicate.History(sql.FieldLT(FieldSeriesID, v))
+// MediaIDLT applies the LT predicate on the "media_id" field.
+func MediaIDLT(v int) predicate.History {
+	return predicate.History(sql.FieldLT(FieldMediaID, v))
 }
 
-// SeriesIDLTE applies the LTE predicate on the "series_id" field.
-func SeriesIDLTE(v int) predicate.History {
-	return predicate.History(sql.FieldLTE(FieldSeriesID, v))
+// MediaIDLTE applies the LTE predicate on the "media_id" field.
+func MediaIDLTE(v int) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldMediaID, v))
 }
 
 // EpisodeIDEQ applies the EQ predicate on the "episode_id" field.

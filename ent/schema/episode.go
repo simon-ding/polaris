@@ -14,7 +14,7 @@ type Episode struct {
 // Fields of the Episode.
 func (Episode) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("series_id").Optional(),
+		field.Int("media_id").Optional(),
 		field.Int("season_number").StructTag("json:\"season_number\""),
 		field.Int("episode_number").StructTag("json:\"episode_number\""),
 		field.String("title"),
@@ -28,10 +28,10 @@ func (Episode) Fields() []ent.Field {
 // Edges of the Episode.
 func (Episode) Edges() []ent.Edge {
 	return []ent.Edge{
-        edge.From("series", Series.Type).
+        edge.From("media", Media.Type).
             Ref("episodes").
             Unique().
-			Field("series_id"),
+			Field("media_id"),
     }
 
 }

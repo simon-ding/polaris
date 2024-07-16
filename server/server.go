@@ -1,7 +1,10 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"polaris/db"
 	"polaris/log"
 	"polaris/pkg/tmdb"
@@ -26,11 +29,11 @@ func NewServer(db *db.Client) *Server {
 }
 
 type Server struct {
-	r        *gin.Engine
-	db       *db.Client
-	cron     *cron.Cron
-	language string
-	tasks    map[int]*Task
+	r         *gin.Engine
+	db        *db.Client
+	cron      *cron.Cron
+	language  string
+	tasks     map[int]*Task
 	jwtSerect string
 }
 
@@ -46,6 +49,7 @@ func (s *Server) Serve() error {
 	api := s.r.Group("/api/v1")
 	api.Use(s.authModdleware)
 	api.StaticFS("/img", http.Dir(db.ImgPath))
+	api.Any("/posters/*proxyPath", s.proxyPosters)
 
 	setting := api.Group("/setting")
 	{
@@ -60,20 +64,24 @@ func (s *Server) Serve() error {
 		activity.DELETE("/:id", HttpHandler(s.RemoveActivity))
 	}
 
-	tv := api.Group("/tv")
+	tv := api.Group("/media")
 	{
-		tv.GET("/search", HttpHandler(s.SearchTvSeries))
-		tv.POST("/watchlist", HttpHandler(s.AddWatchlist))
-		tv.GET("/watchlist", HttpHandler(s.GetWatchlist))
-		tv.GET("/series/:id", HttpHandler(s.GetTvDetails))
-		tv.DELETE("/series/:id", HttpHandler(s.DeleteFromWatchlist))
+		tv.GET("/search", HttpHandler(s.SearchMedia))
+		tv.POST("/tv/watchlist", HttpHandler(s.AddTv2Watchlist))
+		tv.GET("/tv/watchlist", HttpHandler(s.GetTvWatchlist))
+		tv.POST("/movie/watchlist", HttpHandler(s.AddMovie2Watchlist))
+		tv.GET("/movie/watchlist", HttpHandler(s.GetMovieWatchlist))
+		tv.GET("/movie/resources/:id", HttpHandler(s.SearchAvailableMovies))
+		tv.POST("/movie/resources/", HttpHandler(s.DownloadMovieTorrent))
+		tv.GET("/record/:id", HttpHandler(s.GetMediaDetails))
+		tv.DELETE("/record/:id", HttpHandler(s.DeleteFromWatchlist))
 		tv.GET("/resolutions", HttpHandler(s.GetAvailableResolutions))
 	}
 	indexer := api.Group("/indexer")
 	{
 		indexer.GET("/", HttpHandler(s.GetAllIndexers))
 		indexer.POST("/add", HttpHandler(s.AddTorznabInfo))
-		indexer.POST("/download", HttpHandler(s.SearchAndDownload))
+		indexer.POST("/download", HttpHandler(s.SearchTvAndDownload))
 		indexer.DELETE("/del/:id", HttpHandler(s.DeleteTorznabInfo))
 	}
 
@@ -124,4 +132,18 @@ func (s *Server) reloadTasks() {
 		}
 		s.tasks[t.ID] = &Task{Torrent: torrent}
 	}
+}
+
+func (s *Server) proxyPosters(c *gin.Context) {
+	remote, _ := url.Parse("https://image.tmdb.org")
+	proxy := httputil.NewSingleHostReverseProxy(remote)
+
+	proxy.Director = func(req *http.Request) {
+		req.Header = c.Request.Header
+		req.Host = remote.Host
+		req.URL.Scheme = remote.Scheme
+		req.URL.Host = remote.Host
+		req.URL.Path = fmt.Sprintf("/t/p/w500/%v", c.Param("proxyPath")) 
+	}
+	proxy.ServeHTTP(c.Writer, c.Request)
 }

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"polaris/db"
 	"polaris/ent"
+	"polaris/ent/media"
 	"polaris/log"
 	"strconv"
 
@@ -33,13 +34,27 @@ func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
 	return r, nil
 }
 
-type addWatchlistIn struct {
-	TmdbID    int `json:"tmdb_id" binding:"required"`
-	StorageID int `json:"storage_id" `
-	Resolution db.ResolutionType `json:"resolution" binding:"required"`
+func(s *Server) SearchMedia(c *gin.Context) (interface{}, error) {
+	var q searchTvParam
+	if err := c.ShouldBindQuery(&q); err != nil {
+		return nil, errors.Wrap(err, "bind query")
+	}
+	log.Infof("search media with keyword: %v", q.Query)
+	r, err := s.MustTMDB().SearchMedia(q.Query, s.language, 1)
+	if err != nil {
+		return nil, errors.Wrap(err, "search tv")
+	}
+	return r, nil
+
 }
 
-func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
+type addWatchlistIn struct {
+	TmdbID     int               `json:"tmdb_id" binding:"required"`
+	StorageID  int               `json:"storage_id" `
+	Resolution string `json:"resolution" binding:"required"`
+}
+
+func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 	var in addWatchlistIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
@@ -53,7 +68,7 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 	detailEn, _ := s.MustTMDB().GetTvDetails(in.TmdbID, db.LanguageEN)
 	var nameEn = detailEn.Name
 	var detail *tmdb.TVDetails
-	if s.language == "" || s.language ==db.LanguageCN {
+	if s.language == "" || s.language == db.LanguageCN {
 		detail = detailCn
 	} else {
 		detail = detailEn
@@ -83,21 +98,80 @@ func (s *Server) AddWatchlist(c *gin.Context) (interface{}, error) {
 			epIds = append(epIds, epid)
 		}
 	}
-	r, err := s.db.AddWatchlist(in.StorageID, nameCn, nameEn, detail, epIds, db.R1080p)
+	r, err := s.db.AddMediaWatchlist(&ent.Media{
+		TmdbID: int(detail.ID),
+		MediaType: media.MediaTypeTv,
+		NameCn: nameCn,
+		NameEn: nameEn,
+		OriginalName: detail.OriginalName,
+		Overview: detail.Overview,
+		AirDate: detail.FirstAirDate,
+		Resolution: string(in.Resolution),
+		StorageID: in.StorageID,
+
+	}, epIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}
-	go func ()  {
+	go func() {
 		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
-		}	
+		}
 	}()
 
 	log.Infof("add tv %s to watchlist success", detail.Name)
 	return nil, nil
 }
 
-func (s *Server) downloadPoster(path string, seriesId int)  error{
+func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
+	var in addWatchlistIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind query")
+	}
+	detailCn, err := s.MustTMDB().GetMovieDetails(in.TmdbID, db.LanguageCN)
+	if err != nil {
+		return nil, errors.Wrap(err, "get movie detail")
+	}
+	var nameCn = detailCn.Title
+
+	detailEn, _ := s.MustTMDB().GetMovieDetails(in.TmdbID, db.LanguageEN)
+	var nameEn = detailEn.Title
+	var detail *tmdb.MovieDetails
+	if s.language == "" || s.language == db.LanguageCN {
+		detail = detailCn
+	} else {
+		detail = detailEn
+	}
+	log.Infof("find detail for movie id %d: %v", in.TmdbID, detail)
+
+
+	r, err := s.db.AddMediaWatchlist(&ent.Media{
+		TmdbID: int(detail.ID),
+		MediaType: media.MediaTypeMovie,
+		NameCn: nameCn,
+		NameEn: nameEn,
+		OriginalName: detail.OriginalTitle,
+		Overview: detail.Overview,
+		AirDate: detail.ReleaseDate,
+		Resolution: string(in.Resolution),
+		StorageID: in.StorageID,
+
+	}, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "add to list")
+	}
+	go func() {
+		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
+			log.Errorf("download poster error: %v", err)
+		}
+	}()
+
+	log.Infof("add movie %s to watchlist success", detail.Title)
+	return nil, nil
+
+}
+
+func (s *Server) downloadPoster(path string, mediaID int) error {
 	var tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/"
 	url := tmdbImgBaseUrl + path
 	log.Infof("try to download poster: %v", url)
@@ -105,10 +179,10 @@ func (s *Server) downloadPoster(path string, seriesId int)  error{
 	if err != nil {
 		return errors.Wrap(err, "http get")
 	}
-	targetDir := fmt.Sprintf("%v/%d", db.ImgPath, seriesId)
+	targetDir := fmt.Sprintf("%v/%d", db.ImgPath, mediaID)
 	os.MkdirAll(targetDir, 0777)
 	ext := filepath.Ext(path)
-	targetFile := filepath.Join(targetDir, "poster"+ ext)
+	targetFile := filepath.Join(targetDir, "poster"+ext)
 	f, err := os.Create(targetFile)
 	if err != nil {
 		return errors.Wrap(err, "new file")
@@ -122,18 +196,24 @@ func (s *Server) downloadPoster(path string, seriesId int)  error{
 	return nil
 }
 
-func (s *Server) GetWatchlist(c *gin.Context) (interface{}, error) {
-	list := s.db.GetWatchlist()
+func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
+	list := s.db.GetMediaWatchlist(media.MediaTypeTv)
 	return list, nil
 }
 
-func (s *Server) GetTvDetails(c *gin.Context) (interface{}, error) {
+func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
+	list := s.db.GetMediaWatchlist(media.MediaTypeMovie)
+	return list, nil
+}
+
+
+func (s *Server) GetMediaDetails(c *gin.Context) (interface{}, error) {
 	ids := c.Param("id")
 	id, err := strconv.Atoi(ids)
 	if err != nil {
 		return nil, errors.Wrap(err, "convert")
 	}
-	detail := s.db.GetSeriesDetails(id)
+	detail := s.db.GetMediaDetails(id)
 	return detail, nil
 }
 
@@ -151,7 +231,7 @@ func (s *Server) DeleteFromWatchlist(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "convert")
 	}
-	if err := s.db.DeleteSeries(id); err != nil {
+	if err := s.db.DeleteMedia(id); err != nil {
 		return nil, errors.Wrap(err, "delete db")
 	}
 	os.RemoveAll(filepath.Join(db.ImgPath, ids)) //delete image related

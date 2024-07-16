@@ -10,7 +10,7 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
-	"polaris/ent/series"
+	"polaris/ent/media"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"polaris/log"
@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect"
-	tmdb "github.com/cyruzin/golang-tmdb"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 )
@@ -85,46 +84,45 @@ func (c *Client) GetLanguage() string {
 	return lang
 }
 
-func (c *Client) AddWatchlist(storageId int, nameCn, nameEn string, detail *tmdb.TVDetails, episodes []int, res ResolutionType) (*ent.Series, error) {
-	count := c.ent.Series.Query().Where(series.TmdbID(int(detail.ID))).CountX(context.Background())
+func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, error) {
+	count := c.ent.Media.Query().Where(media.TmdbID(m.TmdbID)).CountX(context.Background())
 	if count > 0 {
-		return nil, fmt.Errorf("tv series %s already in watchlist", detail.Name)
+		return nil, fmt.Errorf("tv series %s already in watchlist", m.NameEn)
 	}
-	if res == "" {
-		res = R1080p
-	}
-	if storageId == 0 {
+
+	if m.StorageID == 0 {
 		r, err := c.ent.Storage.Query().Where(storage.And(storage.Default(true), storage.Deleted(false))).First(context.TODO())
 		if err == nil {
 			log.Infof("use default storage: %v", r.Name)
-			storageId = r.ID
+			m.StorageID = r.ID
 		}
 	}
 
-	targetDir := fmt.Sprintf("%s %s (%v)", nameCn, nameEn, strings.Split(detail.FirstAirDate, "-")[0])
-	if !utils.IsChineseChar(nameCn) {
-		log.Warnf("name cn is not chinese name: %v", nameCn)
-		targetDir = fmt.Sprintf("%s (%v)", nameEn, strings.Split(detail.FirstAirDate, "-")[0])
+	targetDir := fmt.Sprintf("%s %s (%v)", m.NameCn, m.NameEn, strings.Split(m.AirDate, "-")[0])
+	if !utils.IsChineseChar(m.NameCn) {
+		log.Warnf("name cn is not chinese name: %v", m.NameCn)
+		targetDir = fmt.Sprintf("%s (%v)", m.NameEn, strings.Split(m.AirDate, "-")[0])
 	}
 
-	r, err := c.ent.Series.Create().
-		SetTmdbID(int(detail.ID)).
-		SetStorageID(storageId).
-		SetOverview(detail.Overview).
-		SetNameCn(nameCn).
-		SetNameEn(nameEn).
-		SetOriginalName(detail.OriginalName).
-		SetPosterPath(detail.PosterPath).
-		SetAirDate(detail.FirstAirDate).
-		SetResolution(res.String()).
+	r, err := c.ent.Media.Create().
+		SetTmdbID(m.TmdbID).
+		SetStorageID(m.StorageID).
+		SetOverview(m.Overview).
+		SetNameCn(m.NameCn).
+		SetNameEn(m.NameEn).
+		SetOriginalName(m.OriginalName).
+		SetMediaType(m.MediaType).
+		SetAirDate(m.AirDate).
+		SetResolution(m.Resolution).
 		SetTargetDir(targetDir).
 		AddEpisodeIDs(episodes...).
 		Save(context.TODO())
 	return r, err
+
 }
 
-func (c *Client) GetWatchlist() []*ent.Series {
-	list, err := c.ent.Series.Query().All(context.TODO())
+func (c *Client) GetMediaWatchlist(mediaType media.MediaType) []*ent.Media {
+	list, err := c.ent.Media.Query().Where(media.MediaTypeEQ(mediaType)).All(context.TODO())
 	if err != nil {
 		log.Infof("query wtach list error: %v", err)
 		return nil
@@ -132,34 +130,37 @@ func (c *Client) GetWatchlist() []*ent.Series {
 	return list
 }
 
-type SeriesDetails struct {
-	*ent.Series
+type MediaDetails struct {
+	*ent.Media
 	Episodes []*ent.Episode `json:"episodes"`
 }
 
-func (c *Client) GetSeriesDetails(id int) *SeriesDetails {
-	se, err := c.ent.Series.Query().Where(series.ID(id)).First(context.TODO())
+func (c *Client) GetMediaDetails(id int) *MediaDetails {
+	se, err := c.ent.Media.Query().Where(media.ID(id)).First(context.TODO())
 	if err != nil {
 		log.Errorf("get series %d: %v", id, err)
 		return nil
 	}
-	ep, err  := se.QueryEpisodes().All(context.Background())
-	if err != nil {
-		log.Errorf("get episodes %d: %v", id, err)
-		return nil
+	var md = &MediaDetails{
+		Media: se,
 	}
-	return &SeriesDetails{
-		Series:   se,
-		Episodes: ep,
+	if se.MediaType == media.MediaTypeTv {
+		ep, err := se.QueryEpisodes().All(context.Background())
+		if err != nil {
+			log.Errorf("get episodes %d: %v", id, err)
+			return nil
+		}
+		md.Episodes = ep
 	}
+	return md
 }
 
-func (c *Client) DeleteSeries(id int) error {
-	_, err := c.ent.Episode.Delete().Where(episode.SeriesID(id)).Exec(context.TODO())
+func (c *Client) DeleteMedia(id int) error {
+	_, err := c.ent.Episode.Delete().Where(episode.MediaID(id)).Exec(context.TODO())
 	if err != nil {
 		return err
 	}
-	_, err = c.ent.Series.Delete().Where(series.ID(id)).Exec(context.TODO())
+	_, err = c.ent.Media.Delete().Where(media.ID(id)).Exec(context.TODO())
 	return err
 }
 
@@ -381,7 +382,7 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 }
 
 func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
-	return c.ent.History.Create().SetSeriesID(h.SeriesID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
+	return c.ent.History.Create().SetMediaID(h.MediaID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
 		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetSaved(h.Saved).Save(context.TODO())
 }
 
@@ -398,7 +399,7 @@ func (c *Client) GetHistories() ent.Histories {
 }
 
 func (c *Client) GetRunningHistories() ent.Histories {
-	h, err := c.ent.History.Query().Where(history.Or(history.StatusEQ(history.StatusRunning), 
+	h, err := c.ent.History.Query().Where(history.Or(history.StatusEQ(history.StatusRunning),
 		history.StatusEQ(history.StatusUploading))).All(context.TODO())
 	if err != nil {
 		return nil
@@ -423,15 +424,14 @@ func (c *Client) GetDownloadDir() string {
 	return r.Value
 }
 
-func (c *Client) UpdateEpisodeFile(seriesID int, seasonNum, episodeNum int, file string) error {
-	ep, err := c.ent.Episode.Query().Where(episode.SeriesID(seriesID)).Where(episode.EpisodeNumber(episodeNum)).
+func (c *Client) UpdateEpisodeFile(mediaID int, seasonNum, episodeNum int, file string) error {
+	ep, err := c.ent.Episode.Query().Where(episode.MediaID(mediaID)).Where(episode.EpisodeNumber(episodeNum)).
 		Where(episode.SeasonNumber(seasonNum)).First(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "finding episode")
 	}
 	return ep.Update().SetFileInStorage(file).Exec(context.TODO())
 }
-
 
 func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetStatus(status).Exec(context.TODO())

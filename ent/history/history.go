@@ -13,8 +13,8 @@ const (
 	Label = "history"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldSeriesID holds the string denoting the series_id field in the database.
-	FieldSeriesID = "series_id"
+	// FieldMediaID holds the string denoting the media_id field in the database.
+	FieldMediaID = "media_id"
 	// FieldEpisodeID holds the string denoting the episode_id field in the database.
 	FieldEpisodeID = "episode_id"
 	// FieldSourceTitle holds the string denoting the source_title field in the database.
@@ -36,7 +36,7 @@ const (
 // Columns holds all SQL columns for history fields.
 var Columns = []string{
 	FieldID,
-	FieldSeriesID,
+	FieldMediaID,
 	FieldEpisodeID,
 	FieldSourceTitle,
 	FieldDate,
@@ -94,9 +94,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// BySeriesID orders the results by the series_id field.
-func BySeriesID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSeriesID, opts...).ToFunc()
+// ByMediaID orders the results by the media_id field.
+func ByMediaID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMediaID, opts...).ToFunc()
 }
 
 // ByEpisodeID orders the results by the episode_id field.

@@ -40,7 +40,7 @@ class ActivityData extends AutoDisposeAsyncNotifier<List<Activity>> {
 class Activity {
   Activity(
       {required this.id,
-      required this.seriesId,
+      required this.mediaId,
       required this.episodeId,
       required this.sourceTitle,
       required this.date,
@@ -50,7 +50,7 @@ class Activity {
       required this.progress});
 
   final int? id;
-  final int? seriesId;
+  final int? mediaId;
   final int? episodeId;
   final String? sourceTitle;
   final DateTime? date;
@@ -62,7 +62,7 @@ class Activity {
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
         id: json["id"],
-        seriesId: json["series_id"],
+        mediaId: json["media_id"],
         episodeId: json["episode_id"],
         sourceTitle: json["source_title"],
         date: DateTime.tryParse(json["date"] ?? ""),

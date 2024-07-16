@@ -56,16 +56,16 @@ func (f IndexersFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IndexersMutation", m)
 }
 
-// The SeriesFunc type is an adapter to allow the use of ordinary
-// function as Series mutator.
-type SeriesFunc func(context.Context, *ent.SeriesMutation) (ent.Value, error)
+// The MediaFunc type is an adapter to allow the use of ordinary
+// function as Media mutator.
+type MediaFunc func(context.Context, *ent.MediaMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f SeriesFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.SeriesMutation); ok {
+func (f MediaFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MediaMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SeriesMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MediaMutation", m)
 }
 
 // The SettingsFunc type is an adapter to allow the use of ordinary

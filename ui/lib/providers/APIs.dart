@@ -7,10 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class APIs {
   static final _baseUrl = baseUrl();
-  static final searchUrl = "$_baseUrl/api/v1/tv/search";
+  static final searchUrl = "$_baseUrl/api/v1/media/search";
   static final settingsUrl = "$_baseUrl/api/v1/setting/do";
-  static final watchlistUrl = "$_baseUrl/api/v1/tv/watchlist";
-  static final seriesDetailUrl = "$_baseUrl/api/v1/tv/series/";
+  static final watchlistTvUrl = "$_baseUrl/api/v1/media/tv/watchlist";
+  static final watchlistMovieUrl = "$_baseUrl/api/v1/media/movie/watchlist";
+  static final availableMoviesUrl = "$_baseUrl/api/v1/media/movie/resources/";
+  static final seriesDetailUrl = "$_baseUrl/api/v1/media/record/";
   static final searchAndDownloadUrl = "$_baseUrl/api/v1/indexer/download";
   static final allIndexersUrl = "$_baseUrl/api/v1/indexer/";
   static final addIndexerUrl = "$_baseUrl/api/v1/indexer/add";
@@ -24,7 +26,7 @@ class APIs {
   static final activityUrl = "$_baseUrl/api/v1/activity/";
   static final imagesUrl = "$_baseUrl/api/v1/img";
 
-  static const tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/";
+  static final tmdbImgBaseUrl = "$_baseUrl/api/v1/posters";
 
   static const tmdbApiKey = "tmdb_api_key";
   static const downloadDirKey = "download_dir";

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"math"
 	"polaris/ent/episode"
+	"polaris/ent/media"
 	"polaris/ent/predicate"
-	"polaris/ent/series"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,7 +22,7 @@ type EpisodeQuery struct {
 	order      []episode.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Episode
-	withSeries *SeriesQuery
+	withMedia  *MediaQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -59,9 +59,9 @@ func (eq *EpisodeQuery) Order(o ...episode.OrderOption) *EpisodeQuery {
 	return eq
 }
 
-// QuerySeries chains the current query on the "series" edge.
-func (eq *EpisodeQuery) QuerySeries() *SeriesQuery {
-	query := (&SeriesClient{config: eq.config}).Query()
+// QueryMedia chains the current query on the "media" edge.
+func (eq *EpisodeQuery) QueryMedia() *MediaQuery {
+	query := (&MediaClient{config: eq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -72,8 +72,8 @@ func (eq *EpisodeQuery) QuerySeries() *SeriesQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(episode.Table, episode.FieldID, selector),
-			sqlgraph.To(series.Table, series.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, episode.SeriesTable, episode.SeriesColumn),
+			sqlgraph.To(media.Table, media.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, episode.MediaTable, episode.MediaColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -273,21 +273,21 @@ func (eq *EpisodeQuery) Clone() *EpisodeQuery {
 		order:      append([]episode.OrderOption{}, eq.order...),
 		inters:     append([]Interceptor{}, eq.inters...),
 		predicates: append([]predicate.Episode{}, eq.predicates...),
-		withSeries: eq.withSeries.Clone(),
+		withMedia:  eq.withMedia.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
 }
 
-// WithSeries tells the query-builder to eager-load the nodes that are connected to
-// the "series" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EpisodeQuery) WithSeries(opts ...func(*SeriesQuery)) *EpisodeQuery {
-	query := (&SeriesClient{config: eq.config}).Query()
+// WithMedia tells the query-builder to eager-load the nodes that are connected to
+// the "media" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EpisodeQuery) WithMedia(opts ...func(*MediaQuery)) *EpisodeQuery {
+	query := (&MediaClient{config: eq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withSeries = query
+	eq.withMedia = query
 	return eq
 }
 
@@ -297,12 +297,12 @@ func (eq *EpisodeQuery) WithSeries(opts ...func(*SeriesQuery)) *EpisodeQuery {
 // Example:
 //
 //	var v []struct {
-//		SeriesID int `json:"series_id,omitempty"`
+//		MediaID int `json:"media_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Episode.Query().
-//		GroupBy(episode.FieldSeriesID).
+//		GroupBy(episode.FieldMediaID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (eq *EpisodeQuery) GroupBy(field string, fields ...string) *EpisodeGroupBy {
@@ -320,11 +320,11 @@ func (eq *EpisodeQuery) GroupBy(field string, fields ...string) *EpisodeGroupBy 
 // Example:
 //
 //	var v []struct {
-//		SeriesID int `json:"series_id,omitempty"`
+//		MediaID int `json:"media_id,omitempty"`
 //	}
 //
 //	client.Episode.Query().
-//		Select(episode.FieldSeriesID).
+//		Select(episode.FieldMediaID).
 //		Scan(ctx, &v)
 func (eq *EpisodeQuery) Select(fields ...string) *EpisodeSelect {
 	eq.ctx.Fields = append(eq.ctx.Fields, fields...)
@@ -370,7 +370,7 @@ func (eq *EpisodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Epis
 		nodes       = []*Episode{}
 		_spec       = eq.querySpec()
 		loadedTypes = [1]bool{
-			eq.withSeries != nil,
+			eq.withMedia != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -391,20 +391,20 @@ func (eq *EpisodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Epis
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := eq.withSeries; query != nil {
-		if err := eq.loadSeries(ctx, query, nodes, nil,
-			func(n *Episode, e *Series) { n.Edges.Series = e }); err != nil {
+	if query := eq.withMedia; query != nil {
+		if err := eq.loadMedia(ctx, query, nodes, nil,
+			func(n *Episode, e *Media) { n.Edges.Media = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (eq *EpisodeQuery) loadSeries(ctx context.Context, query *SeriesQuery, nodes []*Episode, init func(*Episode), assign func(*Episode, *Series)) error {
+func (eq *EpisodeQuery) loadMedia(ctx context.Context, query *MediaQuery, nodes []*Episode, init func(*Episode), assign func(*Episode, *Media)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Episode)
 	for i := range nodes {
-		fk := nodes[i].SeriesID
+		fk := nodes[i].MediaID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -413,7 +413,7 @@ func (eq *EpisodeQuery) loadSeries(ctx context.Context, query *SeriesQuery, node
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(series.IDIn(ids...))
+	query.Where(media.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -421,7 +421,7 @@ func (eq *EpisodeQuery) loadSeries(ctx context.Context, query *SeriesQuery, node
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "series_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "media_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -455,8 +455,8 @@ func (eq *EpisodeQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if eq.withSeries != nil {
-			_spec.Node.AddColumnOnce(episode.FieldSeriesID)
+		if eq.withMedia != nil {
+			_spec.Node.AddColumnOnce(episode.FieldMediaID)
 		}
 	}
 	if ps := eq.predicates; len(ps) > 0 {

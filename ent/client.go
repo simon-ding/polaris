@@ -15,7 +15,7 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
-	"polaris/ent/series"
+	"polaris/ent/media"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 
@@ -38,8 +38,8 @@ type Client struct {
 	History *HistoryClient
 	// Indexers is the client for interacting with the Indexers builders.
 	Indexers *IndexersClient
-	// Series is the client for interacting with the Series builders.
-	Series *SeriesClient
+	// Media is the client for interacting with the Media builders.
+	Media *MediaClient
 	// Settings is the client for interacting with the Settings builders.
 	Settings *SettingsClient
 	// Storage is the client for interacting with the Storage builders.
@@ -59,7 +59,7 @@ func (c *Client) init() {
 	c.Episode = NewEpisodeClient(c.config)
 	c.History = NewHistoryClient(c.config)
 	c.Indexers = NewIndexersClient(c.config)
-	c.Series = NewSeriesClient(c.config)
+	c.Media = NewMediaClient(c.config)
 	c.Settings = NewSettingsClient(c.config)
 	c.Storage = NewStorageClient(c.config)
 }
@@ -158,7 +158,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Episode:         NewEpisodeClient(cfg),
 		History:         NewHistoryClient(cfg),
 		Indexers:        NewIndexersClient(cfg),
-		Series:          NewSeriesClient(cfg),
+		Media:           NewMediaClient(cfg),
 		Settings:        NewSettingsClient(cfg),
 		Storage:         NewStorageClient(cfg),
 	}, nil
@@ -184,7 +184,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Episode:         NewEpisodeClient(cfg),
 		History:         NewHistoryClient(cfg),
 		Indexers:        NewIndexersClient(cfg),
-		Series:          NewSeriesClient(cfg),
+		Media:           NewMediaClient(cfg),
 		Settings:        NewSettingsClient(cfg),
 		Storage:         NewStorageClient(cfg),
 	}, nil
@@ -216,7 +216,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Series, c.Settings,
+		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media, c.Settings,
 		c.Storage,
 	} {
 		n.Use(hooks...)
@@ -227,7 +227,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Series, c.Settings,
+		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media, c.Settings,
 		c.Storage,
 	} {
 		n.Intercept(interceptors...)
@@ -245,8 +245,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.History.mutate(ctx, m)
 	case *IndexersMutation:
 		return c.Indexers.mutate(ctx, m)
-	case *SeriesMutation:
-		return c.Series.mutate(ctx, m)
+	case *MediaMutation:
+		return c.Media.mutate(ctx, m)
 	case *SettingsMutation:
 		return c.Settings.mutate(ctx, m)
 	case *StorageMutation:
@@ -497,15 +497,15 @@ func (c *EpisodeClient) GetX(ctx context.Context, id int) *Episode {
 	return obj
 }
 
-// QuerySeries queries the series edge of a Episode.
-func (c *EpisodeClient) QuerySeries(e *Episode) *SeriesQuery {
-	query := (&SeriesClient{config: c.config}).Query()
+// QueryMedia queries the media edge of a Episode.
+func (c *EpisodeClient) QueryMedia(e *Episode) *MediaQuery {
+	query := (&MediaClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(episode.Table, episode.FieldID, id),
-			sqlgraph.To(series.Table, series.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, episode.SeriesTable, episode.SeriesColumn),
+			sqlgraph.To(media.Table, media.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, episode.MediaTable, episode.MediaColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -804,107 +804,107 @@ func (c *IndexersClient) mutate(ctx context.Context, m *IndexersMutation) (Value
 	}
 }
 
-// SeriesClient is a client for the Series schema.
-type SeriesClient struct {
+// MediaClient is a client for the Media schema.
+type MediaClient struct {
 	config
 }
 
-// NewSeriesClient returns a client for the Series from the given config.
-func NewSeriesClient(c config) *SeriesClient {
-	return &SeriesClient{config: c}
+// NewMediaClient returns a client for the Media from the given config.
+func NewMediaClient(c config) *MediaClient {
+	return &MediaClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `series.Hooks(f(g(h())))`.
-func (c *SeriesClient) Use(hooks ...Hook) {
-	c.hooks.Series = append(c.hooks.Series, hooks...)
+// A call to `Use(f, g, h)` equals to `media.Hooks(f(g(h())))`.
+func (c *MediaClient) Use(hooks ...Hook) {
+	c.hooks.Media = append(c.hooks.Media, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `series.Intercept(f(g(h())))`.
-func (c *SeriesClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Series = append(c.inters.Series, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `media.Intercept(f(g(h())))`.
+func (c *MediaClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Media = append(c.inters.Media, interceptors...)
 }
 
-// Create returns a builder for creating a Series entity.
-func (c *SeriesClient) Create() *SeriesCreate {
-	mutation := newSeriesMutation(c.config, OpCreate)
-	return &SeriesCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Media entity.
+func (c *MediaClient) Create() *MediaCreate {
+	mutation := newMediaMutation(c.config, OpCreate)
+	return &MediaCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Series entities.
-func (c *SeriesClient) CreateBulk(builders ...*SeriesCreate) *SeriesCreateBulk {
-	return &SeriesCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Media entities.
+func (c *MediaClient) CreateBulk(builders ...*MediaCreate) *MediaCreateBulk {
+	return &MediaCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *SeriesClient) MapCreateBulk(slice any, setFunc func(*SeriesCreate, int)) *SeriesCreateBulk {
+func (c *MediaClient) MapCreateBulk(slice any, setFunc func(*MediaCreate, int)) *MediaCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &SeriesCreateBulk{err: fmt.Errorf("calling to SeriesClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &MediaCreateBulk{err: fmt.Errorf("calling to MediaClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*SeriesCreate, rv.Len())
+	builders := make([]*MediaCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &SeriesCreateBulk{config: c.config, builders: builders}
+	return &MediaCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Series.
-func (c *SeriesClient) Update() *SeriesUpdate {
-	mutation := newSeriesMutation(c.config, OpUpdate)
-	return &SeriesUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Media.
+func (c *MediaClient) Update() *MediaUpdate {
+	mutation := newMediaMutation(c.config, OpUpdate)
+	return &MediaUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *SeriesClient) UpdateOne(s *Series) *SeriesUpdateOne {
-	mutation := newSeriesMutation(c.config, OpUpdateOne, withSeries(s))
-	return &SeriesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *MediaClient) UpdateOne(m *Media) *MediaUpdateOne {
+	mutation := newMediaMutation(c.config, OpUpdateOne, withMedia(m))
+	return &MediaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SeriesClient) UpdateOneID(id int) *SeriesUpdateOne {
-	mutation := newSeriesMutation(c.config, OpUpdateOne, withSeriesID(id))
-	return &SeriesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *MediaClient) UpdateOneID(id int) *MediaUpdateOne {
+	mutation := newMediaMutation(c.config, OpUpdateOne, withMediaID(id))
+	return &MediaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Series.
-func (c *SeriesClient) Delete() *SeriesDelete {
-	mutation := newSeriesMutation(c.config, OpDelete)
-	return &SeriesDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Media.
+func (c *MediaClient) Delete() *MediaDelete {
+	mutation := newMediaMutation(c.config, OpDelete)
+	return &MediaDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *SeriesClient) DeleteOne(s *Series) *SeriesDeleteOne {
-	return c.DeleteOneID(s.ID)
+func (c *MediaClient) DeleteOne(m *Media) *MediaDeleteOne {
+	return c.DeleteOneID(m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *SeriesClient) DeleteOneID(id int) *SeriesDeleteOne {
-	builder := c.Delete().Where(series.ID(id))
+func (c *MediaClient) DeleteOneID(id int) *MediaDeleteOne {
+	builder := c.Delete().Where(media.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &SeriesDeleteOne{builder}
+	return &MediaDeleteOne{builder}
 }
 
-// Query returns a query builder for Series.
-func (c *SeriesClient) Query() *SeriesQuery {
-	return &SeriesQuery{
+// Query returns a query builder for Media.
+func (c *MediaClient) Query() *MediaQuery {
+	return &MediaQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeSeries},
+		ctx:    &QueryContext{Type: TypeMedia},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Series entity by its id.
-func (c *SeriesClient) Get(ctx context.Context, id int) (*Series, error) {
-	return c.Query().Where(series.ID(id)).Only(ctx)
+// Get returns a Media entity by its id.
+func (c *MediaClient) Get(ctx context.Context, id int) (*Media, error) {
+	return c.Query().Where(media.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SeriesClient) GetX(ctx context.Context, id int) *Series {
+func (c *MediaClient) GetX(ctx context.Context, id int) *Media {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -912,44 +912,44 @@ func (c *SeriesClient) GetX(ctx context.Context, id int) *Series {
 	return obj
 }
 
-// QueryEpisodes queries the episodes edge of a Series.
-func (c *SeriesClient) QueryEpisodes(s *Series) *EpisodeQuery {
+// QueryEpisodes queries the episodes edge of a Media.
+func (c *MediaClient) QueryEpisodes(m *Media) *EpisodeQuery {
 	query := (&EpisodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
+		id := m.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(series.Table, series.FieldID, id),
+			sqlgraph.From(media.Table, media.FieldID, id),
 			sqlgraph.To(episode.Table, episode.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, series.EpisodesTable, series.EpisodesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, media.EpisodesTable, media.EpisodesColumn),
 		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *SeriesClient) Hooks() []Hook {
-	return c.hooks.Series
+func (c *MediaClient) Hooks() []Hook {
+	return c.hooks.Media
 }
 
 // Interceptors returns the client interceptors.
-func (c *SeriesClient) Interceptors() []Interceptor {
-	return c.inters.Series
+func (c *MediaClient) Interceptors() []Interceptor {
+	return c.inters.Media
 }
 
-func (c *SeriesClient) mutate(ctx context.Context, m *SeriesMutation) (Value, error) {
+func (c *MediaClient) mutate(ctx context.Context, m *MediaMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&SeriesCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&MediaCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&SeriesUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&MediaUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&SeriesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&MediaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&SeriesDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&MediaDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Series mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Media mutation op: %q", m.Op())
 	}
 }
 
@@ -1222,11 +1222,10 @@ func (c *StorageClient) mutate(ctx context.Context, m *StorageMutation) (Value, 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		DownloadClients, Episode, History, Indexers, Series, Settings,
-		Storage []ent.Hook
+		DownloadClients, Episode, History, Indexers, Media, Settings, Storage []ent.Hook
 	}
 	inters struct {
-		DownloadClients, Episode, History, Indexers, Series, Settings,
+		DownloadClients, Episode, History, Indexers, Media, Settings,
 		Storage []ent.Interceptor
 	}
 )

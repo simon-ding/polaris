@@ -20,8 +20,8 @@ type Tx struct {
 	History *HistoryClient
 	// Indexers is the client for interacting with the Indexers builders.
 	Indexers *IndexersClient
-	// Series is the client for interacting with the Series builders.
-	Series *SeriesClient
+	// Media is the client for interacting with the Media builders.
+	Media *MediaClient
 	// Settings is the client for interacting with the Settings builders.
 	Settings *SettingsClient
 	// Storage is the client for interacting with the Storage builders.
@@ -161,7 +161,7 @@ func (tx *Tx) init() {
 	tx.Episode = NewEpisodeClient(tx.config)
 	tx.History = NewHistoryClient(tx.config)
 	tx.Indexers = NewIndexersClient(tx.config)
-	tx.Series = NewSeriesClient(tx.config)
+	tx.Media = NewMediaClient(tx.config)
 	tx.Settings = NewSettingsClient(tx.config)
 	tx.Storage = NewStorageClient(tx.config)
 }

@@ -54,9 +54,9 @@ func IDLTE(id int) predicate.Episode {
 	return predicate.Episode(sql.FieldLTE(FieldID, id))
 }
 
-// SeriesID applies equality check predicate on the "series_id" field. It's identical to SeriesIDEQ.
-func SeriesID(v int) predicate.Episode {
-	return predicate.Episode(sql.FieldEQ(FieldSeriesID, v))
+// MediaID applies equality check predicate on the "media_id" field. It's identical to MediaIDEQ.
+func MediaID(v int) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldMediaID, v))
 }
 
 // SeasonNumber applies equality check predicate on the "season_number" field. It's identical to SeasonNumberEQ.
@@ -89,34 +89,34 @@ func FileInStorage(v string) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldFileInStorage, v))
 }
 
-// SeriesIDEQ applies the EQ predicate on the "series_id" field.
-func SeriesIDEQ(v int) predicate.Episode {
-	return predicate.Episode(sql.FieldEQ(FieldSeriesID, v))
+// MediaIDEQ applies the EQ predicate on the "media_id" field.
+func MediaIDEQ(v int) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldMediaID, v))
 }
 
-// SeriesIDNEQ applies the NEQ predicate on the "series_id" field.
-func SeriesIDNEQ(v int) predicate.Episode {
-	return predicate.Episode(sql.FieldNEQ(FieldSeriesID, v))
+// MediaIDNEQ applies the NEQ predicate on the "media_id" field.
+func MediaIDNEQ(v int) predicate.Episode {
+	return predicate.Episode(sql.FieldNEQ(FieldMediaID, v))
 }
 
-// SeriesIDIn applies the In predicate on the "series_id" field.
-func SeriesIDIn(vs ...int) predicate.Episode {
-	return predicate.Episode(sql.FieldIn(FieldSeriesID, vs...))
+// MediaIDIn applies the In predicate on the "media_id" field.
+func MediaIDIn(vs ...int) predicate.Episode {
+	return predicate.Episode(sql.FieldIn(FieldMediaID, vs...))
 }
 
-// SeriesIDNotIn applies the NotIn predicate on the "series_id" field.
-func SeriesIDNotIn(vs ...int) predicate.Episode {
-	return predicate.Episode(sql.FieldNotIn(FieldSeriesID, vs...))
+// MediaIDNotIn applies the NotIn predicate on the "media_id" field.
+func MediaIDNotIn(vs ...int) predicate.Episode {
+	return predicate.Episode(sql.FieldNotIn(FieldMediaID, vs...))
 }
 
-// SeriesIDIsNil applies the IsNil predicate on the "series_id" field.
-func SeriesIDIsNil() predicate.Episode {
-	return predicate.Episode(sql.FieldIsNull(FieldSeriesID))
+// MediaIDIsNil applies the IsNil predicate on the "media_id" field.
+func MediaIDIsNil() predicate.Episode {
+	return predicate.Episode(sql.FieldIsNull(FieldMediaID))
 }
 
-// SeriesIDNotNil applies the NotNil predicate on the "series_id" field.
-func SeriesIDNotNil() predicate.Episode {
-	return predicate.Episode(sql.FieldNotNull(FieldSeriesID))
+// MediaIDNotNil applies the NotNil predicate on the "media_id" field.
+func MediaIDNotNil() predicate.Episode {
+	return predicate.Episode(sql.FieldNotNull(FieldMediaID))
 }
 
 // SeasonNumberEQ applies the EQ predicate on the "season_number" field.
@@ -489,21 +489,21 @@ func FileInStorageContainsFold(v string) predicate.Episode {
 	return predicate.Episode(sql.FieldContainsFold(FieldFileInStorage, v))
 }
 
-// HasSeries applies the HasEdge predicate on the "series" edge.
-func HasSeries() predicate.Episode {
+// HasMedia applies the HasEdge predicate on the "media" edge.
+func HasMedia() predicate.Episode {
 	return predicate.Episode(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, SeriesTable, SeriesColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, MediaTable, MediaColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSeriesWith applies the HasEdge predicate on the "series" edge with a given conditions (other predicates).
-func HasSeriesWith(preds ...predicate.Series) predicate.Episode {
+// HasMediaWith applies the HasEdge predicate on the "media" edge with a given conditions (other predicates).
+func HasMediaWith(preds ...predicate.Media) predicate.Episode {
 	return predicate.Episode(func(s *sql.Selector) {
-		step := newSeriesStep()
+		step := newMediaStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

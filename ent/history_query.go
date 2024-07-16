@@ -261,12 +261,12 @@ func (hq *HistoryQuery) Clone() *HistoryQuery {
 // Example:
 //
 //	var v []struct {
-//		SeriesID int `json:"series_id,omitempty"`
+//		MediaID int `json:"media_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.History.Query().
-//		GroupBy(history.FieldSeriesID).
+//		GroupBy(history.FieldMediaID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (hq *HistoryQuery) GroupBy(field string, fields ...string) *HistoryGroupBy {
@@ -284,11 +284,11 @@ func (hq *HistoryQuery) GroupBy(field string, fields ...string) *HistoryGroupBy 
 // Example:
 //
 //	var v []struct {
-//		SeriesID int `json:"series_id,omitempty"`
+//		MediaID int `json:"media_id,omitempty"`
 //	}
 //
 //	client.History.Query().
-//		Select(history.FieldSeriesID).
+//		Select(history.FieldMediaID).
 //		Scan(ctx, &v)
 func (hq *HistoryQuery) Select(fields ...string) *HistorySelect {
 	hq.ctx.Fields = append(hq.ctx.Fields, fields...)

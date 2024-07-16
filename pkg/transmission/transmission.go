@@ -121,6 +121,10 @@ func (t *Torrent) Remove() error {
 	})
 }
 
+func (t *Torrent) Size() int {
+	return int(t.getTorrent().TotalSize.Byte())
+}
+
 func (t *Torrent) Save() string {
 
 	d, _ := json.Marshal(*t)

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/episode"
-	"polaris/ent/series"
+	"polaris/ent/media"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -20,16 +20,16 @@ type EpisodeCreate struct {
 	hooks    []Hook
 }
 
-// SetSeriesID sets the "series_id" field.
-func (ec *EpisodeCreate) SetSeriesID(i int) *EpisodeCreate {
-	ec.mutation.SetSeriesID(i)
+// SetMediaID sets the "media_id" field.
+func (ec *EpisodeCreate) SetMediaID(i int) *EpisodeCreate {
+	ec.mutation.SetMediaID(i)
 	return ec
 }
 
-// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
-func (ec *EpisodeCreate) SetNillableSeriesID(i *int) *EpisodeCreate {
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableMediaID(i *int) *EpisodeCreate {
 	if i != nil {
-		ec.SetSeriesID(*i)
+		ec.SetMediaID(*i)
 	}
 	return ec
 }
@@ -92,9 +92,9 @@ func (ec *EpisodeCreate) SetNillableFileInStorage(s *string) *EpisodeCreate {
 	return ec
 }
 
-// SetSeries sets the "series" edge to the Series entity.
-func (ec *EpisodeCreate) SetSeries(s *Series) *EpisodeCreate {
-	return ec.SetSeriesID(s.ID)
+// SetMedia sets the "media" edge to the Media entity.
+func (ec *EpisodeCreate) SetMedia(m *Media) *EpisodeCreate {
+	return ec.SetMediaID(m.ID)
 }
 
 // Mutation returns the EpisodeMutation object of the builder.
@@ -217,21 +217,21 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
 		_node.FileInStorage = value
 	}
-	if nodes := ec.mutation.SeriesIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.MediaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   episode.SeriesTable,
-			Columns: []string{episode.SeriesColumn},
+			Table:   episode.MediaTable,
+			Columns: []string{episode.MediaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(series.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(media.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.SeriesID = nodes[0]
+		_node.MediaID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

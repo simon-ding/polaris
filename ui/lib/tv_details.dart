@@ -5,7 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
-import 'package:ui/weclome.dart';
+import 'package:ui/tv_watchlist.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class TvDetailsPage extends ConsumerStatefulWidget {
@@ -38,7 +38,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var seriesDetails = ref.watch(seriesDetailsProvider(seriesId));
+    var seriesDetails = ref.watch(mediaDetailsProvider(seriesId));
     var storage = ref.watch(storageSettingProvider);
     return FutureBuilder(
         // We listen to the pending operation, to update the UI accordingly.
@@ -70,7 +70,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                             onPressed: () async {
                               var f = ref
                                   .read(
-                                      seriesDetailsProvider(seriesId).notifier)
+                                      mediaDetailsProvider(seriesId).notifier)
                                   .searchAndDownload(seriesId, ep.seasonNumber!,
                                       ep.episodeNumber!);
                               setState(() {
@@ -189,11 +189,11 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                       IconButton(
                                           onPressed: () {
                                             ref
-                                                .read(seriesDetailsProvider(
+                                                .read(mediaDetailsProvider(
                                                         seriesId)
                                                     .notifier)
                                                 .delete();
-                                            context.go(WelcomePage.route);
+                                            context.go(TvWatchlistPage.route);
                                           },
                                           icon: const Icon(Icons.delete))
                                     ],

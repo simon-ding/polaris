@@ -4,7 +4,7 @@ package ent
 
 import (
 	"fmt"
-	"polaris/ent/series"
+	"polaris/ent/media"
 	"strings"
 	"time"
 
@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Series is the model entity for the Series schema.
-type Series struct {
+// Media is the model entity for the Media schema.
+type Media struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -21,6 +21,8 @@ type Series struct {
 	TmdbID int `json:"tmdb_id,omitempty"`
 	// ImdbID holds the value of the "imdb_id" field.
 	ImdbID string `json:"imdb_id,omitempty"`
+	// MediaType holds the value of the "media_type" field.
+	MediaType media.MediaType `json:"media_type,omitempty"`
 	// NameCn holds the value of the "name_cn" field.
 	NameCn string `json:"name_cn,omitempty"`
 	// NameEn holds the value of the "name_en" field.
@@ -29,8 +31,6 @@ type Series struct {
 	OriginalName string `json:"original_name,omitempty"`
 	// Overview holds the value of the "overview" field.
 	Overview string `json:"overview,omitempty"`
-	// PosterPath holds the value of the "poster_path" field.
-	PosterPath string `json:"poster_path,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// AirDate holds the value of the "air_date" field.
@@ -42,13 +42,13 @@ type Series struct {
 	// TargetDir holds the value of the "target_dir" field.
 	TargetDir string `json:"target_dir,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the SeriesQuery when eager-loading is set.
-	Edges        SeriesEdges `json:"edges"`
+	// The values are being populated by the MediaQuery when eager-loading is set.
+	Edges        MediaEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// SeriesEdges holds the relations/edges for other nodes in the graph.
-type SeriesEdges struct {
+// MediaEdges holds the relations/edges for other nodes in the graph.
+type MediaEdges struct {
 	// Episodes holds the value of the episodes edge.
 	Episodes []*Episode `json:"episodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -58,7 +58,7 @@ type SeriesEdges struct {
 
 // EpisodesOrErr returns the Episodes value or an error if the edge
 // was not loaded in eager-loading.
-func (e SeriesEdges) EpisodesOrErr() ([]*Episode, error) {
+func (e MediaEdges) EpisodesOrErr() ([]*Episode, error) {
 	if e.loadedTypes[0] {
 		return e.Episodes, nil
 	}
@@ -66,15 +66,15 @@ func (e SeriesEdges) EpisodesOrErr() ([]*Episode, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Series) scanValues(columns []string) ([]any, error) {
+func (*Media) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case series.FieldID, series.FieldTmdbID, series.FieldStorageID:
+		case media.FieldID, media.FieldTmdbID, media.FieldStorageID:
 			values[i] = new(sql.NullInt64)
-		case series.FieldImdbID, series.FieldNameCn, series.FieldNameEn, series.FieldOriginalName, series.FieldOverview, series.FieldPosterPath, series.FieldAirDate, series.FieldResolution, series.FieldTargetDir:
+		case media.FieldImdbID, media.FieldMediaType, media.FieldNameCn, media.FieldNameEn, media.FieldOriginalName, media.FieldOverview, media.FieldAirDate, media.FieldResolution, media.FieldTargetDir:
 			values[i] = new(sql.NullString)
-		case series.FieldCreatedAt:
+		case media.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -84,170 +84,170 @@ func (*Series) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Series fields.
-func (s *Series) assignValues(columns []string, values []any) error {
+// to the Media fields.
+func (m *Media) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case series.FieldID:
+		case media.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			s.ID = int(value.Int64)
-		case series.FieldTmdbID:
+			m.ID = int(value.Int64)
+		case media.FieldTmdbID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tmdb_id", values[i])
 			} else if value.Valid {
-				s.TmdbID = int(value.Int64)
+				m.TmdbID = int(value.Int64)
 			}
-		case series.FieldImdbID:
+		case media.FieldImdbID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field imdb_id", values[i])
 			} else if value.Valid {
-				s.ImdbID = value.String
+				m.ImdbID = value.String
 			}
-		case series.FieldNameCn:
+		case media.FieldMediaType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field media_type", values[i])
+			} else if value.Valid {
+				m.MediaType = media.MediaType(value.String)
+			}
+		case media.FieldNameCn:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name_cn", values[i])
 			} else if value.Valid {
-				s.NameCn = value.String
+				m.NameCn = value.String
 			}
-		case series.FieldNameEn:
+		case media.FieldNameEn:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name_en", values[i])
 			} else if value.Valid {
-				s.NameEn = value.String
+				m.NameEn = value.String
 			}
-		case series.FieldOriginalName:
+		case media.FieldOriginalName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field original_name", values[i])
 			} else if value.Valid {
-				s.OriginalName = value.String
+				m.OriginalName = value.String
 			}
-		case series.FieldOverview:
+		case media.FieldOverview:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field overview", values[i])
 			} else if value.Valid {
-				s.Overview = value.String
+				m.Overview = value.String
 			}
-		case series.FieldPosterPath:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field poster_path", values[i])
-			} else if value.Valid {
-				s.PosterPath = value.String
-			}
-		case series.FieldCreatedAt:
+		case media.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				s.CreatedAt = value.Time
+				m.CreatedAt = value.Time
 			}
-		case series.FieldAirDate:
+		case media.FieldAirDate:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field air_date", values[i])
 			} else if value.Valid {
-				s.AirDate = value.String
+				m.AirDate = value.String
 			}
-		case series.FieldResolution:
+		case media.FieldResolution:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field resolution", values[i])
 			} else if value.Valid {
-				s.Resolution = value.String
+				m.Resolution = value.String
 			}
-		case series.FieldStorageID:
+		case media.FieldStorageID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field storage_id", values[i])
 			} else if value.Valid {
-				s.StorageID = int(value.Int64)
+				m.StorageID = int(value.Int64)
 			}
-		case series.FieldTargetDir:
+		case media.FieldTargetDir:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field target_dir", values[i])
 			} else if value.Valid {
-				s.TargetDir = value.String
+				m.TargetDir = value.String
 			}
 		default:
-			s.selectValues.Set(columns[i], values[i])
+			m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the Series.
+// Value returns the ent.Value that was dynamically selected and assigned to the Media.
 // This includes values selected through modifiers, order, etc.
-func (s *Series) Value(name string) (ent.Value, error) {
-	return s.selectValues.Get(name)
+func (m *Media) Value(name string) (ent.Value, error) {
+	return m.selectValues.Get(name)
 }
 
-// QueryEpisodes queries the "episodes" edge of the Series entity.
-func (s *Series) QueryEpisodes() *EpisodeQuery {
-	return NewSeriesClient(s.config).QueryEpisodes(s)
+// QueryEpisodes queries the "episodes" edge of the Media entity.
+func (m *Media) QueryEpisodes() *EpisodeQuery {
+	return NewMediaClient(m.config).QueryEpisodes(m)
 }
 
-// Update returns a builder for updating this Series.
-// Note that you need to call Series.Unwrap() before calling this method if this Series
+// Update returns a builder for updating this Media.
+// Note that you need to call Media.Unwrap() before calling this method if this Media
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (s *Series) Update() *SeriesUpdateOne {
-	return NewSeriesClient(s.config).UpdateOne(s)
+func (m *Media) Update() *MediaUpdateOne {
+	return NewMediaClient(m.config).UpdateOne(m)
 }
 
-// Unwrap unwraps the Series entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Media entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (s *Series) Unwrap() *Series {
-	_tx, ok := s.config.driver.(*txDriver)
+func (m *Media) Unwrap() *Media {
+	_tx, ok := m.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Series is not a transactional entity")
+		panic("ent: Media is not a transactional entity")
 	}
-	s.config.driver = _tx.drv
-	return s
+	m.config.driver = _tx.drv
+	return m
 }
 
 // String implements the fmt.Stringer.
-func (s *Series) String() string {
+func (m *Media) String() string {
 	var builder strings.Builder
-	builder.WriteString("Series(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString("Media(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
 	builder.WriteString("tmdb_id=")
-	builder.WriteString(fmt.Sprintf("%v", s.TmdbID))
+	builder.WriteString(fmt.Sprintf("%v", m.TmdbID))
 	builder.WriteString(", ")
 	builder.WriteString("imdb_id=")
-	builder.WriteString(s.ImdbID)
+	builder.WriteString(m.ImdbID)
+	builder.WriteString(", ")
+	builder.WriteString("media_type=")
+	builder.WriteString(fmt.Sprintf("%v", m.MediaType))
 	builder.WriteString(", ")
 	builder.WriteString("name_cn=")
-	builder.WriteString(s.NameCn)
+	builder.WriteString(m.NameCn)
 	builder.WriteString(", ")
 	builder.WriteString("name_en=")
-	builder.WriteString(s.NameEn)
+	builder.WriteString(m.NameEn)
 	builder.WriteString(", ")
 	builder.WriteString("original_name=")
-	builder.WriteString(s.OriginalName)
+	builder.WriteString(m.OriginalName)
 	builder.WriteString(", ")
 	builder.WriteString("overview=")
-	builder.WriteString(s.Overview)
-	builder.WriteString(", ")
-	builder.WriteString("poster_path=")
-	builder.WriteString(s.PosterPath)
+	builder.WriteString(m.Overview)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("air_date=")
-	builder.WriteString(s.AirDate)
+	builder.WriteString(m.AirDate)
 	builder.WriteString(", ")
 	builder.WriteString("resolution=")
-	builder.WriteString(s.Resolution)
+	builder.WriteString(m.Resolution)
 	builder.WriteString(", ")
 	builder.WriteString("storage_id=")
-	builder.WriteString(fmt.Sprintf("%v", s.StorageID))
+	builder.WriteString(fmt.Sprintf("%v", m.StorageID))
 	builder.WriteString(", ")
 	builder.WriteString("target_dir=")
-	builder.WriteString(s.TargetDir)
+	builder.WriteString(m.TargetDir)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// SeriesSlice is a parsable slice of Series.
-type SeriesSlice []*Series
+// MediaSlice is a parsable slice of Media.
+type MediaSlice []*Media

@@ -28,24 +28,24 @@ func (hu *HistoryUpdate) Where(ps ...predicate.History) *HistoryUpdate {
 	return hu
 }
 
-// SetSeriesID sets the "series_id" field.
-func (hu *HistoryUpdate) SetSeriesID(i int) *HistoryUpdate {
-	hu.mutation.ResetSeriesID()
-	hu.mutation.SetSeriesID(i)
+// SetMediaID sets the "media_id" field.
+func (hu *HistoryUpdate) SetMediaID(i int) *HistoryUpdate {
+	hu.mutation.ResetMediaID()
+	hu.mutation.SetMediaID(i)
 	return hu
 }
 
-// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
-func (hu *HistoryUpdate) SetNillableSeriesID(i *int) *HistoryUpdate {
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableMediaID(i *int) *HistoryUpdate {
 	if i != nil {
-		hu.SetSeriesID(*i)
+		hu.SetMediaID(*i)
 	}
 	return hu
 }
 
-// AddSeriesID adds i to the "series_id" field.
-func (hu *HistoryUpdate) AddSeriesID(i int) *HistoryUpdate {
-	hu.mutation.AddSeriesID(i)
+// AddMediaID adds i to the "media_id" field.
+func (hu *HistoryUpdate) AddMediaID(i int) *HistoryUpdate {
+	hu.mutation.AddMediaID(i)
 	return hu
 }
 
@@ -221,11 +221,11 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := hu.mutation.SeriesID(); ok {
-		_spec.SetField(history.FieldSeriesID, field.TypeInt, value)
+	if value, ok := hu.mutation.MediaID(); ok {
+		_spec.SetField(history.FieldMediaID, field.TypeInt, value)
 	}
-	if value, ok := hu.mutation.AddedSeriesID(); ok {
-		_spec.AddField(history.FieldSeriesID, field.TypeInt, value)
+	if value, ok := hu.mutation.AddedMediaID(); ok {
+		_spec.AddField(history.FieldMediaID, field.TypeInt, value)
 	}
 	if value, ok := hu.mutation.EpisodeID(); ok {
 		_spec.SetField(history.FieldEpisodeID, field.TypeInt, value)
@@ -277,24 +277,24 @@ type HistoryUpdateOne struct {
 	mutation *HistoryMutation
 }
 
-// SetSeriesID sets the "series_id" field.
-func (huo *HistoryUpdateOne) SetSeriesID(i int) *HistoryUpdateOne {
-	huo.mutation.ResetSeriesID()
-	huo.mutation.SetSeriesID(i)
+// SetMediaID sets the "media_id" field.
+func (huo *HistoryUpdateOne) SetMediaID(i int) *HistoryUpdateOne {
+	huo.mutation.ResetMediaID()
+	huo.mutation.SetMediaID(i)
 	return huo
 }
 
-// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
-func (huo *HistoryUpdateOne) SetNillableSeriesID(i *int) *HistoryUpdateOne {
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableMediaID(i *int) *HistoryUpdateOne {
 	if i != nil {
-		huo.SetSeriesID(*i)
+		huo.SetMediaID(*i)
 	}
 	return huo
 }
 
-// AddSeriesID adds i to the "series_id" field.
-func (huo *HistoryUpdateOne) AddSeriesID(i int) *HistoryUpdateOne {
-	huo.mutation.AddSeriesID(i)
+// AddMediaID adds i to the "media_id" field.
+func (huo *HistoryUpdateOne) AddMediaID(i int) *HistoryUpdateOne {
+	huo.mutation.AddMediaID(i)
 	return huo
 }
 
@@ -500,11 +500,11 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 			}
 		}
 	}
-	if value, ok := huo.mutation.SeriesID(); ok {
-		_spec.SetField(history.FieldSeriesID, field.TypeInt, value)
+	if value, ok := huo.mutation.MediaID(); ok {
+		_spec.SetField(history.FieldMediaID, field.TypeInt, value)
 	}
-	if value, ok := huo.mutation.AddedSeriesID(); ok {
-		_spec.AddField(history.FieldSeriesID, field.TypeInt, value)
+	if value, ok := huo.mutation.AddedMediaID(); ok {
+		_spec.AddField(history.FieldMediaID, field.TypeInt, value)
 	}
 	if value, ok := huo.mutation.EpisodeID(); ok {
 		_spec.SetField(history.FieldEpisodeID, field.TypeInt, value)

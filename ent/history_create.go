@@ -20,9 +20,9 @@ type HistoryCreate struct {
 	hooks    []Hook
 }
 
-// SetSeriesID sets the "series_id" field.
-func (hc *HistoryCreate) SetSeriesID(i int) *HistoryCreate {
-	hc.mutation.SetSeriesID(i)
+// SetMediaID sets the "media_id" field.
+func (hc *HistoryCreate) SetMediaID(i int) *HistoryCreate {
+	hc.mutation.SetMediaID(i)
 	return hc
 }
 
@@ -127,8 +127,8 @@ func (hc *HistoryCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (hc *HistoryCreate) check() error {
-	if _, ok := hc.mutation.SeriesID(); !ok {
-		return &ValidationError{Name: "series_id", err: errors.New(`ent: missing required field "History.series_id"`)}
+	if _, ok := hc.mutation.MediaID(); !ok {
+		return &ValidationError{Name: "media_id", err: errors.New(`ent: missing required field "History.media_id"`)}
 	}
 	if _, ok := hc.mutation.EpisodeID(); !ok {
 		return &ValidationError{Name: "episode_id", err: errors.New(`ent: missing required field "History.episode_id"`)}
@@ -179,9 +179,9 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 		_node = &History{config: hc.config}
 		_spec = sqlgraph.NewCreateSpec(history.Table, sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt))
 	)
-	if value, ok := hc.mutation.SeriesID(); ok {
-		_spec.SetField(history.FieldSeriesID, field.TypeInt, value)
-		_node.SeriesID = value
+	if value, ok := hc.mutation.MediaID(); ok {
+		_spec.SetField(history.FieldMediaID, field.TypeInt, value)
+		_node.MediaID = value
 	}
 	if value, ok := hc.mutation.EpisodeID(); ok {
 		_spec.SetField(history.FieldEpisodeID, field.TypeInt, value)

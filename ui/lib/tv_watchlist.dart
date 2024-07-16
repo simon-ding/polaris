@@ -6,14 +6,16 @@ import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/tv_details.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
-class WelcomePage extends ConsumerWidget {
+class TvWatchlistPage
+ extends ConsumerWidget {
   static const route = "/series";
 
-  const WelcomePage({super.key});
+  const TvWatchlistPage
+  ({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(welcomePageDataProvider);
+    final data = ref.watch(tvWatchlistDataProvider);
 
     return switch (data) {
       AsyncData(:final value) => GridView.builder(

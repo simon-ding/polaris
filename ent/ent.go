@@ -10,7 +10,7 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
-	"polaris/ent/series"
+	"polaris/ent/media"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"reflect"
@@ -83,7 +83,7 @@ func checkColumn(table, column string) error {
 			episode.Table:         episode.ValidColumn,
 			history.Table:         history.ValidColumn,
 			indexers.Table:        indexers.ValidColumn,
-			series.Table:          series.ValidColumn,
+			media.Table:           media.ValidColumn,
 			settings.Table:        settings.ValidColumn,
 			storage.Table:         storage.ValidColumn,
 		})

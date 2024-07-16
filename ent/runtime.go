@@ -6,8 +6,8 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
+	"polaris/ent/media"
 	"polaris/ent/schema"
-	"polaris/ent/series"
 	"polaris/ent/storage"
 	"time"
 )
@@ -60,20 +60,20 @@ func init() {
 	indexersDescEnableRss := indexersFields[3].Descriptor()
 	// indexers.DefaultEnableRss holds the default value on creation for the enable_rss field.
 	indexers.DefaultEnableRss = indexersDescEnableRss.Default.(bool)
-	seriesFields := schema.Series{}.Fields()
-	_ = seriesFields
-	// seriesDescCreatedAt is the schema descriptor for created_at field.
-	seriesDescCreatedAt := seriesFields[7].Descriptor()
-	// series.DefaultCreatedAt holds the default value on creation for the created_at field.
-	series.DefaultCreatedAt = seriesDescCreatedAt.Default.(time.Time)
-	// seriesDescAirDate is the schema descriptor for air_date field.
-	seriesDescAirDate := seriesFields[8].Descriptor()
-	// series.DefaultAirDate holds the default value on creation for the air_date field.
-	series.DefaultAirDate = seriesDescAirDate.Default.(string)
-	// seriesDescResolution is the schema descriptor for resolution field.
-	seriesDescResolution := seriesFields[9].Descriptor()
-	// series.DefaultResolution holds the default value on creation for the resolution field.
-	series.DefaultResolution = seriesDescResolution.Default.(string)
+	mediaFields := schema.Media{}.Fields()
+	_ = mediaFields
+	// mediaDescCreatedAt is the schema descriptor for created_at field.
+	mediaDescCreatedAt := mediaFields[7].Descriptor()
+	// media.DefaultCreatedAt holds the default value on creation for the created_at field.
+	media.DefaultCreatedAt = mediaDescCreatedAt.Default.(time.Time)
+	// mediaDescAirDate is the schema descriptor for air_date field.
+	mediaDescAirDate := mediaFields[8].Descriptor()
+	// media.DefaultAirDate holds the default value on creation for the air_date field.
+	media.DefaultAirDate = mediaDescAirDate.Default.(string)
+	// mediaDescResolution is the schema descriptor for resolution field.
+	mediaDescResolution := mediaFields[9].Descriptor()
+	// media.DefaultResolution holds the default value on creation for the resolution field.
+	media.DefaultResolution = mediaDescResolution.Default.(string)
 	storageFields := schema.Storage{}.Fields()
 	_ = storageFields
 	// storageDescDeleted is the schema descriptor for deleted field.

@@ -10,8 +10,8 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
+	"polaris/ent/media"
 	"polaris/ent/predicate"
-	"polaris/ent/series"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"sync"
@@ -34,7 +34,7 @@ const (
 	TypeEpisode         = "Episode"
 	TypeHistory         = "History"
 	TypeIndexers        = "Indexers"
-	TypeSeries          = "Series"
+	TypeMedia           = "Media"
 	TypeSettings        = "Settings"
 	TypeStorage         = "Storage"
 )
@@ -921,8 +921,8 @@ type EpisodeMutation struct {
 	status            *episode.Status
 	file_in_storage   *string
 	clearedFields     map[string]struct{}
-	series            *int
-	clearedseries     bool
+	media             *int
+	clearedmedia      bool
 	done              bool
 	oldValue          func(context.Context) (*Episode, error)
 	predicates        []predicate.Episode
@@ -1026,53 +1026,53 @@ func (m *EpisodeMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetSeriesID sets the "series_id" field.
-func (m *EpisodeMutation) SetSeriesID(i int) {
-	m.series = &i
+// SetMediaID sets the "media_id" field.
+func (m *EpisodeMutation) SetMediaID(i int) {
+	m.media = &i
 }
 
-// SeriesID returns the value of the "series_id" field in the mutation.
-func (m *EpisodeMutation) SeriesID() (r int, exists bool) {
-	v := m.series
+// MediaID returns the value of the "media_id" field in the mutation.
+func (m *EpisodeMutation) MediaID() (r int, exists bool) {
+	v := m.media
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSeriesID returns the old "series_id" field's value of the Episode entity.
+// OldMediaID returns the old "media_id" field's value of the Episode entity.
 // If the Episode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpisodeMutation) OldSeriesID(ctx context.Context) (v int, err error) {
+func (m *EpisodeMutation) OldMediaID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSeriesID is only allowed on UpdateOne operations")
+		return v, errors.New("OldMediaID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSeriesID requires an ID field in the mutation")
+		return v, errors.New("OldMediaID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSeriesID: %w", err)
+		return v, fmt.Errorf("querying old value for OldMediaID: %w", err)
 	}
-	return oldValue.SeriesID, nil
+	return oldValue.MediaID, nil
 }
 
-// ClearSeriesID clears the value of the "series_id" field.
-func (m *EpisodeMutation) ClearSeriesID() {
-	m.series = nil
-	m.clearedFields[episode.FieldSeriesID] = struct{}{}
+// ClearMediaID clears the value of the "media_id" field.
+func (m *EpisodeMutation) ClearMediaID() {
+	m.media = nil
+	m.clearedFields[episode.FieldMediaID] = struct{}{}
 }
 
-// SeriesIDCleared returns if the "series_id" field was cleared in this mutation.
-func (m *EpisodeMutation) SeriesIDCleared() bool {
-	_, ok := m.clearedFields[episode.FieldSeriesID]
+// MediaIDCleared returns if the "media_id" field was cleared in this mutation.
+func (m *EpisodeMutation) MediaIDCleared() bool {
+	_, ok := m.clearedFields[episode.FieldMediaID]
 	return ok
 }
 
-// ResetSeriesID resets all changes to the "series_id" field.
-func (m *EpisodeMutation) ResetSeriesID() {
-	m.series = nil
-	delete(m.clearedFields, episode.FieldSeriesID)
+// ResetMediaID resets all changes to the "media_id" field.
+func (m *EpisodeMutation) ResetMediaID() {
+	m.media = nil
+	delete(m.clearedFields, episode.FieldMediaID)
 }
 
 // SetSeasonNumber sets the "season_number" field.
@@ -1380,31 +1380,31 @@ func (m *EpisodeMutation) ResetFileInStorage() {
 	delete(m.clearedFields, episode.FieldFileInStorage)
 }
 
-// ClearSeries clears the "series" edge to the Series entity.
-func (m *EpisodeMutation) ClearSeries() {
-	m.clearedseries = true
-	m.clearedFields[episode.FieldSeriesID] = struct{}{}
+// ClearMedia clears the "media" edge to the Media entity.
+func (m *EpisodeMutation) ClearMedia() {
+	m.clearedmedia = true
+	m.clearedFields[episode.FieldMediaID] = struct{}{}
 }
 
-// SeriesCleared reports if the "series" edge to the Series entity was cleared.
-func (m *EpisodeMutation) SeriesCleared() bool {
-	return m.SeriesIDCleared() || m.clearedseries
+// MediaCleared reports if the "media" edge to the Media entity was cleared.
+func (m *EpisodeMutation) MediaCleared() bool {
+	return m.MediaIDCleared() || m.clearedmedia
 }
 
-// SeriesIDs returns the "series" edge IDs in the mutation.
+// MediaIDs returns the "media" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SeriesID instead. It exists only for internal usage by the builders.
-func (m *EpisodeMutation) SeriesIDs() (ids []int) {
-	if id := m.series; id != nil {
+// MediaID instead. It exists only for internal usage by the builders.
+func (m *EpisodeMutation) MediaIDs() (ids []int) {
+	if id := m.media; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetSeries resets all changes to the "series" edge.
-func (m *EpisodeMutation) ResetSeries() {
-	m.series = nil
-	m.clearedseries = false
+// ResetMedia resets all changes to the "media" edge.
+func (m *EpisodeMutation) ResetMedia() {
+	m.media = nil
+	m.clearedmedia = false
 }
 
 // Where appends a list predicates to the EpisodeMutation builder.
@@ -1442,8 +1442,8 @@ func (m *EpisodeMutation) Type() string {
 // AddedFields().
 func (m *EpisodeMutation) Fields() []string {
 	fields := make([]string, 0, 8)
-	if m.series != nil {
-		fields = append(fields, episode.FieldSeriesID)
+	if m.media != nil {
+		fields = append(fields, episode.FieldMediaID)
 	}
 	if m.season_number != nil {
 		fields = append(fields, episode.FieldSeasonNumber)
@@ -1474,8 +1474,8 @@ func (m *EpisodeMutation) Fields() []string {
 // schema.
 func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case episode.FieldSeriesID:
-		return m.SeriesID()
+	case episode.FieldMediaID:
+		return m.MediaID()
 	case episode.FieldSeasonNumber:
 		return m.SeasonNumber()
 	case episode.FieldEpisodeNumber:
@@ -1499,8 +1499,8 @@ func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case episode.FieldSeriesID:
-		return m.OldSeriesID(ctx)
+	case episode.FieldMediaID:
+		return m.OldMediaID(ctx)
 	case episode.FieldSeasonNumber:
 		return m.OldSeasonNumber(ctx)
 	case episode.FieldEpisodeNumber:
@@ -1524,12 +1524,12 @@ func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case episode.FieldSeriesID:
+	case episode.FieldMediaID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSeriesID(v)
+		m.SetMediaID(v)
 		return nil
 	case episode.FieldSeasonNumber:
 		v, ok := value.(int)
@@ -1637,8 +1637,8 @@ func (m *EpisodeMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *EpisodeMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(episode.FieldSeriesID) {
-		fields = append(fields, episode.FieldSeriesID)
+	if m.FieldCleared(episode.FieldMediaID) {
+		fields = append(fields, episode.FieldMediaID)
 	}
 	if m.FieldCleared(episode.FieldFileInStorage) {
 		fields = append(fields, episode.FieldFileInStorage)
@@ -1657,8 +1657,8 @@ func (m *EpisodeMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *EpisodeMutation) ClearField(name string) error {
 	switch name {
-	case episode.FieldSeriesID:
-		m.ClearSeriesID()
+	case episode.FieldMediaID:
+		m.ClearMediaID()
 		return nil
 	case episode.FieldFileInStorage:
 		m.ClearFileInStorage()
@@ -1671,8 +1671,8 @@ func (m *EpisodeMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *EpisodeMutation) ResetField(name string) error {
 	switch name {
-	case episode.FieldSeriesID:
-		m.ResetSeriesID()
+	case episode.FieldMediaID:
+		m.ResetMediaID()
 		return nil
 	case episode.FieldSeasonNumber:
 		m.ResetSeasonNumber()
@@ -1702,8 +1702,8 @@ func (m *EpisodeMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EpisodeMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.series != nil {
-		edges = append(edges, episode.EdgeSeries)
+	if m.media != nil {
+		edges = append(edges, episode.EdgeMedia)
 	}
 	return edges
 }
@@ -1712,8 +1712,8 @@ func (m *EpisodeMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *EpisodeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case episode.EdgeSeries:
-		if id := m.series; id != nil {
+	case episode.EdgeMedia:
+		if id := m.media; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -1735,8 +1735,8 @@ func (m *EpisodeMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EpisodeMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedseries {
-		edges = append(edges, episode.EdgeSeries)
+	if m.clearedmedia {
+		edges = append(edges, episode.EdgeMedia)
 	}
 	return edges
 }
@@ -1745,8 +1745,8 @@ func (m *EpisodeMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *EpisodeMutation) EdgeCleared(name string) bool {
 	switch name {
-	case episode.EdgeSeries:
-		return m.clearedseries
+	case episode.EdgeMedia:
+		return m.clearedmedia
 	}
 	return false
 }
@@ -1755,8 +1755,8 @@ func (m *EpisodeMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *EpisodeMutation) ClearEdge(name string) error {
 	switch name {
-	case episode.EdgeSeries:
-		m.ClearSeries()
+	case episode.EdgeMedia:
+		m.ClearMedia()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode unique edge %s", name)
@@ -1766,8 +1766,8 @@ func (m *EpisodeMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *EpisodeMutation) ResetEdge(name string) error {
 	switch name {
-	case episode.EdgeSeries:
-		m.ResetSeries()
+	case episode.EdgeMedia:
+		m.ResetMedia()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode edge %s", name)
@@ -1779,8 +1779,8 @@ type HistoryMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	series_id     *int
-	addseries_id  *int
+	media_id      *int
+	addmedia_id   *int
 	episode_id    *int
 	addepisode_id *int
 	source_title  *string
@@ -1894,60 +1894,60 @@ func (m *HistoryMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetSeriesID sets the "series_id" field.
-func (m *HistoryMutation) SetSeriesID(i int) {
-	m.series_id = &i
-	m.addseries_id = nil
+// SetMediaID sets the "media_id" field.
+func (m *HistoryMutation) SetMediaID(i int) {
+	m.media_id = &i
+	m.addmedia_id = nil
 }
 
-// SeriesID returns the value of the "series_id" field in the mutation.
-func (m *HistoryMutation) SeriesID() (r int, exists bool) {
-	v := m.series_id
+// MediaID returns the value of the "media_id" field in the mutation.
+func (m *HistoryMutation) MediaID() (r int, exists bool) {
+	v := m.media_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSeriesID returns the old "series_id" field's value of the History entity.
+// OldMediaID returns the old "media_id" field's value of the History entity.
 // If the History object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *HistoryMutation) OldSeriesID(ctx context.Context) (v int, err error) {
+func (m *HistoryMutation) OldMediaID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSeriesID is only allowed on UpdateOne operations")
+		return v, errors.New("OldMediaID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSeriesID requires an ID field in the mutation")
+		return v, errors.New("OldMediaID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSeriesID: %w", err)
+		return v, fmt.Errorf("querying old value for OldMediaID: %w", err)
 	}
-	return oldValue.SeriesID, nil
+	return oldValue.MediaID, nil
 }
 
-// AddSeriesID adds i to the "series_id" field.
-func (m *HistoryMutation) AddSeriesID(i int) {
-	if m.addseries_id != nil {
-		*m.addseries_id += i
+// AddMediaID adds i to the "media_id" field.
+func (m *HistoryMutation) AddMediaID(i int) {
+	if m.addmedia_id != nil {
+		*m.addmedia_id += i
 	} else {
-		m.addseries_id = &i
+		m.addmedia_id = &i
 	}
 }
 
-// AddedSeriesID returns the value that was added to the "series_id" field in this mutation.
-func (m *HistoryMutation) AddedSeriesID() (r int, exists bool) {
-	v := m.addseries_id
+// AddedMediaID returns the value that was added to the "media_id" field in this mutation.
+func (m *HistoryMutation) AddedMediaID() (r int, exists bool) {
+	v := m.addmedia_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetSeriesID resets all changes to the "series_id" field.
-func (m *HistoryMutation) ResetSeriesID() {
-	m.series_id = nil
-	m.addseries_id = nil
+// ResetMediaID resets all changes to the "media_id" field.
+func (m *HistoryMutation) ResetMediaID() {
+	m.media_id = nil
+	m.addmedia_id = nil
 }
 
 // SetEpisodeID sets the "episode_id" field.
@@ -2290,8 +2290,8 @@ func (m *HistoryMutation) Type() string {
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
 	fields := make([]string, 0, 8)
-	if m.series_id != nil {
-		fields = append(fields, history.FieldSeriesID)
+	if m.media_id != nil {
+		fields = append(fields, history.FieldMediaID)
 	}
 	if m.episode_id != nil {
 		fields = append(fields, history.FieldEpisodeID)
@@ -2322,8 +2322,8 @@ func (m *HistoryMutation) Fields() []string {
 // schema.
 func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case history.FieldSeriesID:
-		return m.SeriesID()
+	case history.FieldMediaID:
+		return m.MediaID()
 	case history.FieldEpisodeID:
 		return m.EpisodeID()
 	case history.FieldSourceTitle:
@@ -2347,8 +2347,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case history.FieldSeriesID:
-		return m.OldSeriesID(ctx)
+	case history.FieldMediaID:
+		return m.OldMediaID(ctx)
 	case history.FieldEpisodeID:
 		return m.OldEpisodeID(ctx)
 	case history.FieldSourceTitle:
@@ -2372,12 +2372,12 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case history.FieldSeriesID:
+	case history.FieldMediaID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSeriesID(v)
+		m.SetMediaID(v)
 		return nil
 	case history.FieldEpisodeID:
 		v, ok := value.(int)
@@ -2436,8 +2436,8 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *HistoryMutation) AddedFields() []string {
 	var fields []string
-	if m.addseries_id != nil {
-		fields = append(fields, history.FieldSeriesID)
+	if m.addmedia_id != nil {
+		fields = append(fields, history.FieldMediaID)
 	}
 	if m.addepisode_id != nil {
 		fields = append(fields, history.FieldEpisodeID)
@@ -2453,8 +2453,8 @@ func (m *HistoryMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *HistoryMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case history.FieldSeriesID:
-		return m.AddedSeriesID()
+	case history.FieldMediaID:
+		return m.AddedMediaID()
 	case history.FieldEpisodeID:
 		return m.AddedEpisodeID()
 	case history.FieldSize:
@@ -2468,12 +2468,12 @@ func (m *HistoryMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *HistoryMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case history.FieldSeriesID:
+	case history.FieldMediaID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddSeriesID(v)
+		m.AddMediaID(v)
 		return nil
 	case history.FieldEpisodeID:
 		v, ok := value.(int)
@@ -2525,8 +2525,8 @@ func (m *HistoryMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *HistoryMutation) ResetField(name string) error {
 	switch name {
-	case history.FieldSeriesID:
-		m.ResetSeriesID()
+	case history.FieldMediaID:
+		m.ResetMediaID()
 		return nil
 	case history.FieldEpisodeID:
 		m.ResetEpisodeID()
@@ -3179,8 +3179,8 @@ func (m *IndexersMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Indexers edge %s", name)
 }
 
-// SeriesMutation represents an operation that mutates the Series nodes in the graph.
-type SeriesMutation struct {
+// MediaMutation represents an operation that mutates the Media nodes in the graph.
+type MediaMutation struct {
 	config
 	op              Op
 	typ             string
@@ -3188,11 +3188,11 @@ type SeriesMutation struct {
 	tmdb_id         *int
 	addtmdb_id      *int
 	imdb_id         *string
+	media_type      *media.MediaType
 	name_cn         *string
 	name_en         *string
 	original_name   *string
 	overview        *string
-	poster_path     *string
 	created_at      *time.Time
 	air_date        *string
 	resolution      *string
@@ -3204,21 +3204,21 @@ type SeriesMutation struct {
 	removedepisodes map[int]struct{}
 	clearedepisodes bool
 	done            bool
-	oldValue        func(context.Context) (*Series, error)
-	predicates      []predicate.Series
+	oldValue        func(context.Context) (*Media, error)
+	predicates      []predicate.Media
 }
 
-var _ ent.Mutation = (*SeriesMutation)(nil)
+var _ ent.Mutation = (*MediaMutation)(nil)
 
-// seriesOption allows management of the mutation configuration using functional options.
-type seriesOption func(*SeriesMutation)
+// mediaOption allows management of the mutation configuration using functional options.
+type mediaOption func(*MediaMutation)
 
-// newSeriesMutation creates new mutation for the Series entity.
-func newSeriesMutation(c config, op Op, opts ...seriesOption) *SeriesMutation {
-	m := &SeriesMutation{
+// newMediaMutation creates new mutation for the Media entity.
+func newMediaMutation(c config, op Op, opts ...mediaOption) *MediaMutation {
+	m := &MediaMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeSeries,
+		typ:           TypeMedia,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -3227,20 +3227,20 @@ func newSeriesMutation(c config, op Op, opts ...seriesOption) *SeriesMutation {
 	return m
 }
 
-// withSeriesID sets the ID field of the mutation.
-func withSeriesID(id int) seriesOption {
-	return func(m *SeriesMutation) {
+// withMediaID sets the ID field of the mutation.
+func withMediaID(id int) mediaOption {
+	return func(m *MediaMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Series
+			value *Media
 		)
-		m.oldValue = func(ctx context.Context) (*Series, error) {
+		m.oldValue = func(ctx context.Context) (*Media, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Series.Get(ctx, id)
+					value, err = m.Client().Media.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -3249,10 +3249,10 @@ func withSeriesID(id int) seriesOption {
 	}
 }
 
-// withSeries sets the old Series of the mutation.
-func withSeries(node *Series) seriesOption {
-	return func(m *SeriesMutation) {
-		m.oldValue = func(context.Context) (*Series, error) {
+// withMedia sets the old Media of the mutation.
+func withMedia(node *Media) mediaOption {
+	return func(m *MediaMutation) {
+		m.oldValue = func(context.Context) (*Media, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -3261,7 +3261,7 @@ func withSeries(node *Series) seriesOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m SeriesMutation) Client() *Client {
+func (m MediaMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -3269,7 +3269,7 @@ func (m SeriesMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m SeriesMutation) Tx() (*Tx, error) {
+func (m MediaMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -3280,7 +3280,7 @@ func (m SeriesMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *SeriesMutation) ID() (id int, exists bool) {
+func (m *MediaMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3291,7 +3291,7 @@ func (m *SeriesMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *SeriesMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *MediaMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -3300,20 +3300,20 @@ func (m *SeriesMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Series.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Media.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
 // SetTmdbID sets the "tmdb_id" field.
-func (m *SeriesMutation) SetTmdbID(i int) {
+func (m *MediaMutation) SetTmdbID(i int) {
 	m.tmdb_id = &i
 	m.addtmdb_id = nil
 }
 
 // TmdbID returns the value of the "tmdb_id" field in the mutation.
-func (m *SeriesMutation) TmdbID() (r int, exists bool) {
+func (m *MediaMutation) TmdbID() (r int, exists bool) {
 	v := m.tmdb_id
 	if v == nil {
 		return
@@ -3321,10 +3321,10 @@ func (m *SeriesMutation) TmdbID() (r int, exists bool) {
 	return *v, true
 }
 
-// OldTmdbID returns the old "tmdb_id" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldTmdbID returns the old "tmdb_id" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldTmdbID(ctx context.Context) (v int, err error) {
+func (m *MediaMutation) OldTmdbID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTmdbID is only allowed on UpdateOne operations")
 	}
@@ -3339,7 +3339,7 @@ func (m *SeriesMutation) OldTmdbID(ctx context.Context) (v int, err error) {
 }
 
 // AddTmdbID adds i to the "tmdb_id" field.
-func (m *SeriesMutation) AddTmdbID(i int) {
+func (m *MediaMutation) AddTmdbID(i int) {
 	if m.addtmdb_id != nil {
 		*m.addtmdb_id += i
 	} else {
@@ -3348,7 +3348,7 @@ func (m *SeriesMutation) AddTmdbID(i int) {
 }
 
 // AddedTmdbID returns the value that was added to the "tmdb_id" field in this mutation.
-func (m *SeriesMutation) AddedTmdbID() (r int, exists bool) {
+func (m *MediaMutation) AddedTmdbID() (r int, exists bool) {
 	v := m.addtmdb_id
 	if v == nil {
 		return
@@ -3357,18 +3357,18 @@ func (m *SeriesMutation) AddedTmdbID() (r int, exists bool) {
 }
 
 // ResetTmdbID resets all changes to the "tmdb_id" field.
-func (m *SeriesMutation) ResetTmdbID() {
+func (m *MediaMutation) ResetTmdbID() {
 	m.tmdb_id = nil
 	m.addtmdb_id = nil
 }
 
 // SetImdbID sets the "imdb_id" field.
-func (m *SeriesMutation) SetImdbID(s string) {
+func (m *MediaMutation) SetImdbID(s string) {
 	m.imdb_id = &s
 }
 
 // ImdbID returns the value of the "imdb_id" field in the mutation.
-func (m *SeriesMutation) ImdbID() (r string, exists bool) {
+func (m *MediaMutation) ImdbID() (r string, exists bool) {
 	v := m.imdb_id
 	if v == nil {
 		return
@@ -3376,10 +3376,10 @@ func (m *SeriesMutation) ImdbID() (r string, exists bool) {
 	return *v, true
 }
 
-// OldImdbID returns the old "imdb_id" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldImdbID returns the old "imdb_id" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldImdbID(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldImdbID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldImdbID is only allowed on UpdateOne operations")
 	}
@@ -3394,30 +3394,66 @@ func (m *SeriesMutation) OldImdbID(ctx context.Context) (v string, err error) {
 }
 
 // ClearImdbID clears the value of the "imdb_id" field.
-func (m *SeriesMutation) ClearImdbID() {
+func (m *MediaMutation) ClearImdbID() {
 	m.imdb_id = nil
-	m.clearedFields[series.FieldImdbID] = struct{}{}
+	m.clearedFields[media.FieldImdbID] = struct{}{}
 }
 
 // ImdbIDCleared returns if the "imdb_id" field was cleared in this mutation.
-func (m *SeriesMutation) ImdbIDCleared() bool {
-	_, ok := m.clearedFields[series.FieldImdbID]
+func (m *MediaMutation) ImdbIDCleared() bool {
+	_, ok := m.clearedFields[media.FieldImdbID]
 	return ok
 }
 
 // ResetImdbID resets all changes to the "imdb_id" field.
-func (m *SeriesMutation) ResetImdbID() {
+func (m *MediaMutation) ResetImdbID() {
 	m.imdb_id = nil
-	delete(m.clearedFields, series.FieldImdbID)
+	delete(m.clearedFields, media.FieldImdbID)
+}
+
+// SetMediaType sets the "media_type" field.
+func (m *MediaMutation) SetMediaType(mt media.MediaType) {
+	m.media_type = &mt
+}
+
+// MediaType returns the value of the "media_type" field in the mutation.
+func (m *MediaMutation) MediaType() (r media.MediaType, exists bool) {
+	v := m.media_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMediaType returns the old "media_type" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MediaMutation) OldMediaType(ctx context.Context) (v media.MediaType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMediaType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMediaType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMediaType: %w", err)
+	}
+	return oldValue.MediaType, nil
+}
+
+// ResetMediaType resets all changes to the "media_type" field.
+func (m *MediaMutation) ResetMediaType() {
+	m.media_type = nil
 }
 
 // SetNameCn sets the "name_cn" field.
-func (m *SeriesMutation) SetNameCn(s string) {
+func (m *MediaMutation) SetNameCn(s string) {
 	m.name_cn = &s
 }
 
 // NameCn returns the value of the "name_cn" field in the mutation.
-func (m *SeriesMutation) NameCn() (r string, exists bool) {
+func (m *MediaMutation) NameCn() (r string, exists bool) {
 	v := m.name_cn
 	if v == nil {
 		return
@@ -3425,10 +3461,10 @@ func (m *SeriesMutation) NameCn() (r string, exists bool) {
 	return *v, true
 }
 
-// OldNameCn returns the old "name_cn" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldNameCn returns the old "name_cn" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldNameCn(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldNameCn(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldNameCn is only allowed on UpdateOne operations")
 	}
@@ -3443,17 +3479,17 @@ func (m *SeriesMutation) OldNameCn(ctx context.Context) (v string, err error) {
 }
 
 // ResetNameCn resets all changes to the "name_cn" field.
-func (m *SeriesMutation) ResetNameCn() {
+func (m *MediaMutation) ResetNameCn() {
 	m.name_cn = nil
 }
 
 // SetNameEn sets the "name_en" field.
-func (m *SeriesMutation) SetNameEn(s string) {
+func (m *MediaMutation) SetNameEn(s string) {
 	m.name_en = &s
 }
 
 // NameEn returns the value of the "name_en" field in the mutation.
-func (m *SeriesMutation) NameEn() (r string, exists bool) {
+func (m *MediaMutation) NameEn() (r string, exists bool) {
 	v := m.name_en
 	if v == nil {
 		return
@@ -3461,10 +3497,10 @@ func (m *SeriesMutation) NameEn() (r string, exists bool) {
 	return *v, true
 }
 
-// OldNameEn returns the old "name_en" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldNameEn returns the old "name_en" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldNameEn(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldNameEn(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldNameEn is only allowed on UpdateOne operations")
 	}
@@ -3479,17 +3515,17 @@ func (m *SeriesMutation) OldNameEn(ctx context.Context) (v string, err error) {
 }
 
 // ResetNameEn resets all changes to the "name_en" field.
-func (m *SeriesMutation) ResetNameEn() {
+func (m *MediaMutation) ResetNameEn() {
 	m.name_en = nil
 }
 
 // SetOriginalName sets the "original_name" field.
-func (m *SeriesMutation) SetOriginalName(s string) {
+func (m *MediaMutation) SetOriginalName(s string) {
 	m.original_name = &s
 }
 
 // OriginalName returns the value of the "original_name" field in the mutation.
-func (m *SeriesMutation) OriginalName() (r string, exists bool) {
+func (m *MediaMutation) OriginalName() (r string, exists bool) {
 	v := m.original_name
 	if v == nil {
 		return
@@ -3497,10 +3533,10 @@ func (m *SeriesMutation) OriginalName() (r string, exists bool) {
 	return *v, true
 }
 
-// OldOriginalName returns the old "original_name" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldOriginalName returns the old "original_name" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldOriginalName(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldOriginalName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOriginalName is only allowed on UpdateOne operations")
 	}
@@ -3515,17 +3551,17 @@ func (m *SeriesMutation) OldOriginalName(ctx context.Context) (v string, err err
 }
 
 // ResetOriginalName resets all changes to the "original_name" field.
-func (m *SeriesMutation) ResetOriginalName() {
+func (m *MediaMutation) ResetOriginalName() {
 	m.original_name = nil
 }
 
 // SetOverview sets the "overview" field.
-func (m *SeriesMutation) SetOverview(s string) {
+func (m *MediaMutation) SetOverview(s string) {
 	m.overview = &s
 }
 
 // Overview returns the value of the "overview" field in the mutation.
-func (m *SeriesMutation) Overview() (r string, exists bool) {
+func (m *MediaMutation) Overview() (r string, exists bool) {
 	v := m.overview
 	if v == nil {
 		return
@@ -3533,10 +3569,10 @@ func (m *SeriesMutation) Overview() (r string, exists bool) {
 	return *v, true
 }
 
-// OldOverview returns the old "overview" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldOverview returns the old "overview" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldOverview(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldOverview(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOverview is only allowed on UpdateOne operations")
 	}
@@ -3551,66 +3587,17 @@ func (m *SeriesMutation) OldOverview(ctx context.Context) (v string, err error) 
 }
 
 // ResetOverview resets all changes to the "overview" field.
-func (m *SeriesMutation) ResetOverview() {
+func (m *MediaMutation) ResetOverview() {
 	m.overview = nil
 }
 
-// SetPosterPath sets the "poster_path" field.
-func (m *SeriesMutation) SetPosterPath(s string) {
-	m.poster_path = &s
-}
-
-// PosterPath returns the value of the "poster_path" field in the mutation.
-func (m *SeriesMutation) PosterPath() (r string, exists bool) {
-	v := m.poster_path
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPosterPath returns the old "poster_path" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldPosterPath(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPosterPath is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPosterPath requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPosterPath: %w", err)
-	}
-	return oldValue.PosterPath, nil
-}
-
-// ClearPosterPath clears the value of the "poster_path" field.
-func (m *SeriesMutation) ClearPosterPath() {
-	m.poster_path = nil
-	m.clearedFields[series.FieldPosterPath] = struct{}{}
-}
-
-// PosterPathCleared returns if the "poster_path" field was cleared in this mutation.
-func (m *SeriesMutation) PosterPathCleared() bool {
-	_, ok := m.clearedFields[series.FieldPosterPath]
-	return ok
-}
-
-// ResetPosterPath resets all changes to the "poster_path" field.
-func (m *SeriesMutation) ResetPosterPath() {
-	m.poster_path = nil
-	delete(m.clearedFields, series.FieldPosterPath)
-}
-
 // SetCreatedAt sets the "created_at" field.
-func (m *SeriesMutation) SetCreatedAt(t time.Time) {
+func (m *MediaMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
 }
 
 // CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *SeriesMutation) CreatedAt() (r time.Time, exists bool) {
+func (m *MediaMutation) CreatedAt() (r time.Time, exists bool) {
 	v := m.created_at
 	if v == nil {
 		return
@@ -3618,10 +3605,10 @@ func (m *SeriesMutation) CreatedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldCreatedAt returns the old "created_at" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *MediaMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -3636,17 +3623,17 @@ func (m *SeriesMutation) OldCreatedAt(ctx context.Context) (v time.Time, err err
 }
 
 // ResetCreatedAt resets all changes to the "created_at" field.
-func (m *SeriesMutation) ResetCreatedAt() {
+func (m *MediaMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
 // SetAirDate sets the "air_date" field.
-func (m *SeriesMutation) SetAirDate(s string) {
+func (m *MediaMutation) SetAirDate(s string) {
 	m.air_date = &s
 }
 
 // AirDate returns the value of the "air_date" field in the mutation.
-func (m *SeriesMutation) AirDate() (r string, exists bool) {
+func (m *MediaMutation) AirDate() (r string, exists bool) {
 	v := m.air_date
 	if v == nil {
 		return
@@ -3654,10 +3641,10 @@ func (m *SeriesMutation) AirDate() (r string, exists bool) {
 	return *v, true
 }
 
-// OldAirDate returns the old "air_date" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldAirDate returns the old "air_date" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldAirDate(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldAirDate(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAirDate is only allowed on UpdateOne operations")
 	}
@@ -3672,17 +3659,17 @@ func (m *SeriesMutation) OldAirDate(ctx context.Context) (v string, err error) {
 }
 
 // ResetAirDate resets all changes to the "air_date" field.
-func (m *SeriesMutation) ResetAirDate() {
+func (m *MediaMutation) ResetAirDate() {
 	m.air_date = nil
 }
 
 // SetResolution sets the "resolution" field.
-func (m *SeriesMutation) SetResolution(s string) {
+func (m *MediaMutation) SetResolution(s string) {
 	m.resolution = &s
 }
 
 // Resolution returns the value of the "resolution" field in the mutation.
-func (m *SeriesMutation) Resolution() (r string, exists bool) {
+func (m *MediaMutation) Resolution() (r string, exists bool) {
 	v := m.resolution
 	if v == nil {
 		return
@@ -3690,10 +3677,10 @@ func (m *SeriesMutation) Resolution() (r string, exists bool) {
 	return *v, true
 }
 
-// OldResolution returns the old "resolution" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldResolution returns the old "resolution" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldResolution(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldResolution(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldResolution is only allowed on UpdateOne operations")
 	}
@@ -3708,18 +3695,18 @@ func (m *SeriesMutation) OldResolution(ctx context.Context) (v string, err error
 }
 
 // ResetResolution resets all changes to the "resolution" field.
-func (m *SeriesMutation) ResetResolution() {
+func (m *MediaMutation) ResetResolution() {
 	m.resolution = nil
 }
 
 // SetStorageID sets the "storage_id" field.
-func (m *SeriesMutation) SetStorageID(i int) {
+func (m *MediaMutation) SetStorageID(i int) {
 	m.storage_id = &i
 	m.addstorage_id = nil
 }
 
 // StorageID returns the value of the "storage_id" field in the mutation.
-func (m *SeriesMutation) StorageID() (r int, exists bool) {
+func (m *MediaMutation) StorageID() (r int, exists bool) {
 	v := m.storage_id
 	if v == nil {
 		return
@@ -3727,10 +3714,10 @@ func (m *SeriesMutation) StorageID() (r int, exists bool) {
 	return *v, true
 }
 
-// OldStorageID returns the old "storage_id" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldStorageID returns the old "storage_id" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldStorageID(ctx context.Context) (v int, err error) {
+func (m *MediaMutation) OldStorageID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStorageID is only allowed on UpdateOne operations")
 	}
@@ -3745,7 +3732,7 @@ func (m *SeriesMutation) OldStorageID(ctx context.Context) (v int, err error) {
 }
 
 // AddStorageID adds i to the "storage_id" field.
-func (m *SeriesMutation) AddStorageID(i int) {
+func (m *MediaMutation) AddStorageID(i int) {
 	if m.addstorage_id != nil {
 		*m.addstorage_id += i
 	} else {
@@ -3754,7 +3741,7 @@ func (m *SeriesMutation) AddStorageID(i int) {
 }
 
 // AddedStorageID returns the value that was added to the "storage_id" field in this mutation.
-func (m *SeriesMutation) AddedStorageID() (r int, exists bool) {
+func (m *MediaMutation) AddedStorageID() (r int, exists bool) {
 	v := m.addstorage_id
 	if v == nil {
 		return
@@ -3763,32 +3750,32 @@ func (m *SeriesMutation) AddedStorageID() (r int, exists bool) {
 }
 
 // ClearStorageID clears the value of the "storage_id" field.
-func (m *SeriesMutation) ClearStorageID() {
+func (m *MediaMutation) ClearStorageID() {
 	m.storage_id = nil
 	m.addstorage_id = nil
-	m.clearedFields[series.FieldStorageID] = struct{}{}
+	m.clearedFields[media.FieldStorageID] = struct{}{}
 }
 
 // StorageIDCleared returns if the "storage_id" field was cleared in this mutation.
-func (m *SeriesMutation) StorageIDCleared() bool {
-	_, ok := m.clearedFields[series.FieldStorageID]
+func (m *MediaMutation) StorageIDCleared() bool {
+	_, ok := m.clearedFields[media.FieldStorageID]
 	return ok
 }
 
 // ResetStorageID resets all changes to the "storage_id" field.
-func (m *SeriesMutation) ResetStorageID() {
+func (m *MediaMutation) ResetStorageID() {
 	m.storage_id = nil
 	m.addstorage_id = nil
-	delete(m.clearedFields, series.FieldStorageID)
+	delete(m.clearedFields, media.FieldStorageID)
 }
 
 // SetTargetDir sets the "target_dir" field.
-func (m *SeriesMutation) SetTargetDir(s string) {
+func (m *MediaMutation) SetTargetDir(s string) {
 	m.target_dir = &s
 }
 
 // TargetDir returns the value of the "target_dir" field in the mutation.
-func (m *SeriesMutation) TargetDir() (r string, exists bool) {
+func (m *MediaMutation) TargetDir() (r string, exists bool) {
 	v := m.target_dir
 	if v == nil {
 		return
@@ -3796,10 +3783,10 @@ func (m *SeriesMutation) TargetDir() (r string, exists bool) {
 	return *v, true
 }
 
-// OldTargetDir returns the old "target_dir" field's value of the Series entity.
-// If the Series object wasn't provided to the builder, the object is fetched from the database.
+// OldTargetDir returns the old "target_dir" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeriesMutation) OldTargetDir(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldTargetDir(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTargetDir is only allowed on UpdateOne operations")
 	}
@@ -3814,25 +3801,25 @@ func (m *SeriesMutation) OldTargetDir(ctx context.Context) (v string, err error)
 }
 
 // ClearTargetDir clears the value of the "target_dir" field.
-func (m *SeriesMutation) ClearTargetDir() {
+func (m *MediaMutation) ClearTargetDir() {
 	m.target_dir = nil
-	m.clearedFields[series.FieldTargetDir] = struct{}{}
+	m.clearedFields[media.FieldTargetDir] = struct{}{}
 }
 
 // TargetDirCleared returns if the "target_dir" field was cleared in this mutation.
-func (m *SeriesMutation) TargetDirCleared() bool {
-	_, ok := m.clearedFields[series.FieldTargetDir]
+func (m *MediaMutation) TargetDirCleared() bool {
+	_, ok := m.clearedFields[media.FieldTargetDir]
 	return ok
 }
 
 // ResetTargetDir resets all changes to the "target_dir" field.
-func (m *SeriesMutation) ResetTargetDir() {
+func (m *MediaMutation) ResetTargetDir() {
 	m.target_dir = nil
-	delete(m.clearedFields, series.FieldTargetDir)
+	delete(m.clearedFields, media.FieldTargetDir)
 }
 
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
-func (m *SeriesMutation) AddEpisodeIDs(ids ...int) {
+func (m *MediaMutation) AddEpisodeIDs(ids ...int) {
 	if m.episodes == nil {
 		m.episodes = make(map[int]struct{})
 	}
@@ -3842,17 +3829,17 @@ func (m *SeriesMutation) AddEpisodeIDs(ids ...int) {
 }
 
 // ClearEpisodes clears the "episodes" edge to the Episode entity.
-func (m *SeriesMutation) ClearEpisodes() {
+func (m *MediaMutation) ClearEpisodes() {
 	m.clearedepisodes = true
 }
 
 // EpisodesCleared reports if the "episodes" edge to the Episode entity was cleared.
-func (m *SeriesMutation) EpisodesCleared() bool {
+func (m *MediaMutation) EpisodesCleared() bool {
 	return m.clearedepisodes
 }
 
 // RemoveEpisodeIDs removes the "episodes" edge to the Episode entity by IDs.
-func (m *SeriesMutation) RemoveEpisodeIDs(ids ...int) {
+func (m *MediaMutation) RemoveEpisodeIDs(ids ...int) {
 	if m.removedepisodes == nil {
 		m.removedepisodes = make(map[int]struct{})
 	}
@@ -3863,7 +3850,7 @@ func (m *SeriesMutation) RemoveEpisodeIDs(ids ...int) {
 }
 
 // RemovedEpisodes returns the removed IDs of the "episodes" edge to the Episode entity.
-func (m *SeriesMutation) RemovedEpisodesIDs() (ids []int) {
+func (m *MediaMutation) RemovedEpisodesIDs() (ids []int) {
 	for id := range m.removedepisodes {
 		ids = append(ids, id)
 	}
@@ -3871,7 +3858,7 @@ func (m *SeriesMutation) RemovedEpisodesIDs() (ids []int) {
 }
 
 // EpisodesIDs returns the "episodes" edge IDs in the mutation.
-func (m *SeriesMutation) EpisodesIDs() (ids []int) {
+func (m *MediaMutation) EpisodesIDs() (ids []int) {
 	for id := range m.episodes {
 		ids = append(ids, id)
 	}
@@ -3879,21 +3866,21 @@ func (m *SeriesMutation) EpisodesIDs() (ids []int) {
 }
 
 // ResetEpisodes resets all changes to the "episodes" edge.
-func (m *SeriesMutation) ResetEpisodes() {
+func (m *MediaMutation) ResetEpisodes() {
 	m.episodes = nil
 	m.clearedepisodes = false
 	m.removedepisodes = nil
 }
 
-// Where appends a list predicates to the SeriesMutation builder.
-func (m *SeriesMutation) Where(ps ...predicate.Series) {
+// Where appends a list predicates to the MediaMutation builder.
+func (m *MediaMutation) Where(ps ...predicate.Media) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the SeriesMutation builder. Using this method,
+// WhereP appends storage-level predicates to the MediaMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *SeriesMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Series, len(ps))
+func (m *MediaMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Media, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -3901,60 +3888,60 @@ func (m *SeriesMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *SeriesMutation) Op() Op {
+func (m *MediaMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *SeriesMutation) SetOp(op Op) {
+func (m *MediaMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (Series).
-func (m *SeriesMutation) Type() string {
+// Type returns the node type of this mutation (Media).
+func (m *MediaMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *SeriesMutation) Fields() []string {
+func (m *MediaMutation) Fields() []string {
 	fields := make([]string, 0, 12)
 	if m.tmdb_id != nil {
-		fields = append(fields, series.FieldTmdbID)
+		fields = append(fields, media.FieldTmdbID)
 	}
 	if m.imdb_id != nil {
-		fields = append(fields, series.FieldImdbID)
+		fields = append(fields, media.FieldImdbID)
+	}
+	if m.media_type != nil {
+		fields = append(fields, media.FieldMediaType)
 	}
 	if m.name_cn != nil {
-		fields = append(fields, series.FieldNameCn)
+		fields = append(fields, media.FieldNameCn)
 	}
 	if m.name_en != nil {
-		fields = append(fields, series.FieldNameEn)
+		fields = append(fields, media.FieldNameEn)
 	}
 	if m.original_name != nil {
-		fields = append(fields, series.FieldOriginalName)
+		fields = append(fields, media.FieldOriginalName)
 	}
 	if m.overview != nil {
-		fields = append(fields, series.FieldOverview)
-	}
-	if m.poster_path != nil {
-		fields = append(fields, series.FieldPosterPath)
+		fields = append(fields, media.FieldOverview)
 	}
 	if m.created_at != nil {
-		fields = append(fields, series.FieldCreatedAt)
+		fields = append(fields, media.FieldCreatedAt)
 	}
 	if m.air_date != nil {
-		fields = append(fields, series.FieldAirDate)
+		fields = append(fields, media.FieldAirDate)
 	}
 	if m.resolution != nil {
-		fields = append(fields, series.FieldResolution)
+		fields = append(fields, media.FieldResolution)
 	}
 	if m.storage_id != nil {
-		fields = append(fields, series.FieldStorageID)
+		fields = append(fields, media.FieldStorageID)
 	}
 	if m.target_dir != nil {
-		fields = append(fields, series.FieldTargetDir)
+		fields = append(fields, media.FieldTargetDir)
 	}
 	return fields
 }
@@ -3962,31 +3949,31 @@ func (m *SeriesMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *SeriesMutation) Field(name string) (ent.Value, bool) {
+func (m *MediaMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case series.FieldTmdbID:
+	case media.FieldTmdbID:
 		return m.TmdbID()
-	case series.FieldImdbID:
+	case media.FieldImdbID:
 		return m.ImdbID()
-	case series.FieldNameCn:
+	case media.FieldMediaType:
+		return m.MediaType()
+	case media.FieldNameCn:
 		return m.NameCn()
-	case series.FieldNameEn:
+	case media.FieldNameEn:
 		return m.NameEn()
-	case series.FieldOriginalName:
+	case media.FieldOriginalName:
 		return m.OriginalName()
-	case series.FieldOverview:
+	case media.FieldOverview:
 		return m.Overview()
-	case series.FieldPosterPath:
-		return m.PosterPath()
-	case series.FieldCreatedAt:
+	case media.FieldCreatedAt:
 		return m.CreatedAt()
-	case series.FieldAirDate:
+	case media.FieldAirDate:
 		return m.AirDate()
-	case series.FieldResolution:
+	case media.FieldResolution:
 		return m.Resolution()
-	case series.FieldStorageID:
+	case media.FieldStorageID:
 		return m.StorageID()
-	case series.FieldTargetDir:
+	case media.FieldTargetDir:
 		return m.TargetDir()
 	}
 	return nil, false
@@ -3995,119 +3982,119 @@ func (m *SeriesMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *SeriesMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *MediaMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case series.FieldTmdbID:
+	case media.FieldTmdbID:
 		return m.OldTmdbID(ctx)
-	case series.FieldImdbID:
+	case media.FieldImdbID:
 		return m.OldImdbID(ctx)
-	case series.FieldNameCn:
+	case media.FieldMediaType:
+		return m.OldMediaType(ctx)
+	case media.FieldNameCn:
 		return m.OldNameCn(ctx)
-	case series.FieldNameEn:
+	case media.FieldNameEn:
 		return m.OldNameEn(ctx)
-	case series.FieldOriginalName:
+	case media.FieldOriginalName:
 		return m.OldOriginalName(ctx)
-	case series.FieldOverview:
+	case media.FieldOverview:
 		return m.OldOverview(ctx)
-	case series.FieldPosterPath:
-		return m.OldPosterPath(ctx)
-	case series.FieldCreatedAt:
+	case media.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case series.FieldAirDate:
+	case media.FieldAirDate:
 		return m.OldAirDate(ctx)
-	case series.FieldResolution:
+	case media.FieldResolution:
 		return m.OldResolution(ctx)
-	case series.FieldStorageID:
+	case media.FieldStorageID:
 		return m.OldStorageID(ctx)
-	case series.FieldTargetDir:
+	case media.FieldTargetDir:
 		return m.OldTargetDir(ctx)
 	}
-	return nil, fmt.Errorf("unknown Series field %s", name)
+	return nil, fmt.Errorf("unknown Media field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *SeriesMutation) SetField(name string, value ent.Value) error {
+func (m *MediaMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case series.FieldTmdbID:
+	case media.FieldTmdbID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTmdbID(v)
 		return nil
-	case series.FieldImdbID:
+	case media.FieldImdbID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImdbID(v)
 		return nil
-	case series.FieldNameCn:
+	case media.FieldMediaType:
+		v, ok := value.(media.MediaType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMediaType(v)
+		return nil
+	case media.FieldNameCn:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNameCn(v)
 		return nil
-	case series.FieldNameEn:
+	case media.FieldNameEn:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNameEn(v)
 		return nil
-	case series.FieldOriginalName:
+	case media.FieldOriginalName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOriginalName(v)
 		return nil
-	case series.FieldOverview:
+	case media.FieldOverview:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOverview(v)
 		return nil
-	case series.FieldPosterPath:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPosterPath(v)
-		return nil
-	case series.FieldCreatedAt:
+	case media.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
 		return nil
-	case series.FieldAirDate:
+	case media.FieldAirDate:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAirDate(v)
 		return nil
-	case series.FieldResolution:
+	case media.FieldResolution:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetResolution(v)
 		return nil
-	case series.FieldStorageID:
+	case media.FieldStorageID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStorageID(v)
 		return nil
-	case series.FieldTargetDir:
+	case media.FieldTargetDir:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -4115,18 +4102,18 @@ func (m *SeriesMutation) SetField(name string, value ent.Value) error {
 		m.SetTargetDir(v)
 		return nil
 	}
-	return fmt.Errorf("unknown Series field %s", name)
+	return fmt.Errorf("unknown Media field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *SeriesMutation) AddedFields() []string {
+func (m *MediaMutation) AddedFields() []string {
 	var fields []string
 	if m.addtmdb_id != nil {
-		fields = append(fields, series.FieldTmdbID)
+		fields = append(fields, media.FieldTmdbID)
 	}
 	if m.addstorage_id != nil {
-		fields = append(fields, series.FieldStorageID)
+		fields = append(fields, media.FieldStorageID)
 	}
 	return fields
 }
@@ -4134,11 +4121,11 @@ func (m *SeriesMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *SeriesMutation) AddedField(name string) (ent.Value, bool) {
+func (m *MediaMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case series.FieldTmdbID:
+	case media.FieldTmdbID:
 		return m.AddedTmdbID()
-	case series.FieldStorageID:
+	case media.FieldStorageID:
 		return m.AddedStorageID()
 	}
 	return nil, false
@@ -4147,16 +4134,16 @@ func (m *SeriesMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *SeriesMutation) AddField(name string, value ent.Value) error {
+func (m *MediaMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case series.FieldTmdbID:
+	case media.FieldTmdbID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTmdbID(v)
 		return nil
-	case series.FieldStorageID:
+	case media.FieldStorageID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -4164,113 +4151,107 @@ func (m *SeriesMutation) AddField(name string, value ent.Value) error {
 		m.AddStorageID(v)
 		return nil
 	}
-	return fmt.Errorf("unknown Series numeric field %s", name)
+	return fmt.Errorf("unknown Media numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *SeriesMutation) ClearedFields() []string {
+func (m *MediaMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(series.FieldImdbID) {
-		fields = append(fields, series.FieldImdbID)
+	if m.FieldCleared(media.FieldImdbID) {
+		fields = append(fields, media.FieldImdbID)
 	}
-	if m.FieldCleared(series.FieldPosterPath) {
-		fields = append(fields, series.FieldPosterPath)
+	if m.FieldCleared(media.FieldStorageID) {
+		fields = append(fields, media.FieldStorageID)
 	}
-	if m.FieldCleared(series.FieldStorageID) {
-		fields = append(fields, series.FieldStorageID)
-	}
-	if m.FieldCleared(series.FieldTargetDir) {
-		fields = append(fields, series.FieldTargetDir)
+	if m.FieldCleared(media.FieldTargetDir) {
+		fields = append(fields, media.FieldTargetDir)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *SeriesMutation) FieldCleared(name string) bool {
+func (m *MediaMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *SeriesMutation) ClearField(name string) error {
+func (m *MediaMutation) ClearField(name string) error {
 	switch name {
-	case series.FieldImdbID:
+	case media.FieldImdbID:
 		m.ClearImdbID()
 		return nil
-	case series.FieldPosterPath:
-		m.ClearPosterPath()
-		return nil
-	case series.FieldStorageID:
+	case media.FieldStorageID:
 		m.ClearStorageID()
 		return nil
-	case series.FieldTargetDir:
+	case media.FieldTargetDir:
 		m.ClearTargetDir()
 		return nil
 	}
-	return fmt.Errorf("unknown Series nullable field %s", name)
+	return fmt.Errorf("unknown Media nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *SeriesMutation) ResetField(name string) error {
+func (m *MediaMutation) ResetField(name string) error {
 	switch name {
-	case series.FieldTmdbID:
+	case media.FieldTmdbID:
 		m.ResetTmdbID()
 		return nil
-	case series.FieldImdbID:
+	case media.FieldImdbID:
 		m.ResetImdbID()
 		return nil
-	case series.FieldNameCn:
+	case media.FieldMediaType:
+		m.ResetMediaType()
+		return nil
+	case media.FieldNameCn:
 		m.ResetNameCn()
 		return nil
-	case series.FieldNameEn:
+	case media.FieldNameEn:
 		m.ResetNameEn()
 		return nil
-	case series.FieldOriginalName:
+	case media.FieldOriginalName:
 		m.ResetOriginalName()
 		return nil
-	case series.FieldOverview:
+	case media.FieldOverview:
 		m.ResetOverview()
 		return nil
-	case series.FieldPosterPath:
-		m.ResetPosterPath()
-		return nil
-	case series.FieldCreatedAt:
+	case media.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
-	case series.FieldAirDate:
+	case media.FieldAirDate:
 		m.ResetAirDate()
 		return nil
-	case series.FieldResolution:
+	case media.FieldResolution:
 		m.ResetResolution()
 		return nil
-	case series.FieldStorageID:
+	case media.FieldStorageID:
 		m.ResetStorageID()
 		return nil
-	case series.FieldTargetDir:
+	case media.FieldTargetDir:
 		m.ResetTargetDir()
 		return nil
 	}
-	return fmt.Errorf("unknown Series field %s", name)
+	return fmt.Errorf("unknown Media field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *SeriesMutation) AddedEdges() []string {
+func (m *MediaMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
 	if m.episodes != nil {
-		edges = append(edges, series.EdgeEpisodes)
+		edges = append(edges, media.EdgeEpisodes)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *SeriesMutation) AddedIDs(name string) []ent.Value {
+func (m *MediaMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case series.EdgeEpisodes:
+	case media.EdgeEpisodes:
 		ids := make([]ent.Value, 0, len(m.episodes))
 		for id := range m.episodes {
 			ids = append(ids, id)
@@ -4281,19 +4262,19 @@ func (m *SeriesMutation) AddedIDs(name string) []ent.Value {
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *SeriesMutation) RemovedEdges() []string {
+func (m *MediaMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
 	if m.removedepisodes != nil {
-		edges = append(edges, series.EdgeEpisodes)
+		edges = append(edges, media.EdgeEpisodes)
 	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *SeriesMutation) RemovedIDs(name string) []ent.Value {
+func (m *MediaMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case series.EdgeEpisodes:
+	case media.EdgeEpisodes:
 		ids := make([]ent.Value, 0, len(m.removedepisodes))
 		for id := range m.removedepisodes {
 			ids = append(ids, id)
@@ -4304,19 +4285,19 @@ func (m *SeriesMutation) RemovedIDs(name string) []ent.Value {
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *SeriesMutation) ClearedEdges() []string {
+func (m *MediaMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
 	if m.clearedepisodes {
-		edges = append(edges, series.EdgeEpisodes)
+		edges = append(edges, media.EdgeEpisodes)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *SeriesMutation) EdgeCleared(name string) bool {
+func (m *MediaMutation) EdgeCleared(name string) bool {
 	switch name {
-	case series.EdgeEpisodes:
+	case media.EdgeEpisodes:
 		return m.clearedepisodes
 	}
 	return false
@@ -4324,21 +4305,21 @@ func (m *SeriesMutation) EdgeCleared(name string) bool {
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *SeriesMutation) ClearEdge(name string) error {
+func (m *MediaMutation) ClearEdge(name string) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown Series unique edge %s", name)
+	return fmt.Errorf("unknown Media unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *SeriesMutation) ResetEdge(name string) error {
+func (m *MediaMutation) ResetEdge(name string) error {
 	switch name {
-	case series.EdgeEpisodes:
+	case media.EdgeEpisodes:
 		m.ResetEpisodes()
 		return nil
 	}
-	return fmt.Errorf("unknown Series edge %s", name)
+	return fmt.Errorf("unknown Media edge %s", name)
 }
 
 // SettingsMutation represents an operation that mutates the Settings nodes in the graph.

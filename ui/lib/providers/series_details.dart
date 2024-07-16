@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
-var seriesDetailsProvider = AsyncNotifierProvider.autoDispose
+var mediaDetailsProvider = AsyncNotifierProvider.autoDispose
     .family<SeriesDetailData, SeriesDetails, String>(SeriesDetailData.new);
 
 class SeriesDetailData

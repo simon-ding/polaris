@@ -2,6 +2,7 @@ package tmdb
 
 import (
 	"polaris/log"
+	"strconv"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/pkg/errors"
@@ -26,9 +27,12 @@ func NewClient(apiKey string) (*Client, error) {
 
 func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) {
 	log.Infof("tv id %d, language %s", id, language)
-	language = wrapLanguage(language)
 	d, err := c.tmdbClient.GetTVDetails(id, withLangOption(language))
 	return d, err
+}
+
+func (c *Client) GetMovieDetails(id int, language string) (*tmdb.MovieDetails, error) {
+	return c.tmdbClient.GetMovieDetails(id, withLangOption(language))
 }
 
 func (c *Client) SearchTvShow(query string, lang string) (*tmdb.SearchTVShows, error) {
@@ -37,6 +41,74 @@ func (c *Client) SearchTvShow(query string, lang string) (*tmdb.SearchTVShows, e
 		return nil, errors.Wrap(err, "tmdb search tv")
 	}
 	return r, nil
+}
+
+type SearchResult struct {
+	Page int `json:"page"`
+	Results []*SearchResultItem `json:"results"`
+	TotalResults int64 `json:"total_results"`
+	TotalPages   int64 `json:"total_pages"`
+
+}
+
+type SearchResultItem struct {
+	PosterPath       string   `json:"poster_path,omitempty"`
+	ID               int64    `json:"id"`
+	Overview         string   `json:"overview,omitempty"`
+	MediaType        string   `json:"media_type"`
+	FirstAirDate     string   `json:"first_air_date,omitempty"`
+	OriginCountry    []string `json:"origin_country,omitempty"`
+	GenreIDs         []int64  `json:"genre_ids,omitempty"`
+	OriginalLanguage string   `json:"original_language,omitempty"`
+	Name             string   `json:"name,omitempty"`
+	OriginalName     string   `json:"original_name,omitempty"`
+	Adult            bool     `json:"adult,omitempty"`
+}
+
+func (c *Client) SearchMedia(query string, lang string, page int) (*SearchResult, error) {
+	if page == 0 {
+		page = 1
+	}
+	options := withLangOption(lang)
+	options["page"] = strconv.Itoa(page)
+	res, err := c.tmdbClient.GetSearchMulti(query, options)
+	if err != nil {
+		return nil, errors.Wrap(err, "query imdb")
+	}
+
+	 searchResult := &SearchResult{
+		Page: res.Page,
+		TotalResults: res.TotalResults,
+		TotalPages: res.TotalPages,
+	 }
+
+	for _, r := range res.Results {
+		if r.MediaType != "tv" && r.MediaType != "movie" {
+			continue
+		}
+		item := &SearchResultItem{
+			PosterPath: r.PosterPath,
+			ID: r.ID,
+			Overview: r.Overview,
+			MediaType: r.MediaType,
+			OriginCountry: r.OriginCountry,
+			OriginalLanguage: r.OriginalLanguage,
+			GenreIDs: r.GenreIDs,
+			Adult: r.Adult,
+		}
+		if r.MediaType == "tv" {
+			item.Name = r.Name
+			item.OriginalName = r.OriginalName
+			item.FirstAirDate = r.FirstAirDate
+		} else if r.MediaType == "movie" {
+			item.Name = r.Title
+			item.OriginalName = r.OriginalTitle
+			item.FirstAirDate = r.ReleaseDate
+		}
+		searchResult.Results = append(searchResult.Results, item)
+		
+	}
+	return searchResult, nil
 }
 
 func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language string) (*tmdb.TVEpisodeDetails, error) {

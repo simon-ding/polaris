@@ -17,8 +17,8 @@ type History struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// SeriesID holds the value of the "series_id" field.
-	SeriesID int `json:"series_id,omitempty"`
+	// MediaID holds the value of the "media_id" field.
+	MediaID int `json:"media_id,omitempty"`
 	// EpisodeID holds the value of the "episode_id" field.
 	EpisodeID int `json:"episode_id,omitempty"`
 	// SourceTitle holds the value of the "source_title" field.
@@ -41,7 +41,7 @@ func (*History) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case history.FieldID, history.FieldSeriesID, history.FieldEpisodeID, history.FieldSize:
+		case history.FieldID, history.FieldMediaID, history.FieldEpisodeID, history.FieldSize:
 			values[i] = new(sql.NullInt64)
 		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldStatus, history.FieldSaved:
 			values[i] = new(sql.NullString)
@@ -68,11 +68,11 @@ func (h *History) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			h.ID = int(value.Int64)
-		case history.FieldSeriesID:
+		case history.FieldMediaID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field series_id", values[i])
+				return fmt.Errorf("unexpected type %T for field media_id", values[i])
 			} else if value.Valid {
-				h.SeriesID = int(value.Int64)
+				h.MediaID = int(value.Int64)
 			}
 		case history.FieldEpisodeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -152,8 +152,8 @@ func (h *History) String() string {
 	var builder strings.Builder
 	builder.WriteString("History(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", h.ID))
-	builder.WriteString("series_id=")
-	builder.WriteString(fmt.Sprintf("%v", h.SeriesID))
+	builder.WriteString("media_id=")
+	builder.WriteString(fmt.Sprintf("%v", h.MediaID))
 	builder.WriteString(", ")
 	builder.WriteString("episode_id=")
 	builder.WriteString(fmt.Sprintf("%v", h.EpisodeID))

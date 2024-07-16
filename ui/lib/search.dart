@@ -54,7 +54,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "${item.name} (${item.firstAirDate?.split("-")[0]})",
+                              "${item.name} (${item.firstAirDate?.year})",
                               style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),
@@ -174,7 +174,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       ref
                           .read(searchPageDataProvider.notifier)
                           .submit2Watchlist(
-                              item.id!, _storageSelected, _resSelected);
+                              item.id!, _storageSelected, _resSelected, item.mediaType!);
                       Navigator.of(context).pop();
                     },
                   ),

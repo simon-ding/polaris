@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quiver/strings.dart';
 import 'package:ui/providers/login.dart';
-import 'package:ui/weclome.dart';
+import 'package:ui/tv_watchlist.dart';
 
 class LoginScreen extends ConsumerWidget {
   static const route = '/login';
@@ -30,7 +30,7 @@ class LoginScreen extends ConsumerWidget {
         ref.read(authSettingProvider.notifier).login(data.name, data.password);
       },
       onSubmitAnimationCompleted: () {
-        context.go(WelcomePage.route);
+        context.go(TvWatchlistPage.route);
       },
       onRecoverPassword: _recoverPassword,
       userValidator: (value) => isBlank(value)? "不能为空":null,

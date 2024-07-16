@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/episode"
+	"polaris/ent/media"
 	"polaris/ent/predicate"
-	"polaris/ent/series"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,23 +28,23 @@ func (eu *EpisodeUpdate) Where(ps ...predicate.Episode) *EpisodeUpdate {
 	return eu
 }
 
-// SetSeriesID sets the "series_id" field.
-func (eu *EpisodeUpdate) SetSeriesID(i int) *EpisodeUpdate {
-	eu.mutation.SetSeriesID(i)
+// SetMediaID sets the "media_id" field.
+func (eu *EpisodeUpdate) SetMediaID(i int) *EpisodeUpdate {
+	eu.mutation.SetMediaID(i)
 	return eu
 }
 
-// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
-func (eu *EpisodeUpdate) SetNillableSeriesID(i *int) *EpisodeUpdate {
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (eu *EpisodeUpdate) SetNillableMediaID(i *int) *EpisodeUpdate {
 	if i != nil {
-		eu.SetSeriesID(*i)
+		eu.SetMediaID(*i)
 	}
 	return eu
 }
 
-// ClearSeriesID clears the value of the "series_id" field.
-func (eu *EpisodeUpdate) ClearSeriesID() *EpisodeUpdate {
-	eu.mutation.ClearSeriesID()
+// ClearMediaID clears the value of the "media_id" field.
+func (eu *EpisodeUpdate) ClearMediaID() *EpisodeUpdate {
+	eu.mutation.ClearMediaID()
 	return eu
 }
 
@@ -166,9 +166,9 @@ func (eu *EpisodeUpdate) ClearFileInStorage() *EpisodeUpdate {
 	return eu
 }
 
-// SetSeries sets the "series" edge to the Series entity.
-func (eu *EpisodeUpdate) SetSeries(s *Series) *EpisodeUpdate {
-	return eu.SetSeriesID(s.ID)
+// SetMedia sets the "media" edge to the Media entity.
+func (eu *EpisodeUpdate) SetMedia(m *Media) *EpisodeUpdate {
+	return eu.SetMediaID(m.ID)
 }
 
 // Mutation returns the EpisodeMutation object of the builder.
@@ -176,9 +176,9 @@ func (eu *EpisodeUpdate) Mutation() *EpisodeMutation {
 	return eu.mutation
 }
 
-// ClearSeries clears the "series" edge to the Series entity.
-func (eu *EpisodeUpdate) ClearSeries() *EpisodeUpdate {
-	eu.mutation.ClearSeries()
+// ClearMedia clears the "media" edge to the Media entity.
+func (eu *EpisodeUpdate) ClearMedia() *EpisodeUpdate {
+	eu.mutation.ClearMedia()
 	return eu
 }
 
@@ -261,28 +261,28 @@ func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if eu.mutation.FileInStorageCleared() {
 		_spec.ClearField(episode.FieldFileInStorage, field.TypeString)
 	}
-	if eu.mutation.SeriesCleared() {
+	if eu.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   episode.SeriesTable,
-			Columns: []string{episode.SeriesColumn},
+			Table:   episode.MediaTable,
+			Columns: []string{episode.MediaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(series.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(media.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.SeriesIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.MediaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   episode.SeriesTable,
-			Columns: []string{episode.SeriesColumn},
+			Table:   episode.MediaTable,
+			Columns: []string{episode.MediaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(series.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(media.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -310,23 +310,23 @@ type EpisodeUpdateOne struct {
 	mutation *EpisodeMutation
 }
 
-// SetSeriesID sets the "series_id" field.
-func (euo *EpisodeUpdateOne) SetSeriesID(i int) *EpisodeUpdateOne {
-	euo.mutation.SetSeriesID(i)
+// SetMediaID sets the "media_id" field.
+func (euo *EpisodeUpdateOne) SetMediaID(i int) *EpisodeUpdateOne {
+	euo.mutation.SetMediaID(i)
 	return euo
 }
 
-// SetNillableSeriesID sets the "series_id" field if the given value is not nil.
-func (euo *EpisodeUpdateOne) SetNillableSeriesID(i *int) *EpisodeUpdateOne {
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (euo *EpisodeUpdateOne) SetNillableMediaID(i *int) *EpisodeUpdateOne {
 	if i != nil {
-		euo.SetSeriesID(*i)
+		euo.SetMediaID(*i)
 	}
 	return euo
 }
 
-// ClearSeriesID clears the value of the "series_id" field.
-func (euo *EpisodeUpdateOne) ClearSeriesID() *EpisodeUpdateOne {
-	euo.mutation.ClearSeriesID()
+// ClearMediaID clears the value of the "media_id" field.
+func (euo *EpisodeUpdateOne) ClearMediaID() *EpisodeUpdateOne {
+	euo.mutation.ClearMediaID()
 	return euo
 }
 
@@ -448,9 +448,9 @@ func (euo *EpisodeUpdateOne) ClearFileInStorage() *EpisodeUpdateOne {
 	return euo
 }
 
-// SetSeries sets the "series" edge to the Series entity.
-func (euo *EpisodeUpdateOne) SetSeries(s *Series) *EpisodeUpdateOne {
-	return euo.SetSeriesID(s.ID)
+// SetMedia sets the "media" edge to the Media entity.
+func (euo *EpisodeUpdateOne) SetMedia(m *Media) *EpisodeUpdateOne {
+	return euo.SetMediaID(m.ID)
 }
 
 // Mutation returns the EpisodeMutation object of the builder.
@@ -458,9 +458,9 @@ func (euo *EpisodeUpdateOne) Mutation() *EpisodeMutation {
 	return euo.mutation
 }
 
-// ClearSeries clears the "series" edge to the Series entity.
-func (euo *EpisodeUpdateOne) ClearSeries() *EpisodeUpdateOne {
-	euo.mutation.ClearSeries()
+// ClearMedia clears the "media" edge to the Media entity.
+func (euo *EpisodeUpdateOne) ClearMedia() *EpisodeUpdateOne {
+	euo.mutation.ClearMedia()
 	return euo
 }
 
@@ -573,28 +573,28 @@ func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err e
 	if euo.mutation.FileInStorageCleared() {
 		_spec.ClearField(episode.FieldFileInStorage, field.TypeString)
 	}
-	if euo.mutation.SeriesCleared() {
+	if euo.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   episode.SeriesTable,
-			Columns: []string{episode.SeriesColumn},
+			Table:   episode.MediaTable,
+			Columns: []string{episode.MediaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(series.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(media.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.SeriesIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.MediaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   episode.SeriesTable,
-			Columns: []string{episode.SeriesColumn},
+			Table:   episode.MediaTable,
+			Columns: []string{episode.MediaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(series.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(media.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

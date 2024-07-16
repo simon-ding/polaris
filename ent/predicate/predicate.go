@@ -18,8 +18,8 @@ type History func(*sql.Selector)
 // Indexers is the predicate function for indexers builders.
 type Indexers func(*sql.Selector)
 
-// Series is the predicate function for series builders.
-type Series func(*sql.Selector)
+// Media is the predicate function for media builders.
+type Media func(*sql.Selector)
 
 // Settings is the predicate function for settings builders.
 type Settings func(*sql.Selector)

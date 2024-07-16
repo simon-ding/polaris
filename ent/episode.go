@@ -5,7 +5,7 @@ package ent
 import (
 	"fmt"
 	"polaris/ent/episode"
-	"polaris/ent/series"
+	"polaris/ent/media"
 	"strings"
 
 	"entgo.io/ent"
@@ -17,8 +17,8 @@ type Episode struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// SeriesID holds the value of the "series_id" field.
-	SeriesID int `json:"series_id,omitempty"`
+	// MediaID holds the value of the "media_id" field.
+	MediaID int `json:"media_id,omitempty"`
 	// SeasonNumber holds the value of the "season_number" field.
 	SeasonNumber int `json:"season_number"`
 	// EpisodeNumber holds the value of the "episode_number" field.
@@ -41,22 +41,22 @@ type Episode struct {
 
 // EpisodeEdges holds the relations/edges for other nodes in the graph.
 type EpisodeEdges struct {
-	// Series holds the value of the series edge.
-	Series *Series `json:"series,omitempty"`
+	// Media holds the value of the media edge.
+	Media *Media `json:"media,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// SeriesOrErr returns the Series value or an error if the edge
+// MediaOrErr returns the Media value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EpisodeEdges) SeriesOrErr() (*Series, error) {
-	if e.Series != nil {
-		return e.Series, nil
+func (e EpisodeEdges) MediaOrErr() (*Media, error) {
+	if e.Media != nil {
+		return e.Media, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: series.Label}
+		return nil, &NotFoundError{label: media.Label}
 	}
-	return nil, &NotLoadedError{edge: "series"}
+	return nil, &NotLoadedError{edge: "media"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -64,7 +64,7 @@ func (*Episode) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case episode.FieldID, episode.FieldSeriesID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
+		case episode.FieldID, episode.FieldMediaID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
 			values[i] = new(sql.NullInt64)
 		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldStatus, episode.FieldFileInStorage:
 			values[i] = new(sql.NullString)
@@ -89,11 +89,11 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			e.ID = int(value.Int64)
-		case episode.FieldSeriesID:
+		case episode.FieldMediaID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field series_id", values[i])
+				return fmt.Errorf("unexpected type %T for field media_id", values[i])
 			} else if value.Valid {
-				e.SeriesID = int(value.Int64)
+				e.MediaID = int(value.Int64)
 			}
 		case episode.FieldSeasonNumber:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -150,9 +150,9 @@ func (e *Episode) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
 }
 
-// QuerySeries queries the "series" edge of the Episode entity.
-func (e *Episode) QuerySeries() *SeriesQuery {
-	return NewEpisodeClient(e.config).QuerySeries(e)
+// QueryMedia queries the "media" edge of the Episode entity.
+func (e *Episode) QueryMedia() *MediaQuery {
+	return NewEpisodeClient(e.config).QueryMedia(e)
 }
 
 // Update returns a builder for updating this Episode.
@@ -178,8 +178,8 @@ func (e *Episode) String() string {
 	var builder strings.Builder
 	builder.WriteString("Episode(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", e.ID))
-	builder.WriteString("series_id=")
-	builder.WriteString(fmt.Sprintf("%v", e.SeriesID))
+	builder.WriteString("media_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.MediaID))
 	builder.WriteString(", ")
 	builder.WriteString("season_number=")
 	builder.WriteString(fmt.Sprintf("%v", e.SeasonNumber))

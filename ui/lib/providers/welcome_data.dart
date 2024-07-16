@@ -4,23 +4,39 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
-final welcomePageDataProvider = FutureProvider.autoDispose((ref) async {
+final tvWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
   final dio = await APIs.getDio();
-  var resp = await dio.get(APIs.watchlistUrl);
+  var resp = await dio.get(APIs.watchlistTvUrl);
   var sp = ServerResponse.fromJson(resp.data);
-  List<TvSeries> favList = List.empty(growable: true);
+  List<MediaDetail> favList = List.empty(growable: true);
   for (var item in sp.data as List) {
-    var tv = TvSeries.fromJson(item);
+    var tv = MediaDetail.fromJson(item);
     favList.add(tv);
   }
   return favList;
 });
 
-var searchPageDataProvider = AsyncNotifierProvider.autoDispose
-    <SearchPageData, List<SearchResult>>(SearchPageData.new);
+final movieWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
+  final dio = await APIs.getDio();
+  var resp = await dio.get(APIs.watchlistMovieUrl);
+  var sp = ServerResponse.fromJson(resp.data);
+  List<MediaDetail> favList = List.empty(growable: true);
+  for (var item in sp.data as List) {
+    var tv = MediaDetail.fromJson(item);
+    favList.add(tv);
+  }
+  return favList;
+});
+
+var searchPageDataProvider =
+    AsyncNotifierProvider.autoDispose<SearchPageData, List<SearchResult>>(
+        SearchPageData.new);
+
+var movieTorrentsDataProvider = AsyncNotifierProvider.autoDispose
+    .family<MovieTorrentResource, List<TorrentResource>, String>(
+        MovieTorrentResource.new);
 
 class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
-  
   List<SearchResult> list = List.empty(growable: true);
 
   @override
@@ -28,19 +44,32 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
     return list;
   }
 
-  Future<void> submit2Watchlist(int tmdbId, int storageId, String resolution) async {
+  Future<void> submit2Watchlist(
+      int tmdbId, int storageId, String resolution, String mediaType) async {
     final dio = await APIs.getDio();
-    var resp = await dio
-        .post(APIs.watchlistUrl, data: {
-          "tmdb_id": tmdbId,
-          "storage_id": storageId,
-          "resolution": resolution
-        });
-    var sp = ServerResponse.fromJson(resp.data);
-    if (sp.code != 0) {
-      throw sp.message;
+    if (mediaType == "tv") {
+      var resp = await dio.post(APIs.watchlistTvUrl, data: {
+        "tmdb_id": tmdbId,
+        "storage_id": storageId,
+        "resolution": resolution
+      });
+      var sp = ServerResponse.fromJson(resp.data);
+      if (sp.code != 0) {
+        throw sp.message;
+      }
+      ref.invalidate(tvWatchlistDataProvider);
+    } else {
+      var resp = await dio.post(APIs.watchlistMovieUrl, data: {
+        "tmdb_id": tmdbId,
+        "storage_id": storageId,
+        "resolution": resolution
+      });
+      var sp = ServerResponse.fromJson(resp.data);
+      if (sp.code != 0) {
+        throw sp.message;
+      }
+      ref.invalidate(movieWatchlistDataProvider);
     }
-    ref.invalidate(welcomePageDataProvider);
   }
 
   Future<void> queryResults(String q) async {
@@ -65,78 +94,149 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
   }
 }
 
-class SearchResult {
-  String? originalName;
-  int? id;
-  String? name;
-  int? voteCount;
-  double? voteAverage;
-  String? posterPath;
-  String? firstAirDate;
-  double? popularity;
-  List<int>? genreIds;
-  String? originalLanguage;
-  String? backdropPath;
-  String? overview;
-  List<String>? originCountry;
-
-  SearchResult(
-      {this.originalName,
-      this.id,
-      this.name,
-      this.voteCount,
-      this.voteAverage,
-      this.posterPath,
-      this.firstAirDate,
-      this.popularity,
-      this.genreIds,
-      this.originalLanguage,
-      this.backdropPath,
-      this.overview,
-      this.originCountry});
-
-  SearchResult.fromJson(Map<String, dynamic> json) {
-    originalName = json['original_name'];
-    id = json['id'];
-    name = json['name'];
-    voteCount = json['vote_count'];
-    voteAverage = json['vote_average'];
-    posterPath = json['poster_path'];
-    firstAirDate = json['first_air_date'];
-    popularity = json['popularity'];
-    genreIds = json['genre_ids'].cast<int>();
-    originalLanguage = json['original_language'];
-    backdropPath = json['backdrop_path'];
-    overview = json['overview'];
-    originCountry = json['origin_country'].cast<String>();
-  }
-}
-
-class TvSeries {
+class MediaDetail {
   int? id;
   int? tmdbId;
+  String? mediaType;
   String? name;
   String? originalName;
   String? overview;
-  String? path;
   String? posterPath;
+  String? createdAt;
+  String? resolution;
+  int? storageId;
+  String? airDate;
 
-  TvSeries(
-      {this.id,
-      this.tmdbId,
-      this.name,
-      this.originalName,
-      this.overview,
-      this.path,
-      this.posterPath});
+  MediaDetail({
+    this.id,
+    this.tmdbId,
+    this.mediaType,
+    this.name,
+    this.originalName,
+    this.overview,
+    this.posterPath,
+    this.createdAt,
+    this.resolution,
+    this.storageId,
+    this.airDate,
+  });
 
-  TvSeries.fromJson(Map<String, dynamic> json) {
+  MediaDetail.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     tmdbId = json['tmdb_id'];
+    mediaType = json["media_type"];
     name = json['name_cn'];
     originalName = json['original_name'];
     overview = json['overview'];
-    path = json['path'];
-    posterPath = json["poster_path"];
+    posterPath = json['poster_path'];
+    createdAt = json['created_at'];
+    resolution = json["resolution"];
+    storageId = json["storage_id"];
+    airDate = json["air_date"];
+  }
+}
+
+class SearchResult {
+  SearchResult({
+    required this.backdropPath,
+    required this.id,
+    required this.name,
+    required this.originalName,
+    required this.overview,
+    required this.posterPath,
+    required this.mediaType,
+    required this.adult,
+    required this.originalLanguage,
+    required this.genreIds,
+    required this.popularity,
+    required this.firstAirDate,
+    required this.voteAverage,
+    required this.voteCount,
+    required this.originCountry,
+  });
+
+  final String? backdropPath;
+  final int? id;
+  final String? name;
+  final String? originalName;
+  final String? overview;
+  final String? posterPath;
+  final String? mediaType;
+  final bool? adult;
+  final String? originalLanguage;
+  final List<int> genreIds;
+  final double? popularity;
+  final DateTime? firstAirDate;
+  final double? voteAverage;
+  final int? voteCount;
+  final List<String> originCountry;
+
+  factory SearchResult.fromJson(Map<String, dynamic> json) {
+    return SearchResult(
+      backdropPath: json["backdrop_path"],
+      id: json["id"],
+      name: json["name"],
+      originalName: json["original_name"],
+      overview: json["overview"],
+      posterPath: json["poster_path"],
+      mediaType: json["media_type"],
+      adult: json["adult"],
+      originalLanguage: json["original_language"],
+      genreIds: json["genre_ids"] == null
+          ? []
+          : List<int>.from(json["genre_ids"]!.map((x) => x)),
+      popularity: json["popularity"],
+      firstAirDate: DateTime.tryParse(json["first_air_date"] ?? ""),
+      voteAverage: json["vote_average"],
+      voteCount: json["vote_count"],
+      originCountry: json["origin_country"] == null
+          ? []
+          : List<String>.from(json["origin_country"]!.map((x) => x)),
+    );
+  }
+}
+
+class MovieTorrentResource
+    extends AutoDisposeFamilyAsyncNotifier<List<TorrentResource>, String> {
+  String? mediaId;
+  @override
+  FutureOr<List<TorrentResource>> build(String id) async {
+    mediaId = id;
+    final dio = await APIs.getDio();
+    var resp = await dio.get(APIs.availableMoviesUrl + id);
+    var rsp = ServerResponse.fromJson(resp.data);
+    if (rsp.code != 0) {
+      throw rsp.message;
+    }
+    return (resp.data as List).map((v) => TorrentResource.fromJson(v)).toList();
+  }
+
+  Future<void> download(String link) async {
+    final dio = await APIs.getDio();
+    var resp = await dio.post(APIs.availableMoviesUrl,
+        data: {"media_id": int.parse(mediaId!), "link": link});
+    var rsp = ServerResponse.fromJson(resp.data);
+    if (rsp.code != 0) {
+      throw rsp.message;
+    }
+  }
+}
+
+class TorrentResource {
+  TorrentResource({this.name, this.size, this.seeders, this.peers, this.link});
+
+  String? name;
+  int? size;
+  int? seeders;
+  int? peers;
+  String? link;
+
+  factory TorrentResource.fromJson(Map<String, dynamic> json) {
+    return TorrentResource(
+        name: json["name"],
+        size: json["size"],
+        seeders: json["seeders"],
+        peers: json["peers"],
+        link: json["link"]);
   }
 }

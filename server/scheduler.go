@@ -5,6 +5,7 @@ import (
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/history"
+	"polaris/ent/media"
 	storage1 "polaris/ent/storage"
 	"polaris/log"
 	"polaris/pkg"
@@ -70,7 +71,7 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 		}
 	}()
 
-	series := s.db.GetSeriesDetails(r.SeriesID)
+	series := s.db.GetMediaDetails(r.MediaID)
 	if series == nil {
 		return nil
 	}
@@ -107,7 +108,7 @@ func (s *Server) updateSeriesEpisodes(seriesId int) {
 }
 
 func (s *Server) checkAllFiles() {
-	var tvs = s.db.GetWatchlist()
+	var tvs = s.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, se := range tvs {
 		if err := s.checkFileExists(se); err != nil {
 			log.Errorf("check files for %s error: %v", se.NameCn, err)
@@ -115,7 +116,7 @@ func (s *Server) checkAllFiles() {
 	}
 }
 
-func (s *Server) checkFileExists(series *ent.Series) error {
+func (s *Server) checkFileExists(series *ent.Media) error {
 	log.Infof("check files in directory: %s", series.TargetDir)
 	st := s.db.GetStorage(series.StorageID)
 

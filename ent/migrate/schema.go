@@ -39,7 +39,7 @@ var (
 		{Name: "air_date", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"missing", "downloading", "downloaded"}, Default: "missing"},
 		{Name: "file_in_storage", Type: field.TypeString, Nullable: true},
-		{Name: "series_id", Type: field.TypeInt, Nullable: true},
+		{Name: "media_id", Type: field.TypeInt, Nullable: true},
 	}
 	// EpisodesTable holds the schema information for the "episodes" table.
 	EpisodesTable = &schema.Table{
@@ -48,9 +48,9 @@ var (
 		PrimaryKey: []*schema.Column{EpisodesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "episodes_series_episodes",
+				Symbol:     "episodes_media_episodes",
 				Columns:    []*schema.Column{EpisodesColumns[8]},
-				RefColumns: []*schema.Column{SeriesColumns[0]},
+				RefColumns: []*schema.Column{MediaColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -58,7 +58,7 @@ var (
 	// HistoriesColumns holds the columns for the "histories" table.
 	HistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "series_id", Type: field.TypeInt},
+		{Name: "media_id", Type: field.TypeInt},
 		{Name: "episode_id", Type: field.TypeInt},
 		{Name: "source_title", Type: field.TypeString},
 		{Name: "date", Type: field.TypeTime},
@@ -88,27 +88,27 @@ var (
 		Columns:    IndexersColumns,
 		PrimaryKey: []*schema.Column{IndexersColumns[0]},
 	}
-	// SeriesColumns holds the columns for the "series" table.
-	SeriesColumns = []*schema.Column{
+	// MediaColumns holds the columns for the "media" table.
+	MediaColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tmdb_id", Type: field.TypeInt},
 		{Name: "imdb_id", Type: field.TypeString, Nullable: true},
+		{Name: "media_type", Type: field.TypeEnum, Enums: []string{"tv", "movie"}},
 		{Name: "name_cn", Type: field.TypeString},
 		{Name: "name_en", Type: field.TypeString},
 		{Name: "original_name", Type: field.TypeString},
 		{Name: "overview", Type: field.TypeString},
-		{Name: "poster_path", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "air_date", Type: field.TypeString, Default: ""},
 		{Name: "resolution", Type: field.TypeString, Default: ""},
 		{Name: "storage_id", Type: field.TypeInt, Nullable: true},
 		{Name: "target_dir", Type: field.TypeString, Nullable: true},
 	}
-	// SeriesTable holds the schema information for the "series" table.
-	SeriesTable = &schema.Table{
-		Name:       "series",
-		Columns:    SeriesColumns,
-		PrimaryKey: []*schema.Column{SeriesColumns[0]},
+	// MediaTable holds the schema information for the "media" table.
+	MediaTable = &schema.Table{
+		Name:       "media",
+		Columns:    MediaColumns,
+		PrimaryKey: []*schema.Column{MediaColumns[0]},
 	}
 	// SettingsColumns holds the columns for the "settings" table.
 	SettingsColumns = []*schema.Column{
@@ -143,12 +143,12 @@ var (
 		EpisodesTable,
 		HistoriesTable,
 		IndexersTable,
-		SeriesTable,
+		MediaTable,
 		SettingsTable,
 		StoragesTable,
 	}
 )
 
 func init() {
-	EpisodesTable.ForeignKeys[0].RefTable = SeriesTable
+	EpisodesTable.ForeignKeys[0].RefTable = MediaTable
 }

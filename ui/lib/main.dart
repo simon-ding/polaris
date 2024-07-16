@@ -4,12 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ui/activity.dart';
 import 'package:ui/login_page.dart';
+import 'package:ui/movie_watchlist.dart';
 import 'package:ui/navdrawer.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
 import 'package:ui/tv_details.dart';
-import 'package:ui/weclome.dart';
+import 'package:ui/tv_watchlist.dart';
 
 void main() {
   runApp(const MyApp());
@@ -76,11 +77,25 @@ class MyApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: "/",
-          redirect: (context, state) => WelcomePage.route,
+          redirect: (context, state) => TvWatchlistPage.route,
         ),
         GoRoute(
-          path: WelcomePage.route,
-          builder: (context, state) => const WelcomePage(),
+          path: TvWatchlistPage.route,
+          builder: (context, state) => const TvWatchlistPage(),
+        ),
+        GoRoute(
+          path: TvDetailsPage.route,
+          builder: (context, state) =>
+              TvDetailsPage(seriesId: state.pathParameters['id']!),
+        ),
+        GoRoute(
+          path: MovieWatchlistPage.route,
+          builder: (context, state) => const MovieWatchlistPage(),
+        ),
+        GoRoute(
+          path: MovieDetailsPage.route,
+          builder: (context, state) =>
+              MovieDetailsPage(id: state.pathParameters['id']!),
         ),
         GoRoute(
           path: SearchPage.route,
@@ -91,11 +106,6 @@ class MyApp extends StatelessWidget {
           builder: (context, state) => const SystemSettingsPage(),
         ),
         GoRoute(
-          path: TvDetailsPage.route,
-          builder: (context, state) =>
-              TvDetailsPage(seriesId: state.pathParameters['id']!),
-        ),
-        GoRoute(
           path: ActivityPage.route,
           builder: (context, state) => const ActivityPage(),
         )
@@ -104,7 +114,7 @@ class MyApp extends StatelessWidget {
 
     final _router = GoRouter(
       navigatorKey: APIs.navigatorKey,
-      initialLocation: WelcomePage.route,
+      initialLocation: TvWatchlistPage.route,
       routes: [
         _shellRoute,
         GoRoute(

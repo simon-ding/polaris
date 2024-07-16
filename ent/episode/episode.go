@@ -14,8 +14,8 @@ const (
 	Label = "episode"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldSeriesID holds the string denoting the series_id field in the database.
-	FieldSeriesID = "series_id"
+	// FieldMediaID holds the string denoting the media_id field in the database.
+	FieldMediaID = "media_id"
 	// FieldSeasonNumber holds the string denoting the season_number field in the database.
 	FieldSeasonNumber = "season_number"
 	// FieldEpisodeNumber holds the string denoting the episode_number field in the database.
@@ -30,23 +30,23 @@ const (
 	FieldStatus = "status"
 	// FieldFileInStorage holds the string denoting the file_in_storage field in the database.
 	FieldFileInStorage = "file_in_storage"
-	// EdgeSeries holds the string denoting the series edge name in mutations.
-	EdgeSeries = "series"
+	// EdgeMedia holds the string denoting the media edge name in mutations.
+	EdgeMedia = "media"
 	// Table holds the table name of the episode in the database.
 	Table = "episodes"
-	// SeriesTable is the table that holds the series relation/edge.
-	SeriesTable = "episodes"
-	// SeriesInverseTable is the table name for the Series entity.
-	// It exists in this package in order to avoid circular dependency with the "series" package.
-	SeriesInverseTable = "series"
-	// SeriesColumn is the table column denoting the series relation/edge.
-	SeriesColumn = "series_id"
+	// MediaTable is the table that holds the media relation/edge.
+	MediaTable = "episodes"
+	// MediaInverseTable is the table name for the Media entity.
+	// It exists in this package in order to avoid circular dependency with the "media" package.
+	MediaInverseTable = "media"
+	// MediaColumn is the table column denoting the media relation/edge.
+	MediaColumn = "media_id"
 )
 
 // Columns holds all SQL columns for episode fields.
 var Columns = []string{
 	FieldID,
-	FieldSeriesID,
+	FieldMediaID,
 	FieldSeasonNumber,
 	FieldEpisodeNumber,
 	FieldTitle,
@@ -101,9 +101,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// BySeriesID orders the results by the series_id field.
-func BySeriesID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSeriesID, opts...).ToFunc()
+// ByMediaID orders the results by the media_id field.
+func ByMediaID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMediaID, opts...).ToFunc()
 }
 
 // BySeasonNumber orders the results by the season_number field.
@@ -141,16 +141,16 @@ func ByFileInStorage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFileInStorage, opts...).ToFunc()
 }
 
-// BySeriesField orders the results by series field.
-func BySeriesField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByMediaField orders the results by media field.
+func ByMediaField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSeriesStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newMediaStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newSeriesStep() *sqlgraph.Step {
+func newMediaStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SeriesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, SeriesTable, SeriesColumn),
+		sqlgraph.To(MediaInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MediaTable, MediaColumn),
 	)
 }

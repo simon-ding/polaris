@@ -13,8 +13,8 @@ type History struct {
 // Fields of the History.
 func (History) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("series_id"),
-		field.Int("episode_id"),
+		field.Int("media_id"),
+		field.Int("episode_id").Optional(),
 		field.String("source_title"),
 		field.Time("date"),
 		field.String("target_dir"),
