@@ -42,15 +42,15 @@ class APIs {
     return "http://127.0.0.1:8080";
   }
 
-  static Dio? dio1;
+  static Dio? gDio;
   static Map<String, String> authHeaders = {};
   static bool isLoggedIn = false;
 
   static Future<Dio> getDio() async {
-    if (dio1 != null) {
-      return dio1!;
+    if (gDio != null) {
+      return gDio!;
     }
-    var token = authHeaders["token"];
+    var token = authHeaders["Authorization"];
     if (isBlank(token)) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var t = prefs.getString("token");
@@ -73,12 +73,15 @@ class APIs {
           final context = navigatorKey.currentContext;
           if (context != null) {
             context.go('/login');
+            gDio = null;
           }
         }
         return handler.next(error);
       },
     ));
-    dio1 = dio;
+    if (isNotBlank(token)) {
+      gDio = dio;
+    }
     return dio;
   }
 
@@ -93,7 +96,7 @@ class APIs {
     }
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var t = sp.data["token"];
-    authHeaders["token"] = "Bearer $t";
+    authHeaders["Authorization"] = "Bearer $t";
     prefs.setString("token", "Bearer $t");
   }
 }
