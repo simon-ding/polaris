@@ -11,6 +11,8 @@ require (
 	golang.org/x/net v0.25.0
 )
 
+require github.com/adrg/strutil v0.3.1 // indirect
+
 require (
 	ariga.io/atlas v0.19.1-0.20240203083654-5948b60a8e43 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect

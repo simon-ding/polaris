@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/adrg/strutil"
+	"github.com/adrg/strutil/metrics"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -70,7 +72,6 @@ func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
 	}
 	return indexers, nil
 }
-
 
 func (s *Server) getDownloadClient() (*transmission.Client, error) {
 	tr := s.db.GetTransmission()
@@ -225,17 +226,17 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 		if !strings.Contains(r.Name, strconv.Itoa(year)) && !strings.Contains(r.Name, strconv.Itoa(year+1)) && !strings.Contains(r.Name, strconv.Itoa(year-1)) {
 			continue //not the same movie, if year is not correct
 		}
-		lowerName := strings.ToLower(r.Name)
-		lowerEnName := strings.ToLower(movieDetail.NameEn)
-		if !strings.Contains(lowerName, movieDetail.NameCn) && !strings.Contains(lowerName, lowerEnName) {
+		distCn := strutil.Similarity(strings.ToLower(r.Name), movieDetail.NameCn, metrics.NewHamming())
+		distEn := strutil.Similarity(strings.ToLower(r.Name), strings.ToLower(movieDetail.NameEn), metrics.NewHamming())
+		if distCn == 0 && distEn == 0 {
 			continue //name not match
 		}
 		searchResults = append(searchResults, TorznabSearchResult{
-			Name: r.Name,
-			Size: r.Size,
+			Name:    r.Name,
+			Size:    r.Size,
 			Seeders: r.Seeders,
-			Peers: r.Peers,
-			Link: r.Magnet,
+			Peers:   r.Peers,
+			Link:    r.Magnet,
 		})
 	}
 	if len(searchResults) == 0 {
@@ -247,9 +248,10 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 }
 
 type downloadTorrentIn struct {
-	MediaID int `json:"media_id" binding:"required"`
-	Link string `json:"link" binding:"required"`
+	MediaID int    `json:"media_id" binding:"required"`
+	Link    string `json:"link" binding:"required"`
 }
+
 func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
 	var in downloadTorrentIn
 	if err := c.ShouldBindJSON(&in); err != nil {
@@ -272,7 +274,7 @@ func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
 	}
 	torrent.Start()
 
-	go func ()  {
+	go func() {
 		for {
 			if !torrent.Exists() {
 				continue
@@ -290,9 +292,9 @@ func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
 			}
 
 			s.tasks[history.ID] = &Task{Torrent: torrent}
-		
+
 			break
-		}	
+		}
 	}()
 
 	log.Infof("success add %s to download task", media.NameEn)
