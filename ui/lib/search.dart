@@ -44,7 +44,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           width: 150,
                           height: 200,
                           child: Image.network(
-                            APIs.tmdbImgBaseUrl + item.posterPath!,
+                            "${APIs.tmdbImgBaseUrl}${item.posterPath}",
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -53,13 +53,20 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "${item.name} (${item.firstAirDate?.year})",
-                              style: const TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.bold),
+                            Row(
+                              children: [
+                                Text(
+                                  "${item.name} (${item.firstAirDate?.year})",
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 10,),
+                                item.mediaType == "tv" ? const Icon(Icons.live_tv): const Icon(Icons.movie)
+                              ],
                             ),
                             const Text(""),
-                            Text(item.overview!)
+                            Text("${item.overview}")
                           ],
                         ),
                       )
@@ -173,8 +180,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       print(_storageSelected);
                       ref
                           .read(searchPageDataProvider.notifier)
-                          .submit2Watchlist(
-                              item.id!, _storageSelected, _resSelected, item.mediaType!);
+                          .submit2Watchlist(item.id!, _storageSelected,
+                              _resSelected, item.mediaType!);
                       Navigator.of(context).pop();
                     },
                   ),

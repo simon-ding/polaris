@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
                 // the App.build method, and use it to set our appbar title.
                 title: Row(
                   children: [
-                    const Text("Polaris 追剧"),
+                    const Text("Polaris"),
                     const SizedBox(
                       width: 100,
                     ),
@@ -129,7 +129,7 @@ class MyApp extends StatelessWidget {
 
     return ProviderScope(
       child: MaterialApp.router(
-        title: 'Polaris',
+        title: 'Polaris 电影电视剧追踪',
         theme: ThemeData(
           // Define the default TextTheme. Use this to specify the default
           // text styling for headlines, titles, bodies of text, and more.
