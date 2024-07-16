@@ -73,7 +73,7 @@ class MyApp extends StatelessWidget {
                   child: NavDrawer(),
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
-                Flexible(flex: 7, child: child)
+                Flexible(flex: 7, child: Padding(padding: const EdgeInsets.all(20),child: child), )
               ]))),
         );
       },
