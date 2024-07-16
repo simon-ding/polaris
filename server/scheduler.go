@@ -61,11 +61,16 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	defer func ()  {
 		if err != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
-			s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
+			if r.EpisodeID != 0 {
+				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
+			}
+			
 		} else {
 			delete(s.tasks, r.ID)	
 			s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
-			s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
+			if r.EpisodeID != 0 {
+				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
+			}
 
 			torrent.Remove()
 		}

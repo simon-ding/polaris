@@ -178,6 +178,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                         DataColumn(label: Text("大小")),
                         DataColumn(label: Text("seeders")),
                         DataColumn(label: Text("peers")),
+                        DataColumn(label: Text("操作"))
                       ],
                       rows: List.generate(v.length, (i) {
                         final torrent = v[i];
@@ -186,6 +187,15 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                           DataCell(Text("${torrent.size?.readableFileSize()}")),
                           DataCell(Text("${torrent.seeders}")),
                           DataCell(Text("${torrent.peers}")),
+                          DataCell(IconButton.filledTonal(
+                            icon: const Icon(Icons.download),
+                            onPressed: () async {
+                              await ref
+                                  .read(movieTorrentsDataProvider(this.id)
+                                      .notifier)
+                                  .download(torrent.link!);
+                            },
+                          ))
                         ]);
                       }),
                     );
