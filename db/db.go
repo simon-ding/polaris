@@ -43,6 +43,7 @@ func Open() (*Client, error) {
 	}
 
 	c.generateJwtSerectIfNotExist()
+	c.generateDefaultLocalStorage()
 	return c, nil
 }
 
@@ -53,6 +54,22 @@ func (c *Client) generateJwtSerectIfNotExist() {
 		key := utils.RandString(32)
 		c.SetSetting(JwtSerectKey, key)
 	}
+}
+
+func (c *Client) generateDefaultLocalStorage() {
+	n, _ := c.ent.Storage.Query().Count(context.TODO())
+	if n != 0 {
+		return
+	}
+	c.AddStorage(&StorageInfo{
+		Name:           "local",
+		Implementation: "local",
+		Default:        true,
+		Settings: map[string]string{
+			"tv_path":    "/data/tv",
+			"movie_path": "/data/movies",
+		},
+	})
 }
 
 func (c *Client) GetSetting(key string) string {

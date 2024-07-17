@@ -10,7 +10,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
 import 'package:ui/tv_details.dart';
-import 'package:ui/tv_watchlist.dart';
+import 'package:ui/welcome_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -80,11 +80,11 @@ class MyApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: "/",
-          redirect: (context, state) => TvWatchlistPage.route,
+          redirect: (context, state) => WelcomePage.routeTv,
         ),
         GoRoute(
-          path: TvWatchlistPage.route,
-          builder: (context, state) => const TvWatchlistPage(),
+          path: WelcomePage.routeTv,
+          builder: (context, state) => const WelcomePage(),
         ),
         GoRoute(
           path: TvDetailsPage.route,
@@ -92,8 +92,8 @@ class MyApp extends StatelessWidget {
               TvDetailsPage(seriesId: state.pathParameters['id']!),
         ),
         GoRoute(
-          path: MovieWatchlistPage.route,
-          builder: (context, state) => const MovieWatchlistPage(),
+          path: WelcomePage.routeMoivie,
+          builder: (context, state) => const WelcomePage(),
         ),
         GoRoute(
           path: MovieDetailsPage.route,
@@ -117,7 +117,6 @@ class MyApp extends StatelessWidget {
 
     final _router = GoRouter(
       navigatorKey: APIs.navigatorKey,
-      initialLocation: TvWatchlistPage.route,
       routes: [
         _shellRoute,
         GoRoute(

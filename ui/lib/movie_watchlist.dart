@@ -8,55 +8,6 @@ import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
-class MovieWatchlistPage extends ConsumerWidget {
-  static const route = "/movies";
-
-  const MovieWatchlistPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(movieWatchlistDataProvider);
-
-    return switch (data) {
-      AsyncData(:final value) => SingleChildScrollView(
-          child: Wrap(
-              spacing: 20,
-              children: List.generate(value.length, (i) {
-                var item = value[i];
-                return Card(
-                    margin: const EdgeInsets.all(4),
-                    clipBehavior: Clip.hardEdge,
-                    child: InkWell(
-                      //splashColor: Colors.blue.withAlpha(30),
-                      onTap: () {
-                        context.go(MovieDetailsPage.toRoute(item.id!));
-                        //showDialog(context: context, builder: builder)
-                      },
-                      child: Column(
-                        children: <Widget>[
-                          SizedBox(
-                            width: 160,
-                            height: 240,
-                            child: Image.network(
-                              "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                              fit: BoxFit.fill,
-                              headers: APIs.authHeaders,
-                            ),
-                          ),
-                          Text(
-                            item.name!,
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold, height: 2.5),
-                          ),
-                        ],
-                      ),
-                    ));
-              }))),
-      _ => const MyProgressIndicator(),
-    };
-  }
-}
-
 class MovieDetailsPage extends ConsumerStatefulWidget {
   static const route = "/movie/:id";
 

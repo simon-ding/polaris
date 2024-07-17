@@ -5,7 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
-import 'package:ui/tv_watchlist.dart';
+import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class TvDetailsPage extends ConsumerStatefulWidget {
@@ -179,7 +179,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                       ),
                                       const Text(""),
                                       Text(
-                                        details!.overview!,
+                                        details.overview!,
                                       ),
                                     ],
                                   )),
@@ -192,7 +192,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                                         seriesId)
                                                     .notifier)
                                                 .delete();
-                                            context.go(TvWatchlistPage.route);
+                                            context.go(WelcomePage.routeTv);
                                           },
                                           icon: const Icon(Icons.delete))
                                     ],

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/activity.dart';
-import 'package:ui/movie_watchlist.dart';
 import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
-import 'package:ui/tv_watchlist.dart';
+import 'package:ui/welcome_page.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({super.key});
@@ -27,9 +26,9 @@ class _NavDrawerState extends State<NavDrawer> {
           _counter = value;
         });
         if (value == 0) {
-          context.go(MovieWatchlistPage.route);
+          context.go(WelcomePage.routeMoivie);
         } else if (value == 1) {
-          context.go(TvWatchlistPage.route);
+          context.go(WelcomePage.routeTv);
         } else if (value == 2) {
           context.go(SearchPage.route);
         } else if (value == 3) {
