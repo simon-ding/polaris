@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // GoRouter configuration
-    final _shellRoute = ShellRoute(
+    final shellRoute = ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
         return SelectionArea(
           child: Scaffold(
@@ -139,10 +139,10 @@ class MyApp extends StatelessWidget {
       ],
     );
 
-    final _router = GoRouter(
+    final router = GoRouter(
       navigatorKey: APIs.navigatorKey,
       routes: [
-        _shellRoute,
+        shellRoute,
         GoRoute(
           path: LoginScreen.route,
           builder: (context, state) => const LoginScreen(),
@@ -172,7 +172,7 @@ class MyApp extends StatelessWidget {
               seedColor: Colors.blue, brightness: Brightness.dark),
           useMaterial3: true,
         ),
-        routerConfig: _router,
+        routerConfig: router,
       ),
     );
   }

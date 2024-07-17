@@ -46,7 +46,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
         builder: (context, snapshot) {
           return seriesDetails.when(
               data: (details) {
-                Map<int, List<DataRow>> m = Map();
+                Map<int, List<DataRow>> m = {};
                 for (final ep in details.episodes!) {
                   var row = DataRow(cells: [
                     DataCell(Text("${ep.episodeNumber}")),

@@ -85,7 +85,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           return cards;
         },
         error: (err, trace) => [Text("$err")],
-        loading: () => [MyProgressIndicator()]);
+        loading: () => [const MyProgressIndicator()]);
 
     var f = FutureBuilder(
         // We listen to the pending operation, to update the UI accordingly.
@@ -93,7 +93,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done &&
               snapshot.connectionState != ConnectionState.none) {
-            return MyProgressIndicator();
+            return const MyProgressIndicator();
           }
           return ListView(
             children: res,
@@ -126,8 +126,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         builder: (BuildContext context) {
           return Consumer(
             builder: (context, ref, _) {
-              String _resSelected = "1080p";
-              int _storageSelected = 0;
+              String resSelected = "1080p";
+              int storageSelected = 0;
               var storage = ref.watch(storageSettingProvider);
 
               return AlertDialog(
@@ -137,7 +137,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   children: [
                     DropdownMenu(
                       label: const Text("清晰度"),
-                      initialSelection: _resSelected,
+                      initialSelection: resSelected,
                       dropdownMenuEntries: const [
                         DropdownMenuEntry(value: "720p", label: "720p"),
                         DropdownMenuEntry(value: "1080p", label: "1080p"),
@@ -145,7 +145,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       ],
                       onSelected: (value) {
                         setState(() {
-                          _resSelected = value!;
+                          resSelected = value!;
                         });
                       },
                     ),
@@ -153,14 +153,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         data: (v) {
                           return DropdownMenu(
                             label: const Text("存储位置"),
-                            initialSelection: _storageSelected,
+                            initialSelection: storageSelected,
                             dropdownMenuEntries: v
                                 .map((s) => DropdownMenuEntry(
                                     label: s.name!, value: s.id))
                                 .toList(),
                             onSelected: (value) {
                               setState(() {
-                                _storageSelected = value!;
+                                storageSelected = value!;
                               });
                             },
                           );
@@ -185,11 +185,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     ),
                     child: const Text('确定'),
                     onPressed: () {
-                      print(_storageSelected);
+                      print(storageSelected);
                       ref
                           .read(searchPageDataProvider.notifier)
-                          .submit2Watchlist(item.id!, _storageSelected,
-                              _resSelected, item.mediaType!);
+                          .submit2Watchlist(item.id!, storageSelected,
+                              resSelected, item.mediaType!);
                       Navigator.of(context).pop();
                     },
                   ),

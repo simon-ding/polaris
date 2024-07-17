@@ -7,18 +7,18 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
 var settingProvider =
-    AsyncNotifierProvider.family<EditSettingData, String, String>(
+    AsyncNotifierProvider.autoDispose.family<EditSettingData, String, String>(
         EditSettingData.new);
 
 var indexersProvider =
-    AsyncNotifierProvider<IndexerSetting, List<Indexer>>(IndexerSetting.new);
+    AsyncNotifierProvider.autoDispose<IndexerSetting, List<Indexer>>(IndexerSetting.new);
 
 var dwonloadClientsProvider =
-    AsyncNotifierProvider<DownloadClientSetting, List<DownloadClient>>(
+    AsyncNotifierProvider.autoDispose<DownloadClientSetting, List<DownloadClient>>(
         DownloadClientSetting.new);
 
 var storageSettingProvider =
-    AsyncNotifierProvider<StorageSettingData, List<Storage>>(
+    AsyncNotifierProvider.autoDispose<StorageSettingData, List<Storage>>(
         StorageSettingData.new);
 
 class EditSettingData extends FamilyAsyncNotifier<String, String> {
@@ -113,10 +113,10 @@ class Indexer {
     id = json["id"];
   }
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['url'] = this.url;
-    data['api_key'] = this.apiKey;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['url'] = url;
+    data['api_key'] = apiKey;
     return data;
   }
 }
@@ -196,14 +196,14 @@ class DownloadClient {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['enable'] = this.enable;
-    data['name'] = this.name;
-    data['implementation'] = this.implementation;
-    data['url'] = this.url;
-    data['remove_completed_downloads'] = this.removeCompletedDownloads;
-    data['remove_failed_downloads'] = this.removeFailedDownloads;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['enable'] = enable;
+    data['name'] = name;
+    data['implementation'] = implementation;
+    data['url'] = url;
+    data['remove_completed_downloads'] = removeCompletedDownloads;
+    data['remove_failed_downloads'] = removeFailedDownloads;
     return data;
   }
 }

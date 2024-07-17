@@ -61,7 +61,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                         );
                       },
                       error: (err, trace) => Text("$err"),
-                      loading: () => MyProgressIndicator()),
+                      loading: () => const MyProgressIndicator()),
                   dirKey.when(
                       data: (data) {
                         _downloadDirController.text = data;
@@ -80,7 +80,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                         );
                       },
                       error: (err, trace) => Text("$err"),
-                      loading: () => MyProgressIndicator()),
+                      loading: () => const MyProgressIndicator()),
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 28.0),
@@ -154,7 +154,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                             )));
                   }),
               error: (err, trace) => Text("$err"),
-              loading: () => MyProgressIndicator());
+              loading: () => const MyProgressIndicator());
         });
 
     var downloadClients = ref.watch(dwonloadClientsProvider);
@@ -197,7 +197,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                             )));
                   }),
               error: (err, trace) => Text("$err"),
-              loading: () => MyProgressIndicator());
+              loading: () => const MyProgressIndicator());
         });
 
     var storageSettingData = ref.watch(storageSettingProvider);
@@ -238,12 +238,12 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                             )));
                   }),
               error: (err, trace) => Text("$err"),
-              loading: () => MyProgressIndicator());
+              loading: () => const MyProgressIndicator());
         });
 
     var authData = ref.watch(authSettingProvider);
-    TextEditingController _userController = TextEditingController();
-    TextEditingController _passController = TextEditingController();
+    TextEditingController userController = TextEditingController();
+    TextEditingController passController = TextEditingController();
     var authSetting = authData.when(
         data: (data) {
           if (_enableAuth == null) {
@@ -251,7 +251,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
               _enableAuth = data.enable;
             });
           }
-          _userController.text = data.user;
+          userController.text = data.user;
           return Column(
             children: [
               SwitchListTile(
@@ -266,13 +266,13 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                   ? Column(
                       children: [
                         TextFormField(
-                            controller: _userController,
+                            controller: userController,
                             decoration: const InputDecoration(
                               labelText: "用户名",
                               icon: Icon(Icons.verified_user),
                             )),
                         TextFormField(
-                            controller: _passController,
+                            controller: passController,
                             decoration: const InputDecoration(
                               labelText: "密码",
                               icon: Icon(Icons.verified_user),
@@ -287,13 +287,13 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                         ref
                             .read(authSettingProvider.notifier)
                             .updateAuthSetting(_enableAuth!,
-                                _userController.text, _passController.text);
+                                userController.text, passController.text);
                       }))
             ],
           );
         },
         error: (err, trace) => Text("$err"),
-        loading: () => MyProgressIndicator());
+        loading: () => const MyProgressIndicator());
 
     return ListView(
       children: [
@@ -490,7 +490,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
             passController.text = s.settings!["password"] ?? "";
           }
 
-          String _selectImpl =
+          String selectImpl =
               s.implementation == null ? "local" : s.implementation!;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
@@ -502,10 +502,10 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                       label: const Text("实现"),
                       onSelected: (value) {
                         setState(() {
-                          _selectImpl = value!;
+                          selectImpl = value!;
                         });
                       },
-                      initialSelection: _selectImpl,
+                      initialSelection: selectImpl,
                       dropdownMenuEntries: const [
                         DropdownMenuEntry(value: "local", label: "本地存储"),
                         DropdownMenuEntry(value: "webdav", label: "webdav")
@@ -515,7 +515,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                       decoration: const InputDecoration(labelText: "名称"),
                       controller: nameController,
                     ),
-                    _selectImpl != "local"
+                    selectImpl != "local"
                         ? 
                         Column(
                             children: [
@@ -573,7 +573,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                         .read(storageSettingProvider.notifier)
                         .addStorage(Storage(
                           name: nameController.text,
-                          implementation: _selectImpl,
+                          implementation: selectImpl,
                           settings: {
                             "tv_path": tvPathController.text,
                             "movie_path": moviePathController.text,

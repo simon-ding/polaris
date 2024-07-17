@@ -72,6 +72,6 @@ class ActivityPage extends ConsumerWidget {
           );
         },
         error: (err, trace) => Text("$err"),
-        loading: () => MyProgressIndicator());
+        loading: () => const MyProgressIndicator());
   }
 }

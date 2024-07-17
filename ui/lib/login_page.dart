@@ -28,6 +28,7 @@ class LoginScreen extends ConsumerWidget {
       title: 'Polaris',
       onLogin: (data) {
         ref.read(authSettingProvider.notifier).login(data.name, data.password);
+        return null;
       },
       onSubmitAnimationCompleted: () {
         context.go(WelcomePage.routeTv);

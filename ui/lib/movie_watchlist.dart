@@ -142,7 +142,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                             icon: const Icon(Icons.download),
                             onPressed: () async {
                               await ref
-                                  .read(movieTorrentsDataProvider(this.id)
+                                  .read(movieTorrentsDataProvider(id)
                                       .notifier)
                                   .download(torrent.link!);
                             },
