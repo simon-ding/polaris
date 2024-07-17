@@ -154,19 +154,6 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'Polaris 电影电视剧追踪',
         theme: ThemeData(
-          // Define the default TextTheme. Use this to specify the default
-          // text styling for headlines, titles, bodies of text, and more.
-          // textTheme: const TextTheme(
-          //   bodyLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   bodyMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   bodySmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   titleLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   titleMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   titleSmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   labelLarge: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   labelMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          //   labelSmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
-          // ),
           fontFamily: "NotoSansSC",
           fontFamilyFallback: const ["PingFang SC", "Heiti SC"],
 

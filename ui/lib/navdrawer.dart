@@ -19,6 +19,18 @@ class _NavDrawerState extends State<NavDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    var uri = GoRouterState.of(context).uri.toString();
+    if (uri.contains(WelcomePage.routeMoivie)) {
+      _counter = 0;
+    } else if (uri.contains(WelcomePage.routeTv)) {
+      _counter = 1;
+    } else if (uri.contains(SearchPage.route)) {
+      _counter = 2;
+    } else if (uri.contains(ActivityPage.route)) {
+      _counter = 3;
+    } else if (uri.contains(SystemSettingsPage.route)) {
+      _counter = 4;
+    }
     return NavigationRail(
       selectedIndex: _counter,
       onDestinationSelected: (value) {
