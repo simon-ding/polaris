@@ -42,9 +42,20 @@ func Open() (*Client, error) {
 		ent: client,
 	}
 
-	c.generateJwtSerectIfNotExist()
-	c.generateDefaultLocalStorage()
 	return c, nil
+}
+
+func (c *Client) init() {
+	c.generateJwtSerectIfNotExist()
+	if err := c.generateDefaultLocalStorage(); err != nil {
+		log.Errorf("generate default storage: %v", err)
+	}
+
+	downloadDir := c.GetSetting(SettingDownloadDir)
+	if downloadDir == "" {
+		log.Infof("set default download dir")
+		c.SetSetting(downloadDir, "/downloads")
+	}
 }
 
 func (c *Client) generateJwtSerectIfNotExist() {
@@ -56,12 +67,13 @@ func (c *Client) generateJwtSerectIfNotExist() {
 	}
 }
 
-func (c *Client) generateDefaultLocalStorage() {
+func (c *Client) generateDefaultLocalStorage() error {
 	n, _ := c.ent.Storage.Query().Count(context.TODO())
 	if n != 0 {
-		return
+		return nil
 	}
-	c.AddStorage(&StorageInfo{
+	log.Infof("add default storage")
+	return c.AddStorage(&StorageInfo{
 		Name:           "local",
 		Implementation: "local",
 		Default:        true,

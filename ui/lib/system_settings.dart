@@ -301,7 +301,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
           initiallyExpanded: true,
-          title: const Text("TMDB 设置"),
+          title: const Text("常规设置"),
           children: [tmdbSetting],
         ),
         ExpansionTile(
@@ -328,7 +328,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         ExpansionTile(
           tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-          initiallyExpanded: true,
+          initiallyExpanded: false,
           title: const Text("认证设置"),
           children: [authSetting],
         ),
@@ -355,7 +355,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                     controller: nameController,
                   ),
                   TextField(
-                    decoration: const InputDecoration(labelText: "网址"),
+                    decoration: const InputDecoration(labelText: "地址"),
                     controller: urlController,
                   ),
                   TextField(
@@ -425,7 +425,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                     controller: nameController,
                   ),
                   TextField(
-                    decoration: const InputDecoration(labelText: "网址"),
+                    decoration: const InputDecoration(labelText: "地址"),
                     controller: urlController,
                   ),
                 ],
@@ -521,7 +521,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                             children: [
                               TextField(
                                 decoration: const InputDecoration(
-                                    labelText: "Webdav网址"),
+                                    labelText: "Webdav地址"),
                                 controller: urlController,
                               ),
                               TextField(

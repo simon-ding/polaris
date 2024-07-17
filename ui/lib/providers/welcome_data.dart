@@ -76,9 +76,7 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
     list = List.empty(growable: true);
     final dio = await APIs.getDio();
     var resp = await dio.get(APIs.searchUrl, queryParameters: {"query": q});
-    //var dy = jsonDecode(resp.data.toString());
 
-    print("search page results: ${resp.data}");
     var rsp = ServerResponse.fromJson(resp.data as Map<String, dynamic>);
     if (rsp.code != 0) {
       throw rsp.message;
