@@ -50,18 +50,41 @@ class MyApp extends StatelessWidget {
                   IconButton(
                       onPressed: () => context.go(SystemSettingsPage.route),
                       icon: const Icon(Icons.settings)),
-                  APIs.isLoggedIn
-                      ? IconButton(
-                          onPressed: () async {
-                            final SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            await prefs.remove('token');
-                            if (context.mounted) {
-                              context.go(LoginScreen.route);
-                            }
-                          },
-                          icon: const Icon(Icons.exit_to_app))
-                      : Container()
+                  FutureBuilder(
+                      future: APIs.isLoggedIn(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data == true) {
+                          return MenuAnchor(
+                            menuChildren: [
+                              MenuItemButton(
+                                leadingIcon: const Icon(Icons.exit_to_app),
+                                child: const Text("登出"),
+                                onPressed: () async {
+                                  final SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.remove('token');
+                                  if (context.mounted) {
+                                    context.go(LoginScreen.route);
+                                  }
+                                },
+                              ),
+                            ],
+                            builder: (context, controller, child) {
+                              return TextButton(
+                                onPressed: () {
+                                  if (controller.isOpen) {
+                                    controller.close();
+                                  } else {
+                                    controller.open();
+                                  }
+                                },
+                                child: const Icon(Icons.account_circle),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      })
                 ],
               ),
               body: Center(
@@ -73,7 +96,11 @@ class MyApp extends StatelessWidget {
                   child: NavDrawer(),
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
-                Flexible(flex: 7, child: Padding(padding: const EdgeInsets.all(20),child: child), )
+                Flexible(
+                  flex: 7,
+                  child:
+                      Padding(padding: const EdgeInsets.all(20), child: child),
+                )
               ]))),
         );
       },

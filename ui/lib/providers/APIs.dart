@@ -44,22 +44,29 @@ class APIs {
 
   static Dio? gDio;
   static Map<String, String> authHeaders = {};
-  static bool isLoggedIn = false;
 
-  static Future<Dio> getDio() async {
-    if (gDio != null) {
-      return gDio!;
-    }
+  static Future<bool> isLoggedIn() async {
+    return isNotBlank(await getToken());
+  }
+
+  static Future<String> getToken() async {
     var token = authHeaders["Authorization"];
     if (isBlank(token)) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var t = prefs.getString("token");
       if (isNotBlank(t)) {
         authHeaders["Authorization"] = t!;
-        isLoggedIn = true;
         token = t;
       }
     }
+    return token ?? "";
+  }
+
+  static Future<Dio> getDio() async {
+    if (gDio != null) {
+      return gDio!;
+    }
+    var token = await getToken();
 
     var dio = Dio();
     dio.interceptors.add(InterceptorsWrapper(
