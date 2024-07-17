@@ -21,7 +21,7 @@ var storageSettingProvider =
     AsyncNotifierProvider.autoDispose<StorageSettingData, List<Storage>>(
         StorageSettingData.new);
 
-class EditSettingData extends FamilyAsyncNotifier<String, String> {
+class EditSettingData extends AutoDisposeFamilyAsyncNotifier<String, String> {
   String? key;
 
   @override
@@ -53,7 +53,7 @@ class EditSettingData extends FamilyAsyncNotifier<String, String> {
   }
 }
 
-class IndexerSetting extends AsyncNotifier<List<Indexer>> {
+class IndexerSetting extends AutoDisposeAsyncNotifier<List<Indexer>> {
   @override
   FutureOr<List<Indexer>> build() async {
     final dio = await APIs.getDio();
@@ -121,7 +121,7 @@ class Indexer {
   }
 }
 
-class DownloadClientSetting extends AsyncNotifier<List<DownloadClient>> {
+class DownloadClientSetting extends AutoDisposeAsyncNotifier<List<DownloadClient>> {
   @override
   FutureOr<List<DownloadClient>> build() async {
     final dio = await APIs.getDio();
@@ -208,7 +208,7 @@ class DownloadClient {
   }
 }
 
-class StorageSettingData extends AsyncNotifier<List<Storage>> {
+class StorageSettingData extends AutoDisposeAsyncNotifier<List<Storage>> {
   @override
   FutureOr<List<Storage>> build() async {
     final dio = await APIs.getDio();

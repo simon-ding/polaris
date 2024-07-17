@@ -167,6 +167,8 @@ class MyApp extends StatelessWidget {
           //   labelMedium: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
           //   labelSmall: TextStyle(fontFamilyFallback: ["PingFang SC", "Heiti SC"]),
           // ),
+          fontFamily: "NotoSansSC",
+          fontFamilyFallback: const ["PingFang SC", "Heiti SC"],
 
           colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.blue, brightness: Brightness.dark),
