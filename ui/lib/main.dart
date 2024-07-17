@@ -47,9 +47,6 @@ class MyApp extends StatelessWidget {
                   ],
                 ),
                 actions: [
-                  IconButton(
-                      onPressed: () => context.go(SystemSettingsPage.route),
-                      icon: const Icon(Icons.settings)),
                   FutureBuilder(
                       future: APIs.isLoggedIn(),
                       builder: (context, snapshot) {
