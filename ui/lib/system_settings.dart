@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quiver/strings.dart';
 import 'package:ui/providers/login.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
@@ -303,7 +304,10 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
   Future<void> showDownloadClientDetails(DownloadClient client) {
     var nameController = TextEditingController(text: client.name);
     var urlController = TextEditingController(text: client.url);
+    var userController = TextEditingController(text: client.user);
+    var passController = TextEditingController(text: client.password);
 
+    var _enableAuth = isNotBlank(client.user);
     String selectImpl = "transmission";
     var body = <Widget>[
       DropdownMenu(
@@ -326,7 +330,34 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         decoration: Commons.requiredTextFieldStyle(text: "地址"),
         controller: urlController,
       ),
-      
+      StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+        return Column(
+          children: [
+            SwitchListTile(
+                title: const Text("开启认证"),
+                value: _enableAuth,
+                onChanged: (v) {
+                  setState(() {
+                    _enableAuth = v;
+                  });
+                }),
+            _enableAuth
+                ? Column(
+                    children: [
+                      TextField(
+                        decoration: Commons.requiredTextFieldStyle(text: "用户"),
+                        controller: userController,
+                      ),
+                      TextField(
+                        decoration: Commons.requiredTextFieldStyle(text: "密码"),
+                        controller: passController,
+                      ),
+                    ],
+                  )
+                : Container()
+          ],
+        );
+      })
     ];
     onDelete() async {
       return ref
@@ -335,9 +366,13 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
     }
 
     onSubmit() async {
-      return ref
-          .read(dwonloadClientsProvider.notifier)
-          .addDownloadClients(nameController.text, urlController.text);
+      return ref.read(dwonloadClientsProvider.notifier).addDownloadClients(
+          DownloadClient(
+              name: nameController.text,
+              implementation: "transmission",
+              url: urlController.text,
+              user: _enableAuth ? userController.text : null,
+              password: _enableAuth ? passController.text : null));
     }
 
     return showSettingDialog(

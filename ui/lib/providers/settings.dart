@@ -6,8 +6,9 @@ import 'package:quiver/strings.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
-var settingProvider = AsyncNotifierProvider.autoDispose
-    <EditSettingData, GeneralSetting>(EditSettingData.new);
+var settingProvider =
+    AsyncNotifierProvider.autoDispose<EditSettingData, GeneralSetting>(
+        EditSettingData.new);
 
 var indexersProvider =
     AsyncNotifierProvider.autoDispose<IndexerSetting, List<Indexer>>(
@@ -152,15 +153,12 @@ class DownloadClientSetting
     return indexers;
   }
 
-  Future<void> addDownloadClients(String name, String url) async {
-    if (name.isEmpty || url.isEmpty) {
+  Future<void> addDownloadClients(DownloadClient client) async {
+    if (isBlank(client.name) || isBlank(client.url)) {
       return;
     }
     final dio = await APIs.getDio();
-    var resp = await dio.post(APIs.addDownloadClientUrl, data: {
-      "name": name,
-      "url": url,
-    });
+    var resp = await dio.post(APIs.addDownloadClientUrl, data: client.toJson());
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;
@@ -185,8 +183,8 @@ class DownloadClient {
   String? name;
   String? implementation;
   String? url;
-  bool? removeCompletedDownloads;
-  bool? removeFailedDownloads;
+  String? user;
+  String? password;
 
   DownloadClient(
       {this.id,
@@ -194,8 +192,8 @@ class DownloadClient {
       this.name,
       this.implementation,
       this.url,
-      this.removeCompletedDownloads,
-      this.removeFailedDownloads});
+      this.user,
+      this.password});
 
   DownloadClient.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -203,8 +201,8 @@ class DownloadClient {
     name = json['name'];
     implementation = json['implementation'];
     url = json['url'];
-    removeCompletedDownloads = json['remove_completed_downloads'];
-    removeFailedDownloads = json['remove_failed_downloads'];
+    user = json['user'];
+    password = json['password'];
   }
 
   Map<String, dynamic> toJson() {
@@ -214,8 +212,8 @@ class DownloadClient {
     data['name'] = name;
     data['implementation'] = implementation;
     data['url'] = url;
-    data['remove_completed_downloads'] = removeCompletedDownloads;
-    data['remove_failed_downloads'] = removeFailedDownloads;
+    data['user'] = user;
+    data['password'] = password;
     return data;
   }
 }
