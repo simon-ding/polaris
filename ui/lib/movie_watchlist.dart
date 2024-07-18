@@ -21,19 +21,16 @@ class MovieDetailsPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _MovieDetailsPageState(id: id);
+    return _MovieDetailsPageState();
   }
 }
 
 class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
-  final String id;
-
-  _MovieDetailsPageState({required this.id});
 
   @override
   Widget build(BuildContext context) {
-    var seriesDetails = ref.watch(mediaDetailsProvider(id));
-    var torrents = ref.watch(movieTorrentsDataProvider(id));
+    var seriesDetails = ref.watch(mediaDetailsProvider(widget.id));
+    var torrents = ref.watch(movieTorrentsDataProvider(widget.id));
     var storage = ref.watch(storageSettingProvider);
 
     return seriesDetails.when(
@@ -107,7 +104,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                                     onPressed: () {
                                       ref
                                           .read(
-                                              mediaDetailsProvider(id).notifier)
+                                              mediaDetailsProvider(widget.id).notifier)
                                           .delete();
                                       context.go(MovieDetailsPage.route);
                                     },
@@ -142,7 +139,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                             icon: const Icon(Icons.download),
                             onPressed: () async {
                               await ref
-                                  .read(movieTorrentsDataProvider(id)
+                                  .read(movieTorrentsDataProvider(widget.id)
                                       .notifier)
                                   .download(torrent.link!);
                             },

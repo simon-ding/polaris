@@ -34,19 +34,30 @@ class MyApp extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                 // Here we take the value from the MyHomePage object that was created by
                 // the App.build method, and use it to set our appbar title.
-                title: Row(
+                title: const Row(
                   children: [
-                    const Text("Polaris"),
-                    const SizedBox(
-                      width: 100,
-                    ),
-                    IconButton(
-                        tooltip: "搜索剧集",
-                        onPressed: () => context.go(SearchPage.route),
-                        icon: const Icon(Icons.search)),
+                    Text("Polaris"),
                   ],
                 ),
                 actions: [
+                  SearchAnchor(builder:
+                      (BuildContext context, SearchController controller) {
+                    return Container(
+                      constraints:
+                          const BoxConstraints(maxWidth: 300, maxHeight: 40),
+                      child: SearchBar(
+                        hintText: "搜索电影和电视剧...",
+                        leading: const Icon(Icons.search),
+                        controller: controller,
+                        onSubmitted: (value) => context.go(Uri(
+                            path: SearchPage.route,
+                            queryParameters: {'query': value}).toString()),
+                      ),
+                    );
+                  }, suggestionsBuilder:
+                      (BuildContext context, SearchController controller) {
+                    return [Text("dadada")];
+                  }),
                   FutureBuilder(
                       future: APIs.isLoggedIn(),
                       builder: (context, snapshot) {
@@ -126,7 +137,8 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: SearchPage.route,
-          builder: (context, state) => const SearchPage(),
+          builder: (context, state) =>
+              SearchPage(query: state.uri.queryParameters["query"]),
         ),
         GoRoute(
           path: SystemSettingsPage.route,

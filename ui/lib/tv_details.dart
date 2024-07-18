@@ -21,14 +21,11 @@ class TvDetailsPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _TvDetailsPageState(seriesId: seriesId);
+    return _TvDetailsPageState();
   }
 }
 
 class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
-  final String seriesId;
-
-  _TvDetailsPageState({required this.seriesId});
   Future<String>? _pendingFuture;
 
   @override
@@ -38,7 +35,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var seriesDetails = ref.watch(mediaDetailsProvider(seriesId));
+    var seriesDetails = ref.watch(mediaDetailsProvider(widget.seriesId));
     var storage = ref.watch(storageSettingProvider);
     return FutureBuilder(
         // We listen to the pending operation, to update the UI accordingly.
@@ -70,8 +67,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                             onPressed: () async {
                               var f = ref
                                   .read(
-                                      mediaDetailsProvider(seriesId).notifier)
-                                  .searchAndDownload(seriesId, ep.seasonNumber!,
+                                      mediaDetailsProvider(widget.seriesId).notifier)
+                                  .searchAndDownload(widget.seriesId, ep.seasonNumber!,
                                       ep.episodeNumber!);
                               setState(() {
                                 _pendingFuture = f;
@@ -187,7 +184,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                           onPressed: () {
                                             ref
                                                 .read(mediaDetailsProvider(
-                                                        seriesId)
+                                                        widget.seriesId)
                                                     .notifier)
                                                 .delete();
                                             context.go(WelcomePage.routeTv);

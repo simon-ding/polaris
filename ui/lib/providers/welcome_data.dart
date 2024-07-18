@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quiver/strings.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
@@ -29,18 +30,37 @@ final movieWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
 });
 
 var searchPageDataProvider =
-    AsyncNotifierProvider.autoDispose<SearchPageData, List<SearchResult>>(
+    AsyncNotifierProvider.autoDispose.family<SearchPageData, List<SearchResult>, String>(
         SearchPageData.new);
 
 var movieTorrentsDataProvider = AsyncNotifierProvider.autoDispose
     .family<MovieTorrentResource, List<TorrentResource>, String>(
         MovieTorrentResource.new);
 
-class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
+class SearchPageData
+    extends AutoDisposeFamilyAsyncNotifier<List<SearchResult>, String> {
   List<SearchResult> list = List.empty(growable: true);
 
   @override
-  FutureOr<List<SearchResult>> build() async {
+  FutureOr<List<SearchResult>> build(String arg) async {
+    if (isBlank(arg)) {
+      return List.empty();
+    }
+    list = List.empty(growable: true);
+    final dio = await APIs.getDio();
+    var resp = await dio.get(APIs.searchUrl, queryParameters: {"query": arg});
+
+    var rsp = ServerResponse.fromJson(resp.data as Map<String, dynamic>);
+    if (rsp.code != 0) {
+      throw rsp.message;
+    }
+
+    var data = rsp.data as Map<String, dynamic>;
+    var results = data["results"] as List<dynamic>;
+    for (final r in results) {
+      var res = SearchResult.fromJson(r);
+      list.add(res);
+    }
     return list;
   }
 
@@ -68,27 +88,7 @@ class SearchPageData extends AutoDisposeAsyncNotifier<List<SearchResult>> {
       if (sp.code != 0) {
         throw sp.message;
       }
-      ref.invalidate(movieWatchlistDataProvider);
     }
-  }
-
-  Future<void> queryResults(String q) async {
-    list = List.empty(growable: true);
-    final dio = await APIs.getDio();
-    var resp = await dio.get(APIs.searchUrl, queryParameters: {"query": q});
-
-    var rsp = ServerResponse.fromJson(resp.data as Map<String, dynamic>);
-    if (rsp.code != 0) {
-      throw rsp.message;
-    }
-
-    var data = rsp.data as Map<String, dynamic>;
-    var results = data["results"] as List<dynamic>;
-    for (final r in results) {
-      var res = SearchResult.fromJson(r);
-      list.add(res);
-    }
-    ref.invalidateSelf();
   }
 }
 

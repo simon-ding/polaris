@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
-  const SearchPage({super.key});
+  const SearchPage({super.key, this.query});
 
   static const route = "/search";
+  final String? query;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -22,7 +24,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Future<void>? _pendingFuture;
   @override
   Widget build(BuildContext context) {
-    var searchList = ref.watch(searchPageDataProvider);
+    final q = widget.query??"";
+    var searchList = ref.watch(searchPageDataProvider(q));
 
     List<Widget> res = searchList.when(
         data: (data) {
@@ -66,8 +69,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                   width: 10,
                                 ),
                                 item.mediaType == "tv"
-                                    ? const Chip(avatar: Icon(Icons.live_tv),label: Text("电视剧",))
-                                    : const Chip(avatar: Icon(Icons.movie),label: Text("电影"))
+                                    ? const Chip(
+                                        avatar: Icon(Icons.live_tv),
+                                        label: Text(
+                                          "电视剧",
+                                        ))
+                                    : const Chip(
+                                        avatar: Icon(Icons.movie),
+                                        label: Text("电影"))
                               ],
                             ),
                             const Text(""),
@@ -103,12 +112,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       children: [
         TextField(
           autofocus: true,
+          controller: TextEditingController(text: q),
           onSubmitted: (value) async {
-            var f =
-                ref.read(searchPageDataProvider.notifier).queryResults(value);
-            setState(() {
-              _pendingFuture = f;
-            });
+            context.go(
+                Uri(path: SearchPage.route, queryParameters: {'query': value})
+                    .toString());
           },
           decoration: const InputDecoration(
               labelText: "搜索",
@@ -185,9 +193,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     ),
                     child: const Text('确定'),
                     onPressed: () {
-                      print(storageSelected);
                       ref
-                          .read(searchPageDataProvider.notifier)
+                          .read(searchPageDataProvider(widget.query??"").notifier)
                           .submit2Watchlist(item.id!, storageSelected,
                               resSelected, item.mediaType!);
                       Navigator.of(context).pop();
