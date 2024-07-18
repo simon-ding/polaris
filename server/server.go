@@ -53,8 +53,8 @@ func (s *Server) Serve() error {
 
 	setting := api.Group("/setting")
 	{
-		setting.POST("/do", HttpHandler(s.SetSetting))
-		setting.GET("/do", HttpHandler(s.GetSetting))
+		setting.POST("/general", HttpHandler(s.SetSetting))
+		setting.GET("/general", HttpHandler(s.GetSetting))
 		setting.POST("/auth", HttpHandler(s.EnableAuth))
 		setting.GET("/auth", HttpHandler(s.GetAuthSetting))
 	}

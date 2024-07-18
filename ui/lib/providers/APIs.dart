@@ -10,6 +10,7 @@ class APIs {
   static final _baseUrl = baseUrl();
   static final searchUrl = "$_baseUrl/api/v1/media/search";
   static final settingsUrl = "$_baseUrl/api/v1/setting/do";
+  static final settingsGeneralUrl = "$_baseUrl/api/v1/setting/general";
   static final watchlistTvUrl = "$_baseUrl/api/v1/media/tv/watchlist";
   static final watchlistMovieUrl = "$_baseUrl/api/v1/media/movie/watchlist";
   static final availableMoviesUrl = "$_baseUrl/api/v1/media/movie/resources/";

@@ -138,7 +138,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                           DataCell(Text("${torrent.size?.readableFileSize()}")),
                           DataCell(Text("${torrent.seeders}")),
                           DataCell(Text("${torrent.peers}")),
-                          DataCell(IconButton.filledTonal(
+                          DataCell(IconButton(
                             icon: const Icon(Icons.download),
                             onPressed: () async {
                               await ref

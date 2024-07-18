@@ -1,33 +1,40 @@
 package server
 
 import (
-	"polaris/log"
+	"polaris/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
 
 
-type setSettingIn struct {
-	Key string `json:"key"`
-	Value string `json:"value"`
+type GeneralSettings struct {
+	TmdbApiKey string `json:"tmdb_api_key"`
+	DownloadDir string `json:"download_dir"`
 }
 func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
-	var in setSettingIn
+	var in GeneralSettings
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
-	err := s.db.SetSetting(in.Key, in.Value)
-	return nil, err
+	if in.TmdbApiKey != "" {
+		if err := s.db.SetSetting(db.SettingTmdbApiKey, in.TmdbApiKey); err != nil {
+			return nil, errors.Wrap(err, "save tmdb api")
+		}
+	}
+	if in.DownloadDir == "" {
+		if err := s.db.SetSetting(db.SettingDownloadDir, in.DownloadDir); err != nil {
+			return nil, errors.Wrap(err, "save download dir")
+		}
+	}
+	return nil, nil
 }
 
 func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
-	q := c.Query("key")
-	log.Infof("query key: %v", q)
-	if q == "" {
-		return nil, nil
-	}
-	v := s.db.GetSetting(q)
-	log.Infof("get value for key %v: %v", q, v)
-	return gin.H{q: v}, nil
+	tmdb := s.db.GetSetting(db.SettingTmdbApiKey)
+	downloadDir := s.db.GetSetting(db.SettingDownloadDir)
+		return &GeneralSettings{
+		TmdbApiKey: tmdb,
+		DownloadDir: downloadDir,
+	}, nil
 }

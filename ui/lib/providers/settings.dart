@@ -6,50 +6,61 @@ import 'package:quiver/strings.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
-var settingProvider =
-    AsyncNotifierProvider.autoDispose.family<EditSettingData, String, String>(
-        EditSettingData.new);
+var settingProvider = AsyncNotifierProvider.autoDispose
+    <EditSettingData, GeneralSetting>(EditSettingData.new);
 
 var indexersProvider =
-    AsyncNotifierProvider.autoDispose<IndexerSetting, List<Indexer>>(IndexerSetting.new);
+    AsyncNotifierProvider.autoDispose<IndexerSetting, List<Indexer>>(
+        IndexerSetting.new);
 
-var dwonloadClientsProvider =
-    AsyncNotifierProvider.autoDispose<DownloadClientSetting, List<DownloadClient>>(
-        DownloadClientSetting.new);
+var dwonloadClientsProvider = AsyncNotifierProvider.autoDispose<
+    DownloadClientSetting, List<DownloadClient>>(DownloadClientSetting.new);
 
 var storageSettingProvider =
     AsyncNotifierProvider.autoDispose<StorageSettingData, List<Storage>>(
         StorageSettingData.new);
 
-class EditSettingData extends AutoDisposeFamilyAsyncNotifier<String, String> {
-  String? key;
-
+class EditSettingData extends AutoDisposeAsyncNotifier<GeneralSetting> {
   @override
-  FutureOr<String> build(String arg) async {
+  FutureOr<GeneralSetting> build() async {
     final dio = await APIs.getDio();
-    key = arg;
-    var resp = await dio.get(APIs.settingsUrl, queryParameters: {"key": arg});
+
+    var resp = await dio.get(APIs.settingsGeneralUrl);
     var rrr = ServerResponse.fromJson(resp.data);
     if (rrr.code != 0) {
       throw rrr.message;
     }
-    var data = rrr.data as Map<String, dynamic>;
-    var value = data[arg] as String;
-
-    return value;
+    final ss = GeneralSetting.fromJson(rrr.data);
+    return ss;
   }
 
-  Future<void> updateSettings(String v) async {
+  Future<void> updateSettings(GeneralSetting gs) async {
     final dio = await APIs.getDio();
-    var resp = await dio.post(APIs.settingsUrl, data: {
-      "key": key,
-      "value": v,
-    });
-    var sp = ServerResponse.fromJson(resp.data as Map<String, dynamic>);
+    var resp = await dio.post(APIs.settingsGeneralUrl, data: gs.toJson());
+    var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;
     }
     ref.invalidateSelf();
+  }
+}
+
+class GeneralSetting {
+  String? tmdbApiKey;
+  String? downloadDIr;
+
+  GeneralSetting({this.tmdbApiKey, this.downloadDIr});
+
+  factory GeneralSetting.fromJson(Map<String, dynamic> json) {
+    return GeneralSetting(
+        tmdbApiKey: json["tmdb_api_key"], downloadDIr: json["download_dir"]);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['tmdb_api_key'] = tmdbApiKey;
+    data['download_dir'] = downloadDIr;
+    return data;
   }
 }
 
@@ -121,7 +132,8 @@ class Indexer {
   }
 }
 
-class DownloadClientSetting extends AutoDisposeAsyncNotifier<List<DownloadClient>> {
+class DownloadClientSetting
+    extends AutoDisposeAsyncNotifier<List<DownloadClient>> {
   @override
   FutureOr<List<DownloadClient>> build() async {
     final dio = await APIs.getDio();
@@ -247,7 +259,8 @@ class StorageSettingData extends AutoDisposeAsyncNotifier<List<Storage>> {
 }
 
 class Storage {
-  Storage({this.id, this.name, this.implementation, this.settings, this.isDefault});
+  Storage(
+      {this.id, this.name, this.implementation, this.settings, this.isDefault});
 
   final int? id;
   final String? name;
@@ -257,12 +270,11 @@ class Storage {
 
   factory Storage.fromJson(Map<String, dynamic> json1) {
     return Storage(
-      id: json1["id"],
-      name: json1["name"],
-      implementation: json1["implementation"],
-      settings: json.decode(json1["settings"]),
-      isDefault: json1["default"]
-    );
+        id: json1["id"],
+        name: json1["name"],
+        implementation: json1["implementation"],
+        settings: json.decode(json1["settings"]),
+        isDefault: json1["default"]);
   }
 
   Map<String, dynamic> toJson() => {

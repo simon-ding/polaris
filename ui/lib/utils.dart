@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ui/providers/APIs.dart';
 
 class Utils {
   static Future<void> showAlertDialog(BuildContext context, String msg) async {
@@ -31,21 +32,26 @@ class Utils {
     );
   }
 
-  static showSnakeBar(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), showCloseIcon: true,));
+  static showSnakeBar(String msg) {
+    final context = APIs.navigatorKey.currentContext;
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(msg),
+        showCloseIcon: true,
+      ));
+    }
   }
 
   static bool showError(BuildContext context, AsyncSnapshot snapshot) {
     final isErrored = snapshot.hasError &&
         snapshot.connectionState != ConnectionState.waiting;
     if (isErrored) {
-      Utils.showSnakeBar(context, "当前操作出错: ${snapshot.error}");
+      Utils.showSnakeBar("当前操作出错: ${snapshot.error}");
       return true;
     }
     return false;
   }
 }
-
 
 extension FileFormatter on num {
   String readableFileSize({bool base1024 = true}) {

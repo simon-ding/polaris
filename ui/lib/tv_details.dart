@@ -62,11 +62,11 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               ? const Icon(Icons.downloading)
                               : (ep.status == "downloaded"
                                   ? const Icon(Icons.download_done)
-                                  : const Icon(Icons.cloud_off))),
+                                  : const Icon(Icons.warning_rounded))),
                     ),
                     DataCell(Row(
                       children: [
-                        IconButton.filledTonal(
+                        IconButton(
                             onPressed: () async {
                               var f = ref
                                   .read(
@@ -78,14 +78,12 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               });
                               if (!Utils.showError(context, snapshot)) {
                                 var name = await f;
-                                if (context.mounted) {
-                                  Utils.showSnakeBar(context, "开始下载: $name");
-                                }
+                                Utils.showSnakeBar("开始下载: $name");
                               }
                             },
                             icon: const Icon(Icons.search)),
                             const SizedBox(width: 10,),
-                        IconButton.filledTonal(
+                        IconButton(
                             onPressed: () {},
                             icon: const Icon(Icons.manage_search))
                       ],
