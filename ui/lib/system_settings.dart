@@ -258,126 +258,218 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
     var nameController = TextEditingController(text: indexer.name);
     var urlController = TextEditingController(text: indexer.url);
     var apiKeyController = TextEditingController(text: indexer.apiKey);
-    return showDialog<void>(
-        context: context,
-        barrierDismissible: true, // user must tap button!
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('索引器'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  TextField(
-                    decoration: Commons.requiredTextFieldStyle(text: "名称"),
-                    controller: nameController,
-                  ),
-                  TextField(
-                    decoration: Commons.requiredTextFieldStyle(text: "地址"),
-                    controller: urlController,
-                  ),
-                  TextField(
-                    decoration: Commons.requiredTextFieldStyle(text: "API Key"),
-                    controller: apiKeyController,
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              indexer.id == null
-                  ? const Text("")
-                  : TextButton(
-                      onPressed: () {
-                        var f = ref
-                            .read(indexersProvider.notifier)
-                            .deleteIndexer(indexer.id!);
-                        f.whenComplete(() {
-                          Utils.showSnakeBar("操作成功");
-                          Navigator.of(context).pop();
-                        }).onError((e, s) {
-                          Utils.showSnakeBar("操作失败：$e");
-                        });
-                      },
-                      child: const Text(
-                        '删除',
-                        style: TextStyle(color: Colors.red),
-                      )),
-              TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('取消')),
-              TextButton(
-                child: const Text('确定'),
-                onPressed: () {
-                  var f = ref.read(indexersProvider.notifier).addIndexer(
-                      Indexer(
-                          name: nameController.text,
-                          url: urlController.text,
-                          apiKey: apiKeyController.text));
-                  f.whenComplete(() {
-                    Utils.showSnakeBar("操作成功");
-                    Navigator.of(context).pop();
-                  }).onError((e, s) {
-                    Utils.showSnakeBar("操作失败：$e");
-                  });
-                },
-              ),
-            ],
-          );
-        });
+    var selectImpl = "torznab";
+    final children = <Widget>[
+      DropdownMenu(
+        label: const Text("类型"),
+        onSelected: (value) {
+          setState(() {
+            selectImpl = value!;
+          });
+        },
+        initialSelection: selectImpl,
+        dropdownMenuEntries: const [
+          DropdownMenuEntry(value: "torznab", label: "Torznab"),
+        ],
+      ),
+      TextField(
+        decoration: Commons.requiredTextFieldStyle(text: "名称"),
+        controller: nameController,
+      ),
+      TextField(
+        decoration: Commons.requiredTextFieldStyle(text: "地址"),
+        controller: urlController,
+      ),
+      TextField(
+        decoration: Commons.requiredTextFieldStyle(text: "API Key"),
+        controller: apiKeyController,
+      ),
+    ];
+    onDelete() async {
+      return ref.read(indexersProvider.notifier).deleteIndexer(indexer.id!);
+    }
+
+    onSubmit() async {
+      return ref.read(indexersProvider.notifier).addIndexer(Indexer(
+          name: nameController.text,
+          url: urlController.text,
+          apiKey: apiKeyController.text));
+    }
+
+    return showSettingDialog(
+        "索引器", indexer.id != null, children, onSubmit, onDelete);
   }
 
   Future<void> showDownloadClientDetails(DownloadClient client) {
     var nameController = TextEditingController(text: client.name);
     var urlController = TextEditingController(text: client.url);
 
+    String selectImpl = "transmission";
+    var body = <Widget>[
+      DropdownMenu(
+        label: const Text("类型"),
+        onSelected: (value) {
+          setState(() {
+            selectImpl = value!;
+          });
+        },
+        initialSelection: selectImpl,
+        dropdownMenuEntries: const [
+          DropdownMenuEntry(value: "transmission", label: "Transmission"),
+        ],
+      ),
+      TextField(
+        decoration: Commons.requiredTextFieldStyle(text: "名称"),
+        controller: nameController,
+      ),
+      TextField(
+        decoration: Commons.requiredTextFieldStyle(text: "地址"),
+        controller: urlController,
+      ),
+      
+    ];
+    onDelete() async {
+      return ref
+          .read(dwonloadClientsProvider.notifier)
+          .deleteDownloadClients(client.id!);
+    }
+
+    onSubmit() async {
+      return ref
+          .read(dwonloadClientsProvider.notifier)
+          .addDownloadClients(nameController.text, urlController.text);
+    }
+
+    return showSettingDialog(
+        "下载客户端", client.id != null, body, onSubmit, onDelete);
+  }
+
+  Future<void> showStorageDetails(Storage s) {
+    var nameController = TextEditingController(text: s.name);
+    var tvPathController = TextEditingController();
+    var moviePathController = TextEditingController();
+    var urlController = TextEditingController();
+    var userController = TextEditingController();
+    var passController = TextEditingController();
+    if (s.settings != null) {
+      tvPathController.text = s.settings!["tv_path"] ?? "";
+      moviePathController.text = s.settings!["movie_path"] ?? "";
+      urlController.text = s.settings!["url"] ?? "";
+      userController.text = s.settings!["user"] ?? "";
+      passController.text = s.settings!["password"] ?? "";
+    }
+
+    String selectImpl = s.implementation == null ? "local" : s.implementation!;
+    final widgets = <Widget>[
+      DropdownMenu(
+        label: const Text("类型"),
+        onSelected: (value) {
+          setState(() {
+            selectImpl = value!;
+          });
+        },
+        initialSelection: selectImpl,
+        dropdownMenuEntries: const [
+          DropdownMenuEntry(value: "local", label: "本地存储"),
+          DropdownMenuEntry(value: "webdav", label: "webdav")
+        ],
+      ),
+      TextField(
+        decoration: const InputDecoration(labelText: "名称"),
+        controller: nameController,
+      ),
+      selectImpl != "local"
+          ? Column(
+              children: [
+                TextField(
+                  decoration: const InputDecoration(labelText: "Webdav地址"),
+                  controller: urlController,
+                ),
+                TextField(
+                  decoration: const InputDecoration(labelText: "用户"),
+                  controller: userController,
+                ),
+                TextField(
+                  decoration: const InputDecoration(labelText: "密码"),
+                  controller: passController,
+                ),
+              ],
+            )
+          : Container(),
+      TextField(
+        decoration: const InputDecoration(labelText: "电视剧路径"),
+        controller: tvPathController,
+      ),
+      TextField(
+        decoration: const InputDecoration(labelText: "电影路径"),
+        controller: moviePathController,
+      )
+    ];
+    onSubmit() async {
+      return ref.read(storageSettingProvider.notifier).addStorage(Storage(
+            name: nameController.text,
+            implementation: selectImpl,
+            settings: {
+              "tv_path": tvPathController.text,
+              "movie_path": moviePathController.text,
+              "url": urlController.text,
+              "user": userController.text,
+              "password": passController.text
+            },
+          ));
+    }
+
+    onDelete() async {
+      return ref.read(storageSettingProvider.notifier).deleteStorage(s.id!);
+    }
+
+    return showSettingDialog('存储', s.id != null, widgets, onSubmit, onDelete);
+  }
+
+  Future<void> showSettingDialog(
+      String title,
+      bool showDelete,
+      List<Widget> children,
+      Future Function() onSubmit,
+      Future Function() onDelete) {
     return showDialog<void>(
         context: context,
-        barrierDismissible: true, // user must tap button!
+        barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('下载客户端'),
+            title: Text(title),
             content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  TextField(
-                    decoration: Commons.requiredTextFieldStyle(text: "名称"),
-                    controller: nameController,
-                  ),
-                  TextField(
-                    decoration: Commons.requiredTextFieldStyle(text: "地址"),
-                    controller: urlController,
-                  ),
-                ],
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 200),
+                child: ListBody(
+                  children: children,
+                ),
               ),
             ),
             actions: <Widget>[
-              client.id == null
-                  ? const Text("")
-                  : TextButton(
+              showDelete
+                  ? TextButton(
                       onPressed: () {
-                        var f = ref
-                            .read(dwonloadClientsProvider.notifier)
-                            .deleteDownloadClients(client.id!);
+                        final f = onDelete();
                         f.whenComplete(() {
-                          Utils.showSnakeBar("操作成功");
+                          Utils.showSnakeBar("删除成功");
                           Navigator.of(context).pop();
                         }).onError((e, s) {
-                          Utils.showSnakeBar("操作失败：$e");
+                          Utils.showSnakeBar("删除失败：$e");
                         });
                       },
                       child: const Text(
                         '删除',
                         style: TextStyle(color: Colors.red),
-                      )),
+                      ))
+                  : const Text(""),
               TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('取消')),
               TextButton(
                 child: const Text('确定'),
                 onPressed: () {
-                  var f = ref
-                      .read(dwonloadClientsProvider.notifier)
-                      .addDownloadClients(
-                          nameController.text, urlController.text);
+                  final f = onSubmit();
                   f.whenComplete(() {
                     Utils.showSnakeBar("操作成功");
                     Navigator.of(context).pop();
@@ -389,140 +481,5 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
             ],
           );
         });
-  }
-
-  Future<void> showStorageDetails(Storage s) {
-    return showDialog<void>(
-        context: context,
-        barrierDismissible: true, // user must tap button!
-        builder: (BuildContext context) {
-          var nameController = TextEditingController(text: s.name);
-          var tvPathController = TextEditingController();
-          var moviePathController = TextEditingController();
-          var urlController = TextEditingController();
-          var userController = TextEditingController();
-          var passController = TextEditingController();
-          if (s.settings != null) {
-            tvPathController.text = s.settings!["tv_path"] ?? "";
-            moviePathController.text = s.settings!["movie_path"] ?? "";
-            urlController.text = s.settings!["url"] ?? "";
-            userController.text = s.settings!["user"] ?? "";
-            passController.text = s.settings!["password"] ?? "";
-          }
-
-          String selectImpl =
-              s.implementation == null ? "local" : s.implementation!;
-          return StatefulBuilder(builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('存储'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    DropdownMenu(
-                      label: const Text("实现"),
-                      onSelected: (value) {
-                        setState(() {
-                          selectImpl = value!;
-                        });
-                      },
-                      initialSelection: selectImpl,
-                      dropdownMenuEntries: const [
-                        DropdownMenuEntry(value: "local", label: "本地存储"),
-                        DropdownMenuEntry(value: "webdav", label: "webdav")
-                      ],
-                    ),
-                    TextField(
-                      decoration: const InputDecoration(labelText: "名称"),
-                      controller: nameController,
-                    ),
-                    selectImpl != "local"
-                        ? Column(
-                            children: [
-                              TextField(
-                                decoration: const InputDecoration(
-                                    labelText: "Webdav地址"),
-                                controller: urlController,
-                              ),
-                              TextField(
-                                decoration:
-                                    const InputDecoration(labelText: "用户"),
-                                controller: userController,
-                              ),
-                              TextField(
-                                decoration:
-                                    const InputDecoration(labelText: "密码"),
-                                controller: passController,
-                              ),
-                            ],
-                          )
-                        : Container(),
-                    TextField(
-                      decoration: const InputDecoration(labelText: "电视剧路径"),
-                      controller: tvPathController,
-                    ),
-                    TextField(
-                      decoration: const InputDecoration(labelText: "电影路径"),
-                      controller: moviePathController,
-                    )
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                s.id == null
-                    ? const Text("")
-                    : TextButton(
-                        onPressed: () {
-                          var f = ref
-                              .read(storageSettingProvider.notifier)
-                              .deleteStorage(s.id!);
-                          f.whenComplete(() {
-                            Utils.showSnakeBar("操作成功");
-                            Navigator.of(context).pop();
-                          }).onError((e, s) {
-                            Utils.showSnakeBar("操作失败：$e");
-                          });
-                        },
-                        child: const Text('删除')),
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('取消')),
-                TextButton(
-                  child: const Text('确定'),
-                  onPressed: () async {
-                    final f = ref
-                        .read(storageSettingProvider.notifier)
-                        .addStorage(Storage(
-                          name: nameController.text,
-                          implementation: selectImpl,
-                          settings: {
-                            "tv_path": tvPathController.text,
-                            "movie_path": moviePathController.text,
-                            "url": urlController.text,
-                            "user": userController.text,
-                            "password": passController.text
-                          },
-                        ));
-                    f.whenComplete(() {
-                      Utils.showSnakeBar("操作成功");
-                      Navigator.of(context).pop();
-                    }).onError((e, s) {
-                      Utils.showSnakeBar("操作失败：$e");
-                    });
-                  },
-                ),
-              ],
-            );
-          });
-        });
-  }
-
-  bool showError(AsyncSnapshot<void> snapshot) {
-    final isErrored = snapshot.hasError &&
-        snapshot.connectionState != ConnectionState.waiting;
-    if (isErrored) {
-      Utils.showSnakeBar("当前操作出错: ${snapshot.error}");
-      return true;
-    }
-    return false;
   }
 }
