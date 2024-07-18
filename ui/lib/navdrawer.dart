@@ -20,16 +20,14 @@ class _NavDrawerState extends State<NavDrawer> {
   @override
   Widget build(BuildContext context) {
     var uri = GoRouterState.of(context).uri.toString();
-    if (uri.contains(WelcomePage.routeMoivie)) {
+    if (uri.contains(WelcomePage.routeTv)) {
       _counter = 0;
-    } else if (uri.contains(WelcomePage.routeTv)) {
+    } else if (uri.contains(WelcomePage.routeMoivie)) {
       _counter = 1;
-    } else if (uri.contains(SearchPage.route)) {
-      _counter = 2;
     } else if (uri.contains(ActivityPage.route)) {
-      _counter = 3;
+      _counter = 2;
     } else if (uri.contains(SystemSettingsPage.route)) {
-      _counter = 4;
+      _counter = 3;
     }
     return NavigationRail(
       selectedIndex: _counter,
@@ -38,14 +36,12 @@ class _NavDrawerState extends State<NavDrawer> {
           _counter = value;
         });
         if (value == 0) {
-          context.go(WelcomePage.routeMoivie);
-        } else if (value == 1) {
           context.go(WelcomePage.routeTv);
+        } else if (value == 1) {
+          context.go(WelcomePage.routeMoivie);
         } else if (value == 2) {
-          context.go(SearchPage.route);
-        } else if (value == 3) {
           context.go(ActivityPage.route);
-        } else if (value == 4) {
+        } else if (value == 3) {
           context.go(SystemSettingsPage.route);
         }
       },
@@ -53,16 +49,12 @@ class _NavDrawerState extends State<NavDrawer> {
       unselectedIconTheme: const IconThemeData(color: Colors.grey),
       destinations: const <NavigationRailDestination>[
         NavigationRailDestination(
-          icon: Icon(Icons.movie),
-          label: Text('电影'),
-        ),
-        NavigationRailDestination(
           icon: Icon(Icons.live_tv),
           label: Text('电视剧'),
         ),
         NavigationRailDestination(
-          icon: Icon(Icons.search),
-          label: Text('搜索'),
+          icon: Icon(Icons.movie),
+          label: Text('电影'),
         ),
         NavigationRailDestination(
           icon: Icon(Icons.download),
