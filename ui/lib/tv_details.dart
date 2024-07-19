@@ -100,7 +100,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                     //childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
                     initiallyExpanded: false,
-                    title: k == 0 ? const Text("特集") : Text("第 $k 季"),
+                    title: k == 0 ? const Text("特别篇") : Text("第 $k 季"),
                     expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       DataTable(columns: const [
