@@ -125,6 +125,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                         decoration: BoxDecoration(
                             image: DecorationImage(
                                 fit: BoxFit.fitWidth,
+                                opacity: 0.5,
                                 image: NetworkImage(
                                     "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
                                     headers: APIs.authHeaders))),
