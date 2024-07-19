@@ -470,7 +470,7 @@ func (c *Client) UpdateEpisodeFile(mediaID int, seasonNum, episodeNum int, file 
 	if err != nil {
 		return errors.Wrap(err, "finding episode")
 	}
-	return ep.Update().SetFileInStorage(file).Exec(context.TODO())
+	return ep.Update().SetFileInStorage(file).SetStatus(episode.StatusDownloaded).Exec(context.TODO())
 }
 
 func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {

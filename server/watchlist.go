@@ -130,6 +130,9 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		if err := s.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
+		if err := s.checkDownloadedSeriesFiles(r); err != nil {
+			log.Errorf("check downloaded files error: %v", err)
+		}
 
 	}()
 

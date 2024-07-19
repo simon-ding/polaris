@@ -118,22 +118,12 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	return nil
 }
 
-func (s *Server) updateSeriesEpisodes(seriesId int) {
-
-}
-
-func (s *Server) checkAllFiles() {
-	var tvs = s.db.GetMediaWatchlist(media.MediaTypeTv)
-	for _, se := range tvs {
-		if err := s.checkFileExists(se); err != nil {
-			log.Errorf("check files for %s error: %v", se.NameCn, err)
-		}
+func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
+	if m.MediaType != media.MediaTypeTv {
+		return nil
 	}
-}
-
-func (s *Server) checkFileExists(series *ent.Media) error {
-	log.Infof("check files in directory: %s", series.TargetDir)
-	st := s.db.GetStorage(series.StorageID)
+	log.Infof("check files in directory: %s", m.TargetDir)
+	st := s.db.GetStorage(m.StorageID)
 
 	var storageImpl storage.Storage
 
@@ -141,10 +131,6 @@ func (s *Server) checkFileExists(series *ent.Media) error {
 	case storage1.ImplementationLocal:
 		ls := st.ToLocalSetting()
 		targetPath := ls.TvPath
-		if series.MediaType == media.MediaTypeMovie {
-			targetPath = ls.MoviePath
-		}
-
 		storageImpl1, err := storage.NewLocalStorage(targetPath)
 		if err != nil {
 			return errors.Wrap(err, "new local")
@@ -154,48 +140,46 @@ func (s *Server) checkFileExists(series *ent.Media) error {
 	case storage1.ImplementationWebdav:
 		ws := st.ToWebDavSetting()
 		targetPath := ws.TvPath
-		if series.MediaType == media.MediaTypeMovie {
-			targetPath = ws.MoviePath
-		}
-
 		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath)
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}
 		storageImpl = storageImpl1
 	}
-	files, err := storageImpl.ReadDir(series.TargetDir)
+	files, err := storageImpl.ReadDir(m.TargetDir)
 	if err != nil {
-		return errors.Wrapf(err, "read dir %s", series.TargetDir)
+		return errors.Wrapf(err, "read dir %s", m.TargetDir)
 	}
-	numRe := regexp.MustCompile("[0-9]+")
-	epRe := regexp.MustCompile("E[0-9]+")
+	seRe := regexp.MustCompile(`S\d+`)
+	epRe := regexp.MustCompile(`E\d+`)
 	for _, in := range files {
 		if !in.IsDir() { //season dir, ignore file
 			continue
 		}
-		nums := numRe.FindAllString(in.Name(), -1)
-		if len(nums) == 0 {
-			continue
-		}
-		seasonNum := nums[0]
-		seasonNum1, _ := strconv.Atoi(seasonNum)
-		dir := filepath.Join(series.TargetDir, in.Name())
+		dir := filepath.Join(m.TargetDir, in.Name())
 		epFiles, err := storageImpl.ReadDir(dir)
 		if err != nil {
 			log.Errorf("read dir %s error: %v", dir, err)
 			continue
 		}
 		for _, ep := range epFiles {
-			match := epRe.FindAllString(ep.Name(), -1)
-			if len(match) == 0 {
+			log.Infof("found file: %v", ep.Name())
+			matchEp := epRe.FindAllString(ep.Name(), -1)
+			if len(matchEp) == 0 {
 				continue
 			}
-			epNum := strings.TrimPrefix(match[0], "E")
+			matchSe := seRe.FindAllString(ep.Name(), -1)
+			if len(matchSe) == 0 {
+				continue
+			}
+
+			epNum := strings.TrimPrefix(matchEp[0], "E")
 			epNum1, _ := strconv.Atoi(epNum)
+			seNum := strings.TrimPrefix(matchSe[0], "S")
+			seNum1, _ := strconv.Atoi(seNum)
 			var dirname = filepath.Join(in.Name(), ep.Name())
-			log.Infof("found match: %v", dirname)
-			err := s.db.UpdateEpisodeFile(series.ID, seasonNum1, epNum1, dirname)
+			log.Infof("found match, season num %d, episode num %d", seNum1, epNum1)
+			err := s.db.UpdateEpisodeFile(m.ID, seNum1, epNum1, dirname)
 			if err != nil {
 				log.Error("update episode: %v", err)
 			}

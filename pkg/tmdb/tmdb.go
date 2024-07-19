@@ -126,6 +126,9 @@ func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language 
 				return d, nil
 			}
 		}
+		if strings.HasPrefix(strings.ToLower(detailEN.Name), "episode") {
+			return d, err
+		}
 		d.Name = detailEN.Name
 		d.Overview = detailEN.Overview	
 	}
@@ -147,7 +150,7 @@ func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.
 	}
 
 	for i, ep := range detailCN.Episodes {
-		if strings.HasSuffix(ep.Name, "集") {
+		if strings.HasSuffix(ep.Name, "集") && !strings.HasPrefix(strings.ToLower(detailEN.Episodes[i].Name), "episode"){
 			detailCN.Episodes[i].Name = detailEN.Episodes[i].Name
 			detailCN.Episodes[i].Overview = detailEN.Episodes[i].Overview
 		}
