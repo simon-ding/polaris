@@ -45,13 +45,18 @@ class MyApp extends StatelessWidget {
                     return Container(
                       constraints:
                           const BoxConstraints(maxWidth: 300, maxHeight: 40),
-                      child: SearchBar(
-                        hintText: "搜索电影和电视剧...",
-                        leading: const Icon(Icons.search),
-                        controller: controller,
-                        onSubmitted: (value) => context.go(Uri(
-                            path: SearchPage.route,
-                            queryParameters: {'query': value}).toString()),
+                      child: Opacity(
+                        opacity: 0.8,
+                        child: SearchBar(
+                          hintText: "搜索...",
+                          leading: const Icon(Icons.search),
+                          controller: controller,
+                          shadowColor: WidgetStateColor.transparent,
+                          backgroundColor: const WidgetStatePropertyAll(Color.fromARGB(255, 29, 78, 119)),
+                          onSubmitted: (value) => context.go(Uri(
+                              path: SearchPage.route,
+                              queryParameters: {'query': value}).toString()),
+                        ),
                       ),
                     );
                   }, suggestionsBuilder:

@@ -158,6 +158,17 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 	}
 	log.Infof("find detail for movie id %d: %v", in.TmdbID, detail)
 
+	epid, err := s.db.SaveEposideDetail(&ent.Episode{
+		SeasonNumber:  1,
+		EpisodeNumber: 1,
+		Title:         "dummy episode for movies",
+		Overview:      "dummy episode for movies",
+		AirDate:       detail.ReleaseDate,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "add dummy episode")
+	}
+
 	r, err := s.db.AddMediaWatchlist(&ent.Media{
 		TmdbID:       int(detail.ID),
 		MediaType:    media.MediaTypeMovie,
@@ -169,7 +180,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		Resolution:   string(in.Resolution),
 		StorageID:    in.StorageID,
 		TargetDir: "./",
-	}, nil)
+	}, []int{epid})
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}
