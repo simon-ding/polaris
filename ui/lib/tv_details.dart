@@ -59,7 +59,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               ? const Icon(Icons.downloading)
                               : (ep.status == "downloaded"
                                   ? const Icon(Icons.download_done)
-                                  : const Icon(Icons.warning_rounded))),
+                                  : const Icon(Icons.warning_amber_rounded))),
                     ),
                     DataCell(Row(
                       children: [
