@@ -44,25 +44,25 @@ func (c *Client) SearchTvShow(query string, lang string) (*tmdb.SearchTVShows, e
 }
 
 type SearchResult struct {
-	Page int `json:"page"`
-	Results []*SearchResultItem `json:"results"`
-	TotalResults int64 `json:"total_results"`
-	TotalPages   int64 `json:"total_pages"`
-
+	Page         int                 `json:"page"`
+	Results      []*SearchResultItem `json:"results"`
+	TotalResults int64               `json:"total_results"`
+	TotalPages   int64               `json:"total_pages"`
 }
 
 type SearchResultItem struct {
-	PosterPath       string   `json:"poster_path,omitempty"`
+	PosterPath       string   `json:"poster_path"`
 	ID               int64    `json:"id"`
-	Overview         string   `json:"overview,omitempty"`
+	Overview         string   `json:"overview"`
 	MediaType        string   `json:"media_type"`
-	FirstAirDate     string   `json:"first_air_date,omitempty"`
-	OriginCountry    []string `json:"origin_country,omitempty"`
-	GenreIDs         []int64  `json:"genre_ids,omitempty"`
-	OriginalLanguage string   `json:"original_language,omitempty"`
-	Name             string   `json:"name,omitempty"`
-	OriginalName     string   `json:"original_name,omitempty"`
-	Adult            bool     `json:"adult,omitempty"`
+	FirstAirDate     string   `json:"first_air_date"`
+	OriginCountry    []string `json:"origin_country"`
+	GenreIDs         []int64  `json:"genre_ids"`
+	OriginalLanguage string   `json:"original_language"`
+	Name             string   `json:"name"`
+	OriginalName     string   `json:"original_name"`
+	Adult            bool     `json:"adult"`
+	InWatchlist      bool     `json:"in_watchlist"`
 }
 
 func (c *Client) SearchMedia(query string, lang string, page int) (*SearchResult, error) {
@@ -76,25 +76,25 @@ func (c *Client) SearchMedia(query string, lang string, page int) (*SearchResult
 		return nil, errors.Wrap(err, "query imdb")
 	}
 
-	 searchResult := &SearchResult{
-		Page: res.Page,
+	searchResult := &SearchResult{
+		Page:         res.Page,
 		TotalResults: res.TotalResults,
-		TotalPages: res.TotalPages,
-	 }
+		TotalPages:   res.TotalPages,
+	}
 
 	for _, r := range res.Results {
 		if r.MediaType != "tv" && r.MediaType != "movie" {
 			continue
 		}
 		item := &SearchResultItem{
-			PosterPath: r.PosterPath,
-			ID: r.ID,
-			Overview: r.Overview,
-			MediaType: r.MediaType,
-			OriginCountry: r.OriginCountry,
+			PosterPath:       r.PosterPath,
+			ID:               r.ID,
+			Overview:         r.Overview,
+			MediaType:        r.MediaType,
+			OriginCountry:    r.OriginCountry,
 			OriginalLanguage: r.OriginalLanguage,
-			GenreIDs: r.GenreIDs,
-			Adult: r.Adult,
+			GenreIDs:         r.GenreIDs,
+			Adult:            r.Adult,
 		}
 		if r.MediaType == "tv" {
 			item.Name = r.Name
@@ -106,7 +106,7 @@ func (c *Client) SearchMedia(query string, lang string, page int) (*SearchResult
 			item.FirstAirDate = r.ReleaseDate
 		}
 		searchResult.Results = append(searchResult.Results, item)
-		
+
 	}
 	return searchResult, nil
 }

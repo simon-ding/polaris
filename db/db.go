@@ -476,3 +476,7 @@ func (c *Client) UpdateEpisodeFile(mediaID int, seasonNum, episodeNum int, file 
 func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetStatus(status).Exec(context.TODO())
 }
+
+func (c *Client) TmdbIdInWatchlist(tmdb_id int) bool {
+	return c.ent.Media.Query().Where(media.TmdbID(tmdb_id)).CountX(context.TODO()) > 0
+}

@@ -36,8 +36,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 child: InkWell(
                   //splashColor: Colors.blue.withAlpha(30),
                   onTap: () {
-                    //showDialog(context: context, builder: builder)
-                    _showSubmitDialog(context, item);
+                    if (item.inWatchlist != true) {
+                      _showSubmitDialog(context, item);
+                    }
                   },
                   child: Row(
                     children: <Widget>[
@@ -75,7 +76,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                         ))
                                     : const Chip(
                                         avatar: Icon(Icons.movie),
-                                        label: Text("电影"))
+                                        label: Text("电影")),
+                                item.inWatchlist == true
+                                    ? const Chip(
+                                        label: Icon(
+                                        Icons.done,
+                                        color: Colors.green,
+                                      ))
+                                    : const Text("")
                               ],
                             ),
                             const Text(""),

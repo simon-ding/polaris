@@ -197,6 +197,7 @@ class SearchResult {
     required this.voteAverage,
     required this.voteCount,
     required this.originCountry,
+    this.inWatchlist
   });
 
   final String? backdropPath;
@@ -214,6 +215,7 @@ class SearchResult {
   final double? voteAverage;
   final int? voteCount;
   final List<String> originCountry;
+  final bool? inWatchlist;
 
   factory SearchResult.fromJson(Map<String, dynamic> json) {
     return SearchResult(
@@ -233,6 +235,7 @@ class SearchResult {
       firstAirDate: DateTime.tryParse(json["first_air_date"] ?? ""),
       voteAverage: json["vote_average"],
       voteCount: json["vote_count"],
+      inWatchlist: json["in_watchlist"],
       originCountry: json["origin_country"] == null
           ? []
           : List<String>.from(json["origin_country"]!.map((x) => x)),

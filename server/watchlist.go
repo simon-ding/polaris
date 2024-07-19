@@ -45,6 +45,11 @@ func (s *Server) SearchMedia(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "search tv")
 	}
+	for i, res := range r.Results {
+		if s.db.TmdbIdInWatchlist(int(res.ID)) {
+			r.Results[i].InWatchlist = true
+		}
+	}
 	return r, nil
 
 }
