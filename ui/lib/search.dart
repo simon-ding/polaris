@@ -172,50 +172,66 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       ),
                       storage.when(
                           data: (v) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                DropdownMenu(
-                                  width: 200,
-                                  label: const Text("存储位置"),
-                                  initialSelection: storageSelected,
-                                  dropdownMenuEntries: v
-                                      .map((s) => DropdownMenuEntry(
-                                          label: s.name!, value: s.id))
-                                      .toList(),
-                                  onSelected: (value) {
-                                    setState(() {
-                                      storageSelected = value!;
-                                    });
-                                  },
-                                ),
-                                item.mediaType == "tv"
-                                    ? name.when(
-                                        data: (s) {
-                                          final path = v[storageSelected]
-                                              .settings!["tv_path"];
+                            return StatefulBuilder(
+                                builder: (context, setState) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DropdownMenu(
+                                    width: 200,
+                                    label: const Text("存储位置"),
+                                    initialSelection: storageSelected,
+                                    dropdownMenuEntries: v
+                                        .map((s) => DropdownMenuEntry(
+                                            label: s.name!, value: s.id))
+                                        .toList(),
+                                    onSelected: (value) {
+                                      setState(() {
+                                        storageSelected = value!;
+                                      });
+                                    },
+                                  ),
+                                  item.mediaType == "tv"
+                                      ? name.when(
+                                          data: (s) {
+                                            return storageSelected == 0
+                                                ? const Text("")
+                                                : () {
+                                                    final storage = v
+                                                        .where((e) =>
+                                                            e.id ==
+                                                            storageSelected)
+                                                        .first;
+                                                    final path = storage
+                                                        .settings!["tv_path"];
 
-                                          pathController.text = s;
-                                          return SizedBox(
-                                            //width: 300,
-                                            child: TextField(
-                                              controller: pathController,
-                                              decoration: InputDecoration(
-                                                  labelText: "存储路径",
-                                                  prefix: Text(path)),
-                                            ),
-                                          );
-                                        },
-                                        error: (error, stackTrace) =>
-                                            Text("$error"),
-                                        loading: () =>
-                                            const MyProgressIndicator(
-                                          size: 20,
-                                        ),
-                                      )
-                                    : Text(""),
-                              ],
-                            );
+                                                    pathController.text = s;
+                                                    return SizedBox(
+                                                      //width: 300,
+                                                      child: TextField(
+                                                        controller:
+                                                            pathController,
+                                                        decoration:
+                                                            InputDecoration(
+                                                                labelText:
+                                                                    "存储路径",
+                                                                prefix:
+                                                                    Text(path)),
+                                                      ),
+                                                    );
+                                                  }();
+                                          },
+                                          error: (error, stackTrace) =>
+                                              Text("$error"),
+                                          loading: () =>
+                                              const MyProgressIndicator(
+                                            size: 20,
+                                          ),
+                                        )
+                                      : Text(""),
+                                ],
+                              );
+                            });
                           },
                           error: (err, trace) => Text("$err"),
                           loading: () => const MyProgressIndicator()),
