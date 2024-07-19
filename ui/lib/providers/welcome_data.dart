@@ -29,9 +29,8 @@ final movieWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
   return favList;
 });
 
-var searchPageDataProvider =
-    AsyncNotifierProvider.autoDispose.family<SearchPageData, List<SearchResult>, String>(
-        SearchPageData.new);
+var searchPageDataProvider = AsyncNotifierProvider.autoDispose
+    .family<SearchPageData, List<SearchResult>, String>(SearchPageData.new);
 
 var movieTorrentsDataProvider = AsyncNotifierProvider.autoDispose
     .family<MovieTorrentResource, List<TorrentResource>, String>(
@@ -40,28 +39,41 @@ var movieTorrentsDataProvider = AsyncNotifierProvider.autoDispose
 class SearchPageData
     extends AutoDisposeFamilyAsyncNotifier<List<SearchResult>, String> {
   List<SearchResult> list = List.empty(growable: true);
-
+  String? q;
+  int page = 1;
   @override
   FutureOr<List<SearchResult>> build(String arg) async {
+    q = arg;
     if (isBlank(arg)) {
       return List.empty();
     }
-    list = List.empty(growable: true);
+    return query(arg, 1);
+  }
+
+  FutureOr<List<SearchResult>> query(String q, int page) async {
     final dio = await APIs.getDio();
-    var resp = await dio.get(APIs.searchUrl, queryParameters: {"query": arg});
+    var resp = await dio
+        .get(APIs.searchUrl, queryParameters: {"query": q, "page": page});
 
     var rsp = ServerResponse.fromJson(resp.data as Map<String, dynamic>);
     if (rsp.code != 0) {
       throw rsp.message;
     }
 
-    var data = rsp.data as Map<String, dynamic>;
-    var results = data["results"] as List<dynamic>;
-    for (final r in results) {
-      var res = SearchResult.fromJson(r);
-      list.add(res);
-    }
-    return list;
+    var sp = SearchResponse.fromJson(rsp.data);
+    return sp.results ?? List.empty();
+  }
+
+  FutureOr<void> queryNextPage() async {
+    //state = const AsyncLoading();
+    final newState = await AsyncValue.guard(
+      () async {
+        page++;
+        final awaiteddata = await query(q!, page);
+        return [...?state.value, ...awaiteddata];
+      },
+    );
+    state = newState;
   }
 
   Future<void> submit2Watchlist(
@@ -89,6 +101,25 @@ class SearchPageData
         throw sp.message;
       }
     }
+  }
+}
+
+class SearchResponse {
+  int? page;
+  int? totalResults;
+  int? totalPage;
+  List<SearchResult>? results;
+
+  SearchResponse({this.page, this.totalResults, this.totalPage, this.results});
+
+  factory SearchResponse.fromJson(Map<String, dynamic> json) {
+    return SearchResponse(
+        page: json["page"],
+        totalPage: json["total_page"],
+        totalResults: json["total_results"],
+        results: (json["results"] as List)
+            .map((v) => SearchResult.fromJson(v))
+            .toList());
   }
 }
 

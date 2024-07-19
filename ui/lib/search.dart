@@ -21,10 +21,9 @@ class SearchPage extends ConsumerStatefulWidget {
 class _SearchPageState extends ConsumerState<SearchPage> {
   List<dynamic> list = List.empty();
 
-  Future<void>? _pendingFuture;
   @override
   Widget build(BuildContext context) {
-    final q = widget.query??"";
+    final q = widget.query ?? "";
     var searchList = ref.watch(searchPageDataProvider(q));
 
     List<Widget> res = searchList.when(
@@ -96,18 +95,18 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         error: (err, trace) => [Text("$err")],
         loading: () => [const MyProgressIndicator()]);
 
-    var f = FutureBuilder(
-        // We listen to the pending operation, to update the UI accordingly.
-        future: _pendingFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done &&
-              snapshot.connectionState != ConnectionState.none) {
-            return const MyProgressIndicator();
+    var f = NotificationListener(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo is ScrollEndNotification &&
+            scrollInfo.metrics.axisDirection == AxisDirection.down &&
+            scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent) {
+            ref.read(searchPageDataProvider(q).notifier).queryNextPage();
           }
-          return ListView(
-            children: res,
-          );
-        });
+          return true;
+        },
+        child: ListView(
+          children: res,
+        ));
     return Column(
       children: [
         TextField(
@@ -194,7 +193,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     child: const Text('确定'),
                     onPressed: () {
                       ref
-                          .read(searchPageDataProvider(widget.query??"").notifier)
+                          .read(searchPageDataProvider(widget.query ?? "")
+                              .notifier)
                           .submit2Watchlist(item.id!, storageSelected,
                               resSelected, item.mediaType!);
                       Navigator.of(context).pop();
