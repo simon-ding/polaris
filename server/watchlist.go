@@ -19,6 +19,7 @@ import (
 
 type searchTvParam struct {
 	Query string `form:"query"`
+	Page  int    `form:"page"`
 }
 
 func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
@@ -34,13 +35,13 @@ func (s *Server) SearchTvSeries(c *gin.Context) (interface{}, error) {
 	return r, nil
 }
 
-func(s *Server) SearchMedia(c *gin.Context) (interface{}, error) {
+func (s *Server) SearchMedia(c *gin.Context) (interface{}, error) {
 	var q searchTvParam
 	if err := c.ShouldBindQuery(&q); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
 	log.Infof("search media with keyword: %v", q.Query)
-	r, err := s.MustTMDB().SearchMedia(q.Query, s.language, 1)
+	r, err := s.MustTMDB().SearchMedia(q.Query, s.language, q.Page)
 	if err != nil {
 		return nil, errors.Wrap(err, "search tv")
 	}
@@ -49,8 +50,8 @@ func(s *Server) SearchMedia(c *gin.Context) (interface{}, error) {
 }
 
 type addWatchlistIn struct {
-	TmdbID     int               `json:"tmdb_id" binding:"required"`
-	StorageID  int               `json:"storage_id" `
+	TmdbID     int    `json:"tmdb_id" binding:"required"`
+	StorageID  int    `json:"storage_id" `
 	Resolution string `json:"resolution" binding:"required"`
 }
 
@@ -99,16 +100,15 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		}
 	}
 	r, err := s.db.AddMediaWatchlist(&ent.Media{
-		TmdbID: int(detail.ID),
-		MediaType: media.MediaTypeTv,
-		NameCn: nameCn,
-		NameEn: nameEn,
+		TmdbID:       int(detail.ID),
+		MediaType:    media.MediaTypeTv,
+		NameCn:       nameCn,
+		NameEn:       nameEn,
 		OriginalName: detail.OriginalName,
-		Overview: detail.Overview,
-		AirDate: detail.FirstAirDate,
-		Resolution: string(in.Resolution),
-		StorageID: in.StorageID,
-
+		Overview:     detail.Overview,
+		AirDate:      detail.FirstAirDate,
+		Resolution:   string(in.Resolution),
+		StorageID:    in.StorageID,
 	}, epIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
@@ -117,7 +117,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
-		if err := s.downloadBackdrop(detail.BackdropPath, r.ID,); err != nil {
+		if err := s.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
 
@@ -148,18 +148,16 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 	}
 	log.Infof("find detail for movie id %d: %v", in.TmdbID, detail)
 
-
 	r, err := s.db.AddMediaWatchlist(&ent.Media{
-		TmdbID: int(detail.ID),
-		MediaType: media.MediaTypeMovie,
-		NameCn: nameCn,
-		NameEn: nameEn,
+		TmdbID:       int(detail.ID),
+		MediaType:    media.MediaTypeMovie,
+		NameCn:       nameCn,
+		NameEn:       nameEn,
 		OriginalName: detail.OriginalTitle,
-		Overview: detail.Overview,
-		AirDate: detail.ReleaseDate,
-		Resolution: string(in.Resolution),
-		StorageID: in.StorageID,
-
+		Overview:     detail.Overview,
+		AirDate:      detail.ReleaseDate,
+		Resolution:   string(in.Resolution),
+		StorageID:    in.StorageID,
 	}, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
@@ -223,7 +221,6 @@ func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
 	list := s.db.GetMediaWatchlist(media.MediaTypeMovie)
 	return list, nil
 }
-
 
 func (s *Server) GetMediaDetails(c *gin.Context) (interface{}, error) {
 	ids := c.Param("id")
