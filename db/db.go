@@ -159,6 +159,15 @@ func (c *Client) GetMediaWatchlist(mediaType media.MediaType) []*ent.Media {
 	return list
 }
 
+func (c *Client) GetEpisode(seriesId, seasonNum, episodeNum int) (*ent.Episode, error) {
+	return c.ent.Episode.Query().Where(episode.MediaID(seriesId), episode.SeasonNumber(seasonNum),
+		episode.EpisodeNumber(episodeNum)).First(context.TODO())
+}
+
+func (c *Client) UpdateEpiode(episodeId int, name, overview string) error {
+	return c.ent.Episode.Update().Where(episode.ID(episodeId)).SetTitle(name).SetOverview(overview).Exec(context.TODO())
+}
+
 type MediaDetails struct {
 	*ent.Media
 	Episodes []*ent.Episode `json:"episodes"`

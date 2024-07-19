@@ -117,6 +117,10 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
+		if err := s.downloadBackdrop(detail.BackdropPath, r.ID,); err != nil {
+			log.Errorf("download poster error: %v", err)
+		}
+
 	}()
 
 	log.Infof("add tv %s to watchlist success", detail.Name)
@@ -164,6 +168,9 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
+		if err := s.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
+			log.Errorf("download backdrop error: %v", err)
+		}
 	}()
 
 	log.Infof("add movie %s to watchlist success", detail.Title)
@@ -171,18 +178,28 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 
 }
 
+func (s *Server) downloadBackdrop(path string, mediaID int) error {
+	url := "https://image.tmdb.org/t/p/original" + path
+	return s.downloadImage(url, mediaID, "backdrop.ipg")
+}
+
 func (s *Server) downloadPoster(path string, mediaID int) error {
-	var tmdbImgBaseUrl = "https://image.tmdb.org/t/p/w500/"
-	url := tmdbImgBaseUrl + path
-	log.Infof("try to download poster: %v", url)
+	var url = "https://image.tmdb.org/t/p/original" + path
+
+	return s.downloadImage(url, mediaID, "poster.ipg")
+}
+
+func (s *Server) downloadImage(url string, mediaID int, name string) error {
+
+	log.Infof("try to download image: %v", url)
 	var resp, err = http.Get(url)
 	if err != nil {
 		return errors.Wrap(err, "http get")
 	}
 	targetDir := fmt.Sprintf("%v/%d", db.ImgPath, mediaID)
 	os.MkdirAll(targetDir, 0777)
-	ext := filepath.Ext(path)
-	targetFile := filepath.Join(targetDir, "poster"+ext)
+	//ext := filepath.Ext(path)
+	targetFile := filepath.Join(targetDir, name)
 	f, err := os.Create(targetFile)
 	if err != nil {
 		return errors.Wrap(err, "new file")
@@ -192,8 +209,9 @@ func (s *Server) downloadPoster(path string, mediaID int) error {
 	if err != nil {
 		return errors.Wrap(err, "copy http response")
 	}
-	log.Infof("poster successfully downlaoded: %v", targetFile)
+	log.Infof("image successfully downlaoded: %v", targetFile)
 	return nil
+
 }
 
 func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {

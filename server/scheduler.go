@@ -20,6 +20,7 @@ import (
 func (s *Server) scheduler() {
 	s.mustAddCron("@every 1m", s.checkTasks)
 	//s.mustAddCron("@every 1h", s.checkAllFiles)
+	s.mustAddCron("@every 1h", s.downloadTvSeries)
 	s.cron.Start()
 }
 
@@ -58,15 +59,15 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	}
 	s.db.SetHistoryStatus(r.ID, history.StatusUploading)
 
-	defer func ()  {
+	defer func() {
 		if err != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
 			if r.EpisodeID != 0 {
 				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
 			}
-			
+
 		} else {
-			delete(s.tasks, r.ID)	
+			delete(s.tasks, r.ID)
 			s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 			if r.EpisodeID != 0 {
 				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
@@ -207,4 +208,42 @@ func (s *Server) checkFileExists(series *ent.Media) error {
 type Task struct {
 	//Processing bool
 	pkg.Torrent
+}
+
+func (s *Server) downloadTvSeries() {
+	log.Infof("begin check all tv series resources")
+	allSeries := s.db.GetMediaWatchlist(media.MediaTypeTv)
+	for _, series := range allSeries {
+		detail, err := s.MustTMDB().GetTvDetails(series.TmdbID, s.language)
+		if err != nil {
+			log.Errorf("get tv details error: %v", err)
+			continue
+		}
+
+		lastEpisode, err := s.db.GetEpisode(series.ID, detail.LastEpisodeToAir.SeasonNumber, detail.LastEpisodeToAir.EpisodeNumber)
+		if err != nil {
+			log.Errorf("get last episode error: %v", err)
+			continue
+		}
+		if lastEpisode.Title != detail.LastEpisodeToAir.Name {
+			s.db.UpdateEpiode(lastEpisode.ID, detail.LastEpisodeToAir.Name, detail.LastEpisodeToAir.Overview)
+		}
+		if lastEpisode.Status  == episode.StatusMissing {
+			name, err := s.searchAndDownload(series.ID, lastEpisode.SeasonNumber, lastEpisode.EpisodeNumber)
+			if err != nil {
+				log.Infof("cannot find resource to download for %s: %v", lastEpisode.Title, err)
+			} else {
+				log.Infof("begin download torrent resource: %v",name)
+			}
+		}
+
+		nextEpisode, err := s.db.GetEpisode(series.ID, detail.NextEpisodeToAir.SeasonNumber, detail.NextEpisodeToAir.EpisodeNumber)
+		if err == nil {
+			if nextEpisode.Title != detail.NextEpisodeToAir.Name {
+				s.db.UpdateEpiode(nextEpisode.ID, detail.NextEpisodeToAir.Name, detail.NextEpisodeToAir.Overview)
+				log.Errorf("updated next episode name to %v", detail.NextEpisodeToAir.Name)
+			}
+		}
+
+	}
 }
