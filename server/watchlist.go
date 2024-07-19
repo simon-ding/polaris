@@ -180,13 +180,13 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 
 func (s *Server) downloadBackdrop(path string, mediaID int) error {
 	url := "https://image.tmdb.org/t/p/original" + path
-	return s.downloadImage(url, mediaID, "backdrop.ipg")
+	return s.downloadImage(url, mediaID, "backdrop.jpg")
 }
 
 func (s *Server) downloadPoster(path string, mediaID int) error {
 	var url = "https://image.tmdb.org/t/p/original" + path
 
-	return s.downloadImage(url, mediaID, "poster.ipg")
+	return s.downloadImage(url, mediaID, "poster.jpg")
 }
 
 func (s *Server) downloadImage(url string, mediaID int, name string) error {

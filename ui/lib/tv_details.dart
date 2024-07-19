@@ -66,10 +66,10 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                         IconButton(
                             onPressed: () async {
                               var f = ref
-                                  .read(
-                                      mediaDetailsProvider(widget.seriesId).notifier)
-                                  .searchAndDownload(widget.seriesId, ep.seasonNumber!,
-                                      ep.episodeNumber!);
+                                  .read(mediaDetailsProvider(widget.seriesId)
+                                      .notifier)
+                                  .searchAndDownload(widget.seriesId,
+                                      ep.seasonNumber!, ep.episodeNumber!);
                               setState(() {
                                 _pendingFuture = f;
                               });
@@ -79,7 +79,9 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               }
                             },
                             icon: const Icon(Icons.search)),
-                            const SizedBox(width: 10,),
+                        const SizedBox(
+                          width: 10,
+                        ),
                         IconButton(
                             onPressed: () {},
                             icon: const Icon(Icons.manage_search))
@@ -119,83 +121,92 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     Card(
                       margin: const EdgeInsets.all(4),
                       clipBehavior: Clip.hardEdge,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Row(
-                          children: <Widget>[
-                            Flexible(
-                              flex: 1,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Image.network(
-                                  "${APIs.imagesUrl}/${details.id}/poster.jpg",
-                                  fit: BoxFit.contain,
-                                  headers: APIs.authHeaders,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.fitWidth,
+                                image: NetworkImage(
+                                    "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
+                                    headers: APIs.authHeaders))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
+                            children: <Widget>[
+                              Flexible(
+                                flex: 1,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Image.network(
+                                    "${APIs.imagesUrl}/${details.id}/poster.jpg",
+                                    fit: BoxFit.contain,
+                                    headers: APIs.authHeaders,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Flexible(
-                              flex: 6,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text("${details.resolution}"),
-                                          const SizedBox(
-                                            width: 30,
-                                          ),
-                                          storage.when(
-                                              data: (value) {
-                                                for (final s in value) {
-                                                  if (s.id ==
-                                                      details.storageId) {
-                                                    return Text(
-                                                        "${s.name}(${s.implementation})");
+                              Flexible(
+                                flex: 6,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text("${details.resolution}"),
+                                            const SizedBox(
+                                              width: 30,
+                                            ),
+                                            storage.when(
+                                                data: (value) {
+                                                  for (final s in value) {
+                                                    if (s.id ==
+                                                        details.storageId) {
+                                                      return Text(
+                                                          "${s.name}(${s.implementation})");
+                                                    }
                                                   }
-                                                }
-                                                return const Text("未知存储");
-                                              },
-                                              error: (error, stackTrace) =>
-                                                  Text("$error"),
-                                              loading: () =>
-                                                  const MyProgressIndicator()),
-                                        ],
-                                      ),
-                                      const Divider(thickness: 1, height: 1),
-                                      Text(
-                                        "${details.name} ${details.name != details.originalName ? details.originalName: ''} (${details.airDate!.split("-")[0]})",
-                                        style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      const Text(""),
-                                      Text(
-                                        details.overview!,
-                                      ),
-                                    ],
-                                  )),
-                                  Column(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {
-                                            ref
-                                                .read(mediaDetailsProvider(
-                                                        widget.seriesId)
-                                                    .notifier)
-                                                .delete();
-                                            context.go(WelcomePage.routeTv);
-                                          },
-                                          icon: const Icon(Icons.delete))
-                                    ],
-                                  )
-                                ],
+                                                  return const Text("未知存储");
+                                                },
+                                                error: (error, stackTrace) =>
+                                                    Text("$error"),
+                                                loading: () =>
+                                                    const MyProgressIndicator()),
+                                          ],
+                                        ),
+                                        const Divider(thickness: 1, height: 1),
+                                        Text(
+                                          "${details.name} ${details.name != details.originalName ? details.originalName : ''} (${details.airDate!.split("-")[0]})",
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Text(""),
+                                        Text(
+                                          details.overview!,
+                                        ),
+                                      ],
+                                    )),
+                                    Column(
+                                      children: [
+                                        IconButton(
+                                            onPressed: () {
+                                              ref
+                                                  .read(mediaDetailsProvider(
+                                                          widget.seriesId)
+                                                      .notifier)
+                                                  .delete();
+                                              context.go(WelcomePage.routeTv);
+                                            },
+                                            icon: const Icon(Icons.delete))
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
