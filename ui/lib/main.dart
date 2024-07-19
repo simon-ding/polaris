@@ -169,7 +169,7 @@ class MyApp extends StatelessWidget {
 
     return ProviderScope(
       child: MaterialApp.router(
-        title: 'Polaris 电影电视剧追踪',
+        title: 'Polaris 影视追踪',
         theme: ThemeData(
           fontFamily: "NotoSansSC",
           colorScheme: ColorScheme.fromSeed(
