@@ -59,7 +59,6 @@ class SearchPageData
     if (rsp.code != 0) {
       throw rsp.message;
     }
-
     var sp = SearchResponse.fromJson(rsp.data);
     return sp.results ?? List.empty();
   }
@@ -117,7 +116,7 @@ class SearchResponse {
         page: json["page"],
         totalPage: json["total_page"],
         totalResults: json["total_results"],
-        results: (json["results"] as List)
+        results: json["results"] == null ? []: json["results"] 
             .map((v) => SearchResult.fromJson(v))
             .toList());
   }
