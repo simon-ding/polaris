@@ -53,13 +53,16 @@ type addWatchlistIn struct {
 	TmdbID     int    `json:"tmdb_id" binding:"required"`
 	StorageID  int    `json:"storage_id" `
 	Resolution string `json:"resolution" binding:"required"`
-	Folder     string `json:"folder" binding:"required"`
+	Folder     string `json:"folder"`
 }
 
 func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 	var in addWatchlistIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
+	}
+	if (in.Folder == "") {
+		return nil, errors.New("folder should be provided")
 	}
 	detailCn, err := s.MustTMDB().GetTvDetails(in.TmdbID, db.LanguageCN)
 	if err != nil {
@@ -160,6 +163,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		AirDate:      detail.ReleaseDate,
 		Resolution:   string(in.Resolution),
 		StorageID:    in.StorageID,
+		TargetDir: "./",
 	}, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")

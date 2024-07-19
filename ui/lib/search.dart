@@ -161,7 +161,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           });
                         },
                       ),
-                      
                       storage.when(
                           data: (v) {
                             return Column(
@@ -180,33 +179,31 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                     });
                                   },
                                 ),
+                                item.mediaType == "tv"
+                                    ? name.when(
+                                        data: (s) {
+                                          final path = v[storageSelected]
+                                              .settings!["tv_path"];
 
-                                name.when(
-                                  data: (s) {
-                                    
-                                    final path = item.mediaType == "tv"
-                                        ? v[storageSelected]
-                                            .settings!["tv_path"]
-                                        : v[storageSelected]
-                                            .settings!["movie_path"];
-                                            pathController.text = s;
-                                    return SizedBox(
-                                        //width: 300,
-                                        child: TextField (
-                                          
-                                        controller: pathController,
-                                        decoration: InputDecoration(
-                                          labelText: "存储路径",
-                                          prefix: Text(path)
+                                          pathController.text = s;
+                                          return SizedBox(
+                                            //width: 300,
+                                            child: TextField(
+                                              controller: pathController,
+                                              decoration: InputDecoration(
+                                                  labelText: "存储路径",
+                                                  prefix: Text(path)),
+                                            ),
+                                          );
+                                        },
+                                        error: (error, stackTrace) =>
+                                            Text("$error"),
+                                        loading: () =>
+                                            const MyProgressIndicator(
+                                          size: 20,
                                         ),
-                                      ),
-                                      );
-                                  },
-                                  error: (error, stackTrace) => Text("$error"),
-                                  loading: () => const MyProgressIndicator(
-                                    size: 20,
-                                  ),
-                                ),
+                                      )
+                                    : Text(""),
                               ],
                             );
                           },
