@@ -10,9 +10,7 @@ import (
 	"polaris/log"
 	"polaris/pkg"
 	"polaris/pkg/storage"
-	"regexp"
-	"strconv"
-	"strings"
+	"polaris/pkg/utils"
 
 	"github.com/pkg/errors"
 )
@@ -150,8 +148,7 @@ func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
 	if err != nil {
 		return errors.Wrapf(err, "read dir %s", m.TargetDir)
 	}
-	seRe := regexp.MustCompile(`S\d+`)
-	epRe := regexp.MustCompile(`E\d+`)
+
 	for _, in := range files {
 		if !in.IsDir() { //season dir, ignore file
 			continue
@@ -164,22 +161,14 @@ func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
 		}
 		for _, ep := range epFiles {
 			log.Infof("found file: %v", ep.Name())
-			matchEp := epRe.FindAllString(ep.Name(), -1)
-			if len(matchEp) == 0 {
+			seNum, epNum, err := utils.FindSeasonEpisodeNum(ep.Name())
+			if err != nil {
+				log.Errorf("find season episode num error: %v", err)
 				continue
 			}
-			matchSe := seRe.FindAllString(ep.Name(), -1)
-			if len(matchSe) == 0 {
-				continue
-			}
-
-			epNum := strings.TrimPrefix(matchEp[0], "E")
-			epNum1, _ := strconv.Atoi(epNum)
-			seNum := strings.TrimPrefix(matchSe[0], "S")
-			seNum1, _ := strconv.Atoi(seNum)
 			var dirname = filepath.Join(in.Name(), ep.Name())
-			log.Infof("found match, season num %d, episode num %d", seNum1, epNum1)
-			err := s.db.UpdateEpisodeFile(m.ID, seNum1, epNum1, dirname)
+			log.Infof("found match, season num %d, episode num %d", seNum, epNum)
+			err = s.db.UpdateEpisodeFile(m.ID, seNum, epNum, dirname)
 			if err != nil {
 				log.Error("update episode: %v", err)
 			}
@@ -212,12 +201,12 @@ func (s *Server) downloadTvSeries() {
 		if lastEpisode.Title != detail.LastEpisodeToAir.Name {
 			s.db.UpdateEpiode(lastEpisode.ID, detail.LastEpisodeToAir.Name, detail.LastEpisodeToAir.Overview)
 		}
-		if lastEpisode.Status  == episode.StatusMissing {
+		if lastEpisode.Status == episode.StatusMissing {
 			name, err := s.searchAndDownload(series.ID, lastEpisode.SeasonNumber, lastEpisode.EpisodeNumber)
 			if err != nil {
 				log.Infof("cannot find resource to download for %s: %v", lastEpisode.Title, err)
 			} else {
-				log.Infof("begin download torrent resource: %v",name)
+				log.Infof("begin download torrent resource: %v", name)
 			}
 		}
 

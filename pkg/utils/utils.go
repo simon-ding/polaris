@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"errors"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -58,4 +60,27 @@ func IsNameAcceptable(name1, name2 string) bool {
 	name1 = re.ReplaceAllString(strings.ToLower(name1), "")
 	name2 = re.ReplaceAllString(strings.ToLower(name2), "")
 	return strutil.Similarity(name1, name2, metrics.NewHamming()) > 0.1
+}
+
+func FindSeasonEpisodeNum(name string) (se int, ep int, err error) {
+	seRe := regexp.MustCompile(`S\d+`)
+	epRe := regexp.MustCompile(`E\d+`)
+	nameUpper := strings.ToUpper(name)
+	matchEp := epRe.FindAllString(nameUpper, -1)
+	if len(matchEp) == 0 {
+		err = errors.New("no episode num")
+	}
+	matchSe := seRe.FindAllString(nameUpper, -1)
+	if len(matchSe) == 0 {
+		err = errors.New("no season num")
+	}
+	if err != nil {
+		return 0, 0, err
+	}
+
+	epNum := strings.TrimPrefix(matchEp[0], "E")
+	epNum1, _ := strconv.Atoi(epNum)
+	seNum := strings.TrimPrefix(matchSe[0], "S")
+	seNum1, _ := strconv.Atoi(seNum)
+	return seNum1, epNum1, nil
 }
