@@ -10,7 +10,6 @@ import (
 	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
 	"polaris/pkg/utils"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -158,11 +157,11 @@ func (s *Server) findBestMatchTv(resources []torznab.Result, season, episode int
 		filtered = append(filtered, r)
 	}
 
-	sort.Slice(filtered, func(i, j int) bool {
-		var s1 = filtered[i]
-		var s2 = filtered[2]
-		return s1.Seeders > s2.Seeders
-	})
+	// sort.Slice(filtered, func(i, j int) bool {
+	// 	var s1 = filtered[i]
+	// 	var s2 = filtered[j]
+	// 	return s1.Seeders > s2.Seeders
+	// })
 
 	return filtered[0]
 }
