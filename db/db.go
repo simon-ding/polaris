@@ -126,13 +126,6 @@ func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, er
 			m.StorageID = r.ID
 		}
 	}
-
-	targetDir := fmt.Sprintf("%s %s (%v)", m.NameCn, m.NameEn, strings.Split(m.AirDate, "-")[0])
-	if !utils.IsChineseChar(m.NameCn) {
-		log.Warnf("name cn is not chinese name: %v", m.NameCn)
-		targetDir = fmt.Sprintf("%s (%v)", m.NameEn, strings.Split(m.AirDate, "-")[0])
-	}
-
 	r, err := c.ent.Media.Create().
 		SetTmdbID(m.TmdbID).
 		SetStorageID(m.StorageID).
@@ -143,7 +136,7 @@ func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, er
 		SetMediaType(m.MediaType).
 		SetAirDate(m.AirDate).
 		SetResolution(m.Resolution).
-		SetTargetDir(targetDir).
+		SetTargetDir(m.TargetDir).
 		AddEpisodeIDs(episodes...).
 		Save(context.TODO())
 	return r, err
@@ -325,6 +318,13 @@ type WebdavSetting struct {
 }
 
 func (c *Client) AddStorage(st *StorageInfo) error {
+	if !strings.HasSuffix(st.Settings["tv_path"], "/") {
+		st.Settings["tv_path"] += "/"
+	}
+	if !strings.HasSuffix(st.Settings["movie_path"], "/") {
+		st.Settings["movie_path"] += "/"
+	}
+
 
 	data, err := json.Marshal(st.Settings)
 	if err != nil {

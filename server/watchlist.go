@@ -53,6 +53,7 @@ type addWatchlistIn struct {
 	TmdbID     int    `json:"tmdb_id" binding:"required"`
 	StorageID  int    `json:"storage_id" `
 	Resolution string `json:"resolution" binding:"required"`
+	Folder     string `json:"folder" binding:"required"`
 }
 
 func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
@@ -109,6 +110,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		AirDate:      detail.FirstAirDate,
 		Resolution:   string(in.Resolution),
 		StorageID:    in.StorageID,
+		TargetDir: in.Folder,
 	}, epIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")

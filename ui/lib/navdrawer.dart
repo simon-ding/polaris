@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/activity.dart';
-import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
 import 'package:ui/welcome_page.dart';
 

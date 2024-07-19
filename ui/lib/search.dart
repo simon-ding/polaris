@@ -98,8 +98,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     var f = NotificationListener(
         onNotification: (ScrollNotification scrollInfo) {
           if (scrollInfo is ScrollEndNotification &&
-            scrollInfo.metrics.axisDirection == AxisDirection.down &&
-            scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent) {
+              scrollInfo.metrics.axisDirection == AxisDirection.down &&
+              scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent) {
             ref.read(searchPageDataProvider(q).notifier).queryNextPage();
           }
           return true;
@@ -136,45 +136,84 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               String resSelected = "1080p";
               int storageSelected = 0;
               var storage = ref.watch(storageSettingProvider);
+              var name = ref.watch(suggestNameDataProvider(item.id!));
 
+              var pathController = TextEditingController();
               return AlertDialog(
                 title: Text('添加剧集: ${item.name}'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownMenu(
-                      label: const Text("清晰度"),
-                      initialSelection: resSelected,
-                      dropdownMenuEntries: const [
-                        DropdownMenuEntry(value: "720p", label: "720p"),
-                        DropdownMenuEntry(value: "1080p", label: "1080p"),
-                        DropdownMenuEntry(value: "4k", label: "4k"),
-                      ],
-                      onSelected: (value) {
-                        setState(() {
-                          resSelected = value!;
-                        });
-                      },
-                    ),
-                    storage.when(
-                        data: (v) {
-                          return DropdownMenu(
-                            label: const Text("存储位置"),
-                            initialSelection: storageSelected,
-                            dropdownMenuEntries: v
-                                .map((s) => DropdownMenuEntry(
-                                    label: s.name!, value: s.id))
-                                .toList(),
-                            onSelected: (value) {
-                              setState(() {
-                                storageSelected = value!;
-                              });
-                            },
-                          );
+                content: SizedBox(
+                  width: 500,
+                  height: 200,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DropdownMenu(
+                        label: const Text("清晰度"),
+                        initialSelection: resSelected,
+                        dropdownMenuEntries: const [
+                          DropdownMenuEntry(value: "720p", label: "720p"),
+                          DropdownMenuEntry(value: "1080p", label: "1080p"),
+                          DropdownMenuEntry(value: "4k", label: "4k"),
+                        ],
+                        onSelected: (value) {
+                          setState(() {
+                            resSelected = value!;
+                          });
                         },
-                        error: (err, trace) => Text("$err"),
-                        loading: () => const MyProgressIndicator()),
-                  ],
+                      ),
+                      
+                      storage.when(
+                          data: (v) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                DropdownMenu(
+                                  label: const Text("存储位置"),
+                                  initialSelection: storageSelected,
+                                  dropdownMenuEntries: v
+                                      .map((s) => DropdownMenuEntry(
+                                          label: s.name!, value: s.id))
+                                      .toList(),
+                                  onSelected: (value) {
+                                    setState(() {
+                                      storageSelected = value!;
+                                    });
+                                  },
+                                ),
+
+                                name.when(
+                                  data: (s) {
+                                    
+                                    final path = item.mediaType == "tv"
+                                        ? v[storageSelected]
+                                            .settings!["tv_path"]
+                                        : v[storageSelected]
+                                            .settings!["movie_path"];
+                                            pathController.text = s;
+                                    return SizedBox(
+                                        //width: 300,
+                                        child: TextField (
+                                          
+                                        controller: pathController,
+                                        decoration: InputDecoration(
+                                          labelText: "存储路径",
+                                          prefix: Text(path)
+                                        ),
+                                      ),
+                                      );
+                                  },
+                                  error: (error, stackTrace) => Text("$error"),
+                                  loading: () => const MyProgressIndicator(
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                          error: (err, trace) => Text("$err"),
+                          loading: () => const MyProgressIndicator()),
+                    ],
+                  ),
                 ),
                 actions: <Widget>[
                   TextButton(
@@ -195,8 +234,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       ref
                           .read(searchPageDataProvider(widget.query ?? "")
                               .notifier)
-                          .submit2Watchlist(item.id!, storageSelected,
-                              resSelected, item.mediaType!);
+                          .submit2Watchlist(
+                              item.id!,
+                              storageSelected,
+                              resSelected,
+                              item.mediaType!,
+                              pathController.text);
                       Navigator.of(context).pop();
                     },
                   ),

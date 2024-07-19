@@ -17,6 +17,18 @@ final tvWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
   return favList;
 });
 
+final suggestNameDataProvider = FutureProvider.autoDispose.family(
+  (ref, int arg) async {
+    final dio = await APIs.getDio();
+    var resp = await dio.get(APIs.suggestedTvName + arg.toString());
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    return sp.data["name"] as String;
+  },
+);
+
 final movieWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
   final dio = await APIs.getDio();
   var resp = await dio.get(APIs.watchlistMovieUrl);
@@ -75,14 +87,15 @@ class SearchPageData
     state = newState;
   }
 
-  Future<void> submit2Watchlist(
-      int tmdbId, int storageId, String resolution, String mediaType) async {
+  Future<void> submit2Watchlist(int tmdbId, int storageId, String resolution,
+      String mediaType, String folder) async {
     final dio = await APIs.getDio();
     if (mediaType == "tv") {
       var resp = await dio.post(APIs.watchlistTvUrl, data: {
         "tmdb_id": tmdbId,
         "storage_id": storageId,
-        "resolution": resolution
+        "resolution": resolution,
+        "folder": folder
       });
       var sp = ServerResponse.fromJson(resp.data);
       if (sp.code != 0) {
@@ -93,7 +106,8 @@ class SearchPageData
       var resp = await dio.post(APIs.watchlistMovieUrl, data: {
         "tmdb_id": tmdbId,
         "storage_id": storageId,
-        "resolution": resolution
+        "resolution": resolution,
+        "folder": folder
       });
       var sp = ServerResponse.fromJson(resp.data);
       if (sp.code != 0) {
@@ -116,9 +130,11 @@ class SearchResponse {
         page: json["page"],
         totalPage: json["total_page"],
         totalResults: json["total_results"],
-        results: json["results"] == null ? []: json["results"] 
-            .map((v) => SearchResult.fromJson(v))
-            .toList());
+        results: json["results"] == null
+            ? []
+            : (json["results"] as List)
+                .map((v) => SearchResult.fromJson(v))
+                .toList());
   }
 }
 
