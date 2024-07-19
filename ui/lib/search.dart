@@ -156,6 +156,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DropdownMenu(
+                        width: 200,
                         label: const Text("清晰度"),
                         initialSelection: resSelected,
                         dropdownMenuEntries: const [
@@ -175,6 +176,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 DropdownMenu(
+                                  width: 200,
                                   label: const Text("存储位置"),
                                   initialSelection: storageSelected,
                                   dropdownMenuEntries: v

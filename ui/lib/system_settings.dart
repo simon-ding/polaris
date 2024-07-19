@@ -395,51 +395,58 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
     }
 
     String selectImpl = s.implementation == null ? "local" : s.implementation!;
-    final widgets = <Widget>[
-      DropdownMenu(
-        label: const Text("类型"),
-        onSelected: (value) {
-          setState(() {
-            selectImpl = value!;
-          });
-        },
-        initialSelection: selectImpl,
-        dropdownMenuEntries: const [
-          DropdownMenuEntry(value: "local", label: "本地存储"),
-          DropdownMenuEntry(value: "webdav", label: "webdav")
+    final widgets =
+        StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          DropdownMenu(
+            label: const Text("类型"),
+            onSelected: (value) {
+              setState(() {
+                selectImpl = value!;
+              });
+            },
+            initialSelection: selectImpl,
+            dropdownMenuEntries: const [
+              DropdownMenuEntry(value: "local", label: "本地存储"),
+              DropdownMenuEntry(value: "webdav", label: "webdav")
+            ],
+          ),
+          TextField(
+            decoration: const InputDecoration(labelText: "名称"),
+            controller: nameController,
+          ),
+          selectImpl != "local"
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      decoration: const InputDecoration(labelText: "Webdav地址"),
+                      controller: urlController,
+                    ),
+                    TextField(
+                      decoration: const InputDecoration(labelText: "用户"),
+                      controller: userController,
+                    ),
+                    TextField(
+                      decoration: const InputDecoration(labelText: "密码"),
+                      controller: passController,
+                    ),
+                  ],
+                )
+              : Container(),
+          TextField(
+            decoration: const InputDecoration(labelText: "电视剧路径"),
+            controller: tvPathController,
+          ),
+          TextField(
+            decoration: const InputDecoration(labelText: "电影路径"),
+            controller: moviePathController,
+          )
         ],
-      ),
-      TextField(
-        decoration: const InputDecoration(labelText: "名称"),
-        controller: nameController,
-      ),
-      selectImpl != "local"
-          ? Column(
-              children: [
-                TextField(
-                  decoration: const InputDecoration(labelText: "Webdav地址"),
-                  controller: urlController,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: "用户"),
-                  controller: userController,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: "密码"),
-                  controller: passController,
-                ),
-              ],
-            )
-          : Container(),
-      TextField(
-        decoration: const InputDecoration(labelText: "电视剧路径"),
-        controller: tvPathController,
-      ),
-      TextField(
-        decoration: const InputDecoration(labelText: "电影路径"),
-        controller: moviePathController,
-      )
-    ];
+      );
+    });
     onSubmit() async {
       return ref.read(storageSettingProvider.notifier).addStorage(Storage(
             name: nameController.text,
@@ -458,7 +465,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
       return ref.read(storageSettingProvider.notifier).deleteStorage(s.id!);
     }
 
-    return showSettingDialog('存储', s.id != null, widgets, onSubmit, onDelete);
+    return showSettingDialog('存储', s.id != null, [widgets], onSubmit, onDelete);
   }
 
   Future<void> showSettingDialog(
