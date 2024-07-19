@@ -334,7 +334,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         return Column(
           children: [
             SwitchListTile(
-                title: const Text("开启认证"),
+                title: const Text("需要认证"),
                 value: _enableAuth,
                 onChanged: (v) {
                   setState(() {
