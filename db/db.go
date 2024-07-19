@@ -78,8 +78,8 @@ func (c *Client) generateDefaultLocalStorage() error {
 		Implementation: "local",
 		Default:        true,
 		Settings: map[string]string{
-			"tv_path":    "/data/tv",
-			"movie_path": "/data/movies",
+			"tv_path":    "/data/tv/",
+			"movie_path": "/data/movies/",
 		},
 	})
 }
