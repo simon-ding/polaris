@@ -168,6 +168,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "add dummy episode")
 	}
+	log.Infof("added dummy episode for movie: %v", nameEn)
 
 	r, err := s.db.AddMediaWatchlist(&ent.Media{
 		TmdbID:       int(detail.ID),

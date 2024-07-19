@@ -3,6 +3,7 @@ package tmdb
 import (
 	"polaris/log"
 	"strconv"
+	"strings"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/pkg/errors"
@@ -112,12 +113,46 @@ func (c *Client) SearchMedia(query string, lang string, page int) (*SearchResult
 }
 
 func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language string) (*tmdb.TVEpisodeDetails, error) {
+
 	d, err := c.tmdbClient.GetTVEpisodeDetails(id, seasonNumber, eposideNumber, withLangOption(language))
+	if err != nil {
+		return nil, err
+	}
+	if strings.HasSuffix(d.Name, "集") {
+		var detailEN *tmdb.TVEpisodeDetails
+		if language == "zh-CN" {
+			detailEN, err = c.tmdbClient.GetTVEpisodeDetails(id, seasonNumber, eposideNumber, withLangOption("en-US"))
+			if err != nil {
+				return d, nil
+			}
+		}
+		d.Name = detailEN.Name
+		d.Overview = detailEN.Overview	
+	}
+
 	return d, err
 }
 
 func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.TVSeasonDetails, error) {
-	return c.tmdbClient.GetTVSeasonDetails(id, seasonNumber, withLangOption(language))
+	detailCN, err := c.tmdbClient.GetTVSeasonDetails(id, seasonNumber, withLangOption(language))
+	if err != nil {
+		return nil, err
+	}
+	var detailEN *tmdb.TVSeasonDetails
+	if language == "zh-CN" {
+		detailEN, err = c.tmdbClient.GetTVSeasonDetails(id, seasonNumber, withLangOption("en-US"))
+		if err != nil {
+			return detailCN, nil
+		}
+	}
+
+	for i, ep := range detailCN.Episodes {
+		if strings.HasSuffix(ep.Name, "集") {
+			detailCN.Episodes[i].Name = detailEN.Episodes[i].Name
+			detailCN.Episodes[i].Overview = detailEN.Episodes[i].Overview
+		}
+	}
+	return detailCN, nil
 }
 
 func (c *Client) GetTVAlternativeTitles(id int, language string) (*tmdb.TVAlternativeTitles, error) {
