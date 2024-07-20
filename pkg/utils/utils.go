@@ -133,7 +133,7 @@ func SeasonId(seasonName string) (int, error) {
 	if len(matchSe) == 0 {
 		return 0, errors.New("no season number") //no season num
 	}
-	num, err := strconv.Atoi(matchSe[0])
+	num, err := strconv.Atoi(matchSe[len(matchSe)-1])
 	if err != nil {
 		return 0, errors.Wrap(err, "convert")
 	}
