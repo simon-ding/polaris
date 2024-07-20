@@ -169,15 +169,15 @@ func (mu *MediaUpdate) SetNillableAirDate(s *string) *MediaUpdate {
 }
 
 // SetResolution sets the "resolution" field.
-func (mu *MediaUpdate) SetResolution(s string) *MediaUpdate {
-	mu.mutation.SetResolution(s)
+func (mu *MediaUpdate) SetResolution(m media.Resolution) *MediaUpdate {
+	mu.mutation.SetResolution(m)
 	return mu
 }
 
 // SetNillableResolution sets the "resolution" field if the given value is not nil.
-func (mu *MediaUpdate) SetNillableResolution(s *string) *MediaUpdate {
-	if s != nil {
-		mu.SetResolution(*s)
+func (mu *MediaUpdate) SetNillableResolution(m *media.Resolution) *MediaUpdate {
+	if m != nil {
+		mu.SetResolution(*m)
 	}
 	return mu
 }
@@ -304,6 +304,11 @@ func (mu *MediaUpdate) check() error {
 			return &ValidationError{Name: "media_type", err: fmt.Errorf(`ent: validator failed for field "Media.media_type": %w`, err)}
 		}
 	}
+	if v, ok := mu.mutation.Resolution(); ok {
+		if err := media.ResolutionValidator(v); err != nil {
+			return &ValidationError{Name: "resolution", err: fmt.Errorf(`ent: validator failed for field "Media.resolution": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -353,7 +358,7 @@ func (mu *MediaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(media.FieldAirDate, field.TypeString, value)
 	}
 	if value, ok := mu.mutation.Resolution(); ok {
-		_spec.SetField(media.FieldResolution, field.TypeString, value)
+		_spec.SetField(media.FieldResolution, field.TypeEnum, value)
 	}
 	if value, ok := mu.mutation.StorageID(); ok {
 		_spec.SetField(media.FieldStorageID, field.TypeInt, value)
@@ -575,15 +580,15 @@ func (muo *MediaUpdateOne) SetNillableAirDate(s *string) *MediaUpdateOne {
 }
 
 // SetResolution sets the "resolution" field.
-func (muo *MediaUpdateOne) SetResolution(s string) *MediaUpdateOne {
-	muo.mutation.SetResolution(s)
+func (muo *MediaUpdateOne) SetResolution(m media.Resolution) *MediaUpdateOne {
+	muo.mutation.SetResolution(m)
 	return muo
 }
 
 // SetNillableResolution sets the "resolution" field if the given value is not nil.
-func (muo *MediaUpdateOne) SetNillableResolution(s *string) *MediaUpdateOne {
-	if s != nil {
-		muo.SetResolution(*s)
+func (muo *MediaUpdateOne) SetNillableResolution(m *media.Resolution) *MediaUpdateOne {
+	if m != nil {
+		muo.SetResolution(*m)
 	}
 	return muo
 }
@@ -723,6 +728,11 @@ func (muo *MediaUpdateOne) check() error {
 			return &ValidationError{Name: "media_type", err: fmt.Errorf(`ent: validator failed for field "Media.media_type": %w`, err)}
 		}
 	}
+	if v, ok := muo.mutation.Resolution(); ok {
+		if err := media.ResolutionValidator(v); err != nil {
+			return &ValidationError{Name: "resolution", err: fmt.Errorf(`ent: validator failed for field "Media.resolution": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -789,7 +799,7 @@ func (muo *MediaUpdateOne) sqlSave(ctx context.Context) (_node *Media, err error
 		_spec.SetField(media.FieldAirDate, field.TypeString, value)
 	}
 	if value, ok := muo.mutation.Resolution(); ok {
-		_spec.SetField(media.FieldResolution, field.TypeString, value)
+		_spec.SetField(media.FieldResolution, field.TypeEnum, value)
 	}
 	if value, ok := muo.mutation.StorageID(); ok {
 		_spec.SetField(media.FieldStorageID, field.TypeInt, value)

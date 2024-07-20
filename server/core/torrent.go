@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func SearchSeasonPackage(db1 *db.Client, seriesId, seasonNum int) ([]torznab.Result, error) {
+func SearchSeasonPackage(db1 *db.Client, seriesId, seasonNum int, checkResolution bool) ([]torznab.Result, error) {
 	series := db1.GetMediaDetails(seriesId)
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
@@ -31,8 +31,12 @@ func SearchSeasonPackage(db1 *db.Client, seriesId, seasonNum int) ([]torznab.Res
 		if !isNameAcceptable(r.Name, series.Media, seasonNum, -1) {
 			continue
 		}
+		if checkResolution && IsWantedResolution(r.Name, series.Resolution) {
+			continue
+		}
+		
 		filtered = append(filtered, r)
-
+		
 	}
 
 	if len(filtered) == 0 {
@@ -41,7 +45,7 @@ func SearchSeasonPackage(db1 *db.Client, seriesId, seasonNum int) ([]torznab.Res
 	return filtered, nil
 }
 
-func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int) ([]torznab.Result, error) {
+func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkResolution bool) ([]torznab.Result, error) {
 	series := db1.GetMediaDetails(seriesId)
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
@@ -58,6 +62,10 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int) ([]torzn
 		if !isNameAcceptable(r.Name, series.Media, seasonNum, episodeNum) {
 			continue
 		}
+		if checkResolution && IsWantedResolution(r.Name, series.Resolution) {
+			continue
+		}
+
 		filtered = append(filtered, r)
 	}
 
@@ -65,7 +73,7 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int) ([]torzn
 
 }
 
-func SearchMovie(db1 *db.Client, movieId int) ([]torznab.Result, error) {
+func SearchMovie(db1 *db.Client, movieId int, checkResolution bool) ([]torznab.Result, error) {
 	movieDetail := db1.GetMediaDetails(movieId)
 	if movieDetail == nil {
 		return nil, errors.New("no media found of id")
@@ -84,6 +92,10 @@ func SearchMovie(db1 *db.Client, movieId int) ([]torznab.Result, error) {
 		if !isNameAcceptable(r.Name, movieDetail.Media, -1, -1) {
 			continue
 		}
+		if checkResolution && IsWantedResolution(r.Name, movieDetail.Resolution) {
+			continue
+		}
+
 		filtered = append(filtered, r)
 
 	}
@@ -117,10 +129,6 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 }
 
 func isNameAcceptable(torrentName string, m *ent.Media, seasonNum, episodeNum int) bool {
-	if !utils.ContainsIgnoreCase(torrentName,m.NameCn) && !utils.ContainsIgnoreCase(torrentName,m.NameEn) &&
-		 !utils.ContainsIgnoreCase(torrentName,m.OriginalName) {
-		return false
-	}
 	if !utils.IsNameAcceptable(torrentName, m.NameCn) && !utils.IsNameAcceptable(torrentName, m.NameEn)  && !utils.IsNameAcceptable(torrentName, m.OriginalName){
 		return false //name not match
 	}
@@ -156,4 +164,16 @@ func isNameAcceptable(torrentName string, m *ent.Media, seasonNum, episodeNum in
 		}
 	}
 	return true
+}
+
+func IsWantedResolution(name string, res media.Resolution) bool {
+	switch res {
+	case media.Resolution720p:
+		return utils.ContainsIgnoreCase(name, "720p")
+	case media.Resolution1080p:
+		return utils.ContainsIgnoreCase(name, "1080p")
+	case media.Resolution4k:
+		return utils.ContainsIgnoreCase(name, "4k") || utils.ContainsIgnoreCase(name, "2160p")
+	}
+	return false
 }

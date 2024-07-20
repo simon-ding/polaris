@@ -59,7 +59,7 @@ var (
 	HistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "media_id", Type: field.TypeInt},
-		{Name: "episode_id", Type: field.TypeInt},
+		{Name: "episode_id", Type: field.TypeInt, Nullable: true},
 		{Name: "source_title", Type: field.TypeString},
 		{Name: "date", Type: field.TypeTime},
 		{Name: "target_dir", Type: field.TypeString},
@@ -100,7 +100,7 @@ var (
 		{Name: "overview", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "air_date", Type: field.TypeString, Default: ""},
-		{Name: "resolution", Type: field.TypeString, Default: ""},
+		{Name: "resolution", Type: field.TypeEnum, Enums: []string{"720p", "1080p", "4k"}, Default: "1080p"},
 		{Name: "storage_id", Type: field.TypeInt, Nullable: true},
 		{Name: "target_dir", Type: field.TypeString, Nullable: true},
 	}

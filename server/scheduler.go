@@ -11,6 +11,7 @@ import (
 	"polaris/pkg"
 	"polaris/pkg/storage"
 	"polaris/pkg/utils"
+	"polaris/server/core"
 
 	"github.com/pkg/errors"
 )
@@ -19,6 +20,7 @@ func (s *Server) scheduler() {
 	s.mustAddCron("@every 1m", s.checkTasks)
 	//s.mustAddCron("@every 1h", s.checkAllFiles)
 	s.mustAddCron("@every 1h", s.downloadTvSeries)
+	s.mustAddCron("@every 1h", s.downloadMovie)
 	s.cron.Start()
 }
 
@@ -240,4 +242,59 @@ func (s *Server) downloadTvSeries() {
 		}
 
 	}
+}
+
+func (s *Server) downloadMovie() {
+	log.Infof("begin check all movie resources")
+	allSeries := s.db.GetMediaWatchlist(media.MediaTypeMovie)
+
+	for _, series := range allSeries {
+		detail := s.db.GetMediaDetails(series.ID)		
+		if len(detail.Episodes) == 0 {
+			log.Errorf("no related dummy episode: %v", detail.NameEn)
+			continue
+		}
+
+		if err := s.downloadMovieSingleEpisode(detail.Episodes[0]); err != nil {
+			log.Errorf("download movie error: %v", err)
+		}
+	}
+}
+
+func (s *Server) downloadMovieSingleEpisode(ep *ent.Episode) error {
+	trc, err := s.getDownloadClient()
+	if err != nil {
+		return errors.Wrap(err, "connect transmission")
+	}
+
+	res, err := core.SearchMovie(s.db, ep.MediaID, true)
+	if err != nil {
+
+		return errors.Wrap(err, "search movie")
+	}
+	r1 := res[0]
+	log.Infof("begin download torrent resource: %v", r1.Name)
+	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
+	if err != nil {
+		return errors.Wrap(err, "downloading")
+	}
+	torrent.Start()
+
+	history, err := s.db.SaveHistoryRecord(ent.History{
+		MediaID:     ep.MediaID,
+		EpisodeID:   ep.ID,
+		SourceTitle: r1.Name,
+		TargetDir:   "./",
+		Status:      history.StatusRunning,
+		Size:        r1.Size,
+		Saved:       torrent.Save(),
+	})
+	if err != nil {
+		log.Errorf("save history error: %v", err)
+	}
+
+	s.tasks[history.ID] = &Task{Torrent: torrent}
+
+	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+	return nil
 }

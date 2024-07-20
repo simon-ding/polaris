@@ -74,7 +74,7 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 		return nil, errors.Wrap(err, "connect transmission")
 	}
 
-	res, err := core.SearchSeasonPackage(s.db, seriesId, seasonNum)
+	res, err := core.SearchSeasonPackage(s.db, seriesId, seasonNum, true)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,6 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 		log.Errorf("space available %v, space needed %v", size, r1.Size)
 		return nil, errors.New("no enough space")
 	}
-
 
 	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
 	if err != nil {
@@ -139,7 +138,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 		return nil, errors.Errorf("no episode of season %d episode %d", seasonNum, episodeNum)
 	}
 
-	res, err := core.SearchEpisode(s.db, seriesId, seasonNum, episodeNum)
+	res, err := core.SearchEpisode(s.db, seriesId, seasonNum, episodeNum, true)
 	if err != nil {
 		return nil, err
 	}
@@ -179,13 +178,13 @@ type searchAndDownloadIn struct {
 	Episode int `json:"episode"`
 }
 
-func (s *Server) SearchAvailableEpisodeResource(c *gin.Context) (interface{}, error)  {
+func (s *Server) SearchAvailableEpisodeResource(c *gin.Context) (interface{}, error) {
 	var in searchAndDownloadIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
 	log.Infof("search episode resources link: %v", in)
-	res, err := core.SearchEpisode(s.db, in.ID, in.Season, in.Episode)
+	res, err := core.SearchEpisode(s.db, in.ID, in.Season, in.Episode, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "search episode")
 	}
@@ -254,7 +253,7 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 		return nil, errors.New("no media found of id " + ids)
 	}
 
-	res, err := core.SearchMovie(s.db, id)
+	res, err := core.SearchMovie(s.db, id, false)
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +276,7 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 
 type downloadTorrentIn struct {
 	MediaID int    `json:"media_id" binding:"required"`
-	Link    string `json:"link" binding:"required"`
+	TorznabSearchResult
 }
 
 func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
@@ -303,26 +302,23 @@ func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
 	torrent.Start()
 
 	go func() {
-		for {
-			if !torrent.Exists() {
-				continue
-			}
-			history, err := s.db.SaveHistoryRecord(ent.History{
-				MediaID:     media.ID,
-				SourceTitle: torrent.Name(),
-				TargetDir:   "./",
-				Status:      history.StatusRunning,
-				Size:        torrent.Size(),
-				Saved:       torrent.Save(),
-			})
-			if err != nil {
-				log.Errorf("save history error: %v", err)
-			}
-
-			s.tasks[history.ID] = &Task{Torrent: torrent}
-
-			break
+		ep := media.Episodes[0]
+		history, err := s.db.SaveHistoryRecord(ent.History{
+			MediaID:     media.ID,
+			EpisodeID:   ep.ID,
+			SourceTitle: media.NameCn,
+			TargetDir:   "./",
+			Status:      history.StatusRunning,
+			Size:        in.Size,
+			Saved:       torrent.Save(),
+		})
+		if err != nil {
+			log.Errorf("save history error: %v", err)
 		}
+
+		s.tasks[history.ID] = &Task{Torrent: torrent}
+
+		s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 	}()
 
 	log.Infof("success add %s to download task", media.NameEn)

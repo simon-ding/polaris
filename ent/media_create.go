@@ -100,15 +100,15 @@ func (mc *MediaCreate) SetNillableAirDate(s *string) *MediaCreate {
 }
 
 // SetResolution sets the "resolution" field.
-func (mc *MediaCreate) SetResolution(s string) *MediaCreate {
-	mc.mutation.SetResolution(s)
+func (mc *MediaCreate) SetResolution(m media.Resolution) *MediaCreate {
+	mc.mutation.SetResolution(m)
 	return mc
 }
 
 // SetNillableResolution sets the "resolution" field if the given value is not nil.
-func (mc *MediaCreate) SetNillableResolution(s *string) *MediaCreate {
-	if s != nil {
-		mc.SetResolution(*s)
+func (mc *MediaCreate) SetNillableResolution(m *media.Resolution) *MediaCreate {
+	if m != nil {
+		mc.SetResolution(*m)
 	}
 	return mc
 }
@@ -239,6 +239,11 @@ func (mc *MediaCreate) check() error {
 	if _, ok := mc.mutation.Resolution(); !ok {
 		return &ValidationError{Name: "resolution", err: errors.New(`ent: missing required field "Media.resolution"`)}
 	}
+	if v, ok := mc.mutation.Resolution(); ok {
+		if err := media.ResolutionValidator(v); err != nil {
+			return &ValidationError{Name: "resolution", err: fmt.Errorf(`ent: validator failed for field "Media.resolution": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -302,7 +307,7 @@ func (mc *MediaCreate) createSpec() (*Media, *sqlgraph.CreateSpec) {
 		_node.AirDate = value
 	}
 	if value, ok := mc.mutation.Resolution(); ok {
-		_spec.SetField(media.FieldResolution, field.TypeString, value)
+		_spec.SetField(media.FieldResolution, field.TypeEnum, value)
 		_node.Resolution = value
 	}
 	if value, ok := mc.mutation.StorageID(); ok {

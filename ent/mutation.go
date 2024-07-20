@@ -2000,10 +2000,24 @@ func (m *HistoryMutation) AddedEpisodeID() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearEpisodeID clears the value of the "episode_id" field.
+func (m *HistoryMutation) ClearEpisodeID() {
+	m.episode_id = nil
+	m.addepisode_id = nil
+	m.clearedFields[history.FieldEpisodeID] = struct{}{}
+}
+
+// EpisodeIDCleared returns if the "episode_id" field was cleared in this mutation.
+func (m *HistoryMutation) EpisodeIDCleared() bool {
+	_, ok := m.clearedFields[history.FieldEpisodeID]
+	return ok
+}
+
 // ResetEpisodeID resets all changes to the "episode_id" field.
 func (m *HistoryMutation) ResetEpisodeID() {
 	m.episode_id = nil
 	m.addepisode_id = nil
+	delete(m.clearedFields, history.FieldEpisodeID)
 }
 
 // SetSourceTitle sets the "source_title" field.
@@ -2497,6 +2511,9 @@ func (m *HistoryMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *HistoryMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(history.FieldEpisodeID) {
+		fields = append(fields, history.FieldEpisodeID)
+	}
 	if m.FieldCleared(history.FieldSaved) {
 		fields = append(fields, history.FieldSaved)
 	}
@@ -2514,6 +2531,9 @@ func (m *HistoryMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *HistoryMutation) ClearField(name string) error {
 	switch name {
+	case history.FieldEpisodeID:
+		m.ClearEpisodeID()
+		return nil
 	case history.FieldSaved:
 		m.ClearSaved()
 		return nil
@@ -3195,7 +3215,7 @@ type MediaMutation struct {
 	overview        *string
 	created_at      *time.Time
 	air_date        *string
-	resolution      *string
+	resolution      *media.Resolution
 	storage_id      *int
 	addstorage_id   *int
 	target_dir      *string
@@ -3664,12 +3684,12 @@ func (m *MediaMutation) ResetAirDate() {
 }
 
 // SetResolution sets the "resolution" field.
-func (m *MediaMutation) SetResolution(s string) {
-	m.resolution = &s
+func (m *MediaMutation) SetResolution(value media.Resolution) {
+	m.resolution = &value
 }
 
 // Resolution returns the value of the "resolution" field in the mutation.
-func (m *MediaMutation) Resolution() (r string, exists bool) {
+func (m *MediaMutation) Resolution() (r media.Resolution, exists bool) {
 	v := m.resolution
 	if v == nil {
 		return
@@ -3680,7 +3700,7 @@ func (m *MediaMutation) Resolution() (r string, exists bool) {
 // OldResolution returns the old "resolution" field's value of the Media entity.
 // If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MediaMutation) OldResolution(ctx context.Context) (v string, err error) {
+func (m *MediaMutation) OldResolution(ctx context.Context) (v media.Resolution, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldResolution is only allowed on UpdateOne operations")
 	}
@@ -4081,7 +4101,7 @@ func (m *MediaMutation) SetField(name string, value ent.Value) error {
 		m.SetAirDate(v)
 		return nil
 	case media.FieldResolution:
-		v, ok := value.(string)
+		v, ok := value.(media.Resolution)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

@@ -70,6 +70,12 @@ func (hu *HistoryUpdate) AddEpisodeID(i int) *HistoryUpdate {
 	return hu
 }
 
+// ClearEpisodeID clears the value of the "episode_id" field.
+func (hu *HistoryUpdate) ClearEpisodeID() *HistoryUpdate {
+	hu.mutation.ClearEpisodeID()
+	return hu
+}
+
 // SetSourceTitle sets the "source_title" field.
 func (hu *HistoryUpdate) SetSourceTitle(s string) *HistoryUpdate {
 	hu.mutation.SetSourceTitle(s)
@@ -233,6 +239,9 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := hu.mutation.AddedEpisodeID(); ok {
 		_spec.AddField(history.FieldEpisodeID, field.TypeInt, value)
 	}
+	if hu.mutation.EpisodeIDCleared() {
+		_spec.ClearField(history.FieldEpisodeID, field.TypeInt)
+	}
 	if value, ok := hu.mutation.SourceTitle(); ok {
 		_spec.SetField(history.FieldSourceTitle, field.TypeString, value)
 	}
@@ -316,6 +325,12 @@ func (huo *HistoryUpdateOne) SetNillableEpisodeID(i *int) *HistoryUpdateOne {
 // AddEpisodeID adds i to the "episode_id" field.
 func (huo *HistoryUpdateOne) AddEpisodeID(i int) *HistoryUpdateOne {
 	huo.mutation.AddEpisodeID(i)
+	return huo
+}
+
+// ClearEpisodeID clears the value of the "episode_id" field.
+func (huo *HistoryUpdateOne) ClearEpisodeID() *HistoryUpdateOne {
+	huo.mutation.ClearEpisodeID()
 	return huo
 }
 
@@ -511,6 +526,9 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if value, ok := huo.mutation.AddedEpisodeID(); ok {
 		_spec.AddField(history.FieldEpisodeID, field.TypeInt, value)
+	}
+	if huo.mutation.EpisodeIDCleared() {
+		_spec.ClearField(history.FieldEpisodeID, field.TypeInt)
 	}
 	if value, ok := huo.mutation.SourceTitle(); ok {
 		_spec.SetField(history.FieldSourceTitle, field.TypeString, value)

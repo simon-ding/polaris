@@ -95,11 +95,6 @@ func AirDate(v string) predicate.Media {
 	return predicate.Media(sql.FieldEQ(FieldAirDate, v))
 }
 
-// Resolution applies equality check predicate on the "resolution" field. It's identical to ResolutionEQ.
-func Resolution(v string) predicate.Media {
-	return predicate.Media(sql.FieldEQ(FieldResolution, v))
-}
-
 // StorageID applies equality check predicate on the "storage_id" field. It's identical to StorageIDEQ.
 func StorageID(v int) predicate.Media {
 	return predicate.Media(sql.FieldEQ(FieldStorageID, v))
@@ -611,68 +606,23 @@ func AirDateContainsFold(v string) predicate.Media {
 }
 
 // ResolutionEQ applies the EQ predicate on the "resolution" field.
-func ResolutionEQ(v string) predicate.Media {
+func ResolutionEQ(v Resolution) predicate.Media {
 	return predicate.Media(sql.FieldEQ(FieldResolution, v))
 }
 
 // ResolutionNEQ applies the NEQ predicate on the "resolution" field.
-func ResolutionNEQ(v string) predicate.Media {
+func ResolutionNEQ(v Resolution) predicate.Media {
 	return predicate.Media(sql.FieldNEQ(FieldResolution, v))
 }
 
 // ResolutionIn applies the In predicate on the "resolution" field.
-func ResolutionIn(vs ...string) predicate.Media {
+func ResolutionIn(vs ...Resolution) predicate.Media {
 	return predicate.Media(sql.FieldIn(FieldResolution, vs...))
 }
 
 // ResolutionNotIn applies the NotIn predicate on the "resolution" field.
-func ResolutionNotIn(vs ...string) predicate.Media {
+func ResolutionNotIn(vs ...Resolution) predicate.Media {
 	return predicate.Media(sql.FieldNotIn(FieldResolution, vs...))
-}
-
-// ResolutionGT applies the GT predicate on the "resolution" field.
-func ResolutionGT(v string) predicate.Media {
-	return predicate.Media(sql.FieldGT(FieldResolution, v))
-}
-
-// ResolutionGTE applies the GTE predicate on the "resolution" field.
-func ResolutionGTE(v string) predicate.Media {
-	return predicate.Media(sql.FieldGTE(FieldResolution, v))
-}
-
-// ResolutionLT applies the LT predicate on the "resolution" field.
-func ResolutionLT(v string) predicate.Media {
-	return predicate.Media(sql.FieldLT(FieldResolution, v))
-}
-
-// ResolutionLTE applies the LTE predicate on the "resolution" field.
-func ResolutionLTE(v string) predicate.Media {
-	return predicate.Media(sql.FieldLTE(FieldResolution, v))
-}
-
-// ResolutionContains applies the Contains predicate on the "resolution" field.
-func ResolutionContains(v string) predicate.Media {
-	return predicate.Media(sql.FieldContains(FieldResolution, v))
-}
-
-// ResolutionHasPrefix applies the HasPrefix predicate on the "resolution" field.
-func ResolutionHasPrefix(v string) predicate.Media {
-	return predicate.Media(sql.FieldHasPrefix(FieldResolution, v))
-}
-
-// ResolutionHasSuffix applies the HasSuffix predicate on the "resolution" field.
-func ResolutionHasSuffix(v string) predicate.Media {
-	return predicate.Media(sql.FieldHasSuffix(FieldResolution, v))
-}
-
-// ResolutionEqualFold applies the EqualFold predicate on the "resolution" field.
-func ResolutionEqualFold(v string) predicate.Media {
-	return predicate.Media(sql.FieldEqualFold(FieldResolution, v))
-}
-
-// ResolutionContainsFold applies the ContainsFold predicate on the "resolution" field.
-func ResolutionContainsFold(v string) predicate.Media {
-	return predicate.Media(sql.FieldContainsFold(FieldResolution, v))
 }
 
 // StorageIDEQ applies the EQ predicate on the "storage_id" field.

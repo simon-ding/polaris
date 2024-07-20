@@ -32,6 +32,14 @@ func (hc *HistoryCreate) SetEpisodeID(i int) *HistoryCreate {
 	return hc
 }
 
+// SetNillableEpisodeID sets the "episode_id" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableEpisodeID(i *int) *HistoryCreate {
+	if i != nil {
+		hc.SetEpisodeID(*i)
+	}
+	return hc
+}
+
 // SetSourceTitle sets the "source_title" field.
 func (hc *HistoryCreate) SetSourceTitle(s string) *HistoryCreate {
 	hc.mutation.SetSourceTitle(s)
@@ -129,9 +137,6 @@ func (hc *HistoryCreate) defaults() {
 func (hc *HistoryCreate) check() error {
 	if _, ok := hc.mutation.MediaID(); !ok {
 		return &ValidationError{Name: "media_id", err: errors.New(`ent: missing required field "History.media_id"`)}
-	}
-	if _, ok := hc.mutation.EpisodeID(); !ok {
-		return &ValidationError{Name: "episode_id", err: errors.New(`ent: missing required field "History.episode_id"`)}
 	}
 	if _, ok := hc.mutation.SourceTitle(); !ok {
 		return &ValidationError{Name: "source_title", err: errors.New(`ent: missing required field "History.source_title"`)}

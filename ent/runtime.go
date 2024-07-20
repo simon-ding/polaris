@@ -70,10 +70,6 @@ func init() {
 	mediaDescAirDate := mediaFields[8].Descriptor()
 	// media.DefaultAirDate holds the default value on creation for the air_date field.
 	media.DefaultAirDate = mediaDescAirDate.Default.(string)
-	// mediaDescResolution is the schema descriptor for resolution field.
-	mediaDescResolution := mediaFields[9].Descriptor()
-	// media.DefaultResolution holds the default value on creation for the resolution field.
-	media.DefaultResolution = mediaDescResolution.Default.(string)
 	storageFields := schema.Storage{}.Fields()
 	_ = storageFields
 	// storageDescDeleted is the schema descriptor for deleted field.

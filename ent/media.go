@@ -36,7 +36,7 @@ type Media struct {
 	// AirDate holds the value of the "air_date" field.
 	AirDate string `json:"air_date,omitempty"`
 	// Resolution holds the value of the "resolution" field.
-	Resolution string `json:"resolution,omitempty"`
+	Resolution media.Resolution `json:"resolution,omitempty"`
 	// StorageID holds the value of the "storage_id" field.
 	StorageID int `json:"storage_id,omitempty"`
 	// TargetDir holds the value of the "target_dir" field.
@@ -155,7 +155,7 @@ func (m *Media) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field resolution", values[i])
 			} else if value.Valid {
-				m.Resolution = value.String
+				m.Resolution = media.Resolution(value.String)
 			}
 		case media.FieldStorageID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -238,7 +238,7 @@ func (m *Media) String() string {
 	builder.WriteString(m.AirDate)
 	builder.WriteString(", ")
 	builder.WriteString("resolution=")
-	builder.WriteString(m.Resolution)
+	builder.WriteString(fmt.Sprintf("%v", m.Resolution))
 	builder.WriteString(", ")
 	builder.WriteString("storage_id=")
 	builder.WriteString(fmt.Sprintf("%v", m.StorageID))

@@ -169,6 +169,16 @@ func EpisodeIDLTE(v int) predicate.History {
 	return predicate.History(sql.FieldLTE(FieldEpisodeID, v))
 }
 
+// EpisodeIDIsNil applies the IsNil predicate on the "episode_id" field.
+func EpisodeIDIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldEpisodeID))
+}
+
+// EpisodeIDNotNil applies the NotNil predicate on the "episode_id" field.
+func EpisodeIDNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldEpisodeID))
+}
+
 // SourceTitleEQ applies the EQ predicate on the "source_title" field.
 func SourceTitleEQ(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSourceTitle, v))

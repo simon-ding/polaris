@@ -116,7 +116,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		OriginalName: detail.OriginalName,
 		Overview:     detail.Overview,
 		AirDate:      detail.FirstAirDate,
-		Resolution:   string(in.Resolution),
+		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
 		TargetDir: in.Folder,
 	}, epIds)
@@ -181,7 +181,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		OriginalName: detail.OriginalTitle,
 		Overview:     detail.Overview,
 		AirDate:      detail.ReleaseDate,
-		Resolution:   string(in.Resolution),
+		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
 		TargetDir: "./",
 	}, []int{epid})
