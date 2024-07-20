@@ -36,11 +36,11 @@ func (l *LocalStorage) Move(src, dest string) error {
 		if err != nil {
 			return errors.Wrapf(err, "relation between %s and %s", src, path)
 		}
-		destName := filepath.Join(targetDir, rel, info.Name())
+		destName := filepath.Join(targetDir, rel)
 
 		if info.IsDir() {
 
-			if err := os.Mkdir(destName, 0666); err != nil {
+			if err := os.Mkdir(destName, 0655); err != nil {
 				return errors.Wrapf(err, "mkdir %v", destName)
 			}
 

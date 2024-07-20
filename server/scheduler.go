@@ -64,7 +64,7 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 			seasonNum = -1
 		}
 
-		if err != nil {
+		if err1 != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
 			if r.EpisodeID != 0 {
 				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
@@ -100,8 +100,7 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 		}
 		storageImpl, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath)
 		if err != nil {
-			err1 = errors.Wrap(err, "new webdav")
-			return 
+			return errors.Wrap(err, "new webdav")
 		}
 		stImpl = storageImpl
 
@@ -114,8 +113,8 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 
 		storageImpl, err := storage.NewLocalStorage(targetPath)
 		if err != nil {
-			err1 = errors.Wrap(err, "new storage")
-			return
+			return errors.Wrap(err, "new storage")
+
 		}
 		stImpl = storageImpl
 
@@ -123,14 +122,14 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 	if r.EpisodeID == 0 {
 		//season package download
 		if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
-			err1 = errors.Wrap(err, "move file")
-			return
+			return errors.Wrap(err, "move file")
+
 		}
 
 	} else {
 		if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), filepath.Join(r.TargetDir, torrent.Name())); err != nil {
-			err1 = errors.Wrap(err, "move file")
-			return
+			return errors.Wrap(err, "move file")
+
 		}
 	}
 
