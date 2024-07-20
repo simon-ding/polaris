@@ -18,9 +18,10 @@ import (
 
 func (s *Server) scheduler() {
 	s.mustAddCron("@every 1m", s.checkTasks)
-	//s.mustAddCron("@every 1h", s.checkAllFiles)
-	s.mustAddCron("@every 1h", s.downloadTvSeries)
-	s.mustAddCron("@every 1h", s.downloadMovie)
+	s.mustAddCron("@every 1h", func() {
+		s.downloadTvSeries()
+		s.downloadMovie()
+	})
 	s.cron.Start()
 }
 
