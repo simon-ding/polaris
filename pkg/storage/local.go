@@ -39,11 +39,7 @@ func (l *LocalStorage) Move(src, dest string) error {
 		destName := filepath.Join(targetDir, rel)
 
 		if info.IsDir() {
-
-			if err := os.Mkdir(destName, 0655); err != nil {
-				return errors.Wrapf(err, "mkdir %v", destName)
-			}
-
+			os.Mkdir(destName, 0655)
 		} else { //is file
 			if writer, err := os.Create(destName); err != nil {
 				return errors.Wrapf(err, "create file %s", destName)
