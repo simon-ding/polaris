@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"polaris/log"
 
 	"github.com/pkg/errors"
 )
@@ -17,7 +18,7 @@ type Storage interface {
 
 func NewLocalStorage(dir string) (*LocalStorage, error) {
 	os.MkdirAll(dir, 0655)
-	
+
 	return &LocalStorage{dir: dir}, nil
 }
 
@@ -32,7 +33,7 @@ func (l *LocalStorage) Move(src, dest string) error {
 		if err != nil {
 			return err
 		}
-		rel, err  := filepath.Rel(src, path)
+		rel, err := filepath.Rel(src, path)
 		if err != nil {
 			return errors.Wrapf(err, "relation between %s and %s", src, path)
 		}
@@ -56,6 +57,7 @@ func (l *LocalStorage) Move(src, dest string) error {
 				}
 			}
 		}
+		log.Infof("file copy complete: %v", destName)
 		return nil
 	})
 	if err != nil {
@@ -65,7 +67,6 @@ func (l *LocalStorage) Move(src, dest string) error {
 
 }
 
-
 func (l *LocalStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
-	 return ioutil.ReadDir(filepath.Join(l.dir, dir))
+	return ioutil.ReadDir(filepath.Join(l.dir, dir))
 }
