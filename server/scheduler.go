@@ -254,8 +254,12 @@ func (s *Server) downloadMovie() {
 			log.Errorf("no related dummy episode: %v", detail.NameEn)
 			continue
 		}
+		ep := detail.Episodes[0]
+		if ep.Status == episode.StatusDownloaded {
+			continue
+		}
 
-		if err := s.downloadMovieSingleEpisode(detail.Episodes[0]); err != nil {
+		if err := s.downloadMovieSingleEpisode(ep); err != nil {
 			log.Errorf("download movie error: %v", err)
 		}
 	}
