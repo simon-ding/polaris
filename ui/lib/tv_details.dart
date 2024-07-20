@@ -56,14 +56,16 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                       Opacity(
                           opacity: 0.7,
                           child: ep.status == "downloading"
-                              ? const Icon(Icons.downloading)
+                              ?  const Tooltip(message: "下载中",child: Icon(Icons.downloading),) 
                               : (ep.status == "downloaded"
-                                  ? const Icon(Icons.download_done)
-                                  : const Icon(Icons.warning_amber_rounded))),
+                                  ? const Tooltip(message: "已下载",child: Icon(Icons.download_done),) 
+                                  : const Tooltip(message: "未下载",child: Icon(Icons.warning_amber_rounded),) )),
                     ),
                     DataCell(Row(
                       children: [
-                        IconButton(
+                        Tooltip(
+                          message: "搜索下载对应剧集",
+                          child: IconButton(
                             onPressed: () async {
                               var f = ref
                                   .read(mediaDetailsProvider(widget.seriesId)
@@ -79,6 +81,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               }
                             },
                             icon: const Icon(Icons.search)),
+                        )
+                        ,
                         const SizedBox(
                           width: 10,
                         ),
@@ -103,14 +107,31 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     title: k == 0 ? const Text("特别篇") : Text("第 $k 季"),
                     expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      DataTable(columns: const [
-                        DataColumn(label: Text("#")),
-                        DataColumn(
+                      DataTable(columns:  [
+                        const DataColumn(label: Text("#")),
+                        const DataColumn(
                           label: Text("标题"),
                         ),
-                        DataColumn(label: Text("播出时间")),
-                        DataColumn(label: Text("状态")),
-                        DataColumn(label: Text("操作"))
+                        const DataColumn(label: Text("播出时间")),
+                        const DataColumn(label: Text("状态")),
+                        DataColumn(label: Tooltip(
+                          message: "搜索下载全部剧集",
+                          child: IconButton(
+                            onPressed: () async {
+                              var f = ref
+                                  .read(mediaDetailsProvider(widget.seriesId)
+                                      .notifier)
+                                  .searchAndDownload(widget.seriesId,
+                                      k, 0);
+                              setState(() {
+                                _pendingFuture = f;
+                              });
+                              if (!Utils.showError(context, snapshot)) {
+                                var name = await f;
+                                Utils.showSnakeBar("开始下载: $name");
+                              }
+                            },
+                            icon: const Icon(Icons.search)),) )
                       ], rows: m[k]!),
                     ],
                   );

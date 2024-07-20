@@ -58,10 +58,18 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 	s.db.SetHistoryStatus(r.ID, history.StatusUploading)
 
 	defer func() {
+		seasonNum, err := utils.SeasonId(r.TargetDir)
+		if err != nil {
+			log.Errorf("no season id: %v", r.TargetDir)
+			seasonNum = -1
+		}
+
 		if err != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
 			if r.EpisodeID != 0 {
 				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
+			} else {
+				s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
 			}
 
 		} else {
@@ -69,6 +77,8 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 			s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 			if r.EpisodeID != 0 {
 				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
+			} else {
+				s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
 			}
 
 			torrent.Remove()
@@ -108,8 +118,16 @@ func (s *Server) moveCompletedTask(id int) (err error) {
 		stImpl = storageImpl
 
 	}
-	if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
-		return errors.Wrap(err, "move file")
+	if r.EpisodeID == 0 {
+		//season package download
+		if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
+			return errors.Wrap(err, "move file")
+		}
+
+	} else {
+		if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), filepath.Join(r.TargetDir, torrent.Name())); err != nil {
+			return errors.Wrap(err, "move file")
+		}
 	}
 
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)

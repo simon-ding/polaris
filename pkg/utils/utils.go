@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"regexp"
 	"strconv"
 	"strings"
@@ -9,8 +8,10 @@ import (
 
 	"github.com/adrg/strutil"
 	"github.com/adrg/strutil/metrics"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
+	"golang.org/x/sys/unix"
 )
 
 func isASCII(s string) bool {
@@ -83,4 +84,65 @@ func FindSeasonEpisodeNum(name string) (se int, ep int, err error) {
 	seNum := strings.TrimPrefix(matchSe[0], "S")
 	seNum1, _ := strconv.Atoi(seNum)
 	return seNum1, epNum1, nil
+}
+
+func FindSeasonPackageInfo(name string) (se int, err error) {
+	seRe := regexp.MustCompile(`S\d+`)
+	epRe := regexp.MustCompile(`E\d+`)
+	nameUpper := strings.ToUpper(name)
+	matchEp := epRe.FindAllString(nameUpper, -1)
+	if len(matchEp) != 0 {
+		err = errors.New("episode number should not exist")
+	}
+	matchSe := seRe.FindAllString(nameUpper, -1)
+	if len(matchSe) == 0 {
+		err = errors.New("no season num")
+	}
+	if err != nil {
+		return 0, err
+	}
+
+	seNum := strings.TrimPrefix(matchSe[0], "S")
+	se, _ = strconv.Atoi(seNum)
+	return se, err
+}
+
+func IsSeasonPackageName(name string) bool {
+	seRe := regexp.MustCompile(`S\d+`)
+	epRe := regexp.MustCompile(`E\d+`)
+	nameUpper := strings.ToUpper(name)
+	matchEp := epRe.FindAllString(nameUpper, -1)
+	if len(matchEp) != 0 {
+		return false //episode number should not exist
+	}
+	matchSe := seRe.FindAllString(nameUpper, -1)
+	if len(matchSe) == 0 {
+		return false //no season num
+	}
+	return true
+}
+
+func ContainsIgnoreCase(s, substr string) bool {
+	return strings.Contains(strings.ToLower(s), strings.ToLower(substr))
+}
+
+func SeasonId(seasonName string) (int, error) {
+	//Season 01
+	seRe := regexp.MustCompile(`\d+`)
+	matchSe := seRe.FindAllString(seasonName, -1)
+	if len(matchSe) == 0 {
+		return 0, errors.New("no season number") //no season num
+	}
+	num, err := strconv.Atoi(matchSe[0])
+	if err != nil {
+		return 0, errors.Wrap(err, "convert")
+	}
+	return num, nil
+}
+
+func AvailableSpace(dir string) uint64 {
+	var stat unix.Statfs_t
+
+	unix.Statfs(dir, &stat)
+	return stat.Bavail * uint64(stat.Bsize)
 }

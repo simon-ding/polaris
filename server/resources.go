@@ -7,30 +7,14 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/log"
-	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
 	"polaris/pkg/utils"
+	"polaris/server/core"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
-
-func (s *Server) searchWithTorznab(q string) []torznab.Result {
-
-	var res []torznab.Result
-	allTorznab := s.db.GetAllTorznabInfo()
-	for _, tor := range allTorznab {
-		resp, err := torznab.Search(tor.URL, tor.ApiKey, q)
-		if err != nil {
-			log.Errorf("search %s error: %v", tor.Name, err)
-			continue
-		}
-		res = append(res, resp...)
-	}
-	return res
-}
 
 type addTorznabIn struct {
 	Name   string `json:"name"`
@@ -83,6 +67,59 @@ func (s *Server) getDownloadClient() (*transmission.Client, error) {
 	}
 	return trc, nil
 }
+
+func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*string, error) {
+	trc, err := s.getDownloadClient()
+	if err != nil {
+		return nil, errors.Wrap(err, "connect transmission")
+	}
+
+	res, err := core.SearchSeasonPackage(s.db, seriesId, seasonNum)
+	if err != nil {
+		return nil, err
+	}
+
+	r1 := res[0]
+	log.Infof("found resource to download: %v", r1)
+
+	downloadDir := s.db.GetDownloadDir()
+	size := utils.AvailableSpace(downloadDir)
+	if size < uint64(r1.Size) {
+		log.Errorf("space available %v, space needed %v", size, r1.Size)
+		return nil, errors.New("no enough space")
+	}
+
+
+	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
+	if err != nil {
+		return nil, errors.Wrap(err, "downloading")
+	}
+	torrent.Start()
+
+	series := s.db.GetMediaDetails(seriesId)
+	if series == nil {
+		return nil, fmt.Errorf("no tv series of id %v", seriesId)
+	}
+	dir := fmt.Sprintf("%s/Season %02d", series.TargetDir, seasonNum)
+
+	history, err := s.db.SaveHistoryRecord(ent.History{
+		MediaID:     seriesId,
+		EpisodeID:   0,
+		SourceTitle: r1.Name,
+		TargetDir:   dir,
+		Status:      history.StatusRunning,
+		Size:        r1.Size,
+		Saved:       torrent.Save(),
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "save record")
+	}
+	s.db.SetSeasonAllEpisodeStatus(seriesId, seasonNum, episode.StatusDownloading)
+
+	s.tasks[history.ID] = &Task{Torrent: torrent}
+	return &r1.Name, nil
+}
+
 func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string, error) {
 	trc, err := s.getDownloadClient()
 	if err != nil {
@@ -102,13 +139,11 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 		return nil, errors.Errorf("no episode of season %d episode %d", seasonNum, episodeNum)
 	}
 
-	q := fmt.Sprintf("%s S%02dE%02d", series.OriginalName, seasonNum, episodeNum)
-
-	res := s.searchWithTorznab(q)
-	if len(res) == 0 {
-		return nil, fmt.Errorf("no resource found")
+	res, err := core.SearchEpisode(s.db, seriesId, seasonNum, episodeNum)
+	if err != nil {
+		return nil, err
 	}
-	r1 := s.findBestMatchTv(res, seasonNum, episodeNum, series)
+	r1 := res[0]
 	log.Infof("found resource to download: %v", r1)
 	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
 	if err != nil {
@@ -116,7 +151,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	}
 	torrent.Start()
 
-	dir := fmt.Sprintf("%s/Season %02d", series.TargetDir, ep.SeasonNumber)
+	dir := fmt.Sprintf("%s/Season %02d", series.TargetDir, seasonNum)
 
 	history, err := s.db.SaveHistoryRecord(ent.History{
 		MediaID:     ep.MediaID,
@@ -127,43 +162,15 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 		Size:        r1.Size,
 		Saved:       torrent.Save(),
 	})
-	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
 	}
+	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+
 	s.tasks[history.ID] = &Task{Torrent: torrent}
 
 	log.Infof("success add %s to download task", r1.Name)
 	return &r1.Name, nil
-}
-
-func (s *Server) findBestMatchTv(resources []torznab.Result, season, episode int, series *db.MediaDetails) torznab.Result {
-	var filtered []torznab.Result
-	for _, r := range resources {
-		if !(series.NameEn != "" && strings.Contains(r.Name, series.NameEn)) && !strings.Contains(r.Name, series.OriginalName) {
-			//name not match
-			continue
-		}
-
-		se := fmt.Sprintf("S%02dE%02d", season, episode)
-		if !strings.Contains(r.Name, se) {
-			//season or episode not match
-			continue
-		}
-		if !strings.Contains(strings.ToLower(r.Name), series.Resolution) {
-			//resolution not match
-			continue
-		}
-		filtered = append(filtered, r)
-	}
-
-	// sort.Slice(filtered, func(i, j int) bool {
-	// 	var s1 = filtered[i]
-	// 	var s2 = filtered[j]
-	// 	return s1.Seeders > s2.Seeders
-	// })
-
-	return filtered[0]
 }
 
 type searchAndDownloadIn struct {
@@ -172,19 +179,58 @@ type searchAndDownloadIn struct {
 	Episode int `json:"episode"`
 }
 
+func (s *Server) SearchAvailableEpisodeResource(c *gin.Context) (interface{}, error)  {
+	var in searchAndDownloadIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind json")
+	}
+	log.Infof("search episode resources link: %v", in)
+	res, err := core.SearchEpisode(s.db, in.ID, in.Season, in.Episode)
+	if err != nil {
+		return nil, errors.Wrap(err, "search episode")
+	}
+	var searchResults []TorznabSearchResult
+	for _, r := range res {
+		searchResults = append(searchResults, TorznabSearchResult{
+			Name:    r.Name,
+			Size:    r.Size,
+			Seeders: r.Seeders,
+			Peers:   r.Peers,
+			Link:    r.Magnet,
+		})
+	}
+	if len(searchResults) == 0 {
+		return nil, errors.New("no resource found")
+	}
+	return searchResults, nil
+}
+
 func (s *Server) SearchTvAndDownload(c *gin.Context) (interface{}, error) {
 	var in searchAndDownloadIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
 	log.Infof("search episode resources link: %v", in)
-	name, err := s.searchAndDownload(in.ID, in.Season, in.Episode)
-	if err != nil {
-		return nil, errors.Wrap(err, "download")
+	var name string
+	if in.Episode == 0 {
+		log.Infof("season package search")
+		//search season package
+		name1, err := s.searchAndDownloadSeasonPackage(in.ID, in.Season)
+		if err != nil {
+			return nil, errors.Wrap(err, "download")
+		}
+		name = *name1
+	} else {
+		log.Infof("season episode search")
+		name1, err := s.searchAndDownload(in.ID, in.Season, in.Episode)
+		if err != nil {
+			return nil, errors.Wrap(err, "download")
+		}
+		name = *name1
 	}
 
 	return gin.H{
-		"name": *name,
+		"name": name,
 	}, nil
 }
 
@@ -208,26 +254,13 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 		return nil, errors.New("no media found of id " + ids)
 	}
 
-	res := s.searchWithTorznab(movieDetail.NameEn)
-
-	res1 := s.searchWithTorznab(movieDetail.NameCn)
-	res = append(res, res1...)
-
-	if len(res) == 0 {
-		return nil, fmt.Errorf("no resource found")
+	res, err := core.SearchMovie(s.db, id)
+	if err != nil {
+		return nil, err
 	}
-	ss := strings.Split(movieDetail.AirDate, "-")[0]
-	year, _ := strconv.Atoi(ss)
 
 	var searchResults []TorznabSearchResult
 	for _, r := range res {
-		if !strings.Contains(r.Name, strconv.Itoa(year)) && !strings.Contains(r.Name, strconv.Itoa(year+1)) && !strings.Contains(r.Name, strconv.Itoa(year-1)) {
-			continue //not the same movie, if year is not correct
-		}
-
-		if !utils.IsNameAcceptable(r.Name, movieDetail.NameCn) && !utils.IsNameAcceptable(r.Name, movieDetail.NameEn) {
-			continue //name not match
-		}
 		searchResults = append(searchResults, TorznabSearchResult{
 			Name:    r.Name,
 			Size:    r.Size,
@@ -239,9 +272,7 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 	if len(searchResults) == 0 {
 		return nil, errors.New("no resource found")
 	}
-
 	return searchResults, nil
-
 }
 
 type downloadTorrentIn struct {

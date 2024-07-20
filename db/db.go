@@ -175,14 +175,14 @@ func (c *Client) GetMediaDetails(id int) *MediaDetails {
 	var md = &MediaDetails{
 		Media: se,
 	}
-	if se.MediaType == media.MediaTypeTv {
-		ep, err := se.QueryEpisodes().All(context.Background())
-		if err != nil {
-			log.Errorf("get episodes %d: %v", id, err)
-			return nil
-		}
-		md.Episodes = ep
+
+	ep, err := se.QueryEpisodes().All(context.Background())
+	if err != nil {
+		log.Errorf("get episodes %d: %v", id, err)
+		return nil
 	}
+	md.Episodes = ep
+
 	return md
 }
 
@@ -324,7 +324,6 @@ func (c *Client) AddStorage(st *StorageInfo) error {
 	if !strings.HasSuffix(st.Settings["movie_path"], "/") {
 		st.Settings["movie_path"] += "/"
 	}
-
 
 	data, err := json.Marshal(st.Settings)
 	if err != nil {
@@ -475,6 +474,10 @@ func (c *Client) UpdateEpisodeFile(mediaID int, seasonNum, episodeNum int, file 
 
 func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetStatus(status).Exec(context.TODO())
+}
+
+func (c *Client) SetSeasonAllEpisodeStatus(mediaID, seasonNum int, status episode.Status) error {
+	return c.ent.Episode.Update().Where(episode.MediaID(mediaID), episode.SeasonNumber(seasonNum)).SetStatus(status).Exec(context.TODO())
 }
 
 func (c *Client) TmdbIdInWatchlist(tmdb_id int) bool {

@@ -29,8 +29,8 @@ func NewWebdavStorage(url, user, password, path string) (*WebdavStorage, error) 
 }
 
 func (w *WebdavStorage) Move(local, remote string) error {
-	baseLocal := filepath.Base(local)
-	remoteBase := filepath.Join(w.dir,remote, baseLocal)
+
+	remoteBase := filepath.Join(w.dir,remote)
 
 	//log.Infof("remove all content in %s", remoteBase)
 	//w.fs.RemoveAll(remoteBase)

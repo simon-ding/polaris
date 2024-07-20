@@ -69,6 +69,7 @@ func (s *Server) Serve() error {
 		tv.GET("/search", HttpHandler(s.SearchMedia))
 		tv.POST("/tv/watchlist", HttpHandler(s.AddTv2Watchlist))
 		tv.GET("/tv/watchlist", HttpHandler(s.GetTvWatchlist))
+		tv.POST("/tv/torrents", HttpHandler(s.SearchAvailableEpisodeResource))
 		tv.POST("/movie/watchlist", HttpHandler(s.AddMovie2Watchlist))
 		tv.GET("/movie/watchlist", HttpHandler(s.GetMovieWatchlist))
 		tv.GET("/movie/resources/:id", HttpHandler(s.SearchAvailableMovies))

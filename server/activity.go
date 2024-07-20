@@ -4,6 +4,7 @@ import (
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/log"
+	"polaris/pkg/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +13,7 @@ import (
 
 type Activity struct {
 	*ent.History
-	Progress    int  `json:"progress"`
+	Progress int `json:"progress"`
 }
 
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
@@ -51,7 +52,18 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		}
 		delete(s.tasks, his.ID)
 	}
-	s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
+	if his.EpisodeID != 0 {
+		s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
+
+	} else {
+		seasonNum, err := utils.SeasonId(his.TargetDir)
+		if err != nil {
+			log.Errorf("no season id: %v", his.TargetDir)
+			seasonNum = -1
+		}
+		s.db.SetSeasonAllEpisodeStatus(his.MediaID, seasonNum, episode.StatusMissing)
+
+	}
 
 	err = s.db.DeleteHistory(id)
 	if err != nil {
