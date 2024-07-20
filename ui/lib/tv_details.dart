@@ -194,7 +194,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                                 error: (error, stackTrace) =>
                                                     Text("$error"),
                                                 loading: () =>
-                                                    const MyProgressIndicator()),
+                                                    const Text("")),
                                           ],
                                         ),
                                         const Divider(thickness: 1, height: 1),

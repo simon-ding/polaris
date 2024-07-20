@@ -27,8 +27,28 @@ func NewClient(apiKey string) (*Client, error) {
 }
 
 func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) {
-	log.Infof("tv id %d, language %s", id, language)
 	d, err := c.tmdbClient.GetTVDetails(id, withLangOption(language))
+
+	log.Infof("tv id %d, language %s", id, language)
+	if !episodeNameUseful(d.LastEpisodeToAir.Name) {
+		log.Debug("should fetch english version")
+		var detailEN *tmdb.TVDetails
+		if language == "zh-CN" {
+			detailEN, err = c.tmdbClient.GetTVDetails(id, withLangOption("en-US"))
+			if err != nil {
+				return d, nil
+			}
+			
+		}
+		if episodeNameUseful(detailEN.LastEpisodeToAir.Name) {
+			d.LastEpisodeToAir.Name = detailEN.LastEpisodeToAir.Name
+			d.LastEpisodeToAir.Overview = detailEN.LastEpisodeToAir.Overview
+			d.NextEpisodeToAir.Name = detailEN.NextEpisodeToAir.Name
+			d.NextEpisodeToAir.Overview = detailEN.NextEpisodeToAir.Overview
+		}
+	}
+
+
 	return d, err
 }
 
@@ -118,7 +138,7 @@ func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language 
 	if err != nil {
 		return nil, err
 	}
-	if strings.HasSuffix(d.Name, "集") {
+	if !episodeNameUseful(d.Name) {
 		var detailEN *tmdb.TVEpisodeDetails
 		if language == "zh-CN" {
 			detailEN, err = c.tmdbClient.GetTVEpisodeDetails(id, seasonNumber, eposideNumber, withLangOption("en-US"))
@@ -126,7 +146,7 @@ func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language 
 				return d, nil
 			}
 		}
-		if strings.HasPrefix(strings.ToLower(detailEN.Name), "episode") {
+		if episodeNameUseful(detailEN.Name) {
 			return d, err
 		}
 		d.Name = detailEN.Name
@@ -150,7 +170,7 @@ func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.
 	}
 
 	for i, ep := range detailCN.Episodes {
-		if strings.HasSuffix(ep.Name, "集") && !strings.HasPrefix(strings.ToLower(detailEN.Episodes[i].Name), "episode"){
+		if episodeNameUseful(ep.Name){
 			detailCN.Episodes[i].Name = detailEN.Episodes[i].Name
 			detailCN.Episodes[i].Overview = detailEN.Episodes[i].Overview
 		}
@@ -174,4 +194,9 @@ func withLangOption(language string) map[string]string {
 	return map[string]string{
 		"language": language,
 	}
+}
+
+
+func episodeNameUseful(name string) bool {
+	return !strings.HasSuffix(name, "集") && !strings.HasPrefix(strings.ToLower(name), "episode")
 }
