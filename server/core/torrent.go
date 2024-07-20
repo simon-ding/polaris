@@ -31,7 +31,7 @@ func SearchSeasonPackage(db1 *db.Client, seriesId, seasonNum int, checkResolutio
 		if !isNameAcceptable(r.Name, series.Media, seasonNum, -1) {
 			continue
 		}
-		if checkResolution && IsWantedResolution(r.Name, series.Resolution) {
+		if checkResolution && !IsWantedResolution(r.Name, series.Resolution) {
 			continue
 		}
 		
@@ -62,7 +62,7 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 		if !isNameAcceptable(r.Name, series.Media, seasonNum, episodeNum) {
 			continue
 		}
-		if checkResolution && IsWantedResolution(r.Name, series.Resolution) {
+		if checkResolution && !IsWantedResolution(r.Name, series.Resolution) {
 			continue
 		}
 
@@ -92,7 +92,7 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool) ([]torznab.R
 		if !isNameAcceptable(r.Name, movieDetail.Media, -1, -1) {
 			continue
 		}
-		if checkResolution && IsWantedResolution(r.Name, movieDetail.Resolution) {
+		if checkResolution && !IsWantedResolution(r.Name, movieDetail.Resolution) {
 			continue
 		}
 
