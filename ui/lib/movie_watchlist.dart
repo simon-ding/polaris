@@ -6,10 +6,11 @@ import 'package:ui/providers/series_details.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/utils.dart';
+import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class MovieDetailsPage extends ConsumerStatefulWidget {
-  static const route = "/movie/:id";
+  static const route = "/movie/";
 
   static String toRoute(int id) {
     return "/movie/$id";
@@ -106,7 +107,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                                           .read(
                                               mediaDetailsProvider(widget.id).notifier)
                                           .delete();
-                                      context.go(MovieDetailsPage.route);
+                                      context.go(WelcomePage.routeMoivie);
                                     },
                                     icon: const Icon(Icons.delete))
                               ],
