@@ -16,9 +16,7 @@ type Storage interface {
 }
 
 func NewLocalStorage(dir string) (*LocalStorage, error) {
-	if _, err := os.Stat(dir); err != nil {
-		return nil, errors.Wrap(err, "stat")
-	}
+	os.MkdirAll(dir, 0655)
 	
 	return &LocalStorage{dir: dir}, nil
 }
