@@ -25,7 +25,8 @@ class ActivityPage extends ConsumerWidget {
                 DataColumn(label: Text("状态")),
                 DataColumn(label: Text("操作"))
               ],
-              source: ActivityDataSource(activities: activities, onDelete: onDelete(ref)),
+              source: ActivityDataSource(
+                  activities: activities, onDelete: onDelete(ref)),
             ),
           );
         },
@@ -62,17 +63,27 @@ class ActivityDataSource extends DataTableSource {
       DataCell(() {
         if (activity.status == "uploading") {
           return const SizedBox(
-              width: 20, height: 20, child: Tooltip(message: "正在上传到指定存储",child: CircularProgressIndicator(),) );
+              width: 20,
+              height: 20,
+              child: Tooltip(
+                message: "正在上传到指定存储",
+                child: CircularProgressIndicator(),
+              ));
         } else if (activity.status == "fail") {
-          return const Tooltip(message: "下载失败",child: Icon(
-            Icons.close,
-            color: Colors.red,
-          ));
+          return const Tooltip(
+              message: "下载失败",
+              child: Icon(
+                Icons.close,
+                color: Colors.red,
+              ));
         } else if (activity.status == "success") {
-          return const Tooltip(message: "下载成功",child: Icon(
-            Icons.check,
-            color: Colors.green,
-          ),) ;
+          return const Tooltip(
+            message: "下载成功",
+            child: Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+          );
         }
 
         double p =
@@ -85,7 +96,11 @@ class ActivityDataSource extends DataTableSource {
           progressColor: Colors.green,
         );
       }()),
-      DataCell(IconButton(onPressed:() => onDelete(activity.id!), icon: const Icon(Icons.delete)))
+      DataCell(Tooltip(
+          message: "删除任务",
+          child: IconButton(
+              onPressed: () => onDelete(activity.id!),
+              icon: const Icon(Icons.delete))))
     ]);
   }
 
