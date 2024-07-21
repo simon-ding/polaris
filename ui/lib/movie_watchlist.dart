@@ -27,7 +27,6 @@ class MovieDetailsPage extends ConsumerStatefulWidget {
 }
 
 class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
-
   @override
   Widget build(BuildContext context) {
     var seriesDetails = ref.watch(mediaDetailsProvider(widget.id));
@@ -104,10 +103,14 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                                 IconButton(
                                     onPressed: () {
                                       ref
-                                          .read(
-                                              mediaDetailsProvider(widget.id).notifier)
-                                          .delete();
-                                      context.go(WelcomePage.routeMoivie);
+                                          .read(mediaDetailsProvider(widget.id)
+                                              .notifier)
+                                          .delete()
+                                          .whenComplete(() => context
+                                              .go(WelcomePage.routeMoivie))
+                                          .onError((error, trace) =>
+                                              Utils.showSnakeBar(
+                                                  "删除失败：$error"));
                                     },
                                     icon: const Icon(Icons.delete))
                               ],
@@ -138,11 +141,13 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                           DataCell(Text("${torrent.peers}")),
                           DataCell(IconButton(
                             icon: const Icon(Icons.download),
-                            onPressed: () async {
-                              await ref
+                            onPressed: () {
+                              ref
                                   .read(movieTorrentsDataProvider(widget.id)
                                       .notifier)
-                                  .download(torrent.link!);
+                                  .download(torrent.link!)
+                                  .whenComplete(() => Utils.showSnakeBar(
+                                      "开始下载：${torrent.name}")).onError((error, trace) => Utils.showSnakeBar("操作失败: $error"));
                             },
                           ))
                         ]);

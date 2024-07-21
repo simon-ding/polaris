@@ -26,7 +26,6 @@ class TvDetailsPage extends ConsumerStatefulWidget {
 }
 
 class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
-  Future<String>? _pendingFuture;
 
   @override
   void initState() {
@@ -37,211 +36,207 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
   Widget build(BuildContext context) {
     var seriesDetails = ref.watch(mediaDetailsProvider(widget.seriesId));
     var storage = ref.watch(storageSettingProvider);
-    return FutureBuilder(
-        // We listen to the pending operation, to update the UI accordingly.
-        future: _pendingFuture,
-        builder: (context, snapshot) {
-          return seriesDetails.when(
-              data: (details) {
-                Map<int, List<DataRow>> m = {};
-                for (final ep in details.episodes!) {
-                  var row = DataRow(cells: [
-                    DataCell(Text("${ep.episodeNumber}")),
-                    DataCell(Text("${ep.title}")),
-                    DataCell(Opacity(
-                      opacity: 0.5,
-                      child: Text("${ep.airDate}"),
-                    )),
-                    DataCell(
-                      Opacity(
-                          opacity: 0.7,
-                          child: ep.status == "downloading"
-                              ?  const Tooltip(message: "下载中",child: Icon(Icons.downloading),) 
-                              : (ep.status == "downloaded"
-                                  ? const Tooltip(message: "已下载",child: Icon(Icons.download_done),) 
-                                  : const Tooltip(message: "未下载",child: Icon(Icons.warning_amber_rounded),) )),
-                    ),
-                    DataCell(Row(
-                      children: [
-                        Tooltip(
-                          message: "搜索下载对应剧集",
-                          child: IconButton(
-                            onPressed: () async {
-                              var f = ref
-                                  .read(mediaDetailsProvider(widget.seriesId)
-                                      .notifier)
-                                  .searchAndDownload(widget.seriesId,
-                                      ep.seasonNumber!, ep.episodeNumber!);
-                              setState(() {
-                                _pendingFuture = f;
-                              });
-                              if (!Utils.showError(context, snapshot)) {
-                                var name = await f;
-                                Utils.showSnakeBar("开始下载: $name");
-                              }
-                            },
-                            icon: const Icon(Icons.search)),
-                        )
-                        ,
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.manage_search))
-                      ],
-                    ))
-                  ]);
+    return seriesDetails.when(
+        data: (details) {
+          Map<int, List<DataRow>> m = {};
+          for (final ep in details.episodes!) {
+            var row = DataRow(cells: [
+              DataCell(Text("${ep.episodeNumber}")),
+              DataCell(Text("${ep.title}")),
+              DataCell(Opacity(
+                opacity: 0.5,
+                child: Text("${ep.airDate}"),
+              )),
+              DataCell(
+                Opacity(
+                    opacity: 0.7,
+                    child: ep.status == "downloading"
+                        ? const Tooltip(
+                            message: "下载中",
+                            child: Icon(Icons.downloading),
+                          )
+                        : (ep.status == "downloaded"
+                            ? const Tooltip(
+                                message: "已下载",
+                                child: Icon(Icons.download_done),
+                              )
+                            : const Tooltip(
+                                message: "未下载",
+                                child: Icon(Icons.warning_amber_rounded),
+                              ))),
+              ),
+              DataCell(Row(
+                children: [
+                  Tooltip(
+                    message: "搜索下载对应剧集",
+                    child: IconButton(
+                        onPressed: () {
+                          ref
+                              .read(mediaDetailsProvider(widget.seriesId)
+                                  .notifier)
+                              .searchAndDownload(widget.seriesId,
+                                  ep.seasonNumber!, ep.episodeNumber!)
+                              .then((v) => Utils.showSnakeBar("开始下载: $v"))
+                              .onError((error, trace) =>
+                                  Utils.showSnakeBar("操作失败: $error"));
+                        },
+                        icon: const Icon(Icons.search)),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.manage_search))
+                ],
+              ))
+            ]);
 
-                  if (m[ep.seasonNumber] == null) {
-                    m[ep.seasonNumber!] = List.empty(growable: true);
-                  }
-                  m[ep.seasonNumber!]!.add(row);
-                }
-                List<ExpansionTile> list = List.empty(growable: true);
-                for (final k in m.keys.toList().reversed) {
-                  var seasonList = ExpansionTile(
-                    tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    //childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-                    initiallyExpanded: false,
-                    title: k == 0 ? const Text("特别篇") : Text("第 $k 季"),
-                    expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DataTable(columns:  [
-                        const DataColumn(label: Text("#")),
-                        const DataColumn(
-                          label: Text("标题"),
+            if (m[ep.seasonNumber] == null) {
+              m[ep.seasonNumber!] = List.empty(growable: true);
+            }
+            m[ep.seasonNumber!]!.add(row);
+          }
+          List<ExpansionTile> list = List.empty(growable: true);
+          for (final k in m.keys.toList().reversed) {
+            var seasonList = ExpansionTile(
+              tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              //childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+              initiallyExpanded: false,
+              title: k == 0 ? const Text("特别篇") : Text("第 $k 季"),
+              expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DataTable(columns: [
+                  const DataColumn(label: Text("#")),
+                  const DataColumn(
+                    label: Text("标题"),
+                  ),
+                  const DataColumn(label: Text("播出时间")),
+                  const DataColumn(label: Text("状态")),
+                  DataColumn(
+                      label: Tooltip(
+                    message: "搜索下载全部剧集",
+                    child: IconButton(
+                        onPressed: () {
+                          ref
+                              .read(mediaDetailsProvider(widget.seriesId)
+                                  .notifier)
+                              .searchAndDownload(widget.seriesId, k, 0)
+                              .then((v) => Utils.showSnakeBar("开始下载: $v"))
+                              .onError((error, trace) =>
+                                  Utils.showSnakeBar("操作失败: $error"));
+                        },
+                        icon: const Icon(Icons.search)),
+                  ))
+                ], rows: m[k]!),
+              ],
+            );
+            list.add(seasonList);
+          }
+          return ListView(
+            children: [
+              Card(
+                margin: const EdgeInsets.all(4),
+                clipBehavior: Clip.hardEdge,
+                child: Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.fitWidth,
+                          opacity: 0.5,
+                          image: NetworkImage(
+                              "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
+                              headers: APIs.authHeaders))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      children: <Widget>[
+                        Flexible(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Image.network(
+                              "${APIs.imagesUrl}/${details.id}/poster.jpg",
+                              fit: BoxFit.contain,
+                              headers: APIs.authHeaders,
+                            ),
+                          ),
                         ),
-                        const DataColumn(label: Text("播出时间")),
-                        const DataColumn(label: Text("状态")),
-                        DataColumn(label: Tooltip(
-                          message: "搜索下载全部剧集",
-                          child: IconButton(
-                            onPressed: () async {
-                              var f = ref
-                                  .read(mediaDetailsProvider(widget.seriesId)
-                                      .notifier)
-                                  .searchAndDownload(widget.seriesId,
-                                      k, 0);
-                              setState(() {
-                                _pendingFuture = f;
-                              });
-                              if (!Utils.showError(context, snapshot)) {
-                                var name = await f;
-                                Utils.showSnakeBar("开始下载: $name");
-                              }
-                            },
-                            icon: const Icon(Icons.search)),) )
-                      ], rows: m[k]!),
-                    ],
-                  );
-                  list.add(seasonList);
-                }
-                return ListView(
-                  children: [
-                    Card(
-                      margin: const EdgeInsets.all(4),
-                      clipBehavior: Clip.hardEdge,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                fit: BoxFit.fitWidth,
-                                opacity: 0.5,
-                                image: NetworkImage(
-                                    "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
-                                    headers: APIs.authHeaders))),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
+                        Flexible(
+                          flex: 6,
                           child: Row(
-                            children: <Widget>[
-                              Flexible(
-                                flex: 1,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Image.network(
-                                    "${APIs.imagesUrl}/${details.id}/poster.jpg",
-                                    fit: BoxFit.contain,
-                                    headers: APIs.authHeaders,
+                            children: [
+                              Expanded(
+                                  child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text("${details.resolution}"),
+                                      const SizedBox(
+                                        width: 30,
+                                      ),
+                                      storage.when(
+                                          data: (value) {
+                                            for (final s in value) {
+                                              if (s.id == details.storageId) {
+                                                return Text(
+                                                    "${s.name}(${s.implementation})");
+                                              }
+                                            }
+                                            return const Text("未知存储");
+                                          },
+                                          error: (error, stackTrace) =>
+                                              Text("$error"),
+                                          loading: () => const Text("")),
+                                    ],
                                   ),
-                                ),
-                              ),
-                              Flexible(
-                                flex: 6,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                        child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text("${details.resolution}"),
-                                            const SizedBox(
-                                              width: 30,
-                                            ),
-                                            storage.when(
-                                                data: (value) {
-                                                  for (final s in value) {
-                                                    if (s.id ==
-                                                        details.storageId) {
-                                                      return Text(
-                                                          "${s.name}(${s.implementation})");
-                                                    }
-                                                  }
-                                                  return const Text("未知存储");
-                                                },
-                                                error: (error, stackTrace) =>
-                                                    Text("$error"),
-                                                loading: () =>
-                                                    const Text("")),
-                                          ],
-                                        ),
-                                        const Divider(thickness: 1, height: 1),
-                                        Text(
-                                          "${details.name} ${details.name != details.originalName ? details.originalName : ''} (${details.airDate!.split("-")[0]})",
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const Text(""),
-                                        Text(
-                                          details.overview!,
-                                        ),
-                                      ],
-                                    )),
-                                    Column(
-                                      children: [
-                                        IconButton(
-                                            onPressed: () {
-                                              ref
-                                                  .read(mediaDetailsProvider(
-                                                          widget.seriesId)
-                                                      .notifier)
-                                                  .delete();
-                                              context.go(WelcomePage.routeTv);
-                                            },
-                                            icon: const Icon(Icons.delete))
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
+                                  const Divider(thickness: 1, height: 1),
+                                  Text(
+                                    "${details.name} ${details.name != details.originalName ? details.originalName : ''} (${details.airDate!.split("-")[0]})",
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const Text(""),
+                                  Text(
+                                    details.overview!,
+                                  ),
+                                ],
+                              )),
+                              Column(
+                                children: [
+                                  IconButton(
+                                      onPressed: () {
+                                        ref
+                                            .read(mediaDetailsProvider(
+                                                    widget.seriesId)
+                                                .notifier)
+                                            .delete()
+                                            .whenComplete(() =>
+                                                context.go(WelcomePage.routeTv))
+                                            .onError((error, trace) =>
+                                                Utils.showSnakeBar(
+                                                    "删除失败： $error"));
+                                      },
+                                      icon: const Icon(Icons.delete))
+                                ],
+                              )
                             ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    Column(
-                      children: list,
-                    ),
-                  ],
-                );
-              },
-              error: (err, trace) {
-                return Text("$err");
-              },
-              loading: () => const MyProgressIndicator());
-        });
+                  ),
+                ),
+              ),
+              Column(
+                children: list,
+              ),
+            ],
+          );
+        },
+        error: (err, trace) {
+          return Text("$err");
+        },
+        loading: () => const MyProgressIndicator());
   }
 }

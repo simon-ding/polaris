@@ -43,6 +43,7 @@ class SeriesDetailData
     if (sp.code != 0) {
       throw sp.message;
     }
+    ref.invalidateSelf();
     var name = (sp.data as Map<String, dynamic>)["name"];
     return name;
   }

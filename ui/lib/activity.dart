@@ -62,17 +62,17 @@ class ActivityDataSource extends DataTableSource {
       DataCell(() {
         if (activity.status == "uploading") {
           return const SizedBox(
-              width: 20, height: 20, child: CircularProgressIndicator());
+              width: 20, height: 20, child: Tooltip(message: "正在上传到指定存储",child: CircularProgressIndicator(),) );
         } else if (activity.status == "fail") {
-          return const Icon(
+          return const Tooltip(message: "下载失败",child: Icon(
             Icons.close,
             color: Colors.red,
-          );
+          ));
         } else if (activity.status == "success") {
-          return const Icon(
+          return const Tooltip(message: "下载成功",child: Icon(
             Icons.check,
             color: Colors.green,
-          );
+          ),) ;
         }
 
         double p =
