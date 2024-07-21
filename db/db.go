@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 )
@@ -430,7 +431,7 @@ func (c *Client) SetHistoryStatus(id int, status history.Status) error {
 }
 
 func (c *Client) GetHistories() ent.Histories {
-	h, err := c.ent.History.Query().All(context.TODO())
+	h, err := c.ent.History.Query().Order(history.ByID(sql.OrderDesc())).All(context.TODO())
 	if err != nil {
 		return nil
 	}
