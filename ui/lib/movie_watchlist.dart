@@ -10,7 +10,7 @@ import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class MovieDetailsPage extends ConsumerStatefulWidget {
-  static const route = "/movie/";
+  static const route = "/movie/:id";
 
   static String toRoute(int id) {
     return "/movie/$id";
