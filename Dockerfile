@@ -33,3 +33,5 @@ RUN apt-get update && apt-get -y install ca-certificates
 COPY --from=builder /app/polaris .
 
 EXPOSE 8080
+
+ENTRYPOINT ["./polaris"]
