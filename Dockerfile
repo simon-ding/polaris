@@ -22,7 +22,7 @@ COPY . .
 
 COPY --from=flutter /app/build/web ./ui/build/web/
 # 指定OS等，并go build
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o polaris ./cmd/ 
+RUN CGO_ENABLED=1 go build -o polaris ./cmd/ 
 
 FROM debian:12
 
