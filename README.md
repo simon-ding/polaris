@@ -9,14 +9,14 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 
 - [x] 电视剧自动追踪下载
 - [x] 电影自动追踪下载
-- [x] webdav 存储支持，配合 (alist)[https://github.com/alist-org/alist] 或阿里云实现更多功能
+- [x] webdav 存储支持，配合 [alist](https://github.com/alist-org/alist) 或阿里云等实现更多功能
 
 ## 对比 sonarr/radarr
 * 更好的中文支持
-* 支持webdav后端存储，可以配合alist或者阿里云来实现下载后实时传到云上的功能。这样外出就可以不依靠家里的宽带来看电影了，或者实现个轻NAS功能，下载功能放在本地，数据放在云盘
-* golang实现后端，相比于.NET更节省资源
+* 支持 webdav 后端存储，可以配合 alist 或者阿里云来实现下载后实时传到云上的功能。这样外出就可以不依靠家里的宽带来看电影了，或者实现个轻 NAS 功能，下载功能放在本地，数据放在云盘
+* golang 实现后端，相比于 .NET 更节省资源
 * 一个程序同时实现了电影、电视剧功能，不需要装两个程序
-* 当然sonarr/radarr也是非常优秀的开源项目，目前Polaris功能还没有sonarr/radarr丰富
+* 当然 sonarr/radarr 也是非常优秀的开源项目，目前Polaris功能还没有 sonarr/radarr 丰富
 
 ## 快速开始
 
