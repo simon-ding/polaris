@@ -10,7 +10,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build -o polaris ./cmd/
+RUN CGO_ENABLED=1 go build -o polaris ./cmd/
 
 FROM alpine:3.20
 
