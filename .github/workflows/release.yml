@@ -1,4 +1,4 @@
-name: build
+name: Create and publish a Docker image
 
 on:
   workflow_dispatch:
@@ -14,7 +14,12 @@ jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -37,6 +42,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
