@@ -233,7 +233,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
           initiallyExpanded: false,
-          title: const Text("下载客户端设置"),
+          title: const Text("下载器设置"),
           children: [downloadSetting],
         ),
         ExpansionTile(
@@ -376,7 +376,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
     }
 
     return showSettingDialog(
-        "下载客户端", client.id != null, body, onSubmit, onDelete);
+        "下载器", client.id != null, body, onSubmit, onDelete);
   }
 
   Future<void> showStorageDetails(Storage s) {
