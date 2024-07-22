@@ -23,6 +23,7 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 最简单部署 Polaris 的方式是使用 docker compose
 
 ```yaml
+services:
   polaris:
     image: ghcr.io/simon-ding/polaris:latest
     restart: always
@@ -32,6 +33,32 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
       - /data:/data #数据存储路径
     ports:
       - 8080:8080
+  jackett: #资源提供者，也可以不安装使用已有的
+    image: lscr.io/linuxserver/jackett:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - AUTO_UPDATE=false
+    volumes:
+      - ./config/jackett:/config
+    ports:
+      - 9117:9117
+    restart: always
+  transmission:    #下载客户端，也可以不安装使用已有的
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./config/transmission:/config
+      - /downloads:/downloads #此路径要与polaris下载路径保持一致
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
 ```
 
 拉起之后访问 http://< ip >:8080 的形式访问
