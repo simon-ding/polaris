@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine3.20 as builder
+FROM golang:1.22 as builder
 
 RUN apk add build-base
 
@@ -14,10 +14,10 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=1 go build -o polaris ./cmd/
 
-FROM alpine:3.20
+FROM debian:12
 
 WORKDIR /app
-RUN apk add --no-cache bash ca-certificates
+RUN apt-get update && apt-get -y install ca-certificates
 
 COPY --from=builder /app/polaris .
 
