@@ -30,7 +30,7 @@ services:
     volumes:
       - ./config/polaris:/app/data #程序配置文件路径
       - /downloads:/downloads #下载路径，需要和下载客户端配置一致
-      - /data:/data #数据存储路径
+      - /data:/data #媒体数据存储路径，也可以启动自己配置webdav存储
     ports:
       - 8080:8080
   jackett: #资源提供者，也可以不安装使用已有的
