@@ -51,4 +51,4 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 
 ## 请我喝杯咖啡
 
-![wechat](assets/wechat.JPG =400x)
+![wechat](assets/wechat.JPG | width=400)
