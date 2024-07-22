@@ -1,13 +1,4 @@
-FROM instrumentisto/flutter:3 AS flutter
-WORKDIR /app
-COPY ./ui/pubspec.yaml ./ui/pubspec.lock ./
-RUN flutter pub get
-COPY ./ui/ ./
-RUN flutter build web 
-
-
-# 打包依赖阶段使用golang作为基础镜像
-FROM golang:1.22 as builder
+FROM golang:1.22-alpine3.20 as builder
 
 # 启用go module
 ENV GO111MODULE=on \
@@ -15,22 +6,17 @@ ENV GO111MODULE=on \
 
 WORKDIR /app
 
-COPY  go.mod .
-COPY  go.sum .
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
+RUN go build -o polaris ./cmd/
 
-COPY --from=flutter /app/build/web ./ui/build/web/
-# 指定OS等，并go build
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o polaris ./cmd/ 
-
-FROM debian:12
+FROM alpine:3.20
 
 WORKDIR /app
-RUN apt-get update && apt-get -y install ca-certificates
+RUN apk add --no-cache bash ca-certificates
 
-# 将上一个阶段publish文件夹下的所有文件复制进来
 COPY --from=builder /app/polaris .
 
 EXPOSE 8080
