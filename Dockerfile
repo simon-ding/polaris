@@ -1,7 +1,5 @@
 FROM golang:1.22 as builder
 
-RUN apk add build-base
-
 # 启用go module
 ENV GO111MODULE=on \
     GOPROXY=https://goproxy.cn,direct
