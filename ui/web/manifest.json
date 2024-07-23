@@ -1,6 +1,6 @@
 {
-    "name": "ui",
-    "short_name": "ui",
+    "name": "Polaris",
+    "short_name": "Polaris",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
