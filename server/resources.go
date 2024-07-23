@@ -269,7 +269,7 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 		})
 	}
 	if len(searchResults) == 0 {
-		return nil, errors.New("no resource found")
+		return []TorznabSearchResult{}, nil
 	}
 	return searchResults, nil
 }

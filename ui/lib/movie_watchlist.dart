@@ -225,6 +225,12 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
           } else {
             return torrents.when(
                 data: (v) {
+                  if (v.isEmpty) {
+                    return const Center(
+                      child: Text("无可用资源"),
+                    );
+                  }
+
                   return DataTable(
                     columns: const [
                       DataColumn(label: Text("名称")),
