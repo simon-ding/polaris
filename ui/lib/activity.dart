@@ -151,7 +151,7 @@ class ActivityDataSource extends DataTableSource {
               child: IconButton(
                   onPressed: () => onDelete!(activity.id!),
                   icon: const Icon(Icons.delete))))
-          : const DataCell(Text(""))
+          : const DataCell(Text("-"))
     ]);
   }
 
