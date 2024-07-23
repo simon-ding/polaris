@@ -45,7 +45,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               DataCell(Text("${ep.title}")),
               DataCell(Opacity(
                 opacity: 0.5,
-                child: Text("${ep.airDate}"),
+                child: Text(ep.airDate??"-"),
               )),
               DataCell(
                 Opacity(
