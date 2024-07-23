@@ -19,7 +19,7 @@ func HttpHandler(f func(*gin.Context) (interface{}, error)) gin.HandlerFunc {
 			})
 			return
 		}
-		log.Infof("url %v return: %+v", ctx.Request.URL, r)
+		//log.Infof("url %v return: %+v", ctx.Request.URL, r)
 
 		ctx.JSON(200, Response{
 			Code:    0,
