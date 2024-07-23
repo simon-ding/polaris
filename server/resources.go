@@ -255,6 +255,9 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 
 	res, err := core.SearchMovie(s.db, id, false)
 	if err != nil {
+		if err.Error() == "no resource found" {
+			return []TorznabSearchResult{}, nil
+		}
 		return nil, err
 	}
 
