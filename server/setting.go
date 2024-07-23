@@ -2,6 +2,7 @@ package server
 
 import (
 	"polaris/db"
+	"polaris/log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -17,12 +18,13 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
+	log.Infof("set setting input: %+v", in)
 	if in.TmdbApiKey != "" {
 		if err := s.db.SetSetting(db.SettingTmdbApiKey, in.TmdbApiKey); err != nil {
 			return nil, errors.Wrap(err, "save tmdb api")
 		}
 	}
-	if in.DownloadDir == "" {
+	if in.DownloadDir != "" {
 		if err := s.db.SetSetting(db.SettingDownloadDir, in.DownloadDir); err != nil {
 			return nil, errors.Wrap(err, "save download dir")
 		}
@@ -33,7 +35,8 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	tmdb := s.db.GetSetting(db.SettingTmdbApiKey)
 	downloadDir := s.db.GetSetting(db.SettingDownloadDir)
-		return &GeneralSettings{
+	
+	return &GeneralSettings{
 		TmdbApiKey: tmdb,
 		DownloadDir: downloadDir,
 	}, nil
