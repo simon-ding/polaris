@@ -170,7 +170,7 @@ func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.
 	}
 
 	for i, ep := range detailCN.Episodes {
-		if episodeNameUseful(ep.Name){
+		if !episodeNameUseful(ep.Name){
 			detailCN.Episodes[i].Name = detailEN.Episodes[i].Name
 			detailCN.Episodes[i].Overview = detailEN.Episodes[i].Overview
 		}
