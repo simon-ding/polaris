@@ -198,7 +198,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                   ),
                                   const Text(""),
                                   Text(
-                                    details.overview!,
+                                    details.overview??"",
                                   ),
                                 ],
                               )),
