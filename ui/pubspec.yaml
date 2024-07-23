@@ -43,6 +43,7 @@ dependencies:
   shared_preferences: ^2.2.3
   percent_indicator: ^4.2.3
   intl: ^0.19.0
+  flutter_adaptive_scaffold: ^0.1.11+1
 
 dev_dependencies:
   flutter_test:

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ui/activity.dart';
 import 'package:ui/login_page.dart';
 import 'package:ui/movie_watchlist.dart';
-import 'package:ui/navdrawer.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/search.dart';
 import 'package:ui/system_settings.dart';
@@ -16,8 +16,17 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _MyAppState();
+  }
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  
 
   // This widget is the root of your application.
   @override
@@ -52,7 +61,8 @@ class MyApp extends StatelessWidget {
                           leading: const Icon(Icons.search),
                           controller: controller,
                           shadowColor: WidgetStateColor.transparent,
-                          backgroundColor: const WidgetStatePropertyAll(Color.fromARGB(255, 29, 78, 119)),
+                          backgroundColor: const WidgetStatePropertyAll(
+                              Color.fromARGB(255, 29, 78, 119)),
                           onSubmitted: (value) => context.go(Uri(
                               path: SearchPage.route,
                               queryParameters: {'query': value}).toString()),
@@ -100,21 +110,8 @@ class MyApp extends StatelessWidget {
                       })
                 ],
               ),
-              body: Center(
-                  // Center is a layout widget. It takes a single child and positions it
-                  // in the middle of the parent.
-                  child: Flex(direction: Axis.horizontal, children: <Widget>[
-                const Flexible(
-                  flex: 1,
-                  child: NavDrawer(),
-                ),
-                const VerticalDivider(thickness: 1, width: 1),
-                Flexible(
-                  flex: 7,
-                  child:
-                      Padding(padding: const EdgeInsets.all(20), child: child),
-                )
-              ]))),
+              body: MainSkeleton(body: Padding(padding: const EdgeInsets.all(20), child: child),)
+            ),
         );
       },
       routes: [
@@ -173,24 +170,83 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           fontFamily: "NotoSansSC",
           colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.blue, brightness: Brightness.dark),
+              seedColor: Colors.blue, brightness: Brightness.dark, surface: Colors.black54),
           useMaterial3: true,
+          //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
         ),
         routerConfig: router,
       ),
     );
   }
+
 }
 
-CustomTransitionPage buildPageWithDefaultTransition<T>({
-  required BuildContext context,
-  required GoRouterState state,
-  required Widget child,
-}) {
-  return CustomTransitionPage<T>(
-    key: state.pageKey,
-    child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-        FadeTransition(opacity: animation, child: child),
-  );
+class MainSkeleton extends StatefulWidget {
+  final Widget body;
+  const MainSkeleton({super.key, required this.body});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _MainSkeletonState();
+  }
+}
+
+class _MainSkeletonState extends State<MainSkeleton> {
+  var _selectedTab;
+
+  @override
+  Widget build(BuildContext context) {
+    var uri = GoRouterState.of(context).uri.toString();
+    if (uri.contains(WelcomePage.routeTv)) {
+      _selectedTab = 0;
+    } else if (uri.contains(WelcomePage.routeMoivie)) {
+      _selectedTab = 1;
+    } else if (uri.contains(ActivityPage.route)) {
+      _selectedTab = 2;
+    } else if (uri.contains(SystemSettingsPage.route)) {
+      _selectedTab = 3;
+    }
+
+    return AdaptiveScaffold(
+      useDrawer: false,
+      selectedIndex: _selectedTab,
+      onSelectedIndexChange: (int index) {
+        setState(() {
+          _selectedTab = index;
+        });
+        if (index == 0) {
+          context.go(WelcomePage.routeTv);
+        } else if (index == 1) {
+          context.go(WelcomePage.routeMoivie);
+        } else if (index == 2) {
+          context.go(ActivityPage.route);
+        } else if (index == 3) {
+          context.go(SystemSettingsPage.route);
+        }
+      },
+      destinations: const <NavigationDestination>[
+        NavigationDestination(
+          icon: Icon(Icons.live_tv),
+          label: '电视剧',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.movie),
+          label: '电影',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.download),
+          label: '活动',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.settings),
+          label: '设置',
+        ),
+      ],
+      body: (context) => widget.body,
+      // Define a default secondaryBody.
+      // Override the default secondaryBody during the smallBreakpoint to be
+      // empty. Must use AdaptiveScaffold.emptyBuilder to ensure it is properly
+      // overridden.
+    );
+  }
 }

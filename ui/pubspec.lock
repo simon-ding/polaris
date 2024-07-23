@@ -110,6 +110,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_adaptive_scaffold:
+    dependency: "direct main"
+    description:
+      name: flutter_adaptive_scaffold
+      sha256: "56d4d81fe88ecffe8ae96b8d89a1ae793c0a85035bb9b74ff28f20eea0cdbdc2"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.11+1"
   flutter_lints:
     dependency: "direct dev"
     description:
