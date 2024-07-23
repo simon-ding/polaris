@@ -311,11 +311,12 @@ type LocalDirSetting struct {
 }
 
 type WebdavSetting struct {
-	URL       string `json:"url"`
-	TvPath    string `json:"tv_path"`
-	MoviePath string `json:"movie_path"`
-	User      string `json:"user"`
-	Password  string `json:"password"`
+	URL            string `json:"url"`
+	TvPath         string `json:"tv_path"`
+	MoviePath      string `json:"movie_path"`
+	User           string `json:"user"`
+	Password       string `json:"password"`
+	ChangeFileHash string `json:"change_file_hash"`
 }
 
 func (c *Client) AddStorage(st *StorageInfo) error {

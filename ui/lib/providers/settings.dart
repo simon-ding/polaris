@@ -258,7 +258,12 @@ class StorageSettingData extends AutoDisposeAsyncNotifier<List<Storage>> {
 
 class Storage {
   Storage(
-      {this.id, this.name, this.implementation, this.settings, this.isDefault});
+      {this.id,
+      this.name,
+      this.implementation,
+      this.settings,
+      this.isDefault,
+      });
 
   final int? id;
   final String? name;

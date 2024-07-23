@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -145,4 +146,17 @@ func AvailableSpace(dir string) uint64 {
 
 	unix.Statfs(dir, &stat)
 	return stat.Bavail * uint64(stat.Bsize)
+}
+
+func ChangeFileHash(name string) error {
+	f, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0655)
+	if err != nil {
+		return errors.Wrap(err, "open file")
+	}
+	defer f.Close()
+	_, err = f.Write([]byte("\000"))
+	if err != nil {
+		return errors.Wrap(err, "write file")
+	}
+	return nil
 }

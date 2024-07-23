@@ -386,12 +386,15 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
     var urlController = TextEditingController();
     var userController = TextEditingController();
     var passController = TextEditingController();
+    bool enablingChangeFileHash = false;
     if (s.settings != null) {
       tvPathController.text = s.settings!["tv_path"] ?? "";
       moviePathController.text = s.settings!["movie_path"] ?? "";
       urlController.text = s.settings!["url"] ?? "";
       userController.text = s.settings!["user"] ?? "";
       passController.text = s.settings!["password"] ?? "";
+      enablingChangeFileHash =
+          s.settings!["change_file_hash"] == "true" ? true : false;
     }
 
     String selectImpl = s.implementation == null ? "local" : s.implementation!;
@@ -419,7 +422,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           ),
           selectImpl != "local"
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextField(
                       decoration: const InputDecoration(labelText: "Webdav地址"),
@@ -433,6 +436,14 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                       decoration: const InputDecoration(labelText: "密码"),
                       controller: passController,
                     ),
+                    CheckboxListTile(
+                        title: const Text("上传时更改文件哈希", style: TextStyle(fontSize: 14),),
+                        value: enablingChangeFileHash,
+                        onChanged: (v) {
+                          setState(() {
+                            enablingChangeFileHash = v??false;
+                          });
+                        }),
                   ],
                 )
               : Container(),
@@ -456,7 +467,8 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
               "movie_path": moviePathController.text,
               "url": urlController.text,
               "user": userController.text,
-              "password": passController.text
+              "password": passController.text,
+              "change_file_hash": enablingChangeFileHash ? "true" : "false"
             },
           ));
     }

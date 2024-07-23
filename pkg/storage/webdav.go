@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"polaris/log"
 	"polaris/pkg/gowebdav"
+	"polaris/pkg/utils"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/pkg/errors"
@@ -15,9 +16,10 @@ import (
 type WebdavStorage struct {
 	fs *gowebdav.Client
 	dir string
+	changeMediaHash bool
 }
 
-func NewWebdavStorage(url, user, password, path string) (*WebdavStorage, error) {
+func NewWebdavStorage(url, user, password, path string, changeMediaHash bool) (*WebdavStorage, error) {
 	c := gowebdav.NewClient(url, user, password)
 	if err := c.Connect(); err != nil {
 		return nil, errors.Wrap(err, "connect webdav")
@@ -53,6 +55,11 @@ func (w *WebdavStorage) Move(local, remote string) error {
 			// }
 
 		} else { //is file
+			if w.changeMediaHash {
+				if err := utils.ChangeFileHash(path); err != nil {
+					log.Errorf("change file %v hash error: %v", path, err)
+				}
+			}
 			if f, err := os.OpenFile(path, os.O_RDONLY, 0666); err != nil {
 				return errors.Wrapf(err, "read file %v", path)
 			} else { //open success

@@ -101,7 +101,7 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 		if series.MediaType == media.MediaTypeMovie {
 			targetPath = ws.MoviePath
 		}
-		storageImpl, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath)
+		storageImpl, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}
@@ -162,7 +162,7 @@ func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
 	case storage1.ImplementationWebdav:
 		ws := st.ToWebDavSetting()
 		targetPath := ws.TvPath
-		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath)
+		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
 		if err != nil {
 			return errors.Wrap(err, "new webdav")
 		}
