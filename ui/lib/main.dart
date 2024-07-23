@@ -35,82 +35,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     final shellRoute = ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
         return SelectionArea(
-          child: Scaffold(
-              appBar: AppBar(
-                // TRY THIS: Try changing the color here to a specific color (to
-                // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-                // change color while the other colors stay the same.
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                // Here we take the value from the MyHomePage object that was created by
-                // the App.build method, and use it to set our appbar title.
-                title: const Row(
-                  children: [
-                    Text("Polaris"),
-                  ],
-                ),
-                actions: [
-                  SearchAnchor(builder:
-                      (BuildContext context, SearchController controller) {
-                    return Container(
-                      constraints:
-                          const BoxConstraints(maxWidth: 300, maxHeight: 40),
-                      child: Opacity(
-                        opacity: 0.8,
-                        child: SearchBar(
-                          hintText: "搜索...",
-                          leading: const Icon(Icons.search),
-                          controller: controller,
-                          shadowColor: WidgetStateColor.transparent,
-                          backgroundColor: const WidgetStatePropertyAll(
-                              Color.fromARGB(255, 29, 78, 119)),
-                          onSubmitted: (value) => context.go(Uri(
-                              path: SearchPage.route,
-                              queryParameters: {'query': value}).toString()),
-                        ),
-                      ),
-                    );
-                  }, suggestionsBuilder:
-                      (BuildContext context, SearchController controller) {
-                    return [Text("dadada")];
-                  }),
-                  FutureBuilder(
-                      future: APIs.isLoggedIn(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData && snapshot.data == true) {
-                          return MenuAnchor(
-                            menuChildren: [
-                              MenuItemButton(
-                                leadingIcon: const Icon(Icons.exit_to_app),
-                                child: const Text("登出"),
-                                onPressed: () async {
-                                  final SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  await prefs.remove('token');
-                                  if (context.mounted) {
-                                    context.go(LoginScreen.route);
-                                  }
-                                },
-                              ),
-                            ],
-                            builder: (context, controller, child) {
-                              return TextButton(
-                                onPressed: () {
-                                  if (controller.isOpen) {
-                                    controller.close();
-                                  } else {
-                                    controller.open();
-                                  }
-                                },
-                                child: const Icon(Icons.account_circle),
-                              );
-                            },
-                          );
-                        }
-                        return Container();
-                      })
-                ],
-              ),
-              body: MainSkeleton(body: Padding(padding: const EdgeInsets.all(20), child: child),)
+          child: MainSkeleton(body: Padding(padding: const EdgeInsets.all(20), child: child),
             ),
         );
       },
@@ -170,7 +95,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         theme: ThemeData(
           fontFamily: "NotoSansSC",
           colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.blue, brightness: Brightness.dark, surface: Colors.black54),
+              seedColor: Colors.blueAccent, brightness: Brightness.dark, surface: Colors.black54),
           useMaterial3: true,
           //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
         ),
@@ -208,6 +133,82 @@ class _MainSkeletonState extends State<MainSkeleton> {
     }
 
     return AdaptiveScaffold(
+      appBarBreakpoint: Breakpoints.standard,
+      appBar: AppBar(
+                // TRY THIS: Try changing the color here to a specific color (to
+                // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+                // change color while the other colors stay the same.
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                // Here we take the value from the MyHomePage object that was created by
+                // the App.build method, and use it to set our appbar title.
+                title: const Row(
+                  children: [
+                    Text("Polaris"),
+                  ],
+                ),
+                actions: [
+                  SearchAnchor(builder:
+                      (BuildContext context, SearchController controller) {
+                    return Container(
+                      constraints:
+                          const BoxConstraints(maxWidth: 300, maxHeight: 40),
+                      child: Opacity(
+                        opacity: 0.8,
+                        child: SearchBar(
+                          hintText: "搜索...",
+                          leading: const Icon(Icons.search),
+                          controller: controller,
+                          shadowColor: WidgetStateColor.transparent,
+                          backgroundColor:  WidgetStatePropertyAll(
+                              Theme.of(context).colorScheme.primaryContainer
+                              ),
+                          onSubmitted: (value) => context.go(Uri(
+                              path: SearchPage.route,
+                              queryParameters: {'query': value}).toString()),
+                        ),
+                      ),
+                    );
+                  }, suggestionsBuilder:
+                      (BuildContext context, SearchController controller) {
+                    return [Text("dadada")];
+                  }),
+                  FutureBuilder(
+                      future: APIs.isLoggedIn(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data == true) {
+                          return MenuAnchor(
+                            menuChildren: [
+                              MenuItemButton(
+                                leadingIcon: const Icon(Icons.exit_to_app),
+                                child: const Text("登出"),
+                                onPressed: () async {
+                                  final SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.remove('token');
+                                  if (context.mounted) {
+                                    context.go(LoginScreen.route);
+                                  }
+                                },
+                              ),
+                            ],
+                            builder: (context, controller, child) {
+                              return TextButton(
+                                onPressed: () {
+                                  if (controller.isOpen) {
+                                    controller.close();
+                                  } else {
+                                    controller.open();
+                                  }
+                                },
+                                child: const Icon(Icons.account_circle),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      })
+                ],
+              ),
       useDrawer: false,
       selectedIndex: _selectedTab,
       onSelectedIndexChange: (int index) {
