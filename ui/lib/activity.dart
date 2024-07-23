@@ -5,39 +5,88 @@ import 'package:ui/providers/activity.dart';
 import 'package:ui/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
-class ActivityPage extends ConsumerWidget {
+class ActivityPage extends ConsumerStatefulWidget {
+  const ActivityPage({super.key});
   static const route = "/activities";
 
-  const ActivityPage({super.key});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var activitiesWatcher = ref.watch(activitiesDataProvider);
+  _ActivityPageState createState() => _ActivityPageState();
+}
 
-    return activitiesWatcher.when(
-        data: (activities) {
-          return SingleChildScrollView(
-            child: PaginatedDataTable(
-              rowsPerPage: 10,
-              columns: const [
-                DataColumn(label: Text("#"), numeric: true),
-                DataColumn(label: Text("名称")),
-                DataColumn(label: Text("开始时间")),
-                DataColumn(label: Text("状态")),
-                DataColumn(label: Text("操作"))
-              ],
-              source: ActivityDataSource(
-                  activities: activities, onDelete: onDelete(ref)),
-            ),
-          );
-        },
-        error: (err, trace) => Text("$err"),
-        loading: () => const MyProgressIndicator());
+class _ActivityPageState extends ConsumerState<ActivityPage>
+    with TickerProviderStateMixin {
+  late TabController _nestedTabController;
+  @override
+  void initState() {
+    super.initState();
+    _nestedTabController = new TabController(length: 2, vsync: this);
   }
 
-  Function(int) onDelete(WidgetRef ref) {
+  @override
+  void dispose() {
+    super.dispose();
+    _nestedTabController.dispose();
+  }
+
+  int selectedTab = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TabBar(
+          controller: _nestedTabController,
+          isScrollable: true,
+          onTap: (value) {
+            setState(() {
+              selectedTab = value;
+            });
+          },
+          tabs: const <Widget>[
+            Tab(
+              text: "下载中",
+            ),
+            Tab(
+              text: "历史记录",
+            ),
+          ],
+        ),
+        Builder(builder: (context) {
+          var activitiesWatcher = ref.watch(activitiesDataProvider("active"));
+          if (selectedTab == 1) {
+            activitiesWatcher = ref.watch(activitiesDataProvider("archive"));
+          }
+
+          return activitiesWatcher.when(
+              data: (activities) {
+                return SingleChildScrollView(
+                  child: PaginatedDataTable(
+                    rowsPerPage: 10,
+                    columns: const [
+                      DataColumn(label: Text("#"), numeric: true),
+                      DataColumn(label: Text("名称")),
+                      DataColumn(label: Text("开始时间")),
+                      DataColumn(label: Text("状态")),
+                     DataColumn(label: Text("操作"))
+                    ],
+                    source: ActivityDataSource(
+                        activities: activities,
+                        onDelete: selectedTab == 0 ? onDelete() : null),
+                  ),
+                );
+              },
+              error: (err, trace) => Text("$err"),
+              loading: () => const MyProgressIndicator());
+        })
+      ],
+    );
+  }
+
+  Function(int) onDelete() {
     return (id) {
       ref
-          .read(activitiesDataProvider.notifier)
+          .read(activitiesDataProvider("active").notifier)
           .deleteActivity(id)
           .whenComplete(() => Utils.showSnakeBar("删除成功"))
           .onError((error, trace) => Utils.showSnakeBar("删除失败：$error"));
@@ -47,8 +96,8 @@ class ActivityPage extends ConsumerWidget {
 
 class ActivityDataSource extends DataTableSource {
   List<Activity> activities;
-  Function(int) onDelete;
-  ActivityDataSource({required this.activities, required this.onDelete});
+  Function(int)? onDelete;
+  ActivityDataSource({required this.activities, this.onDelete});
 
   @override
   int get rowCount => activities.length;
@@ -96,11 +145,13 @@ class ActivityDataSource extends DataTableSource {
           progressColor: Colors.green,
         );
       }()),
-      DataCell(Tooltip(
-          message: "删除任务",
-          child: IconButton(
-              onPressed: () => onDelete(activity.id!),
-              icon: const Icon(Icons.delete))))
+      onDelete != null
+          ? DataCell(Tooltip(
+              message: "删除任务",
+              child: IconButton(
+                  onPressed: () => onDelete!(activity.id!),
+                  icon: const Icon(Icons.delete))))
+          : const DataCell(Text(""))
     ]);
   }
 

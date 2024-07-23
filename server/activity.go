@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"polaris/ent"
 	"polaris/ent/episode"
+	"polaris/ent/history"
 	"polaris/log"
 	"polaris/pkg/utils"
 	"strconv"
@@ -18,9 +19,16 @@ type Activity struct {
 }
 
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
+	q := c.Query("status")
 	his := s.db.GetHistories()
 	var activities = make([]Activity, 0, len(his))
 	for _, h := range his {
+		if q == "active" && (h.Status != history.StatusRunning && h.Status != history.StatusUploading) {
+			continue //active downloads
+		} else if q == "archive" && (h.Status == history.StatusRunning || h.Status == history.StatusUploading) {
+			continue //archived downloads
+		}
+
 		a := Activity{
 			History: h,
 		}
