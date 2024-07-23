@@ -12,6 +12,7 @@ import (
 	"polaris/pkg/storage"
 	"polaris/pkg/utils"
 	"polaris/server/core"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -225,14 +226,6 @@ func (s *Server) downloadTvSeries() {
 		if lastEpisode.Title != detail.LastEpisodeToAir.Name {
 			s.db.UpdateEpiode(lastEpisode.ID, detail.LastEpisodeToAir.Name, detail.LastEpisodeToAir.Overview)
 		}
-		if lastEpisode.Status == episode.StatusMissing {
-			name, err := s.searchAndDownload(series.ID, lastEpisode.SeasonNumber, lastEpisode.EpisodeNumber)
-			if err != nil {
-				log.Infof("cannot find resource to download for %s: %v", lastEpisode.Title, err)
-			} else {
-				log.Infof("begin download torrent resource: %v", name)
-			}
-		}
 
 		nextEpisode, err := s.db.GetEpisode(series.ID, detail.NextEpisodeToAir.SeasonNumber, detail.NextEpisodeToAir.EpisodeNumber)
 		if err == nil {
@@ -241,6 +234,28 @@ func (s *Server) downloadTvSeries() {
 				log.Errorf("updated next episode name to %v", detail.NextEpisodeToAir.Name)
 			}
 		}
+
+		if lastEpisode.Status == episode.StatusMissing {
+			if lastEpisode.AirDate != "" {
+				t, err := time.ParseInLocation("2006-01-02", lastEpisode.AirDate, time.Local)
+				if err != nil {
+					log.Errorf("parse air date error: airdate %v, error %v",lastEpisode.AirDate, err)
+				} else {
+					if series.CreatedAt.Sub(t) > 24*time.Hour { //24h容错时间
+						log.Infof("episode were aired 24h before monitoring, skipping: %v", lastEpisode.Title)
+						return
+					}
+				}
+			}
+	
+			name, err := s.searchAndDownload(series.ID, lastEpisode.SeasonNumber, lastEpisode.EpisodeNumber)
+			if err != nil {
+				log.Infof("cannot find resource to download for %s: %v", lastEpisode.Title, err)
+			} else {
+				log.Infof("begin download torrent resource: %v", name)
+			}
+		}
+
 
 	}
 }
