@@ -485,3 +485,8 @@ func (c *Client) SetSeasonAllEpisodeStatus(mediaID, seasonNum int, status episod
 func (c *Client) TmdbIdInWatchlist(tmdb_id int) bool {
 	return c.ent.Media.Query().Where(media.TmdbID(tmdb_id)).CountX(context.TODO()) > 0
 }
+
+
+func (c *Client) GetDownloadHistory(mediaID int) ([]*ent.History, error) {
+	return c.ent.History.Query().Where(history.MediaID(mediaID)).All(context.TODO())
+}

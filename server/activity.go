@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/log"
@@ -71,4 +72,16 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	}
 	log.Infof("history record successful deleted: %v", his.SourceTitle)
 	return nil, nil
+}
+func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {
+	var ids = c.Param("id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, fmt.Errorf("id is not correct: %v", ids)
+	}
+	his, err := s.db.GetDownloadHistory(id)
+	if err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+	return his, nil
 }

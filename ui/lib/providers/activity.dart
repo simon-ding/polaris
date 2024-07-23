@@ -8,10 +8,27 @@ var activitiesDataProvider =
     AsyncNotifierProvider.autoDispose<ActivityData, List<Activity>>(
         ActivityData.new);
 
+var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
+  (ref, arg) async {
+    final dio = await APIs.getDio();
+    var resp = await dio.get("${APIs.activityMediaUrl}$arg");
+    final sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    List<Activity> activities = List.empty(growable: true);
+    for (final a in sp.data as List) {
+      activities.add(Activity.fromJson(a));
+    }
+    return activities;
+  },
+);
+
 class ActivityData extends AutoDisposeAsyncNotifier<List<Activity>> {
   @override
   FutureOr<List<Activity>> build() async {
-    Timer(const Duration(seconds: 5), ref.invalidateSelf);//Periodically Refresh
+    Timer(
+        const Duration(seconds: 5), ref.invalidateSelf); //Periodically Refresh
 
     final dio = await APIs.getDio();
     var resp = await dio.get(APIs.activityUrl);
