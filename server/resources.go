@@ -89,7 +89,7 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 		return nil, errors.New("no enough space")
 	}
 
-	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
+	torrent, err := trc.Download(r1.Link, s.db.GetDownloadDir())
 	if err != nil {
 		return nil, errors.Wrap(err, "downloading")
 	}
@@ -144,7 +144,7 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	}
 	r1 := res[0]
 	log.Infof("found resource to download: %+v", r1)
-	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
+	torrent, err := trc.Download(r1.Link, s.db.GetDownloadDir())
 	if err != nil {
 		return nil, errors.Wrap(err, "downloading")
 	}
@@ -195,7 +195,7 @@ func (s *Server) SearchAvailableEpisodeResource(c *gin.Context) (interface{}, er
 			Size:    r.Size,
 			Seeders: r.Seeders,
 			Peers:   r.Peers,
-			Link:    r.Magnet,
+			Link:    r.Link,
 		})
 	}
 	if len(searchResults) == 0 {
@@ -268,7 +268,7 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 			Size:    r.Size,
 			Seeders: r.Seeders,
 			Peers:   r.Peers,
-			Link:    r.Magnet,
+			Link:    r.Link,
 		})
 	}
 	if len(searchResults) == 0 {

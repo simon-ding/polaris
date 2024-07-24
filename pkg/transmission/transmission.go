@@ -38,9 +38,9 @@ type Client struct {
 	cfg Config
 }
 
-func (c *Client) Download(magnet, dir string) (*Torrent, error) {
+func (c *Client) Download(link, dir string) (*Torrent, error) {
 	t, err := c.c.TorrentAdd(context.TODO(), transmissionrpc.TorrentAddPayload{
-		Filename:    &magnet,
+		Filename:    &link,
 		DownloadDir: &dir,
 	})
 	log.Infof("get torrent info: %+v", t)

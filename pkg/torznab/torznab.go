@@ -76,7 +76,7 @@ func (r *Response) ToResults() []Result {
 	for _, item := range r.Channel.Item {
 		r := Result{
 			Name:     item.Title,
-			Magnet:   item.Link,
+			Link:   item.Link,
 			Size:     mustAtoI(item.Size),
 			Seeders:  mustAtoI(item.GetAttr("seeders")),
 			Peers:    mustAtoI(item.GetAttr("peers")),
@@ -129,7 +129,7 @@ func Search(torznabUrl, api, keyWord string) ([]Result, error) {
 
 type Result struct {
 	Name     string
-	Magnet   string
+	Link   string
 	Size     int
 	Seeders  int
 	Peers    int

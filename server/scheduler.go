@@ -294,7 +294,7 @@ func (s *Server) downloadMovieSingleEpisode(ep *ent.Episode) error {
 	}
 	r1 := res[0]
 	log.Infof("begin download torrent resource: %v", r1.Name)
-	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
+	torrent, err := trc.Download(r1.Link, s.db.GetDownloadDir())
 	if err != nil {
 		return errors.Wrap(err, "downloading")
 	}

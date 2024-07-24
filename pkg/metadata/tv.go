@@ -9,11 +9,11 @@ import (
 )
 
 type Metadata struct {
-	NameEn     string
-	NameCn     string
-	Season     int
-	Episode    int
-	Resolution string
+	NameEn       string
+	NameCn       string
+	Season       int
+	Episode      int
+	Resolution   string
 	IsSeasonPack bool
 }
 
@@ -158,9 +158,9 @@ func parseChineseName(name string) *Metadata {
 			re3 := regexp.MustCompile(`[^\d\w]\d{1,2}[^\d\w]`)
 			epNums := re3.FindAllString(name, -1)
 			if len(epNums) > 0 {
-				
+
 				re3 := regexp.MustCompile(`\d{1,2}`)
-				epNum := re3.FindAllString(epNums[0],-1)[0]
+				epNum := re3.FindAllString(epNums[0], -1)[0]
 				n, err := strconv.Atoi(epNum)
 				if err != nil {
 					panic(fmt.Sprintf("convert %s error: %v", epNum, err))
@@ -203,10 +203,10 @@ func parseChineseName(name string) *Metadata {
 		}
 	}
 
-	if meta.IsSeasonPack && meta.Episode != 0{
+	if meta.IsSeasonPack && meta.Episode != 0 {
 		meta.Season = meta.Episode
 		meta.Episode = -1
-   }
+	}
 
 	//tv name
 	title := name
