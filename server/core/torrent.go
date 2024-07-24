@@ -31,6 +31,7 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 
 	var filtered []torznab.Result
 	for _, r := range res {
+		log.Infof("torrent resource: %+v", r)
 		meta := metadata.ParseTv(r.Name)
 		if meta.Season != seasonNum {
 			continue
