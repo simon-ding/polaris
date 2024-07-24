@@ -62,7 +62,7 @@ func (s *Server) SuggestedSeriesFolderName(c *gin.Context) (interface{}, error) 
 	}
 	name = fmt.Sprintf("%s %s", name, originalName)
 
-	if !utils.IsChineseChar(name) {
+	if !utils.ContainsChineseChar(name) {
 		name = originalName
 	}
 	if year != "" {
