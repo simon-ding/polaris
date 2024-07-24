@@ -60,6 +60,8 @@ func IsNameAcceptable(name1, name2 string) bool {
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
 	name1 = re.ReplaceAllString(strings.ToLower(name1), " ")
 	name2 = re.ReplaceAllString(strings.ToLower(name2), " ")
+	name1 = strings.Join(strings.Fields(name1), " ")
+	name2 = strings.Join(strings.Fields(name2), " ")
 	if strings.Contains(name1, name2) || strings.Contains(name2, name1) {
 		return true
 	}

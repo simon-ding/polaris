@@ -15,6 +15,7 @@ type MovieMetadata struct {
 }
 
 func ParseMovie(name string) *MovieMetadata {
+	name = strings.Join(strings.Fields(name), " ") //remove unnessary spaces
 	name = strings.ToLower(strings.TrimSpace(name))
 	var meta = &MovieMetadata{}
 	yearRe := regexp.MustCompile(`\(\d{4}\)`)
