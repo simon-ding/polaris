@@ -39,7 +39,9 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 		if meta.Season != seasonNum {
 			continue
 		}
-		if episodeNum != -1 && meta.Episode != episodeNum { //not season pack
+		if episodeNum != -1 && meta.Episode != episodeNum { //not season pack, episode number equals
+			continue
+		} else if seasonNum == -1 && !meta.IsSeasonPack { //want season pack, but not season pack
 			continue
 		}
 		if checkResolution && meta.Resolution != series.Resolution.String() {
