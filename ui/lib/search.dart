@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/providers/welcome_data.dart';
+import 'package:ui/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -257,13 +258,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       ref
                           .read(searchPageDataProvider(widget.query ?? "")
                               .notifier)
-                          .submit2Watchlist(
-                              item.id!,
-                              storageSelected,
-                              resSelected,
-                              item.mediaType!,
-                              pathController.text);
-                      Navigator.of(context).pop();
+                          .submit2Watchlist(item.id!, storageSelected,
+                              resSelected, item.mediaType!, pathController.text)
+                          .then((v) {
+                        Utils.showSnakeBar("添加成功");
+                        Navigator.of(context).pop();
+                      }).onError((error, trace) {
+                        Utils.showSnakeBar("添加失败：$error");
+                      });
                     },
                   ),
                 ],
