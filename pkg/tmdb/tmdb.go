@@ -28,6 +28,9 @@ func NewClient(apiKey string) (*Client, error) {
 
 func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) {
 	d, err := c.tmdbClient.GetTVDetails(id, withLangOption(language))
+	if err != nil {
+		return nil, errors.Wrap(err, "get tv detail")
+	}
 
 	log.Infof("tv id %d, language %s", id, language)
 	if !episodeNameUseful(d.LastEpisodeToAir.Name) {
@@ -38,13 +41,12 @@ func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) 
 			if err != nil {
 				return d, nil
 			}
-			
-		}
-		if episodeNameUseful(detailEN.LastEpisodeToAir.Name) {
-			d.LastEpisodeToAir.Name = detailEN.LastEpisodeToAir.Name
-			d.LastEpisodeToAir.Overview = detailEN.LastEpisodeToAir.Overview
-			d.NextEpisodeToAir.Name = detailEN.NextEpisodeToAir.Name
-			d.NextEpisodeToAir.Overview = detailEN.NextEpisodeToAir.Overview
+			if episodeNameUseful(detailEN.LastEpisodeToAir.Name) {
+				d.LastEpisodeToAir.Name = detailEN.LastEpisodeToAir.Name
+				d.LastEpisodeToAir.Overview = detailEN.LastEpisodeToAir.Overview
+				d.NextEpisodeToAir.Name = detailEN.NextEpisodeToAir.Name
+				d.NextEpisodeToAir.Overview = detailEN.NextEpisodeToAir.Overview
+			}
 		}
 	}
 
