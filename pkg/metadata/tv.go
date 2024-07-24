@@ -112,8 +112,11 @@ func parseEnglishName(name string) *Metadata {
 	} else { //no episode, maybe like  One Punch Man S2 - 08 [1080p].mkv
 
 		numRe := regexp.MustCompile(`^\d{1,2}$`)
-		for _, p := range newSplits {
+		for i, p := range newSplits {
 			if numRe.MatchString(p) {
+				if i > 0 && strings.Contains(newSplits[i-1], "season") { //last word cannot be season
+					continue
+				}
 				//episodeIndex = i
 				n, err := strconv.Atoi(p)
 				if err != nil {
@@ -129,7 +132,8 @@ func parseEnglishName(name string) *Metadata {
 		//resolution exists
 		meta.Resolution = newSplits[resIndex]
 	}
-	if meta.Episode == -1 {
+	if meta.Episode == -1 || strings.Contains(name, "complete"){
+		meta.Episode = -1
 		meta.IsSeasonPack = true
 	}
 
