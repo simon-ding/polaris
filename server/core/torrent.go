@@ -56,6 +56,11 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 				continue
 			}	
 		}
+		if isNumberedSeries(series) && episodeNum == -1 {
+			//should not want season
+			continue
+		}
+		
 		if episodeNum != -1 && meta.Episode != episodeNum { //not season pack, episode number equals
 			continue
 		} else if seasonNum == -1 && !meta.IsSeasonPack { //want season pack, but not season pack
