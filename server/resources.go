@@ -303,13 +303,16 @@ func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "downloading")
 	}
 	torrent.Start()
-
+	name := in.Name
+	if name == "" {
+		name = media.OriginalName
+	}
 	go func() {
 		ep := media.Episodes[0]
 		history, err := s.db.SaveHistoryRecord(ent.History{
 			MediaID:     media.ID,
 			EpisodeID:   ep.ID,
-			SourceTitle: in.Name,
+			SourceTitle: name,
 			TargetDir:   "./",
 			Status:      history.StatusRunning,
 			Size:        in.Size,
