@@ -1,12 +1,14 @@
 package torznab
 
 import (
+	"context"
 	"encoding/xml"
 	"io"
 	"net/http"
 	"net/url"
 	"polaris/log"
 	"strconv"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -59,7 +61,6 @@ type Item struct {
 		Name  string `xml:"name,attr"`
 		Value string `xml:"value,attr"`
 	} `xml:"attr"`
-
 }
 
 func (i *Item) GetAttr(key string) string {
@@ -75,12 +76,12 @@ func (r *Response) ToResults() []Result {
 	for _, item := range r.Channel.Item {
 		r := Result{
 			Name:     item.Title,
-			Magnet: item.Link,
-			Size: mustAtoI(item.Size),
-			Seeders: mustAtoI(item.GetAttr("seeders")),
-			Peers: mustAtoI(item.GetAttr("peers")),
+			Magnet:   item.Link,
+			Size:     mustAtoI(item.Size),
+			Seeders:  mustAtoI(item.GetAttr("seeders")),
+			Peers:    mustAtoI(item.GetAttr("peers")),
 			Category: mustAtoI(item.GetAttr("category")),
-			Source: r.Channel.Title,
+			Source:   r.Channel.Title,
 		}
 		res = append(res, r)
 	}
@@ -96,7 +97,10 @@ func mustAtoI(key string) int {
 	return i
 }
 func Search(torznabUrl, api, keyWord string) ([]Result, error) {
-	req, err := http.NewRequest(http.MethodGet, torznabUrl, nil)
+	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, torznabUrl, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "new request")
 	}
@@ -130,5 +134,5 @@ type Result struct {
 	Seeders  int
 	Peers    int
 	Category int
-	Source string
+	Source   string
 }

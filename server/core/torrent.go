@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -97,14 +98,32 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 
 	var res []torznab.Result
 	allTorznab := db.GetAllTorznabInfo()
+	resChan := make(chan []torznab.Result)
+	var wg sync.WaitGroup
+
 	for _, tor := range allTorznab {
-		resp, err := torznab.Search(tor.URL, tor.ApiKey, q)
-		if err != nil {
-			log.Errorf("search %s error: %v", tor.Name, err)
-			continue
-		}
-		res = append(res, resp...)
+		wg.Add(1)
+		go func ()  {
+			log.Debugf("search torznab %v with %v", tor.Name, q)
+			defer wg.Done()
+			resp, err := torznab.Search(tor.URL, tor.ApiKey, q)
+			if err != nil {
+				log.Errorf("search %s error: %v", tor.Name, err)
+				return
+			}
+			resChan <- resp
+	
+		}()
 	}
+	go func() {
+		wg.Wait()
+		close(resChan) // 在所有的worker完成后关闭Channel
+	}()
+
+	for result := range resChan {
+		res = append(res, result...)
+	}
+
 	sort.Slice(res, func(i, j int) bool {
 		var s1 = res[i]
 		var s2 = res[j]
