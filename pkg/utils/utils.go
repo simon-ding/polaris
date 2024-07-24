@@ -59,8 +59,8 @@ func RandString(n int) string {
 func IsNameAcceptable(name1, name2 string) bool {
 
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name1 = re.ReplaceAllString(strings.ToLower(name1), "")
-	name2 = re.ReplaceAllString(strings.ToLower(name2), "")
+	name1 = re.ReplaceAllString(strings.ToLower(name1), " ")
+	name2 = re.ReplaceAllString(strings.ToLower(name2), " ")
 	return strutil.Similarity(name1, name2, metrics.NewHamming()) > 0.4
 }
 
