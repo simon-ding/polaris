@@ -3,8 +3,11 @@ package transmission
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"net/url"
 	"polaris/log"
+	"strings"
 
 	"github.com/hekmon/transmissionrpc/v3"
 	"github.com/pkg/errors"
@@ -34,20 +37,42 @@ type Config struct {
 	Password string `json:"password"`
 }
 type Client struct {
-	c *transmissionrpc.Client
+	c   *transmissionrpc.Client
 	cfg Config
 }
 
 func (c *Client) Download(link, dir string) (*Torrent, error) {
+	if strings.HasPrefix(link, "http") {
+		client := &http.Client{
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		}
+		resp, err:=client.Get(link)
+		if err == nil {
+			if resp.StatusCode == http.StatusFound {
+				loc, err := resp.Location()
+				if err == nil {
+					link = loc.String()
+					log.Warnf("transimision redirect to url: %v", link)
+				}
+			}
+	
+		}
+	
+	} 
 	t, err := c.c.TorrentAdd(context.TODO(), transmissionrpc.TorrentAddPayload{
 		Filename:    &link,
 		DownloadDir: &dir,
 	})
 	log.Infof("get torrent info: %+v", t)
+	if t.ID == nil {
+		return nil, fmt.Errorf("download torrent error: %v", link)
+	}
 
 	return &Torrent{
-		ID: *t.ID,
-		c:  c.c,
+		ID:     *t.ID,
+		c:      c.c,
 		Config: c.cfg,
 	}, err
 }
@@ -95,7 +120,7 @@ func (t *Torrent) Progress() int {
 	if t.getTorrent().PercentComplete != nil && *t.getTorrent().PercentComplete >= 1 {
 		return 100
 	}
-	
+
 	if t.getTorrent().PercentComplete != nil {
 		p := int(*t.getTorrent().PercentComplete * 100)
 		if p == 100 {

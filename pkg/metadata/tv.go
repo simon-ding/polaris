@@ -19,13 +19,10 @@ type Metadata struct {
 
 func ParseTv(name string) *Metadata {
 	name = strings.ToLower(name)
-	if utils.IsASCII(name) { //english name
-		return parseEnglishName(name)
-	}
 	if utils.ContainsChineseChar(name) {
 		return parseChineseName(name)
 	}
-	return nil
+	return parseEnglishName(name)
 }
 
 func parseEnglishName(name string) *Metadata {
