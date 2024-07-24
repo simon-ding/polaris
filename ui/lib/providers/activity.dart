@@ -5,7 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
 var activitiesDataProvider =
-    AsyncNotifierProvider.autoDispose.family<ActivityData, List<Activity>, String>(
+    AsyncNotifierProvider.family<ActivityData, List<Activity>, String>(
         ActivityData.new);
 
 var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
@@ -24,8 +24,7 @@ var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   },
 );
 
-class ActivityData
-    extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String> {
+class ActivityData extends FamilyAsyncNotifier<List<Activity>, String> {
   @override
   FutureOr<List<Activity>> build(String arg) async {
     if (arg == "active") {
@@ -35,7 +34,8 @@ class ActivityData
     }
 
     final dio = await APIs.getDio();
-    var resp = await dio.get(APIs.activityUrl, queryParameters: {"status": arg});
+    var resp =
+        await dio.get(APIs.activityUrl, queryParameters: {"status": arg});
     final sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;
