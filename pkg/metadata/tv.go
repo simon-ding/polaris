@@ -19,6 +19,7 @@ type Metadata struct {
 
 func ParseTv(name string) *Metadata {
 	name = strings.ToLower(name)
+	name = strings.ReplaceAll(name, "\u200b", "") //remove unicode hidden character
 	if utils.ContainsChineseChar(name) {
 		return parseChineseName(name)
 	}
@@ -115,6 +116,10 @@ func parseEnglishName(name string) *Metadata {
 		for i, p := range newSplits {
 			if numRe.MatchString(p) {
 				if i > 0 && strings.Contains(newSplits[i-1], "season") { //last word cannot be season
+					continue
+				}
+				if i < seasonIndex {
+					//episode number most likely  should comes alfter season number
 					continue
 				}
 				//episodeIndex = i
