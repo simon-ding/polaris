@@ -309,7 +309,7 @@ func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
 		history, err := s.db.SaveHistoryRecord(ent.History{
 			MediaID:     media.ID,
 			EpisodeID:   ep.ID,
-			SourceTitle: media.NameCn,
+			SourceTitle: in.Name,
 			TargetDir:   "./",
 			Status:      history.StatusRunning,
 			Size:        in.Size,

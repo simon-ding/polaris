@@ -181,24 +181,23 @@ class MediaDetail {
 }
 
 class SearchResult {
-  SearchResult({
-    required this.backdropPath,
-    required this.id,
-    required this.name,
-    required this.originalName,
-    required this.overview,
-    required this.posterPath,
-    required this.mediaType,
-    required this.adult,
-    required this.originalLanguage,
-    required this.genreIds,
-    required this.popularity,
-    required this.firstAirDate,
-    required this.voteAverage,
-    required this.voteCount,
-    required this.originCountry,
-    this.inWatchlist
-  });
+  SearchResult(
+      {required this.backdropPath,
+      required this.id,
+      required this.name,
+      required this.originalName,
+      required this.overview,
+      required this.posterPath,
+      required this.mediaType,
+      required this.adult,
+      required this.originalLanguage,
+      required this.genreIds,
+      required this.popularity,
+      required this.firstAirDate,
+      required this.voteAverage,
+      required this.voteCount,
+      required this.originCountry,
+      this.inWatchlist});
 
   final String? backdropPath;
   final int? id;
@@ -258,10 +257,12 @@ class MovieTorrentResource
     return (rsp.data as List).map((v) => TorrentResource.fromJson(v)).toList();
   }
 
-  Future<void> download(String link) async {
+  Future<void> download(TorrentResource res) async {
+    var m = res.toJson();
+    m["media_id"] = int.parse(mediaId!);
+
     final dio = await APIs.getDio();
-    var resp = await dio.post(APIs.availableMoviesUrl,
-        data: {"media_id": int.parse(mediaId!), "link": link});
+    var resp = await dio.post(APIs.availableMoviesUrl, data: m);
     var rsp = ServerResponse.fromJson(resp.data);
     if (rsp.code != 0) {
       throw rsp.message;
@@ -285,5 +286,12 @@ class TorrentResource {
         seeders: json["seeders"],
         peers: json["peers"],
         link: json["link"]);
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['size'] = size;
+    data["link"] = link;
+    return data;
   }
 }

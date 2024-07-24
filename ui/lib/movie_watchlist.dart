@@ -252,7 +252,7 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                             ref
                                 .read(movieTorrentsDataProvider(widget.id)
                                     .notifier)
-                                .download(torrent.link!)
+                                .download(torrent)
                                 .whenComplete(() =>
                                     Utils.showSnakeBar("开始下载：${torrent.name}"))
                                 .onError((error, trace) =>
