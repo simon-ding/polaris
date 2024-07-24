@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"fmt"
-	"polaris/log"
 	"polaris/pkg/utils"
 	"regexp"
 	"strconv"
@@ -216,13 +215,11 @@ func parseChineseName(name string) *Metadata {
 		return r == '[' || r == ']' || r == '【' || r == '】'
 	})
 	title = ""
-	log.Info(fields)
 	for _, p := range fields { //寻找匹配的最长的字符串，最有可能是名字
 		if len([]rune(p)) > len([]rune(title)) {
 			title = p
 		}
 	}
-	log.Infof("title: %v", title)
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
 	title = re.ReplaceAllString(strings.TrimSpace(strings.ToLower(title)), "")
 
