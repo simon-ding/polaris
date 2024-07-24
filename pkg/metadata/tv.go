@@ -137,7 +137,7 @@ func parseEnglishName(name string) *Metadata {
 		//resolution exists
 		meta.Resolution = newSplits[resIndex]
 	}
-	if meta.Episode == -1 || strings.Contains(name, "complete"){
+	if meta.Episode == -1 || strings.Contains(name, "complete") {
 		meta.Episode = -1
 		meta.IsSeasonPack = true
 	}
@@ -187,10 +187,10 @@ func parseChineseName(name string) *Metadata {
 		}
 		meta.Episode = n
 	} else { //【第09話】
-		re2 := regexp.MustCompile(`第\d{1,2}(话|話|集)`)
+		re2 := regexp.MustCompile(`第\d{1,4}(话|話|集)`)
 		episodeMatches1 := re2.FindAllString(name, -1)
 		if len(episodeMatches1) > 0 {
-			re := regexp.MustCompile(`\d{1,2}`)
+			re := regexp.MustCompile(`\d{1,4}`)
 			epNum := re.FindAllString(episodeMatches1[0], -1)[0]
 			n, err := strconv.Atoi(epNum)
 			if err != nil {
