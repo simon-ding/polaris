@@ -27,7 +27,7 @@ func ParseTv(name string) *Metadata {
 
 func parseEnglishName(name string) *Metadata {
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(strings.ToLower(name), "")
+	name = re.ReplaceAllString(strings.ToLower(name), " ")
 
 	splits := strings.Split(strings.TrimSpace(name), " ")
 	var newSplits []string
@@ -68,11 +68,6 @@ func parseEnglishName(name string) *Metadata {
 	}
 	if seasonIndex != -1 {
 		//season exists
-		if seasonIndex != 0 {
-			//name exists
-			names := newSplits[0:seasonIndex]
-			meta.NameEn = strings.Join(names, " ")
-		}
 		ss := seasonRe.FindAllString(newSplits[seasonIndex], -1)
 		if len(ss) != 0 {
 			//season info
@@ -83,6 +78,24 @@ func parseEnglishName(name string) *Metadata {
 				panic(fmt.Sprintf("convert %s error: %v", ssNum, err))
 			}
 			meta.Season = n
+		}
+	} else { //maybe like Season 1?
+		seasonRe := regexp.MustCompile(`season \d{1,2}`)
+		matches := seasonRe.FindAllString(name, -1)
+		if len(matches) > 0 {
+			for i, s := range newSplits {
+				if s == "season" {
+					seasonIndex = i
+				}
+			}
+			numRe := regexp.MustCompile(`\d{1,2}`)
+			seNum := numRe.FindAllString(matches[0], -1)[0]
+			n, err := strconv.Atoi(seNum)
+			if err != nil {
+				panic(fmt.Sprintf("convert %s error: %v", seNum, err))
+			}
+			meta.Season = n
+
 		}
 	}
 	if episodeIndex != -1 {
@@ -104,6 +117,15 @@ func parseEnglishName(name string) *Metadata {
 	if meta.Episode == -1 {
 		meta.IsSeasonPack = true
 	}
+
+	if seasonIndex != 0 {
+		//name exists
+		names := newSplits[0:seasonIndex]
+		meta.NameEn = strings.TrimSpace(strings.Join(names, " ")) 
+	} else {
+		meta.NameEn = name
+	}
+
 	return meta
 }
 
