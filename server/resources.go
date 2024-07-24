@@ -80,7 +80,7 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 	}
 
 	r1 := res[0]
-	log.Infof("found resource to download: %v", r1)
+	log.Infof("found resource to download: %+v", r1)
 
 	downloadDir := s.db.GetDownloadDir()
 	size := utils.AvailableSpace(downloadDir)
@@ -99,7 +99,7 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
 	}
-	dir := fmt.Sprintf("%s/Season %02d", series.TargetDir, seasonNum)
+	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
 
 	history, err := s.db.SaveHistoryRecord(ent.History{
 		MediaID:     seriesId,
@@ -143,14 +143,14 @@ func (s *Server) searchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 		return nil, err
 	}
 	r1 := res[0]
-	log.Infof("found resource to download: %v", r1)
+	log.Infof("found resource to download: %+v", r1)
 	torrent, err := trc.Download(r1.Magnet, s.db.GetDownloadDir())
 	if err != nil {
 		return nil, errors.Wrap(err, "downloading")
 	}
 	torrent.Start()
 
-	dir := fmt.Sprintf("%s/Season %02d", series.TargetDir, seasonNum)
+	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
 
 	history, err := s.db.SaveHistoryRecord(ent.History{
 		MediaID:     ep.MediaID,
