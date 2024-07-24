@@ -305,6 +305,21 @@ type StorageInfo struct {
 	Default        bool              `json:"default"`
 }
 
+func (s *StorageInfo) ToWebDavSetting() WebdavSetting {
+	if s.Implementation != storage.ImplementationWebdav.String() {
+		panic("not webdav storage")
+	}
+	return WebdavSetting{
+		URL:  s.Settings["url"],
+		TvPath: s.Settings["tv_path"],
+		MoviePath: s.Settings["movie_path"],
+		User: s.Settings["user"],
+		Password: s.Settings["password"],
+		ChangeFileHash: s.Settings["change_file_hash"],
+	}
+}
+
+
 type LocalDirSetting struct {
 	TvPath    string `json:"tv_path"`
 	MoviePath string `json:"movie_path"`

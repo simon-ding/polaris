@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"polaris/db"
 	"polaris/log"
+	"polaris/pkg/storage"
 	"polaris/pkg/utils"
 	"strconv"
 	"strings"
@@ -23,6 +24,21 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "bind json")
 	}
 
+	if in.Implementation == "webdav" {
+		//test webdav
+		wd := in.ToWebDavSetting()
+		st, err := storage.NewWebdavStorage(wd.URL, wd.User, wd.Password, wd.TvPath, false)
+		if err != nil {
+			return nil, errors.Wrap(err, "new webdav")
+		}
+		fs, err := st.ReadDir(".")
+		if err != nil {
+			return nil, errors.Wrap(err, "test read")
+		}
+		for _, f := range fs {
+			log.Infof("file name: %v", f.Name())
+		}
+	}
 	log.Infof("received add storage input: %v", in)
 	err := s.db.AddStorage(&in)
 	return nil, err
