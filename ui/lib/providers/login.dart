@@ -41,10 +41,11 @@ class AuthSettingData extends AutoDisposeAsyncNotifier<AuthSetting> {
 class AuthSetting {
   bool enable;
   String user;
+  String password;
 
-  AuthSetting({required this.enable, required this.user});
+  AuthSetting({required this.enable, required this.user, required this.password});
 
   factory AuthSetting.fromJson(Map<String, dynamic> json) {
-    return AuthSetting(enable: json["enable"], user: json["user"]);
+    return AuthSetting(enable: json["enable"], user: json["user"], password: json["password"]);
   }
 }

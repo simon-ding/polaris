@@ -211,7 +211,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                                     widget.seriesId)
                                                 .notifier)
                                             .delete()
-                                            .whenComplete(() =>
+                                            .then((v) =>
                                                 context.go(WelcomePage.routeTv))
                                             .onError((error, trace) =>
                                                 Utils.showSnakeBar(

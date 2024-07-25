@@ -115,7 +115,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                                                       widget.id)
                                                   .notifier)
                                               .delete()
-                                              .whenComplete(() => context
+                                              .then((v) => context
                                                   .go(WelcomePage.routeMoivie))
                                               .onError((error, trace) =>
                                                   Utils.showSnakeBar(
@@ -253,7 +253,7 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                                 .read(movieTorrentsDataProvider(widget.id)
                                     .notifier)
                                 .download(torrent)
-                                .whenComplete(() =>
+                                .then((v) =>
                                     Utils.showSnakeBar("开始下载：${torrent.name}"))
                                 .onError((error, trace) =>
                                     Utils.showSnakeBar("操作失败: $error"));

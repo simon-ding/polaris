@@ -88,7 +88,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
       ref
           .read(activitiesDataProvider("active").notifier)
           .deleteActivity(id)
-          .whenComplete(() => Utils.showSnakeBar("删除成功"))
+          .then((v) => Utils.showSnakeBar("删除成功"))
           .onError((error, trace) => Utils.showSnakeBar("删除失败：$error"));
     };
   }

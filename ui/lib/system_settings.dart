@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiver/strings.dart';
 import 'package:ui/providers/login.dart';
@@ -6,6 +7,7 @@ import 'package:ui/providers/settings.dart';
 import 'package:ui/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:ui/widgets/widgets.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 class SystemSettingsPage extends ConsumerStatefulWidget {
   static const route = "/settings";
@@ -18,10 +20,8 @@ class SystemSettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
-  final GlobalKey _formKey = GlobalKey<FormState>();
-
-  final _tmdbApiController = TextEditingController();
-  final _downloadDirController = TextEditingController();
+  final _formKey = GlobalKey<FormBuilderState>();
+  final _formKey2 = GlobalKey<FormBuilderState>();
   bool? _enableAuth;
 
   @override
@@ -30,62 +30,56 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
 
     var tmdbSetting = settings.when(
         data: (v) {
-          _tmdbApiController.text = v.tmdbApiKey!;
-          _downloadDirController.text = v.downloadDIr!;
           return Container(
               padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
-              child: Form(
+              child: FormBuilder(
                 key: _formKey, //设置globalKey，用于后面获取FormState
                 autovalidateMode: AutovalidateMode.onUserInteraction,
+                initialValue: {
+                  "tmdb_api": v.tmdbApiKey,
+                  "download_dir": v.downloadDIr
+                },
                 child: Column(
                   children: [
-                    TextFormField(
+                    FormBuilderTextField(
+                      name: "tmdb_api",
                       autofocus: true,
-                      controller: _tmdbApiController,
                       decoration: Commons.requiredTextFieldStyle(
                           text: "TMDB Api Key", icon: const Icon(Icons.key)),
                       //
-                      validator: (v) {
-                        return v!.trim().isNotEmpty ? null : "ApiKey 不能为空";
-                      },
-                      onSaved: (newValue) {},
+                      validator: FormBuilderValidators.required(),
                     ),
-                    TextFormField(
+                    FormBuilderTextField(
+                      name: "download_dir",
                       autofocus: true,
-                      controller: _downloadDirController,
                       decoration: Commons.requiredTextFieldStyle(
                           text: "下载路径", icon: const Icon(Icons.folder)),
                       //
-                      validator: (v) {
-                        return v!.trim().isNotEmpty ? null : "下载路径不能为空";
-                      },
-                      onSaved: (newValue) {},
+                      validator: FormBuilderValidators.required(),
                     ),
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 28.0),
                         child: ElevatedButton(
-                          child: const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text("保存"),
-                          ),
-                          onPressed: () {
-                            if ((_formKey.currentState as FormState)
-                                .validate()) {
-                              var f = ref
-                                  .read(settingProvider.notifier)
-                                  .updateSettings(GeneralSetting(
-                                      tmdbApiKey: _tmdbApiController.text,
-                                      downloadDIr:
-                                          _downloadDirController.text));
-                              f.whenComplete(() {
-                                Utils.showSnakeBar("更新成功");
-                              }).onError((e, s) {
-                                Utils.showSnakeBar("更新失败：$e");
-                              });
-                            }
-                          },
-                        ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text("保存"),
+                            ),
+                            onPressed: () {
+                              if (_formKey.currentState!.saveAndValidate()) {
+                                var values = _formKey.currentState!.value;
+                                var f = ref
+                                    .read(settingProvider.notifier)
+                                    .updateSettings(GeneralSetting(
+                                        tmdbApiKey: values["tmdb_api"],
+                                        downloadDIr: values["download_dir"]));
+                                f.then((v) {
+                                  Utils.showSnakeBar("更新成功");
+                                }).onError((e, s) {
+                                  Utils.showSnakeBar("更新失败：$e");
+                                });
+                              }
+                            }),
                       ),
                     )
                   ],
@@ -103,7 +97,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                   var indexer = value[i];
                   return SettingsCard(
                       onTap: () => showIndexerDetails(indexer),
-                      child: Text(indexer.name??""));
+                      child: Text(indexer.name ?? ""));
                 }
                 return SettingsCard(
                     onTap: () => showIndexerDetails(Indexer()),
@@ -121,7 +115,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 var client = value[i];
                 return SettingsCard(
                     onTap: () => showDownloadClientDetails(client),
-                    child: Text(client.name??""));
+                    child: Text(client.name ?? ""));
               }
               return SettingsCard(
                   onTap: () => showDownloadClientDetails(DownloadClient()),
@@ -138,7 +132,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                   var storage = value[i];
                   return SettingsCard(
                       onTap: () => showStorageDetails(storage),
-                      child: Text(storage.name??""));
+                      child: Text(storage.name ?? ""));
                 }
                 return SettingsCard(
                     onTap: () => showStorageDetails(Storage()),
@@ -159,53 +153,69 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
             });
           }
           userController.text = data.user;
-          return Column(
-            children: [
-              SwitchListTile(
-                  title: const Text("开启认证"),
-                  value: _enableAuth!,
-                  onChanged: (v) {
-                    setState(() {
-                      _enableAuth = v;
-                    });
-                  }),
-              _enableAuth!
-                  ? Column(
-                      children: [
-                        TextFormField(
-                            controller: userController,
-                            decoration: Commons.requiredTextFieldStyle(
-                              text: "用户名",
-                              icon: const Icon(Icons.account_box),
-                            )),
-                        TextFormField(
-                            obscureText: true,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            controller: passController,
-                            decoration: Commons.requiredTextFieldStyle(
-                              text: "密码",
-                              icon: const Icon(Icons.password),
-                            ))
-                      ],
-                    )
-                  : const Column(),
-              Center(
-                  child: ElevatedButton(
-                      child: const Text("保存"),
-                      onPressed: () {
-                        var f = ref
-                            .read(authSettingProvider.notifier)
-                            .updateAuthSetting(_enableAuth!,
-                                userController.text, passController.text);
-                        f.whenComplete(() {
-                          Utils.showSnakeBar("更新成功");
-                        }).onError((e, s) {
-                          Utils.showSnakeBar("更新失败：$e");
+          return FormBuilder(
+              key: _formKey2,
+              initialValue: {
+                "user": data.user,
+                "password": data.password,
+                "enable": data.enable
+              },
+              child: Column(
+                children: [
+                  FormBuilderSwitch(
+                      name: "enable",
+                      title: const Text("开启认证"),
+                      onChanged: (v) {
+                        setState(() {
+                          _enableAuth = v;
                         });
-                      }))
-            ],
-          );
+                      }),
+                  _enableAuth!
+                      ? Column(
+                          children: [
+                            FormBuilderTextField(
+                                name: "user",
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: FormBuilderValidators.required(),
+                                decoration: Commons.requiredTextFieldStyle(
+                                  text: "用户名",
+                                  icon: const Icon(Icons.account_box),
+                                )),
+                            FormBuilderTextField(
+                                name: "password",
+                                obscureText: true,
+                                enableSuggestions: false,
+                                autocorrect: false,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: FormBuilderValidators.required(),
+                                decoration: Commons.requiredTextFieldStyle(
+                                  text: "密码",
+                                  icon: const Icon(Icons.password),
+                                ))
+                          ],
+                        )
+                      : const Column(),
+                  Center(
+                      child: ElevatedButton(
+                          child: const Text("保存"),
+                          onPressed: () {
+                            if (_formKey2.currentState!.saveAndValidate()) {
+                              var values = _formKey2.currentState!.value;
+                              var f = ref
+                                  .read(authSettingProvider.notifier)
+                                  .updateAuthSetting(_enableAuth!,
+                                      values["user"], values["password"]);
+                              f.then((v) {
+                                Utils.showSnakeBar("更新成功");
+                              }).onError((e, s) {
+                                Utils.showSnakeBar("更新失败：$e");
+                              });
+                            }
+                          }))
+                ],
+              ));
         },
         error: (err, trace) => Text("$err"),
         loading: () => const MyProgressIndicator());
@@ -256,109 +266,155 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
   }
 
   Future<void> showIndexerDetails(Indexer indexer) {
-    var nameController = TextEditingController(text: indexer.name);
-    var urlController = TextEditingController(text: indexer.url);
-    var apiKeyController = TextEditingController(text: indexer.apiKey);
+    final _formKey = GlobalKey<FormBuilderState>();
     var selectImpl = "torznab";
-    final children = <Widget>[
-      DropdownMenu(
-        label: const Text("类型"),
-        onSelected: (value) {
-          setState(() {
-            selectImpl = value!;
-          });
-        },
-        initialSelection: selectImpl,
-        dropdownMenuEntries: const [
-          DropdownMenuEntry(value: "torznab", label: "Torznab"),
+    var body = FormBuilder(
+      key: _formKey,
+      initialValue: {
+        "name": indexer.name,
+        "url": indexer.url,
+        "api_key": indexer.apiKey,
+        "impl": "torznab"
+      },
+      child: Column(
+        children: [
+          FormBuilderDropdown(
+            name: "impl",
+            decoration: const InputDecoration(labelText: "类型"),
+            items: const [
+              DropdownMenuItem(value: "torznab", child: Text("Torznab")),
+            ],
+          ),
+          FormBuilderTextField(
+            name: "name",
+            decoration: Commons.requiredTextFieldStyle(text: "名称"),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.required(),
+          ),
+          FormBuilderTextField(
+            name: "url",
+            decoration: Commons.requiredTextFieldStyle(text: "地址"),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+              FormBuilderValidators.url()
+            ]),
+          ),
+          FormBuilderTextField(
+            name: "api_key",
+            decoration: Commons.requiredTextFieldStyle(text: "API Key"),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.required(),
+          ),
         ],
       ),
-      TextField(
-        decoration: Commons.requiredTextFieldStyle(text: "名称"),
-        controller: nameController,
-      ),
-      TextField(
-        decoration: Commons.requiredTextFieldStyle(text: "地址"),
-        controller: urlController,
-      ),
-      TextField(
-        decoration: Commons.requiredTextFieldStyle(text: "API Key"),
-        controller: apiKeyController,
-      ),
-    ];
+    );
     onDelete() async {
       return ref.read(indexersProvider.notifier).deleteIndexer(indexer.id!);
     }
 
     onSubmit() async {
-      return ref.read(indexersProvider.notifier).addIndexer(Indexer(
-          name: nameController.text,
-          url: urlController.text,
-          apiKey: apiKeyController.text));
+      if (_formKey.currentState!.saveAndValidate()) {
+        var values = _formKey.currentState!.value;
+        return ref.read(indexersProvider.notifier).addIndexer(Indexer(
+            name: values["name"],
+            url: values["url"],
+            apiKey: values["api_key"]));
+      } else {
+        throw "数据校验失败";
+      }
     }
 
     return showSettingDialog(
-        "索引器", indexer.id != null, children, onSubmit, onDelete);
+        "索引器", indexer.id != null, body, onSubmit, onDelete);
   }
 
   Future<void> showDownloadClientDetails(DownloadClient client) {
-    var nameController = TextEditingController(text: client.name);
-    var urlController = TextEditingController(text: client.url);
-    var userController = TextEditingController(text: client.user);
-    var passController = TextEditingController(text: client.password);
-
+    final _formKey = GlobalKey<FormBuilderState>();
     var _enableAuth = isNotBlank(client.user);
     String selectImpl = "transmission";
-    var body = <Widget>[
-      DropdownMenu(
-        label: const Text("类型"),
-        onSelected: (value) {
-          setState(() {
-            selectImpl = value!;
-          });
-        },
-        initialSelection: selectImpl,
-        dropdownMenuEntries: const [
-          DropdownMenuEntry(value: "transmission", label: "Transmission"),
-        ],
-      ),
-      TextField(
-        decoration: Commons.requiredTextFieldStyle(text: "名称"),
-        controller: nameController,
-      ),
-      TextField(
-        decoration: Commons.requiredTextFieldStyle(text: "地址"),
-        controller: urlController,
-      ),
-      StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-        return Column(
-          children: [
-            SwitchListTile(
-                title: const Text("需要认证"),
-                value: _enableAuth,
-                onChanged: (v) {
+
+    final body =
+        StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+      return FormBuilder(
+          key: _formKey,
+          initialValue: {
+            "name": client.name,
+            "url": client.url,
+            "user": client.user,
+            "password": client.password,
+            "impl": "transmission"
+          },
+          child: Column(
+            children: [
+              FormBuilderDropdown<String>(
+                name: "impl",
+                decoration: const InputDecoration(labelText: "类型"),
+                onChanged: (value) {
                   setState(() {
-                    _enableAuth = v;
+                    selectImpl = value!;
                   });
-                }),
-            _enableAuth
-                ? Column(
-                    children: [
-                      TextField(
-                        decoration: Commons.requiredTextFieldStyle(text: "用户"),
-                        controller: userController,
-                      ),
-                      TextField(
-                        decoration: Commons.requiredTextFieldStyle(text: "密码"),
-                        controller: passController,
-                      ),
-                    ],
-                  )
-                : Container()
-          ],
-        );
-      })
-    ];
+                },
+                items: const [
+                  DropdownMenuItem(
+                      value: "transmission", child: Text("Transmission")),
+                ],
+              ),
+              FormBuilderTextField(
+                  name: "name",
+                  decoration: const InputDecoration(labelText: "名称"),
+                  validator: FormBuilderValidators.required(),
+                  autovalidateMode: AutovalidateMode.onUserInteraction),
+              FormBuilderTextField(
+                name: "url",
+                decoration: const InputDecoration(
+                    labelText: "地址", hintText: "http://127.0.0.1:9091"),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                  FormBuilderValidators.url()
+                ]),
+              ),
+              StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  children: [
+                    FormBuilderSwitch(
+                        name: "auth",
+                        title: const Text("需要认证"),
+                        initialValue: _enableAuth,
+                        onChanged: (v) {
+                          setState(() {
+                            _enableAuth = v!;
+                          });
+                        }),
+                    _enableAuth
+                        ? Column(
+                            children: [
+                              FormBuilderTextField(
+                                  name: "user",
+                                  decoration: Commons.requiredTextFieldStyle(
+                                      text: "用户"),
+                                  validator: FormBuilderValidators.required(),
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction),
+                              FormBuilderTextField(
+                                  name: "password",
+                                  decoration: Commons.requiredTextFieldStyle(
+                                      text: "密码"),
+                                  validator: FormBuilderValidators.required(),
+                                  obscureText: true,
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction),
+                            ],
+                          )
+                        : Container()
+                  ],
+                );
+              })
+            ],
+          ));
+    });
     onDelete() async {
       return ref
           .read(dwonloadClientsProvider.notifier)
@@ -366,13 +422,18 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
     }
 
     onSubmit() async {
-      return ref.read(dwonloadClientsProvider.notifier).addDownloadClients(
-          DownloadClient(
-              name: nameController.text,
-              implementation: "transmission",
-              url: urlController.text,
-              user: _enableAuth ? userController.text : null,
-              password: _enableAuth ? passController.text : null));
+      if (_formKey.currentState!.saveAndValidate()) {
+        var values = _formKey.currentState!.value;
+        return ref.read(dwonloadClientsProvider.notifier).addDownloadClients(
+            DownloadClient(
+                name: values["name"],
+                implementation: values["impl"],
+                url: values["url"],
+                user: _enableAuth ? values["user"] : null,
+                password: _enableAuth ? values["password"] : null));
+      } else {
+        throw "数据校验不通过";
+      }
     }
 
     return showSettingDialog(
@@ -380,112 +441,137 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
   }
 
   Future<void> showStorageDetails(Storage s) {
-    var nameController = TextEditingController(text: s.name);
-    var tvPathController = TextEditingController();
-    var moviePathController = TextEditingController();
-    var urlController = TextEditingController();
-    var userController = TextEditingController();
-    var passController = TextEditingController();
-    bool enablingChangeFileHash = false;
-    if (s.settings != null) {
-      tvPathController.text = s.settings!["tv_path"] ?? "";
-      moviePathController.text = s.settings!["movie_path"] ?? "";
-      urlController.text = s.settings!["url"] ?? "";
-      userController.text = s.settings!["user"] ?? "";
-      passController.text = s.settings!["password"] ?? "";
-      enablingChangeFileHash =
-          s.settings!["change_file_hash"] == "true" ? true : false;
-    }
+    final _formKey = GlobalKey<FormBuilderState>();
 
     String selectImpl = s.implementation == null ? "local" : s.implementation!;
     final widgets =
         StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DropdownMenu(
-            label: const Text("类型"),
-            onSelected: (value) {
-              setState(() {
-                selectImpl = value!;
-              });
-            },
-            initialSelection: selectImpl,
-            dropdownMenuEntries: const [
-              DropdownMenuEntry(value: "local", label: "本地存储"),
-              DropdownMenuEntry(value: "webdav", label: "webdav")
+      return FormBuilder(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.disabled,
+          initialValue: {
+            "name": s.name,
+            "impl": s.implementation == null ? "local" : s.implementation!,
+            "user": s.settings != null ? s.settings!["user"] ?? "" : "",
+            "password": s.settings != null ? s.settings!["password"] ?? "" : "",
+            "tv_path": s.settings != null ? s.settings!["tv_path"] ?? "" : "",
+            "url": s.settings != null ? s.settings!["url"] ?? "" : "",
+            "movie_path":
+                s.settings != null ? s.settings!["movie_path"] ?? "" : "",
+            "change_file_hash": s.settings != null
+                ? s.settings!["change_file_hash"] == "true"
+                    ? true
+                    : false
+                : false,
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              FormBuilderDropdown<String>(
+                name: "impl",
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                decoration: const InputDecoration(labelText: "类型"),
+                onChanged: (value) {
+                  setState(() {
+                    selectImpl = value!;
+                  });
+                },
+                items: const [
+                  DropdownMenuItem(
+                    value: "local",
+                    child: Text("本地存储"),
+                  ),
+                  DropdownMenuItem(
+                    value: "webdav",
+                    child: Text("webdav"),
+                  )
+                ],
+                validator: FormBuilderValidators.required(),
+              ),
+              FormBuilderTextField(
+                name: "name",
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                initialValue: s.name,
+                decoration: const InputDecoration(labelText: "名称"),
+                validator: FormBuilderValidators.required(),
+              ),
+              selectImpl != "local"
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FormBuilderTextField(
+                          name: "url",
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration:
+                              const InputDecoration(labelText: "Webdav地址"),
+                          validator: FormBuilderValidators.required(),
+                        ),
+                        FormBuilderTextField(
+                          name: "user",
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: const InputDecoration(labelText: "用户"),
+                        ),
+                        FormBuilderTextField(
+                          name: "password",
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: const InputDecoration(labelText: "密码"),
+                          obscureText: true,
+                        ),
+                        FormBuilderCheckbox(
+                          name: "change_file_hash",
+                          title: const Text(
+                            "上传时更改文件哈希",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Container(),
+              FormBuilderTextField(
+                name: "tv_path",
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                decoration: const InputDecoration(labelText: "电视剧路径"),
+                validator: FormBuilderValidators.required(),
+              ),
+              FormBuilderTextField(
+                name: "movie_path",
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                decoration: const InputDecoration(labelText: "电影路径"),
+                validator: FormBuilderValidators.required(),
+              )
             ],
-          ),
-          TextField(
-            decoration: const InputDecoration(labelText: "名称"),
-            controller: nameController,
-          ),
-          selectImpl != "local"
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      decoration: const InputDecoration(labelText: "Webdav地址"),
-                      controller: urlController,
-                    ),
-                    TextField(
-                      decoration: const InputDecoration(labelText: "用户"),
-                      controller: userController,
-                    ),
-                    TextField(
-                      decoration: const InputDecoration(labelText: "密码"),
-                      controller: passController,
-                    ),
-                    CheckboxListTile(
-                        title: const Text("上传时更改文件哈希", style: TextStyle(fontSize: 14),),
-                        value: enablingChangeFileHash,
-                        onChanged: (v) {
-                          setState(() {
-                            enablingChangeFileHash = v??false;
-                          });
-                        }),
-                  ],
-                )
-              : Container(),
-          TextField(
-            decoration: const InputDecoration(labelText: "电视剧路径"),
-            controller: tvPathController,
-          ),
-          TextField(
-            decoration: const InputDecoration(labelText: "电影路径"),
-            controller: moviePathController,
-          )
-        ],
-      );
+          ));
     });
     onSubmit() async {
-      return ref.read(storageSettingProvider.notifier).addStorage(Storage(
-            name: nameController.text,
-            implementation: selectImpl,
-            settings: {
-              "tv_path": tvPathController.text,
-              "movie_path": moviePathController.text,
-              "url": urlController.text,
-              "user": userController.text,
-              "password": passController.text,
-              "change_file_hash": enablingChangeFileHash ? "true" : "false"
-            },
-          ));
+      if (_formKey.currentState!.saveAndValidate()) {
+        final values = _formKey.currentState!.value;
+        return ref.read(storageSettingProvider.notifier).addStorage(Storage(
+              name: values["name"],
+              implementation: selectImpl,
+              settings: {
+                "tv_path": values["tv_path"],
+                "movie_path": values["movie_path"],
+                "url": values["url"],
+                "user": values["user"],
+                "password": values["password"],
+                "change_file_hash":
+                    values["change_file_hash"] as bool ? "true" : "false"
+              },
+            ));
+      } else {
+        throw "数据校验位未通过";
+      }
     }
 
     onDelete() async {
       return ref.read(storageSettingProvider.notifier).deleteStorage(s.id!);
     }
 
-    return showSettingDialog('存储', s.id != null, [widgets], onSubmit, onDelete);
+    return showSettingDialog('存储', s.id != null, widgets, onSubmit, onDelete);
   }
 
-  Future<void> showSettingDialog(
-      String title,
-      bool showDelete,
-      List<Widget> children,
-      Future Function() onSubmit,
-      Future Function() onDelete) {
+  Future<void> showSettingDialog(String title, bool showDelete, Widget body,
+      Future Function() onSubmit, Future Function() onDelete) {
     return showDialog<void>(
         context: context,
         barrierDismissible: true,
@@ -495,9 +581,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
             content: SingleChildScrollView(
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 200),
-                child: ListBody(
-                  children: children,
-                ),
+                child: body,
               ),
             ),
             actions: <Widget>[
@@ -505,7 +589,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                   ? TextButton(
                       onPressed: () {
                         final f = onDelete();
-                        f.whenComplete(() {
+                        f.then((v) {
                           Utils.showSnakeBar("删除成功");
                           Navigator.of(context).pop();
                         }).onError((e, s) {
@@ -524,7 +608,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 child: const Text('确定'),
                 onPressed: () {
                   final f = onSubmit();
-                  f.whenComplete(() {
+                  f.then((v) {
                     Utils.showSnakeBar("操作成功");
                     Navigator.of(context).pop();
                   }).onError((e, s) {

@@ -118,6 +118,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.1.11+1"
+  flutter_form_builder:
+    dependency: "direct main"
+    description:
+      name: flutter_form_builder
+      sha256: "447f8808f68070f7df968e8063aada3c9d2e90e789b5b70f3b44e4b315212656"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "9.3.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -126,6 +134,11 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.0"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_login:
     dependency: "direct main"
     description:
@@ -160,6 +173,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "10.7.0"
+  form_builder_validators:
+    dependency: "direct main"
+    description:
+      name: form_builder_validators
+      sha256: c61ed7b1deecf0e1ebe49e2fa79e3283937c5a21c7e48e3ed9856a4a14e1191a
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "11.0.0"
   go_router:
     dependency: "direct main"
     description:
