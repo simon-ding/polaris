@@ -25,6 +25,7 @@ COPY --from=flutter /app/build/web ./ui/build/web/
 RUN CGO_ENABLED=1 go build -o polaris ./cmd/ 
 
 FROM debian:12
+ENV TZ="Asia/Shanghai"
 
 WORKDIR /app
 RUN apt-get update && apt-get -y install ca-certificates
