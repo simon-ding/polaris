@@ -34,12 +34,16 @@ func SetLogLevel(l string) {
 	switch strings.TrimSpace(strings.ToLower(l)) {
 	case "debug":
 		atom.SetLevel(zap.DebugLevel)
+		Debug("set log level to debug")
 	case "info":
 		atom.SetLevel(zap.InfoLevel)
+		Info("set log level to info")
 	case "warn", "warnning":
 		atom.SetLevel(zap.WarnLevel)
+		Warn("set log level to warnning")
 	case "error":
 		atom.SetLevel(zap.ErrorLevel)
+		Error("set log level to error")
 	}
 }
 
