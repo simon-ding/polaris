@@ -20,18 +20,18 @@ func SearchSeasonPackage(db1 *db.Client, seriesId, seasonNum int, checkResolutio
 }
 
 func isNumberedSeries(detail *db.MediaDetails) bool {
-	epCount := 0
-	seSeen := make(map[int]int, 0)
+	hasSeason2 := false
+	season2HasEpisode1 := false
 	for _, ep := range detail.Episodes {
-		if ep.SeasonNumber == 0 {
-			continue
+		if ep.SeasonNumber == 2 {
+			hasSeason2 = true
+			if ep.EpisodeNumber == 1 {
+				season2HasEpisode1 = true
+			}
+	
 		}
-		if ep.EpisodeNumber == 1 {
-			epCount++
-		}
-		seSeen[ep.SeasonNumber]++
 	}
-	return epCount == 1 && len(seSeen) > 2//only one 1st episode
+	return hasSeason2 && !season2HasEpisode1//only one 1st episode
 }
 
 func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkResolution bool) ([]torznab.Result, error) {
@@ -60,7 +60,7 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 			//should not want season
 			continue
 		}
-		
+
 		if episodeNum != -1 && meta.Episode != episodeNum { //not season pack, episode number equals
 			continue
 		} else if seasonNum == -1 && !meta.IsSeasonPack { //want season pack, but not season pack
