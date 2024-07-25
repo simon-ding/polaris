@@ -96,3 +96,50 @@ func (s *Server) getDownloadClient() (*transmission.Client, error) {
 	}
 	return trc, nil
 }
+
+
+type downloadClientIn struct {
+	Name           string `json:"name" binding:"required"`
+	URL            string `json:"url" binding:"required"`
+	User           string `json:"user"`
+	Password       string `json:"password"`
+	Implementation string `json:"implementation" binding:"required"`
+}
+
+func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
+	var in downloadClientIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind json")
+	}
+	//test connection
+	_, err := transmission.NewClient(transmission.Config{
+		URL: in.URL,
+		User: in.User,
+		Password: in.Password,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "tranmission setting")
+	}
+	if err := s.db.SaveTransmission(in.Name, in.URL, in.User, in.Password); err != nil {
+		return nil, errors.Wrap(err, "save transmission")
+	}
+	return nil, nil
+}
+
+func (s *Server) GetAllDonloadClients(c *gin.Context) (interface{}, error) {
+	res := s.db.GetAllDonloadClients()
+	if len(res) == 0 {
+		return nil, nil
+	}
+	return res, nil
+}
+
+func (s *Server) DeleteDownloadCLient(c *gin.Context) (interface{}, error) {
+	var ids = c.Param("id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, fmt.Errorf("id is not correct: %v", ids)
+	}
+	s.db.DeleteDownloadCLient(id)
+	return "success", nil
+}

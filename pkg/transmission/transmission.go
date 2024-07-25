@@ -28,6 +28,10 @@ func NewClient(c Config) (*Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
+	_, err = tbt.TorrentGetAll(context.TODO())
+	if err != nil {
+		return nil, errors.Wrap(err, "transmission cannot connect")
+	}
 	return &Client{c: tbt, cfg: c}, nil
 }
 
