@@ -15,7 +15,7 @@ const dataPath = "./data"
 
 func init() {
 	atom = zap.NewAtomicLevel()
-
+	atom.SetLevel(zap.DebugLevel)
 	filer, _, err := zap.Open(filepath.Join(dataPath, "polaris.log"))
 	if err != nil {
 		panic(err)
