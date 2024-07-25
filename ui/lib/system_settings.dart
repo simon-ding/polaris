@@ -103,7 +103,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                   var indexer = value[i];
                   return SettingsCard(
                       onTap: () => showIndexerDetails(indexer),
-                      child: Text(indexer.name!));
+                      child: Text(indexer.name??""));
                 }
                 return SettingsCard(
                     onTap: () => showIndexerDetails(Indexer()),
@@ -121,7 +121,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 var client = value[i];
                 return SettingsCard(
                     onTap: () => showDownloadClientDetails(client),
-                    child: Text(client.name!));
+                    child: Text(client.name??""));
               }
               return SettingsCard(
                   onTap: () => showDownloadClientDetails(DownloadClient()),
@@ -138,7 +138,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                   var storage = value[i];
                   return SettingsCard(
                       onTap: () => showStorageDetails(storage),
-                      child: Text(storage.name!));
+                      child: Text(storage.name??""));
                 }
                 return SettingsCard(
                     onTap: () => showStorageDetails(Storage()),
