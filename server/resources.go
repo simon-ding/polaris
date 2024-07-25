@@ -185,6 +185,7 @@ type TorznabSearchResult struct {
 	Link    string `json:"link"`
 	Seeders int    `json:"seeders"`
 	Peers   int    `json:"peers"`
+	Source  string `json:"source"`
 }
 
 func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
@@ -215,6 +216,7 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 			Seeders: r.Seeders,
 			Peers:   r.Peers,
 			Link:    r.Link,
+			Source:  r.Source,
 		})
 	}
 	if len(searchResults) == 0 {
@@ -277,4 +279,3 @@ func (s *Server) DownloadMovieTorrent(c *gin.Context) (interface{}, error) {
 	return media.NameEn, nil
 
 }
-
