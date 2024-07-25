@@ -162,6 +162,10 @@ func (c *Client) UpdateEpiode(episodeId int, name, overview string) error {
 	return c.ent.Episode.Update().Where(episode.ID(episodeId)).SetTitle(name).SetOverview(overview).Exec(context.TODO())
 }
 
+func (c *Client) UpdateEpiode2(episodeId int, name, overview, airdate string) error {
+	return c.ent.Episode.Update().Where(episode.ID(episodeId)).SetTitle(name).SetOverview(overview).SetAirDate(airdate).Exec(context.TODO())
+}
+
 type MediaDetails struct {
 	*ent.Media
 	Episodes []*ent.Episode `json:"episodes"`
@@ -201,6 +205,19 @@ func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
 		SetAirDate(d.AirDate).
 		SetSeasonNumber(d.SeasonNumber).
 		SetEpisodeNumber(d.EpisodeNumber).
+		SetOverview(d.Overview).
+		SetTitle(d.Title).Save(context.TODO())
+
+	return ep.ID, err
+}
+
+func (c *Client) SaveEposideDetail2(d *ent.Episode) (int, error) {
+	ep, err := c.ent.Episode.Create().
+		SetAirDate(d.AirDate).
+		SetSeasonNumber(d.SeasonNumber).
+		SetEpisodeNumber(d.EpisodeNumber).
+		SetMediaID(d.MediaID).
+		SetStatus(d.Status).
 		SetOverview(d.Overview).
 		SetTitle(d.Title).Save(context.TODO())
 
@@ -310,15 +327,14 @@ func (s *StorageInfo) ToWebDavSetting() WebdavSetting {
 		panic("not webdav storage")
 	}
 	return WebdavSetting{
-		URL:  s.Settings["url"],
-		TvPath: s.Settings["tv_path"],
-		MoviePath: s.Settings["movie_path"],
-		User: s.Settings["user"],
-		Password: s.Settings["password"],
+		URL:            s.Settings["url"],
+		TvPath:         s.Settings["tv_path"],
+		MoviePath:      s.Settings["movie_path"],
+		User:           s.Settings["user"],
+		Password:       s.Settings["password"],
 		ChangeFileHash: s.Settings["change_file_hash"],
 	}
 }
-
 
 type LocalDirSetting struct {
 	TvPath    string `json:"tv_path"`
@@ -500,7 +516,6 @@ func (c *Client) SetSeasonAllEpisodeStatus(mediaID, seasonNum int, status episod
 func (c *Client) TmdbIdInWatchlist(tmdb_id int) bool {
 	return c.ent.Media.Query().Where(media.TmdbID(tmdb_id)).CountX(context.TODO()) > 0
 }
-
 
 func (c *Client) GetDownloadHistory(mediaID int) ([]*ent.History, error) {
 	return c.ent.History.Query().Where(history.MediaID(mediaID)).All(context.TODO())

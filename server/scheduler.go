@@ -23,6 +23,7 @@ func (s *Server) scheduler() {
 		s.downloadTvSeries()
 		s.downloadMovie()
 	})
+	s.mustAddCron("@every 12h", s.checkAllSeriesNewSeason)
 	s.cron.Start()
 }
 
@@ -316,5 +317,51 @@ func (s *Server) downloadMovieSingleEpisode(ep *ent.Episode) error {
 	s.tasks[history.ID] = &Task{Torrent: torrent}
 
 	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+	return nil
+}
+
+func (s *Server) checkAllSeriesNewSeason() {
+	log.Infof("begin checking series all new season")
+	allSeries := s.db.GetMediaWatchlist(media.MediaTypeTv)
+	for _, series := range allSeries {
+		err := s.checkSeiesNewSeason(series)
+		if err != nil {
+			log.Errorf("check series new season error: series name %v, error: %v", series.NameEn, err)
+		}
+	}
+}
+
+func (s *Server) checkSeiesNewSeason(media *ent.Media) error{
+	d, err := s.MustTMDB().GetTvDetails(media.TmdbID, s.language)
+	if err != nil {
+		return errors.Wrap(err, "tmdb")
+	}
+	lastsSason := d.NumberOfSeasons
+	seasonDetail, err := s.MustTMDB().GetSeasonDetails(media.TmdbID, lastsSason, s.language)
+	if err != nil {
+		return errors.Wrap(err, "tmdb season")
+	}
+	
+	for _, ep := range seasonDetail.Episodes {
+		epDb, err := s.db.GetEpisode(media.ID, ep.SeasonNumber, ep.EpisodeNumber)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				log.Infof("add new episode: %+v", ep)
+				episode := &ent.Episode{
+					MediaID: media.ID,
+					SeasonNumber: ep.SeasonNumber,
+					EpisodeNumber: ep.EpisodeNumber,
+					Title: ep.Name,
+					Overview: ep.Overview,
+					AirDate: ep.AirDate,
+					Status: episode.StatusMissing,
+				}
+				s.db.SaveEposideDetail2(episode)
+			}
+		} else {//update episode
+			log.Infof("update new episode: %+v", ep)
+			s.db.UpdateEpiode2(epDb.ID, ep.Name, ep.Overview, ep.AirDate)
+		}
+	}
 	return nil
 }
