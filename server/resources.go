@@ -195,11 +195,6 @@ func (s *Server) SearchAvailableMovies(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "convert")
 	}
 
-	movieDetail := s.db.GetMediaDetails(id)
-	if movieDetail == nil {
-		return nil, errors.New("no media found of id " + ids)
-	}
-
 	res, err := core.SearchMovie(s.db, id, false)
 	if err != nil {
 		if err.Error() == "no resource found" {

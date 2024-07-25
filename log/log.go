@@ -1,18 +1,50 @@
 package log
 
 import (
+	"path/filepath"
+	"strings"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 var sugar *zap.SugaredLogger
+var atom zap.AtomicLevel
+
+const dataPath = "./data"
 
 func init() {
-	config := zap.NewDevelopmentConfig()
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	config.DisableStacktrace = true
-	logger, _ := config.Build(zap.AddCallerSkip(1))
+	atom = zap.NewAtomicLevel()
+
+	filer, _, err := zap.Open(filepath.Join(dataPath, "polaris.log"))
+	if err != nil {
+		panic(err)
+	}
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	
+	logger := zap.New(zapcore.NewCore(consoleEncoder, zapcore.Lock(filer), atom), zap.AddCallerSkip(1))
+
 	sugar = logger.Sugar()
+
+}
+
+
+
+func SetLogLevel(l string) {
+	switch strings.TrimSpace(strings.ToLower(l)) {
+	case "debug":
+		atom.SetLevel(zap.DebugLevel)
+	case "info":
+		atom.SetLevel(zap.InfoLevel)
+	case "warn", "warnning":
+		atom.SetLevel(zap.WarnLevel)
+	case "error":
+		atom.SetLevel(zap.ErrorLevel)
+	}
+}
+
+func Logger() *zap.SugaredLogger {
+	return sugar
 }
 
 func Info(args ...interface{}) {

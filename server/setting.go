@@ -143,3 +143,16 @@ func (s *Server) DeleteDownloadCLient(c *gin.Context) (interface{}, error) {
 	s.db.DeleteDownloadCLient(id)
 	return "success", nil
 }
+
+type logLovelIn struct {
+	Level string `json:"level"`
+}
+
+func (s *Server) SetLogLevel(c *gin.Context) (interface{}, error) {
+	var in logLovelIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind json")
+	}
+	log.SetLogLevel(in.Level)
+	return "success", nil
+}

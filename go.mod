@@ -13,6 +13,8 @@ require (
 
 require github.com/adrg/strutil v0.3.1
 
+require github.com/gin-contrib/zap v1.1.3 // indirect
+
 require (
 	ariga.io/atlas v0.19.1-0.20240203083654-5948b60a8e43 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
@@ -74,5 +76,5 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.19.0
-	go.uber.org/multierr v1.10.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 )

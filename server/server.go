@@ -10,6 +10,9 @@ import (
 	"polaris/pkg/tmdb"
 	"polaris/pkg/transmission"
 	"polaris/ui"
+	"time"
+
+	ginzap "github.com/gin-contrib/zap"
 
 	"github.com/gin-contrib/static"
 	"github.com/robfig/cron"
@@ -43,6 +46,8 @@ func (s *Server) Serve() error {
 	s.jwtSerect = s.db.GetSetting(db.JwtSerectKey)
 	//st, _ := fs.Sub(ui.Web, "build/web")
 	s.r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
+	s.r.Use(ginzap.Ginzap(log.Logger().Desugar(), time.RFC3339, false))
+	s.r.Use(ginzap.RecoveryWithZap(log.Logger().Desugar(), true))
 
 	s.r.POST("/api/login", HttpHandler(s.Login))
 
@@ -57,6 +62,7 @@ func (s *Server) Serve() error {
 		setting.GET("/general", HttpHandler(s.GetSetting))
 		setting.POST("/auth", HttpHandler(s.EnableAuth))
 		setting.GET("/auth", HttpHandler(s.GetAuthSetting))
+		setting.POST("/loglevel", HttpHandler(s.SetLogLevel))
 	}
 	activity := api.Group("/activity")
 	{
@@ -146,7 +152,7 @@ func (s *Server) proxyPosters(c *gin.Context) {
 		req.Host = remote.Host
 		req.URL.Scheme = remote.Scheme
 		req.URL.Host = remote.Host
-		req.URL.Path = fmt.Sprintf("/t/p/w500/%v", c.Param("proxyPath")) 
+		req.URL.Path = fmt.Sprintf("/t/p/w500/%v", c.Param("proxyPath"))
 	}
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
