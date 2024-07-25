@@ -260,7 +260,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               .notifier)
                           .submit2Watchlist(item.id!, storageSelected,
                               resSelected, item.mediaType!, pathController.text)
-                          .then((v) {
+                          .whenComplete(() {
                         Utils.showSnakeBar("添加成功");
                         Navigator.of(context).pop();
                       }).onError((error, trace) {
