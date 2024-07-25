@@ -295,10 +295,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
             name: "url",
             decoration: Commons.requiredTextFieldStyle(text: "地址"),
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(),
-              FormBuilderValidators.url()
-            ]),
+            validator: FormBuilderValidators.required(),
           ),
           FormBuilderTextField(
             name: "api_key",
@@ -370,10 +367,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 decoration: const InputDecoration(
                     labelText: "地址", hintText: "http://127.0.0.1:9091"),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(),
-                  FormBuilderValidators.url()
-                ]),
+                validator: FormBuilderValidators.required(),
               ),
               StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
