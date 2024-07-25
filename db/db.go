@@ -316,9 +316,9 @@ func (c *Client) DeleteDownloadCLient(id int) {
 
 // Storage is the model entity for the Storage schema.
 type StorageInfo struct {
-	Name           string            `json:"name"`
-	Implementation string            `json:"implementation"`
-	Settings       map[string]string `json:"settings"`
+	Name           string            `json:"name" binding:"required"`
+	Implementation string            `json:"implementation" binding:"required"`
+	Settings       map[string]string `json:"settings" binding:"required"`
 	Default        bool              `json:"default"`
 }
 
