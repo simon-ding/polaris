@@ -35,7 +35,7 @@ func (s *Server) mustAddCron(spec string, cmd func()) {
 }
 
 func (s *Server) checkTasks() {
-	log.Infof("begin check tasks...")
+	log.Debug("begin check tasks...")
 	for id, t := range s.tasks {
 		if !t.Exists() {
 			log.Infof("task no longer exists: %v", id)
@@ -213,50 +213,27 @@ func (s *Server) downloadTvSeries() {
 	log.Infof("begin check all tv series resources")
 	allSeries := s.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
-		detail, err := s.MustTMDB().GetTvDetails(series.TmdbID, s.language)
-		if err != nil {
-			log.Errorf("get tv details error: %v", err)
-			continue
-		}
-
-		lastEpisode, err := s.db.GetEpisode(series.ID, detail.LastEpisodeToAir.SeasonNumber, detail.LastEpisodeToAir.EpisodeNumber)
-		if err != nil {
-			log.Errorf("get last episode error: %v", err)
-			continue
-		}
-		if lastEpisode.Title != detail.LastEpisodeToAir.Name {
-			s.db.UpdateEpiode(lastEpisode.ID, detail.LastEpisodeToAir.Name, detail.LastEpisodeToAir.Overview)
-		}
-
-		nextEpisode, err := s.db.GetEpisode(series.ID, detail.NextEpisodeToAir.SeasonNumber, detail.NextEpisodeToAir.EpisodeNumber)
-		if err == nil {
-			if nextEpisode.Title != detail.NextEpisodeToAir.Name {
-				s.db.UpdateEpiode(nextEpisode.ID, detail.NextEpisodeToAir.Name, detail.NextEpisodeToAir.Overview)
-				log.Errorf("updated next episode name to %v", detail.NextEpisodeToAir.Name)
-			}
-		}
-
-		if lastEpisode.Status == episode.StatusMissing {
-			if lastEpisode.AirDate != "" {
-				t, err := time.ParseInLocation("2006-01-02", lastEpisode.AirDate, time.Local)
-				if err != nil {
-					log.Errorf("parse air date error: airdate %v, error %v",lastEpisode.AirDate, err)
-				} else {
-					if series.CreatedAt.Sub(t) > 24*time.Hour { //24h容错时间
-						log.Infof("episode were aired 24h before monitoring, skipping: %v", lastEpisode.Title)
-						return
-					}
-				}
-			}
-	
-			name, err := s.searchAndDownload(series.ID, lastEpisode.SeasonNumber, lastEpisode.EpisodeNumber)
+		tvDetail := s.db.GetMediaDetails(series.ID)
+		for _, ep := range tvDetail.Episodes {
+			t, err := time.ParseInLocation("2006-01-02", ep.AirDate, time.Local)
 			if err != nil {
-				log.Infof("cannot find resource to download for %s: %v", lastEpisode.Title, err)
+				log.Error("air date not known, skip: %v", ep.Title)
+				continue
+			}
+			if series.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
+				continue
+			}
+			if ep.Status != episode.StatusMissing { //已经下载的不去下载
+				continue
+			}
+			name, err := s.searchAndDownload(series.ID, ep.SeasonNumber, ep.EpisodeNumber)
+			if err != nil {
+				log.Infof("cannot find resource to download for %s: %v", ep.Title, err)
 			} else {
 				log.Infof("begin download torrent resource: %v", name)
 			}
-		}
 
+		}
 
 	}
 }
@@ -359,8 +336,10 @@ func (s *Server) checkSeiesNewSeason(media *ent.Media) error{
 				s.db.SaveEposideDetail2(episode)
 			}
 		} else {//update episode
-			log.Infof("update new episode: %+v", ep)
-			s.db.UpdateEpiode2(epDb.ID, ep.Name, ep.Overview, ep.AirDate)
+			if ep.Name != epDb.Title || ep.Overview != epDb.Overview || ep.AirDate != epDb.AirDate {
+				log.Infof("update new episode: %+v", ep)
+				s.db.UpdateEpiode2(epDb.ID, ep.Name, ep.Overview, ep.AirDate)	
+			}
 		}
 	}
 	return nil
