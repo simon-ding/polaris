@@ -341,7 +341,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
             url: values["url"],
             apiKey: values["api_key"]));
       } else {
-        throw "数据校验失败";
+        throw "validation_error";
       }
     }
 
@@ -449,7 +449,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 user: _enableAuth ? values["user"] : null,
                 password: _enableAuth ? values["password"] : null));
       } else {
-        throw "数据校验不通过";
+        throw "validation_error";
       }
     }
 
@@ -576,7 +576,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
               },
             ));
       } else {
-        throw "数据校验位未通过";
+        throw "validation_error";
       }
     }
 
@@ -629,7 +629,9 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                     Utils.showSnakeBar("操作成功");
                     Navigator.of(context).pop();
                   }).onError((e, s) {
-                    Utils.showSnakeBar("操作失败：$e");
+                    if (e.toString() != "validation_error") {
+                      Utils.showSnakeBar("操作失败：$e");
+                    }
                   });
                 },
               ),
