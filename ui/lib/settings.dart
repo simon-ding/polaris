@@ -72,7 +72,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                               value: "debug", child: Text("DEBUG")),
                           DropdownMenuItem(value: "info", child: Text("INFO")),
                           DropdownMenuItem(
-                              value: "warn", child: Text("WARNNING")),
+                              value: "warn", child: Text("WARNING")),
                           DropdownMenuItem(
                               value: "error", child: Text("ERROR")),
                         ],
