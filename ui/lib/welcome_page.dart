@@ -46,8 +46,8 @@ class WelcomePage extends ConsumerWidget {
                     child: Column(
                       children: <Widget>[
                         SizedBox(
-                          width: 130,
-                          height: 195,
+                          width: 140,
+                          height: 210,
                           child: Image.network(
                             "${APIs.imagesUrl}/${item.id}/poster.jpg",
                             fit: BoxFit.fill,
@@ -55,7 +55,7 @@ class WelcomePage extends ConsumerWidget {
                           ),
                         ),
                         SizedBox(
-                            width: 130,
+                            width: 140,
                             child: LinearProgressIndicator(
                               value: 1,
                               color: item.status == "downloaded"
