@@ -21,7 +21,6 @@ func (Episode) Fields() []ent.Field {
 		field.String("overview"),
 		field.String("air_date"),
 		field.Enum("status").Values("missing", "downloading", "downloaded").Default("missing"),
-		field.String("file_in_storage").Optional(),
 	}
 }
 

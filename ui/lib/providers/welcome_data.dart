@@ -150,6 +150,7 @@ class MediaDetail {
   String? resolution;
   int? storageId;
   String? airDate;
+  String? status;
 
   MediaDetail({
     this.id,
@@ -163,6 +164,7 @@ class MediaDetail {
     this.resolution,
     this.storageId,
     this.airDate,
+    this.status,
   });
 
   MediaDetail.fromJson(Map<String, dynamic> json) {
@@ -177,6 +179,7 @@ class MediaDetail {
     resolution = json["resolution"];
     storageId = json["storage_id"];
     airDate = json["air_date"];
+    status = json["status"];
   }
 }
 

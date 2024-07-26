@@ -520,3 +520,15 @@ func (c *Client) TmdbIdInWatchlist(tmdb_id int) bool {
 func (c *Client) GetDownloadHistory(mediaID int) ([]*ent.History, error) {
 	return c.ent.History.Query().Where(history.MediaID(mediaID)).All(context.TODO())
 }
+
+func (c *Client) GetMovieDummyEpisode(movieId int) (*ent.Episode, error) {
+	_, err := c.ent.Media.Query().Where(media.ID(movieId), media.MediaTypeEQ(media.MediaTypeMovie)).First(context.TODO())
+	if err != nil {
+		return nil, errors.Wrap(err, "get movie")
+	}
+	ep, err := c.ent.Episode.Query().Where(episode.MediaID(movieId)).First(context.TODO())
+	if err != nil {
+		return nil, errors.Wrap(err, "query episode")
+	}
+	return ep, nil
+}

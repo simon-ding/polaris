@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"polaris/db"
 	"polaris/ent"
+	"polaris/ent/episode"
 	"polaris/ent/media"
 	"polaris/log"
 	"strconv"
@@ -238,6 +239,15 @@ func (s *Server) downloadImage(url string, mediaID int, name string) error {
 
 }
 
+type MediaWithStatus struct {
+	*ent.Media
+	Status string `json:"status"`
+}
+//missing: episode aired missing
+//downloaded: all monitored episode downloaded
+//monitoring: episode aired downloaded, but still has not aired episode
+//for movie, only monitoring/downloaded
+
 func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 	list := s.db.GetMediaWatchlist(media.MediaTypeTv)
 	return list, nil
@@ -245,7 +255,23 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 
 func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
 	list := s.db.GetMediaWatchlist(media.MediaTypeMovie)
-	return list, nil
+	res := make([]MediaWithStatus, len(list))
+	for i, item := range list {
+		var ms = MediaWithStatus{
+			Media: item,
+			Status: "monitoring",
+		}
+		dummyEp, err := s.db.GetMovieDummyEpisode(item.ID)
+		if err != nil {
+			log.Errorf("get dummy episode: %v", err)
+		} else {
+			if dummyEp.Status != episode.StatusMissing {
+				ms.Status = "downloaded"
+			}
+		}
+		res[i] = ms
+	}
+	return res, nil
 }
 
 func (s *Server) GetMediaDetails(c *gin.Context) (interface{}, error) {
