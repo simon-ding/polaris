@@ -48,48 +48,27 @@ class WelcomePage extends ConsumerWidget {
                         SizedBox(
                           width: 130,
                           height: 195,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
-                            child: Stack(
-                              alignment: AlignmentDirectional.topEnd,
-                              children: [
-                                Image.network(
-                                  "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                                  fit: BoxFit.fill,
-                                  headers: APIs.authHeaders,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: () {
-                                    if (item.mediaType == "tv") {
-                                      return Text("");
-                                    }
-                                    var icon = const CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: Colors.black12,
-                                      child: Icon(
-                                        Icons.access_time_rounded,
-                                        color: Colors.blue,
-                                        size: 24,
-                                      ),
-                                    );
-                                    if (item.status == "downloaded") {
-                                      icon = const CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: Colors.black12,
-                                      child: Icon(
-                                        Icons.done_rounded,
-                                        color: Colors.green,
-                                        size: 24,
-                                      ),
-                                    );
-                                    }
-                                    return icon;
-                                  }(),
-                                )
-                              ],
-                            ),
+                          child: Image.network(
+                            "${APIs.imagesUrl}/${item.id}/poster.jpg",
+                            fit: BoxFit.fill,
+                            headers: APIs.authHeaders,
                           ),
+                        ),
+                        SizedBox(
+                          width: 130,
+                          child: () {
+                            if (item.mediaType == "movie" &&
+                                item.status == "downloaded") {
+                              return const LinearProgressIndicator(
+                                value: 1,
+                                color: Colors.green,
+                              );
+                            }
+                            return const LinearProgressIndicator(
+                              value: 1,
+                              color: Colors.blue,
+                            );
+                          }(),
                         ),
                         Text(
                           item.name!,
