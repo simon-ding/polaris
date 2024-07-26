@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 
 import 'package:ui/providers/settings.dart';
+import 'package:ui/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,7 +46,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
 
                           return DataRow(cells: [
                             DataCell(Text(item.name ?? "")),
-                            DataCell(Text("${item.size ?? 0}")),
+                            DataCell(Text((item.size??0).readableFileSize())),
                             DataCell(InkWell(
                               child: Icon(Icons.download),
                               onTap: () => launchUrl(uri,
