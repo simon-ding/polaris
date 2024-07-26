@@ -57,6 +57,11 @@ func (c *Client) init() {
 		log.Infof("set default download dir")
 		c.SetSetting(downloadDir, "/downloads")
 	}
+	logLevel := c.GetSetting(SettingLogLevel)
+	if logLevel == "" {
+		log.Infof("set default log level")
+		c.SetSetting(SettingLogLevel, "info")
+	}
 }
 
 func (c *Client) generateJwtSerectIfNotExist() {

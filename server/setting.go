@@ -35,6 +35,10 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 	}
 	if in.LogLevel != "" {
 		log.SetLogLevel(in.LogLevel)
+		if err := s.db.SetSetting(db.SettingLogLevel, in.LogLevel); err != nil {
+			return nil, errors.Wrap(err, "save log level")
+		}
+
 	}
 	return nil, nil
 }
@@ -42,10 +46,11 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	tmdb := s.db.GetSetting(db.SettingTmdbApiKey)
 	downloadDir := s.db.GetSetting(db.SettingDownloadDir)
-
+	logLevel := s.db.GetSetting(db.SettingLogLevel)
 	return &GeneralSettings{
 		TmdbApiKey:  tmdb,
 		DownloadDir: downloadDir,
+		LogLevel: logLevel,
 	}, nil
 }
 
@@ -144,18 +149,5 @@ func (s *Server) DeleteDownloadCLient(c *gin.Context) (interface{}, error) {
 		return nil, fmt.Errorf("id is not correct: %v", ids)
 	}
 	s.db.DeleteDownloadCLient(id)
-	return "success", nil
-}
-
-type logLovelIn struct {
-	Level string `json:"level"`
-}
-
-func (s *Server) SetLogLevel(c *gin.Context) (interface{}, error) {
-	var in logLovelIn
-	if err := c.ShouldBindJSON(&in); err != nil {
-		return nil, errors.Wrap(err, "bind json")
-	}
-	log.SetLogLevel(in.Level)
 	return "success", nil
 }

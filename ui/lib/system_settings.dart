@@ -37,9 +37,11 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 initialValue: {
                   "tmdb_api": v.tmdbApiKey,
-                  "download_dir": v.downloadDIr
+                  "download_dir": v.downloadDIr,
+                  "log_level": v.logLevel
                 },
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FormBuilderTextField(
                       name: "tmdb_api",
@@ -57,6 +59,26 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                       //
                       validator: FormBuilderValidators.required(),
                     ),
+                    SizedBox(
+                      width: 300,
+                      child: FormBuilderDropdown(
+                        name: "log_level",
+                        decoration: const InputDecoration(
+                          labelText: "日志级别",
+                          icon: Icon(Icons.file_present_rounded),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                              value: "debug", child: Text("Debug")),
+                          DropdownMenuItem(value: "info", child: Text("Info")),
+                          DropdownMenuItem(
+                              value: "warn", child: Text("Warnning")),
+                          DropdownMenuItem(
+                              value: "error", child: Text("Error")),
+                        ],
+                        validator: FormBuilderValidators.required(),
+                      ),
+                    ),
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 28.0),
@@ -72,7 +94,8 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                                     .read(settingProvider.notifier)
                                     .updateSettings(GeneralSetting(
                                         tmdbApiKey: values["tmdb_api"],
-                                        downloadDIr: values["download_dir"]));
+                                        downloadDIr: values["download_dir"],
+                                        logLevel: values["log_level"]));
                                 f.then((v) {
                                   Utils.showSnakeBar("更新成功");
                                 }).onError((e, s) {

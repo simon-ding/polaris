@@ -49,18 +49,22 @@ class EditSettingData extends AutoDisposeAsyncNotifier<GeneralSetting> {
 class GeneralSetting {
   String? tmdbApiKey;
   String? downloadDIr;
+  String? logLevel;
 
-  GeneralSetting({this.tmdbApiKey, this.downloadDIr});
+  GeneralSetting({this.tmdbApiKey, this.downloadDIr, this.logLevel});
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
     return GeneralSetting(
-        tmdbApiKey: json["tmdb_api_key"], downloadDIr: json["download_dir"]);
+        tmdbApiKey: json["tmdb_api_key"],
+        downloadDIr: json["download_dir"],
+        logLevel: json["log_level"]);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['tmdb_api_key'] = tmdbApiKey;
     data['download_dir'] = downloadDIr;
+    data["log_level"] = logLevel;
     return data;
   }
 }
@@ -257,13 +261,13 @@ class StorageSettingData extends AutoDisposeAsyncNotifier<List<Storage>> {
 }
 
 class Storage {
-  Storage(
-      {this.id,
-      this.name,
-      this.implementation,
-      this.settings,
-      this.isDefault,
-      });
+  Storage({
+    this.id,
+    this.name,
+    this.implementation,
+    this.settings,
+    this.isDefault,
+  });
 
   final int? id;
   final String? name;

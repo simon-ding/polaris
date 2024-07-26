@@ -49,6 +49,8 @@ func (s *Server) Serve() error {
 	s.r.Use(ginzap.Ginzap(log.Logger().Desugar(), time.RFC3339, false))
 	s.r.Use(ginzap.RecoveryWithZap(log.Logger().Desugar(), true))
 
+	log.SetLogLevel(s.db.GetSetting(db.SettingLogLevel)) //restore log level
+	
 	s.r.POST("/api/login", HttpHandler(s.Login))
 
 	api := s.r.Group("/api/v1")
@@ -62,7 +64,6 @@ func (s *Server) Serve() error {
 		setting.GET("/general", HttpHandler(s.GetSetting))
 		setting.POST("/auth", HttpHandler(s.EnableAuth))
 		setting.GET("/auth", HttpHandler(s.GetAuthSetting))
-		setting.POST("/loglevel", HttpHandler(s.SetLogLevel))
 	}
 	activity := api.Group("/activity")
 	{
