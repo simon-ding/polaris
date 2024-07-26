@@ -42,6 +42,7 @@ func Open() (*Client, error) {
 	c := &Client{
 		ent: client,
 	}
+	c.init()
 
 	return c, nil
 }
