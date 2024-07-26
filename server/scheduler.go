@@ -215,7 +215,7 @@ func (s *Server) downloadTvSeries() {
 	for _, series := range allSeries {
 		tvDetail := s.db.GetMediaDetails(series.ID)
 		for _, ep := range tvDetail.Episodes {
-			t, err := time.ParseInLocation("2006-01-02", ep.AirDate, time.Local)
+			t, err := time.Parse("2006-01-02", ep.AirDate)
 			if err != nil {
 				log.Error("air date not known, skip: %v", ep.Title)
 				continue

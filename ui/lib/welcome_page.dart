@@ -55,21 +55,13 @@ class WelcomePage extends ConsumerWidget {
                           ),
                         ),
                         SizedBox(
-                          width: 130,
-                          child: () {
-                            if (item.mediaType == "movie" &&
-                                item.status == "downloaded") {
-                              return const LinearProgressIndicator(
-                                value: 1,
-                                color: Colors.green,
-                              );
-                            }
-                            return const LinearProgressIndicator(
+                            width: 130,
+                            child: LinearProgressIndicator(
                               value: 1,
-                              color: Colors.blue,
-                            );
-                          }(),
-                        ),
+                              color: item.status == "downloaded"
+                                  ? Colors.green
+                                  : Colors.blue,
+                            )),
                         Text(
                           item.name!,
                           style: const TextStyle(

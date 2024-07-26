@@ -12,6 +12,7 @@ import (
 	"polaris/ent/media"
 	"polaris/log"
 	"strconv"
+	"time"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/gin-gonic/gin"
@@ -67,7 +68,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
-	if (in.Folder == "") {
+	if in.Folder == "" {
 		return nil, errors.New("folder should be provided")
 	}
 	detailCn, err := s.MustTMDB().GetTvDetails(in.TmdbID, db.LanguageCN)
@@ -119,7 +120,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		AirDate:      detail.FirstAirDate,
 		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
-		TargetDir: in.Folder,
+		TargetDir:    in.Folder,
 	}, epIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
@@ -184,7 +185,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		AirDate:      detail.ReleaseDate,
 		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
-		TargetDir: "./",
+		TargetDir:    "./",
 	}, []int{epid})
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
@@ -243,6 +244,7 @@ type MediaWithStatus struct {
 	*ent.Media
 	Status string `json:"status"`
 }
+
 //missing: episode aired missing
 //downloaded: all monitored episode downloaded
 //monitoring: episode aired downloaded, but still has not aired episode
@@ -250,7 +252,33 @@ type MediaWithStatus struct {
 
 func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 	list := s.db.GetMediaWatchlist(media.MediaTypeTv)
-	return list, nil
+	res := make([]MediaWithStatus, len(list))
+	for i, item := range list {
+		var ms = MediaWithStatus{
+			Media:  item,
+			Status: "downloaded",
+		}
+
+		details := s.db.GetMediaDetails(item.ID)
+		for _, ep := range details.Episodes {
+			if ep.SeasonNumber == 0 {
+				continue
+			}
+			t, err := time.Parse("2006-01-02", ep.AirDate)
+			if err != nil { //airdate not exist
+				ms.Status = "monitoring"
+			} else {
+				if item.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
+					continue
+				}
+				if ep.Status == episode.StatusMissing {
+					ms.Status = "monitoring"
+				}	
+			}
+		}
+		res[i] = ms
+	}
+	return res, nil
 }
 
 func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
@@ -258,7 +286,7 @@ func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
 	res := make([]MediaWithStatus, len(list))
 	for i, item := range list {
 		var ms = MediaWithStatus{
-			Media: item,
+			Media:  item,
 			Status: "monitoring",
 		}
 		dummyEp, err := s.db.GetMovieDummyEpisode(item.ID)
