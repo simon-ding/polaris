@@ -29,6 +29,7 @@ class WelcomePage extends ConsumerWidget {
       AsyncData(:final value) => SingleChildScrollView(
           child: Wrap(
             spacing: 10,
+            runSpacing: 20,
             children: List.generate(value.length, (i) {
               var item = value[i];
               return Card(
