@@ -29,6 +29,9 @@ class APIs {
   static final activityUrl = "$_baseUrl/api/v1/activity/";
   static final activityMediaUrl = "$_baseUrl/api/v1/activity/media/";
   static final imagesUrl = "$_baseUrl/api/v1/img";
+  static final logsBaseUrl = "$_baseUrl/api/v1/logs/";
+  static final logFilesUrl = "$_baseUrl/api/v1/setting/logfiles";
+  static final aboutUrl = "$_baseUrl/api/v1/setting/about";
 
   static final tmdbImgBaseUrl = "$_baseUrl/api/v1/posters";
 

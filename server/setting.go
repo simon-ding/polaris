@@ -50,7 +50,7 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	return &GeneralSettings{
 		TmdbApiKey:  tmdb,
 		DownloadDir: downloadDir,
-		LogLevel: logLevel,
+		LogLevel:    logLevel,
 	}, nil
 }
 

@@ -292,3 +292,65 @@ class Storage {
         "default": isDefault,
       };
 }
+
+final logFileDataProvider = FutureProvider.autoDispose((ref) async {
+  final dio = await APIs.getDio();
+  var resp = await dio.get(APIs.logFilesUrl);
+  var sp = ServerResponse.fromJson(resp.data);
+  if (sp.code != 0) {
+    throw sp.message;
+  }
+  List<LogFile> favList = List.empty(growable: true);
+  for (var item in sp.data as List) {
+    var tv = LogFile.fromJson(item);
+    favList.add(tv);
+  }
+  return favList;
+});
+
+final aboutDataProvider = FutureProvider.autoDispose((ref) async {
+  final dio = await APIs.getDio();
+  var resp = await dio.get(APIs.aboutUrl);
+  var sp = ServerResponse.fromJson(resp.data);
+  if (sp.code != 0) {
+    throw sp.message;
+  }
+  return About.fromJson(sp.data);
+});
+
+class LogFile {
+  String? name;
+  int? size;
+
+  LogFile({this.name, this.size});
+
+  factory LogFile.fromJson(Map<String, dynamic> json1) {
+    return LogFile(name: json1["name"], size: json1["size"]);
+  }
+}
+
+class About {
+  About({
+    required this.chatGroup,
+    required this.goVersion,
+    required this.homepage,
+    required this.intro,
+    required this.uptime,
+  });
+
+  final String? chatGroup;
+  final String? goVersion;
+  final String? homepage;
+  final String? intro;
+  final Duration? uptime;
+
+  factory About.fromJson(Map<String, dynamic> json) {
+    return About(
+      chatGroup: json["chat_group"],
+      goVersion: json["go_version"],
+      homepage: json["homepage"],
+      intro: json["intro"],
+      uptime: Duration(microseconds: (json["uptime"]/1000.0 as double).round()),
+    );
+  }
+}

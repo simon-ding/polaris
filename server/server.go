@@ -50,12 +50,13 @@ func (s *Server) Serve() error {
 	s.r.Use(ginzap.RecoveryWithZap(log.Logger().Desugar(), true))
 
 	log.SetLogLevel(s.db.GetSetting(db.SettingLogLevel)) //restore log level
-	
+
 	s.r.POST("/api/login", HttpHandler(s.Login))
 
 	api := s.r.Group("/api/v1")
 	api.Use(s.authModdleware)
 	api.StaticFS("/img", http.Dir(db.ImgPath))
+	api.StaticFS("/logs", http.Dir(db.LogPath))
 	api.Any("/posters/*proxyPath", s.proxyPosters)
 
 	setting := api.Group("/setting")
@@ -64,6 +65,8 @@ func (s *Server) Serve() error {
 		setting.GET("/general", HttpHandler(s.GetSetting))
 		setting.POST("/auth", HttpHandler(s.EnableAuth))
 		setting.GET("/auth", HttpHandler(s.GetAuthSetting))
+		setting.GET("/logfiles", HttpHandler(s.GetAllLogs))
+		setting.GET("/about", HttpHandler(s.About))
 	}
 	activity := api.Group("/activity")
 	{

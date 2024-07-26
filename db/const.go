@@ -19,6 +19,7 @@ const (
 	IndexerTorznabImpl = "torznab"
 	DataPath = "./data"
 	ImgPath = DataPath + "/img"
+	LogPath = DataPath + "/logs"
 )
 
 const (
