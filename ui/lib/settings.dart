@@ -69,12 +69,12 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                         ),
                         items: const [
                           DropdownMenuItem(
-                              value: "debug", child: Text("Debug")),
-                          DropdownMenuItem(value: "info", child: Text("Info")),
+                              value: "debug", child: Text("DEBUG")),
+                          DropdownMenuItem(value: "info", child: Text("INFO")),
                           DropdownMenuItem(
-                              value: "warn", child: Text("Warnning")),
+                              value: "warn", child: Text("WARNNING")),
                           DropdownMenuItem(
-                              value: "error", child: Text("Error")),
+                              value: "error", child: Text("ERROR")),
                         ],
                         validator: FormBuilderValidators.required(),
                       ),
