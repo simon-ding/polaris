@@ -14,6 +14,7 @@ import (
 type GeneralSettings struct {
 	TmdbApiKey  string `json:"tmdb_api_key"`
 	DownloadDir string `json:"download_dir"`
+	LogLevel    string `json:"log_level"`
 }
 
 func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
@@ -31,6 +32,9 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		if err := s.db.SetSetting(db.SettingDownloadDir, in.DownloadDir); err != nil {
 			return nil, errors.Wrap(err, "save download dir")
 		}
+	}
+	if in.LogLevel != "" {
+		log.SetLogLevel(in.LogLevel)
 	}
 	return nil, nil
 }
@@ -97,7 +101,6 @@ func (s *Server) getDownloadClient() (*transmission.Client, error) {
 	return trc, nil
 }
 
-
 type downloadClientIn struct {
 	Name           string `json:"name" binding:"required"`
 	URL            string `json:"url" binding:"required"`
@@ -113,8 +116,8 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 	}
 	//test connection
 	_, err := transmission.NewClient(transmission.Config{
-		URL: in.URL,
-		User: in.User,
+		URL:      in.URL,
+		User:     in.User,
 		Password: in.Password,
 	})
 	if err != nil {

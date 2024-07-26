@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -16,19 +17,21 @@ const dataPath = "./data"
 func init() {
 	atom = zap.NewAtomicLevel()
 	atom.SetLevel(zap.DebugLevel)
-	filer, _, err := zap.Open(filepath.Join(dataPath, "polaris.log"))
-	if err != nil {
-		panic(err)
-	}
+
+	w := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   filepath.Join(dataPath, "logs", "polaris.log"),
+		MaxSize:    50, // megabytes
+		MaxBackups: 3,
+		MaxAge:     30, // days
+	})
+
 	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	
-	logger := zap.New(zapcore.NewCore(consoleEncoder, zapcore.Lock(filer), atom), zap.AddCallerSkip(1))
+
+	logger := zap.New(zapcore.NewCore(consoleEncoder, w, atom), zap.AddCallerSkip(1))
 
 	sugar = logger.Sugar()
 
 }
-
-
 
 func SetLogLevel(l string) {
 	switch strings.TrimSpace(strings.ToLower(l)) {
