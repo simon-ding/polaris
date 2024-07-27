@@ -6,6 +6,7 @@ import (
 	"polaris/server"
 )
 
+
 func main() {
 	dbClient, err := db.Open()
 	if err != nil {

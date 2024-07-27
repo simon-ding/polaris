@@ -48,5 +48,6 @@ func (s *Server) About(c *gin.Context) (interface{}, error) {
 		"uptime":     uptime.Uptime(),
 		"chat_group": "https://t.me/+8R2nzrlSs2JhMDgx",
 		"go_version": runtime.Version(),
+		"version": db.Version,
 	}, nil
 }

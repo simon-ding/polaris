@@ -84,5 +84,6 @@ func (s *Server) SuggestedSeriesFolderName(c *gin.Context) (interface{}, error) 
 	if year != "" {
 		name = fmt.Sprintf("%s (%s)", name, year)
 	}
+	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
 	return gin.H{"name": name}, nil
 }

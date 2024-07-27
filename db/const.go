@@ -1,5 +1,7 @@
 package db
 
+var Version = "undefined"
+
 const (
 	SettingTmdbApiKey = "tmdb_api_key"
 	SettingLanguage = "language"

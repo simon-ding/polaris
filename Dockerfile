@@ -22,7 +22,7 @@ COPY . .
 
 COPY --from=flutter /app/build/web ./ui/build/web/
 # 指定OS等，并go build
-RUN CGO_ENABLED=1 go build -o polaris ./cmd/ 
+RUN CGO_ENABLED=1 go build -o polaris -ldflags="-X polaris/db.Version=$(git describe --tags --long)"  ./cmd/ 
 
 FROM debian:12
 ENV TZ="Asia/Shanghai"

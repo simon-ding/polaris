@@ -31,7 +31,7 @@ func (s *Server) authModdleware(c *gin.Context) {
 		return
 	}
 	auth = strings.TrimPrefix(auth, "Bearer ")
-	//log.Infof("current token: %v", auth)
+	//log.Debugf("current token: %v", auth)
 	token, err := jwt.ParseWithClaims(auth, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {	
 		return []byte(s.jwtSerect), nil
 	})
