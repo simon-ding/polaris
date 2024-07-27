@@ -81,7 +81,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               .onError((error, trace) =>
                                   Utils.showSnakeBar("操作失败: $error"));
                         },
-                        icon: const Icon(Icons.search)),
+                        icon: const Icon(Icons.download)),
                   ),
                   const SizedBox(
                     width: 10,
@@ -128,7 +128,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               .onError((error, trace) =>
                                   Utils.showSnakeBar("操作失败: $error"));
                         },
-                        icon: const Icon(Icons.search)),
+                        icon: const Icon(Icons.download)),
                   ))
                 ], rows: m[k]!),
               ],

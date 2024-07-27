@@ -235,7 +235,7 @@ class _MainSkeletonState extends State<MainSkeleton> {
       destinations: const <NavigationDestination>[
         NavigationDestination(
           icon: Icon(Icons.live_tv),
-          label: '电视剧',
+          label: '剧集',
         ),
         NavigationDestination(
           icon: Icon(Icons.movie),

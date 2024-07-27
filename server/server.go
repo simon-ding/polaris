@@ -69,6 +69,8 @@ func (s *Server) Serve() error {
 		setting.GET("/auth", HttpHandler(s.GetAuthSetting))
 		setting.GET("/logfiles", HttpHandler(s.GetAllLogs))
 		setting.GET("/about", HttpHandler(s.About))
+		setting.POST("/parse/tv", HttpHandler(s.ParseTv))
+		setting.POST("/parse/movie", HttpHandler(s.ParseMovie))
 	}
 	activity := api.Group("/activity")
 	{
