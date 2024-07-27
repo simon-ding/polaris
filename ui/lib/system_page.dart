@@ -37,7 +37,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                         columns: const [
                           DataColumn(label: Text("日志")),
                           DataColumn(label: Text("大小")),
-                          DataColumn(label: Text("*"))
+                          DataColumn(label: Text("下载"))
                         ],
                         rows: List.generate(list.length, (i) {
                           final item = list[i];

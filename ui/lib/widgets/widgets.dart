@@ -4,8 +4,10 @@ class Commons {
   static InputDecoration requiredTextFieldStyle({
     required String text,
     Widget? icon,
+    String? helperText,
   }) {
     return InputDecoration(
+      helperText: helperText,
       label: Row(
         children: [
           Text(text),

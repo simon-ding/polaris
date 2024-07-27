@@ -36,14 +36,14 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
             initialValue: {
               "tmdb_api": v.tmdbApiKey,
               "download_dir": v.downloadDIr,
-              "log_level": v.logLevel
+              "log_level": v.logLevel,
+              "proxy": v.proxy,
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FormBuilderTextField(
                   name: "tmdb_api",
-                  autofocus: true,
                   decoration: Commons.requiredTextFieldStyle(
                       text: "TMDB Api Key", icon: const Icon(Icons.key)),
                   //
@@ -51,11 +51,15 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 ),
                 FormBuilderTextField(
                   name: "download_dir",
-                  autofocus: true,
                   decoration: Commons.requiredTextFieldStyle(
-                      text: "下载路径", icon: const Icon(Icons.folder)),
+                      text: "下载路径", icon: const Icon(Icons.folder), helperText: "媒体文件临时下载路径，非最终存储路径"),
                   //
                   validator: FormBuilderValidators.required(),
+                ),
+                FormBuilderTextField(
+                  name: "proxy",
+                  decoration: const InputDecoration(
+                      labelText: "代理地址", icon: Icon(Icons.folder), helperText: "后台联网代理地址，留空表示不启用代理"),
                 ),
                 SizedBox(
                   width: 300,
@@ -66,13 +70,10 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                       icon: Icon(Icons.file_present_rounded),
                     ),
                     items: const [
-                      DropdownMenuItem(
-                          value: "debug", child: Text("DEBUG")),
+                      DropdownMenuItem(value: "debug", child: Text("DEBUG")),
                       DropdownMenuItem(value: "info", child: Text("INFO")),
-                      DropdownMenuItem(
-                          value: "warn", child: Text("WARNING")),
-                      DropdownMenuItem(
-                          value: "error", child: Text("ERROR")),
+                      DropdownMenuItem(value: "warn", child: Text("WARN")),
+                      DropdownMenuItem(value: "error", child: Text("ERROR")),
                     ],
                     validator: FormBuilderValidators.required(),
                   ),
@@ -93,7 +94,8 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                                 .updateSettings(GeneralSetting(
                                     tmdbApiKey: values["tmdb_api"],
                                     downloadDIr: values["download_dir"],
-                                    logLevel: values["log_level"]));
+                                    logLevel: values["log_level"],
+                                    proxy: values["proxy"]));
                             f.then((v) {
                               Utils.showSnakeBar("更新成功");
                             }).onError((e, s) {

@@ -8,6 +8,7 @@ import (
 
 
 func main() {
+	log.Infof("------------------- Starting Polaris ---------------------")
 	dbClient, err := db.Open()
 	if err != nil {
 		log.Panicf("init db error: %v", err)

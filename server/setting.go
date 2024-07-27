@@ -2,6 +2,8 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
 	"polaris/db"
 	"polaris/log"
 	"polaris/pkg/transmission"
@@ -15,6 +17,7 @@ type GeneralSettings struct {
 	TmdbApiKey  string `json:"tmdb_api_key"`
 	DownloadDir string `json:"download_dir"`
 	LogLevel    string `json:"log_level"`
+	Proxy       string `json:"proxy"`
 }
 
 func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
@@ -29,6 +32,7 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		}
 	}
 	if in.DownloadDir != "" {
+		log.Info("set download dir to %s", in.DownloadDir)
 		if err := s.db.SetSetting(db.SettingDownloadDir, in.DownloadDir); err != nil {
 			return nil, errors.Wrap(err, "save download dir")
 		}
@@ -40,7 +44,28 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		}
 
 	}
+
+	s.setProxy(in.Proxy)
 	return nil, nil
+}
+
+func (s *Server) setProxy(proxy string) {
+	proxyUrl, err := url.Parse(proxy)
+	tp := http.DefaultTransport.(*http.Transport)
+	if proxy == "" || err != nil {
+		log.Warnf("proxy url not valid, disabling: %v", proxy)
+		tp.Proxy = nil
+		s.db.SetSetting(db.SettingProxy, "")
+	} else {
+		log.Infof("set proxy to %v", proxy)
+		tp.Proxy = http.ProxyURL(proxyUrl)
+		s.db.SetSetting(db.SettingProxy, proxy)
+	}
+}
+
+func (s *Server) restoreProxy() {
+	p := s.db.GetSetting(db.SettingProxy)
+	s.setProxy(p)
 }
 
 func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
@@ -51,6 +76,7 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 		TmdbApiKey:  tmdb,
 		DownloadDir: downloadDir,
 		LogLevel:    logLevel,
+		Proxy:       s.db.GetSetting(db.SettingProxy),
 	}, nil
 }
 

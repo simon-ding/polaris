@@ -43,6 +43,8 @@ type Server struct {
 func (s *Server) Serve() error {
 	s.scheduler()
 	s.reloadTasks()
+	s.restoreProxy()
+
 	s.jwtSerect = s.db.GetSetting(db.JwtSerectKey)
 	//st, _ := fs.Sub(ui.Web, "build/web")
 	s.r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))

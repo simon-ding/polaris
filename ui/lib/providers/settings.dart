@@ -50,14 +50,17 @@ class GeneralSetting {
   String? tmdbApiKey;
   String? downloadDIr;
   String? logLevel;
+  String? proxy;
 
-  GeneralSetting({this.tmdbApiKey, this.downloadDIr, this.logLevel});
+  GeneralSetting(
+      {this.tmdbApiKey, this.downloadDIr, this.logLevel, this.proxy});
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
     return GeneralSetting(
         tmdbApiKey: json["tmdb_api_key"],
         downloadDIr: json["download_dir"],
-        logLevel: json["log_level"]);
+        logLevel: json["log_level"],
+        proxy: json["proxy"]);
   }
 
   Map<String, dynamic> toJson() {
@@ -65,6 +68,7 @@ class GeneralSetting {
     data['tmdb_api_key'] = tmdbApiKey;
     data['download_dir'] = downloadDIr;
     data["log_level"] = logLevel;
+    data["proxy"] = proxy;
     return data;
   }
 }

@@ -9,6 +9,7 @@ const (
 	SettingJacketApiKey = "jacket_api_key"
 	SettingDownloadDir = "download_dir"
 	SettingLogLevel = "log_level"
+	SettingProxy = "proxy"
 )
 
 const (
