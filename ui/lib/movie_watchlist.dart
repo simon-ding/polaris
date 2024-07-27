@@ -172,8 +172,6 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
 
   @override
   Widget build(BuildContext context) {
-    var torrents = ref.watch(
-        mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id)).future);
     var histories = ref.watch(mediaHistoryDataProvider(widget.id));
 
     return Column(
