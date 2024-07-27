@@ -50,3 +50,5 @@
 ![local_storage](./assets/local_storage.png)
 
 类型里选择 webdav 可以使用 webdav 存储，配合 alist/clouddrive 等，可以实现存储到云盘里的功能。
+
+![webdav](./assets/webdav_storage.png)
