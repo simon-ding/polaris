@@ -18,6 +18,8 @@ COPY  go.mod .
 COPY  go.sum .
 RUN go mod download
 
+RUN apt-get update && apt-get -y install git
+
 COPY . .
 
 COPY --from=flutter /app/build/web ./ui/build/web/
