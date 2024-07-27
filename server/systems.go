@@ -4,6 +4,7 @@ import (
 	"os"
 	"polaris/db"
 	"polaris/log"
+	"polaris/pkg/metadata"
 	"polaris/pkg/uptime"
 	"runtime"
 
@@ -50,4 +51,24 @@ func (s *Server) About(c *gin.Context) (interface{}, error) {
 		"go_version": runtime.Version(),
 		"version":    db.Version,
 	}, nil
+}
+
+type parseIn struct {
+	S         string `json:"s" binding:"required"`
+}
+
+func (s *Server) ParseTv(c *gin.Context) (interface{}, error) {
+	var in parseIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind")
+	}
+	return metadata.ParseTv(in.S), nil
+}
+
+func (s *Server) ParseMovie(c *gin.Context) (interface{}, error) {
+	var in parseIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind")
+	}
+	return metadata.ParseMovie(in.S), nil
 }
