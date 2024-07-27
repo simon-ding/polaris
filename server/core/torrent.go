@@ -110,10 +110,6 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool) ([]torznab.R
 		if meta.Year != year && meta.Year != year-1 && meta.Year != year+1 { //year not match
 			continue
 		}
-		if utils.ContainsIgnoreCase(r.Name, "soundtrack") {
-			//ignore soundtracks
-			continue
-		}
 
 		filtered = append(filtered, r)
 

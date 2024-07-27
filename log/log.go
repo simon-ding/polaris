@@ -41,9 +41,9 @@ func SetLogLevel(l string) {
 	case "info":
 		atom.SetLevel(zap.InfoLevel)
 		Info("set log level to info")
-	case "warn", "warnning":
+	case "warn", "warning":
 		atom.SetLevel(zap.WarnLevel)
-		Warn("set log level to warnning")
+		Warn("set log level to warning")
 	case "error":
 		atom.SetLevel(zap.ErrorLevel)
 		Error("set log level to error")

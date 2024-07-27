@@ -93,3 +93,33 @@ func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {
 	}
 	return his, nil
 }
+
+type TorrentInfo struct {
+	Name      string  `json:"name"`
+	ID        int64     `json:"id"`
+	SeedRatio float32 `json:"seed_ratio"`
+	Progress  int     `json:"progress"`
+}
+
+func (s *Server) GetAllTorrents(c *gin.Context) (interface{}, error) {
+	trc, err := s.getDownloadClient()
+	if err != nil {
+		return nil, errors.Wrap(err, "connect transmission")
+	}
+	all, err := trc.GetAll()
+	if err != nil {
+		return nil, errors.Wrap(err, "get all")
+	}
+	var infos []TorrentInfo
+	for _, t := range all {
+		if !t.Exists() {
+			continue
+		}
+		infos = append(infos, TorrentInfo{
+			Name: t.Name(),
+			ID: t.ID,
+			Progress: t.Progress(),
+		})
+	}
+	return infos, nil
+}

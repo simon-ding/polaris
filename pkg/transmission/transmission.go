@@ -45,6 +45,22 @@ type Client struct {
 	cfg Config
 }
 
+func (c *Client) GetAll() ([]*Torrent, error) {
+	all, err := c.c.TorrentGetAll(context.TODO())
+	if err != nil {
+		return nil, errors.Wrap(err, "get all")
+	}
+	var torrents []*Torrent
+	for _, t := range all {
+		torrents = append(torrents, &Torrent{
+			ID:     *t.ID,
+			c:      c.c,
+			Config: c.cfg,		
+		})
+	}
+	return torrents, nil
+}
+
 func (c *Client) Download(link, dir string) (*Torrent, error) {
 	if strings.HasPrefix(link, "http") {
 		client := &http.Client{

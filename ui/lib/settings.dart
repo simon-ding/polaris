@@ -30,84 +30,82 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
 
     var tmdbSetting = settings.when(
         data: (v) {
-          return Container(
-              padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
-              child: FormBuilder(
-                key: _formKey, //设置globalKey，用于后面获取FormState
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                initialValue: {
-                  "tmdb_api": v.tmdbApiKey,
-                  "download_dir": v.downloadDIr,
-                  "log_level": v.logLevel
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FormBuilderTextField(
-                      name: "tmdb_api",
-                      autofocus: true,
-                      decoration: Commons.requiredTextFieldStyle(
-                          text: "TMDB Api Key", icon: const Icon(Icons.key)),
-                      //
-                      validator: FormBuilderValidators.required(),
-                    ),
-                    FormBuilderTextField(
-                      name: "download_dir",
-                      autofocus: true,
-                      decoration: Commons.requiredTextFieldStyle(
-                          text: "下载路径", icon: const Icon(Icons.folder)),
-                      //
-                      validator: FormBuilderValidators.required(),
-                    ),
-                    SizedBox(
-                      width: 300,
-                      child: FormBuilderDropdown(
-                        name: "log_level",
-                        decoration: const InputDecoration(
-                          labelText: "日志级别",
-                          icon: Icon(Icons.file_present_rounded),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                              value: "debug", child: Text("DEBUG")),
-                          DropdownMenuItem(value: "info", child: Text("INFO")),
-                          DropdownMenuItem(
-                              value: "warn", child: Text("WARNING")),
-                          DropdownMenuItem(
-                              value: "error", child: Text("ERROR")),
-                        ],
-                        validator: FormBuilderValidators.required(),
-                      ),
-                    ),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 28.0),
-                        child: ElevatedButton(
-                            child: const Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text("保存"),
-                            ),
-                            onPressed: () {
-                              if (_formKey.currentState!.saveAndValidate()) {
-                                var values = _formKey.currentState!.value;
-                                var f = ref
-                                    .read(settingProvider.notifier)
-                                    .updateSettings(GeneralSetting(
-                                        tmdbApiKey: values["tmdb_api"],
-                                        downloadDIr: values["download_dir"],
-                                        logLevel: values["log_level"]));
-                                f.then((v) {
-                                  Utils.showSnakeBar("更新成功");
-                                }).onError((e, s) {
-                                  Utils.showSnakeBar("更新失败：$e");
-                                });
-                              }
-                            }),
-                      ),
-                    )
-                  ],
+          return FormBuilder(
+            key: _formKey, //设置globalKey，用于后面获取FormState
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            initialValue: {
+              "tmdb_api": v.tmdbApiKey,
+              "download_dir": v.downloadDIr,
+              "log_level": v.logLevel
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FormBuilderTextField(
+                  name: "tmdb_api",
+                  autofocus: true,
+                  decoration: Commons.requiredTextFieldStyle(
+                      text: "TMDB Api Key", icon: const Icon(Icons.key)),
+                  //
+                  validator: FormBuilderValidators.required(),
                 ),
-              ));
+                FormBuilderTextField(
+                  name: "download_dir",
+                  autofocus: true,
+                  decoration: Commons.requiredTextFieldStyle(
+                      text: "下载路径", icon: const Icon(Icons.folder)),
+                  //
+                  validator: FormBuilderValidators.required(),
+                ),
+                SizedBox(
+                  width: 300,
+                  child: FormBuilderDropdown(
+                    name: "log_level",
+                    decoration: const InputDecoration(
+                      labelText: "日志级别",
+                      icon: Icon(Icons.file_present_rounded),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                          value: "debug", child: Text("DEBUG")),
+                      DropdownMenuItem(value: "info", child: Text("INFO")),
+                      DropdownMenuItem(
+                          value: "warn", child: Text("WARNING")),
+                      DropdownMenuItem(
+                          value: "error", child: Text("ERROR")),
+                    ],
+                    validator: FormBuilderValidators.required(),
+                  ),
+                ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 28.0),
+                    child: ElevatedButton(
+                        child: const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text("保存"),
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState!.saveAndValidate()) {
+                            var values = _formKey.currentState!.value;
+                            var f = ref
+                                .read(settingProvider.notifier)
+                                .updateSettings(GeneralSetting(
+                                    tmdbApiKey: values["tmdb_api"],
+                                    downloadDIr: values["download_dir"],
+                                    logLevel: values["log_level"]));
+                            f.then((v) {
+                              Utils.showSnakeBar("更新成功");
+                            }).onError((e, s) {
+                              Utils.showSnakeBar("更新失败：$e");
+                            });
+                          }
+                        }),
+                  ),
+                )
+              ],
+            ),
+          );
         },
         error: (err, trace) => Text("$err"),
         loading: () => const MyProgressIndicator());
