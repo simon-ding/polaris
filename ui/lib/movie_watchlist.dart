@@ -172,7 +172,8 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
 
   @override
   Widget build(BuildContext context) {
-    var torrents = ref.watch(mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id)));
+    var torrents = ref.watch(
+        mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id)).future);
     var histories = ref.watch(mediaHistoryDataProvider(widget.id));
 
     return Column(
@@ -223,48 +224,62 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                 error: (error, trace) => Text("$error"),
                 loading: () => const MyProgressIndicator());
           } else {
-            return torrents.when(
-                data: (v) {
-                  if (v.isEmpty) {
-                    return const Center(
-                      child: Text("无可用资源"),
-                    );
-                  }
+            var torrents = ref.watch(
+                mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id))
+                    .future);
+            return FutureBuilder(
+                future: torrents,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+                      // 请求失败，显示错误
+                      return Text("Error: ${snapshot.error}");
+                    } else {
+                      final v = snapshot.data!;
+                      if (v.isEmpty) {
+                        return const Center(
+                          child: Text("无可用资源"),
+                        );
+                      }
 
-                  return DataTable(
-                    columns: const [
-                      DataColumn(label: Text("名称")),
-                      DataColumn(label: Text("大小")),
-                      DataColumn(label: Text("seeders")),
-                      DataColumn(label: Text("peers")),
-                      DataColumn(label: Text("操作"))
-                    ],
-                    rows: List.generate(v.length, (i) {
-                      final torrent = v[i];
-                      return DataRow(cells: [
-                        DataCell(Text("${torrent.name}")),
-                        DataCell(Text("${torrent.size?.readableFileSize()}")),
-                        DataCell(Text("${torrent.seeders}")),
-                        DataCell(Text("${torrent.peers}")),
-                        DataCell(IconButton(
-                          icon: const Icon(Icons.download),
-                          onPressed: () {
-                            ref
-                                .read(mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id))
-                                    .notifier)
-                                .download(torrent)
-                                .then((v) =>
-                                    Utils.showSnakeBar("开始下载：${torrent.name}"))
-                                .onError((error, trace) =>
-                                    Utils.showSnakeBar("操作失败: $error"));
-                          },
-                        ))
-                      ]);
-                    }),
-                  );
-                },
-                error: (error, trace) => Text("$error"),
-                loading: () => const MyProgressIndicator());
+                      return DataTable(
+                        columns: const [
+                          DataColumn(label: Text("名称")),
+                          DataColumn(label: Text("大小")),
+                          DataColumn(label: Text("seeders")),
+                          DataColumn(label: Text("peers")),
+                          DataColumn(label: Text("操作"))
+                        ],
+                        rows: List.generate(v.length, (i) {
+                          final torrent = v[i];
+                          return DataRow(cells: [
+                            DataCell(Text("${torrent.name}")),
+                            DataCell(
+                                Text("${torrent.size?.readableFileSize()}")),
+                            DataCell(Text("${torrent.seeders}")),
+                            DataCell(Text("${torrent.peers}")),
+                            DataCell(IconButton(
+                              icon: const Icon(Icons.download),
+                              onPressed: () {
+                                ref
+                                    .read(mediaTorrentsDataProvider(
+                                            TorrentQuery(mediaId: widget.id))
+                                        .notifier)
+                                    .download(torrent)
+                                    .then((v) => Utils.showSnakeBar(
+                                        "开始下载：${torrent.name}"))
+                                    .onError((error, trace) =>
+                                        Utils.showSnakeBar("操作失败: $error"));
+                              },
+                            ))
+                          ]);
+                        }),
+                      );
+                    }
+                  } else {
+                    return MyProgressIndicator();
+                  }
+                });
           }
         })
       ],
