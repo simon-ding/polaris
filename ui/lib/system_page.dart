@@ -46,9 +46,9 @@ class _SystemPageState extends ConsumerState<SystemPage> {
 
                           return DataRow(cells: [
                             DataCell(Text(item.name ?? "")),
-                            DataCell(Text((item.size??0).readableFileSize())),
+                            DataCell(Text((item.size ?? 0).readableFileSize())),
                             DataCell(InkWell(
-                              child: Icon(Icons.download),
+                              child: const Icon(Icons.download),
                               onTap: () => launchUrl(uri,
                                   webViewConfiguration: WebViewConfiguration(
                                       headers: APIs.authHeaders)),
@@ -82,6 +82,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                               "#",
                               style: TextStyle(height: 2.5),
                             ),
+                            Text("版本", style: TextStyle(height: 2.5)),
                             Text("主页", style: TextStyle(height: 2.5)),
                             Text("讨论组", style: TextStyle(height: 2.5)),
                             Text("go version", style: TextStyle(height: 2.5)),
@@ -104,8 +105,11 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                                 ),
                                 Text(v.intro ?? "",
                                     style: const TextStyle(height: 2.5)),
+                                Text(v.version ?? "",
+                                    style: const TextStyle(height: 2.5)),
                                 InkWell(
                                   child: Text(v.homepage ?? "",
+                                      softWrap: false,
                                       style: const TextStyle(height: 2.5)),
                                   onTap: () => launchUrl(homepage),
                                 ),

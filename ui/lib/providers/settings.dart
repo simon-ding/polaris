@@ -336,6 +336,7 @@ class About {
     required this.homepage,
     required this.intro,
     required this.uptime,
+    required this.version,
   });
 
   final String? chatGroup;
@@ -343,6 +344,7 @@ class About {
   final String? homepage;
   final String? intro;
   final Duration? uptime;
+  final String? version;
 
   factory About.fromJson(Map<String, dynamic> json) {
     return About(
@@ -350,7 +352,9 @@ class About {
       goVersion: json["go_version"],
       homepage: json["homepage"],
       intro: json["intro"],
-      uptime: Duration(microseconds: (json["uptime"]/1000.0 as double).round()),
+      version: json["version"],
+      uptime:
+          Duration(microseconds: (json["uptime"] / 1000.0 as double).round()),
     );
   }
 }
