@@ -146,26 +146,6 @@ func (eu *EpisodeUpdate) SetNillableStatus(e *episode.Status) *EpisodeUpdate {
 	return eu
 }
 
-// SetFileInStorage sets the "file_in_storage" field.
-func (eu *EpisodeUpdate) SetFileInStorage(s string) *EpisodeUpdate {
-	eu.mutation.SetFileInStorage(s)
-	return eu
-}
-
-// SetNillableFileInStorage sets the "file_in_storage" field if the given value is not nil.
-func (eu *EpisodeUpdate) SetNillableFileInStorage(s *string) *EpisodeUpdate {
-	if s != nil {
-		eu.SetFileInStorage(*s)
-	}
-	return eu
-}
-
-// ClearFileInStorage clears the value of the "file_in_storage" field.
-func (eu *EpisodeUpdate) ClearFileInStorage() *EpisodeUpdate {
-	eu.mutation.ClearFileInStorage()
-	return eu
-}
-
 // SetMedia sets the "media" edge to the Media entity.
 func (eu *EpisodeUpdate) SetMedia(m *Media) *EpisodeUpdate {
 	return eu.SetMediaID(m.ID)
@@ -254,12 +234,6 @@ func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.Status(); ok {
 		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
-	}
-	if value, ok := eu.mutation.FileInStorage(); ok {
-		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
-	}
-	if eu.mutation.FileInStorageCleared() {
-		_spec.ClearField(episode.FieldFileInStorage, field.TypeString)
 	}
 	if eu.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -428,26 +402,6 @@ func (euo *EpisodeUpdateOne) SetNillableStatus(e *episode.Status) *EpisodeUpdate
 	return euo
 }
 
-// SetFileInStorage sets the "file_in_storage" field.
-func (euo *EpisodeUpdateOne) SetFileInStorage(s string) *EpisodeUpdateOne {
-	euo.mutation.SetFileInStorage(s)
-	return euo
-}
-
-// SetNillableFileInStorage sets the "file_in_storage" field if the given value is not nil.
-func (euo *EpisodeUpdateOne) SetNillableFileInStorage(s *string) *EpisodeUpdateOne {
-	if s != nil {
-		euo.SetFileInStorage(*s)
-	}
-	return euo
-}
-
-// ClearFileInStorage clears the value of the "file_in_storage" field.
-func (euo *EpisodeUpdateOne) ClearFileInStorage() *EpisodeUpdateOne {
-	euo.mutation.ClearFileInStorage()
-	return euo
-}
-
 // SetMedia sets the "media" edge to the Media entity.
 func (euo *EpisodeUpdateOne) SetMedia(m *Media) *EpisodeUpdateOne {
 	return euo.SetMediaID(m.ID)
@@ -566,12 +520,6 @@ func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err e
 	}
 	if value, ok := euo.mutation.Status(); ok {
 		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
-	}
-	if value, ok := euo.mutation.FileInStorage(); ok {
-		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
-	}
-	if euo.mutation.FileInStorageCleared() {
-		_spec.ClearField(episode.FieldFileInStorage, field.TypeString)
 	}
 	if euo.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{

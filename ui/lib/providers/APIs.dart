@@ -13,7 +13,8 @@ class APIs {
   static final settingsGeneralUrl = "$_baseUrl/api/v1/setting/general";
   static final watchlistTvUrl = "$_baseUrl/api/v1/media/tv/watchlist";
   static final watchlistMovieUrl = "$_baseUrl/api/v1/media/movie/watchlist";
-  static final availableMoviesUrl = "$_baseUrl/api/v1/media/movie/resources/";
+  static final availableTorrentsUrl = "$_baseUrl/api/v1/media/torrents/";
+  static final downloadTorrentUrl = "$_baseUrl/api/v1/media/torrents/download";
   static final seriesDetailUrl = "$_baseUrl/api/v1/media/record/";
   static final suggestedTvName = "$_baseUrl/api/v1/media/suggest/";
   static final searchAndDownloadUrl = "$_baseUrl/api/v1/indexer/download";

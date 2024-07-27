@@ -172,7 +172,7 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
 
   @override
   Widget build(BuildContext context) {
-    var torrents = ref.watch(movieTorrentsDataProvider(widget.id));
+    var torrents = ref.watch(mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id)));
     var histories = ref.watch(mediaHistoryDataProvider(widget.id));
 
     return Column(
@@ -250,7 +250,7 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                           icon: const Icon(Icons.download),
                           onPressed: () {
                             ref
-                                .read(movieTorrentsDataProvider(widget.id)
+                                .read(mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id))
                                     .notifier)
                                 .download(torrent)
                                 .then((v) =>

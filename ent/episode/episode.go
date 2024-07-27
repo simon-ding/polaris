@@ -28,8 +28,6 @@ const (
 	FieldAirDate = "air_date"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldFileInStorage holds the string denoting the file_in_storage field in the database.
-	FieldFileInStorage = "file_in_storage"
 	// EdgeMedia holds the string denoting the media edge name in mutations.
 	EdgeMedia = "media"
 	// Table holds the table name of the episode in the database.
@@ -53,7 +51,6 @@ var Columns = []string{
 	FieldOverview,
 	FieldAirDate,
 	FieldStatus,
-	FieldFileInStorage,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -134,11 +131,6 @@ func ByAirDate(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
-}
-
-// ByFileInStorage orders the results by the file_in_storage field.
-func ByFileInStorage(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFileInStorage, opts...).ToFunc()
 }
 
 // ByMediaField orders the results by media field.

@@ -591,8 +591,8 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
           return AlertDialog(
             title: Text(title),
             content: SingleChildScrollView(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 200),
+              child: SizedBox(
+                width: 300,
                 child: body,
               ),
             ),

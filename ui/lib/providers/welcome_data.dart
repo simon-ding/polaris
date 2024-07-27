@@ -44,10 +44,6 @@ final movieWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
 var searchPageDataProvider = AsyncNotifierProvider.autoDispose
     .family<SearchPageData, List<SearchResult>, String>(SearchPageData.new);
 
-var movieTorrentsDataProvider = AsyncNotifierProvider.autoDispose
-    .family<MovieTorrentResource, List<TorrentResource>, String>(
-        MovieTorrentResource.new);
-
 class SearchPageData
     extends AutoDisposeFamilyAsyncNotifier<List<SearchResult>, String> {
   List<SearchResult> list = List.empty(growable: true);
@@ -245,56 +241,3 @@ class SearchResult {
   }
 }
 
-class MovieTorrentResource
-    extends AutoDisposeFamilyAsyncNotifier<List<TorrentResource>, String> {
-  String? mediaId;
-  @override
-  FutureOr<List<TorrentResource>> build(String id) async {
-    mediaId = id;
-    final dio = await APIs.getDio();
-    var resp = await dio.get(APIs.availableMoviesUrl + id);
-    var rsp = ServerResponse.fromJson(resp.data);
-    if (rsp.code != 0) {
-      throw rsp.message;
-    }
-    return (rsp.data as List).map((v) => TorrentResource.fromJson(v)).toList();
-  }
-
-  Future<void> download(TorrentResource res) async {
-    var m = res.toJson();
-    m["media_id"] = int.parse(mediaId!);
-
-    final dio = await APIs.getDio();
-    var resp = await dio.post(APIs.availableMoviesUrl, data: m);
-    var rsp = ServerResponse.fromJson(resp.data);
-    if (rsp.code != 0) {
-      throw rsp.message;
-    }
-  }
-}
-
-class TorrentResource {
-  TorrentResource({this.name, this.size, this.seeders, this.peers, this.link});
-
-  String? name;
-  int? size;
-  int? seeders;
-  int? peers;
-  String? link;
-
-  factory TorrentResource.fromJson(Map<String, dynamic> json) {
-    return TorrentResource(
-        name: json["name"],
-        size: json["size"],
-        seeders: json["seeders"],
-        peers: json["peers"],
-        link: json["link"]);
-  }
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['name'] = name;
-    data['size'] = size;
-    data["link"] = link;
-    return data;
-  }
-}

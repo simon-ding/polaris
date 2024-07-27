@@ -6,7 +6,6 @@ import (
 	"polaris/server"
 )
 
-
 func main() {
 	log.Infof("------------------- Starting Polaris ---------------------")
 	dbClient, err := db.Open()

@@ -97,7 +97,7 @@ class SeriesDetails {
 
 class Episodes {
   int? id;
-  int? seriesId;
+  int? mediaId;
   int? episodeNumber;
   String? title;
   String? airDate;
@@ -107,7 +107,7 @@ class Episodes {
 
   Episodes(
       {this.id,
-      this.seriesId,
+      this.mediaId,
       this.episodeNumber,
       this.title,
       this.airDate,
@@ -117,12 +117,84 @@ class Episodes {
 
   Episodes.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    seriesId = json['series_id'];
+    mediaId = json['media_id'];
     episodeNumber = json['episode_number'];
     title = json['title'];
     airDate = json['air_date'];
     seasonNumber = json['season_number'];
     status = json['status'];
     overview = json['overview'];
+  }
+}
+
+var mediaTorrentsDataProvider = AsyncNotifierProvider.autoDispose
+    .family<MediaTorrentResource, List<TorrentResource>, TorrentQuery>(
+        MediaTorrentResource.new);
+
+class TorrentQuery {
+  final String mediaId;
+  final int seasonNumber;
+  final int episodeNumber;
+  TorrentQuery(
+      {required this.mediaId, this.seasonNumber = 0, this.episodeNumber = 0});
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = int.parse(mediaId);
+    data["season"] = seasonNumber;
+    data["episode"] = episodeNumber;
+    return data;
+  }
+}
+
+class MediaTorrentResource extends AutoDisposeFamilyAsyncNotifier<
+    List<TorrentResource>, TorrentQuery> {
+  TorrentQuery? query;
+  @override
+  FutureOr<List<TorrentResource>> build(TorrentQuery arg) async {
+    query = arg;
+    final dio = await APIs.getDio();
+    var resp = await dio.post(APIs.availableTorrentsUrl, data: arg.toJson());
+    var rsp = ServerResponse.fromJson(resp.data);
+    if (rsp.code != 0) {
+      throw rsp.message;
+    }
+    return (rsp.data as List).map((v) => TorrentResource.fromJson(v)).toList();
+  }
+
+  Future<void> download(TorrentResource res) async {
+    final data = res.toJson();
+    data.addAll(query!.toJson());
+    final dio = await APIs.getDio();
+    var resp = await dio.post(APIs.downloadTorrentUrl, data: data);
+    var rsp = ServerResponse.fromJson(resp.data);
+    if (rsp.code != 0) {
+      throw rsp.message;
+    }
+  }
+}
+
+class TorrentResource {
+  TorrentResource({this.name, this.size, this.seeders, this.peers, this.link});
+
+  String? name;
+  int? size;
+  int? seeders;
+  int? peers;
+  String? link;
+
+  factory TorrentResource.fromJson(Map<String, dynamic> json) {
+    return TorrentResource(
+        name: json["name"],
+        size: json["size"],
+        seeders: json["seeders"],
+        peers: json["peers"],
+        link: json["link"]);
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['size'] = size;
+    data["link"] = link;
+    return data;
   }
 }

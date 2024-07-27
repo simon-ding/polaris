@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +28,6 @@ class TvDetailsPage extends ConsumerStatefulWidget {
 }
 
 class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
-
   @override
   void initState() {
     super.initState();
@@ -45,7 +46,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               DataCell(Text("${ep.title}")),
               DataCell(Opacity(
                 opacity: 0.5,
-                child: Text(ep.airDate??"-"),
+                child: Text(ep.airDate ?? "-"),
               )),
               DataCell(
                 Opacity(
@@ -86,7 +87,9 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     width: 10,
                   ),
                   IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.manage_search))
+                      onPressed: () => showAvailableTorrents(widget.seriesId,
+                          ep.seasonNumber ?? 0, ep.episodeNumber ?? 0),
+                      icon: const Icon(Icons.manage_search))
                 ],
               ))
             ]);
@@ -198,7 +201,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                   ),
                                   const Text(""),
                                   Text(
-                                    details.overview??"",
+                                    details.overview ?? "",
                                   ),
                                 ],
                               )),
@@ -238,5 +241,87 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
           return Text("$err");
         },
         loading: () => const MyProgressIndicator());
+  }
+
+  Future<void> showAvailableTorrents(String id, int season, int episode) {
+    final torrents = ref.watch(mediaTorrentsDataProvider(TorrentQuery(
+            mediaId: id, seasonNumber: season, episodeNumber: episode))
+        .future);
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: Text("资源"),
+            content: FutureBuilder(
+                future: torrents,
+                builder: (context, snapshot) {
+                  return SelectionArea(
+                      child: Container(
+                          constraints:
+                              BoxConstraints(maxHeight: 400, maxWidth: 1000),
+                          child: () {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.hasError) {
+                                // 请求失败，显示错误
+                                return Text("Error: ${snapshot.error}");
+                              } else {
+                                // 请求成功，显示数据
+                                final v = snapshot.data;
+                                return SingleChildScrollView(
+                                    child: DataTable(
+                                        dataTextStyle:
+                                            TextStyle(fontSize: 14, height: 0),
+                                        columns: const [
+                                          DataColumn(label: Text("名称")),
+                                          DataColumn(label: Text("大小")),
+                                          DataColumn(label: Text("seeders")),
+                                          DataColumn(label: Text("peers")),
+                                          DataColumn(label: Text("操作"))
+                                        ],
+                                        rows: List.generate(v!.length, (i) {
+                                          final torrent = v[i];
+                                          return DataRow(cells: [
+                                            DataCell(Text("${torrent.name}")),
+                                            DataCell(Text(
+                                                "${torrent.size?.readableFileSize()}")),
+                                            DataCell(
+                                                Text("${torrent.seeders}")),
+                                            DataCell(Text("${torrent.peers}")),
+                                            DataCell(IconButton(
+                                              icon: const Icon(Icons.download),
+                                              onPressed: () async {
+                                                await ref
+                                                    .read(mediaTorrentsDataProvider(
+                                                            TorrentQuery(
+                                                                mediaId: id,
+                                                                seasonNumber:
+                                                                    season,
+                                                                episodeNumber:
+                                                                    episode))
+                                                        .notifier)
+                                                    .download(torrent)
+                                                    .then((v) {
+                                                  Navigator.of(context).pop();
+                                                  Utils.showSnakeBar(
+                                                      "开始下载：${torrent.name}");
+                                                }).onError((error, trace) =>
+                                                        Utils.showSnakeBar(
+                                                            "下载失败：$error"));
+                                              },
+                                            ))
+                                          ]);
+                                        })));
+                              }
+                            } else {
+                              // 请求未结束，显示loading
+                              return MyProgressIndicator();
+                            }
+                          }()));
+                }));
+      },
+    );
   }
 }

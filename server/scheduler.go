@@ -192,12 +192,18 @@ func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
 				log.Errorf("find season episode num error: %v", err)
 				continue
 			}
-			var dirname = filepath.Join(in.Name(), ep.Name())
 			log.Infof("found match, season num %d, episode num %d", seNum, epNum)
-			err = s.db.UpdateEpisodeFile(m.ID, seNum, epNum, dirname)
+			ep, err := s.db.GetEpisode(m.ID, seNum, epNum)
 			if err != nil {
 				log.Error("update episode: %v", err)
+				continue
 			}
+			err = s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloaded)
+			if err != nil {
+				log.Error("update episode: %v", err)
+				continue
+			}
+
 		}
 	}
 	return nil

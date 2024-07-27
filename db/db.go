@@ -201,6 +201,10 @@ func (c *Client) GetMediaDetails(id int) *MediaDetails {
 	return md
 }
 
+func (c *Client) GetMedia(id int) (*ent.Media, error) {
+	return c.ent.Media.Query().Where(media.ID(id)).First(context.TODO())
+}
+
 func (c *Client) DeleteMedia(id int) error {
 	_, err := c.ent.Episode.Delete().Where(episode.MediaID(id)).Exec(context.TODO())
 	if err != nil {
@@ -506,13 +510,13 @@ func (c *Client) GetDownloadDir() string {
 	return r.Value
 }
 
-func (c *Client) UpdateEpisodeFile(mediaID int, seasonNum, episodeNum int, file string) error {
+func (c *Client) UpdateEpisodeStatus(mediaID int, seasonNum, episodeNum int) error {
 	ep, err := c.ent.Episode.Query().Where(episode.MediaID(mediaID)).Where(episode.EpisodeNumber(episodeNum)).
 		Where(episode.SeasonNumber(seasonNum)).First(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "finding episode")
 	}
-	return ep.Update().SetFileInStorage(file).SetStatus(episode.StatusDownloaded).Exec(context.TODO())
+	return ep.Update().SetStatus(episode.StatusDownloaded).Exec(context.TODO())
 }
 
 func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {

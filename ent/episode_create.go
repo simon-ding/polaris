@@ -78,20 +78,6 @@ func (ec *EpisodeCreate) SetNillableStatus(e *episode.Status) *EpisodeCreate {
 	return ec
 }
 
-// SetFileInStorage sets the "file_in_storage" field.
-func (ec *EpisodeCreate) SetFileInStorage(s string) *EpisodeCreate {
-	ec.mutation.SetFileInStorage(s)
-	return ec
-}
-
-// SetNillableFileInStorage sets the "file_in_storage" field if the given value is not nil.
-func (ec *EpisodeCreate) SetNillableFileInStorage(s *string) *EpisodeCreate {
-	if s != nil {
-		ec.SetFileInStorage(*s)
-	}
-	return ec
-}
-
 // SetMedia sets the "media" edge to the Media entity.
 func (ec *EpisodeCreate) SetMedia(m *Media) *EpisodeCreate {
 	return ec.SetMediaID(m.ID)
@@ -212,10 +198,6 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.Status(); ok {
 		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
-	}
-	if value, ok := ec.mutation.FileInStorage(); ok {
-		_spec.SetField(episode.FieldFileInStorage, field.TypeString, value)
-		_node.FileInStorage = value
 	}
 	if nodes := ec.mutation.MediaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

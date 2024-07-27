@@ -919,7 +919,6 @@ type EpisodeMutation struct {
 	overview          *string
 	air_date          *string
 	status            *episode.Status
-	file_in_storage   *string
 	clearedFields     map[string]struct{}
 	media             *int
 	clearedmedia      bool
@@ -1331,55 +1330,6 @@ func (m *EpisodeMutation) ResetStatus() {
 	m.status = nil
 }
 
-// SetFileInStorage sets the "file_in_storage" field.
-func (m *EpisodeMutation) SetFileInStorage(s string) {
-	m.file_in_storage = &s
-}
-
-// FileInStorage returns the value of the "file_in_storage" field in the mutation.
-func (m *EpisodeMutation) FileInStorage() (r string, exists bool) {
-	v := m.file_in_storage
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFileInStorage returns the old "file_in_storage" field's value of the Episode entity.
-// If the Episode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EpisodeMutation) OldFileInStorage(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFileInStorage is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFileInStorage requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFileInStorage: %w", err)
-	}
-	return oldValue.FileInStorage, nil
-}
-
-// ClearFileInStorage clears the value of the "file_in_storage" field.
-func (m *EpisodeMutation) ClearFileInStorage() {
-	m.file_in_storage = nil
-	m.clearedFields[episode.FieldFileInStorage] = struct{}{}
-}
-
-// FileInStorageCleared returns if the "file_in_storage" field was cleared in this mutation.
-func (m *EpisodeMutation) FileInStorageCleared() bool {
-	_, ok := m.clearedFields[episode.FieldFileInStorage]
-	return ok
-}
-
-// ResetFileInStorage resets all changes to the "file_in_storage" field.
-func (m *EpisodeMutation) ResetFileInStorage() {
-	m.file_in_storage = nil
-	delete(m.clearedFields, episode.FieldFileInStorage)
-}
-
 // ClearMedia clears the "media" edge to the Media entity.
 func (m *EpisodeMutation) ClearMedia() {
 	m.clearedmedia = true
@@ -1441,7 +1391,7 @@ func (m *EpisodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EpisodeMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 7)
 	if m.media != nil {
 		fields = append(fields, episode.FieldMediaID)
 	}
@@ -1462,9 +1412,6 @@ func (m *EpisodeMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, episode.FieldStatus)
-	}
-	if m.file_in_storage != nil {
-		fields = append(fields, episode.FieldFileInStorage)
 	}
 	return fields
 }
@@ -1488,8 +1435,6 @@ func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 		return m.AirDate()
 	case episode.FieldStatus:
 		return m.Status()
-	case episode.FieldFileInStorage:
-		return m.FileInStorage()
 	}
 	return nil, false
 }
@@ -1513,8 +1458,6 @@ func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldAirDate(ctx)
 	case episode.FieldStatus:
 		return m.OldStatus(ctx)
-	case episode.FieldFileInStorage:
-		return m.OldFileInStorage(ctx)
 	}
 	return nil, fmt.Errorf("unknown Episode field %s", name)
 }
@@ -1572,13 +1515,6 @@ func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
-		return nil
-	case episode.FieldFileInStorage:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFileInStorage(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
@@ -1640,9 +1576,6 @@ func (m *EpisodeMutation) ClearedFields() []string {
 	if m.FieldCleared(episode.FieldMediaID) {
 		fields = append(fields, episode.FieldMediaID)
 	}
-	if m.FieldCleared(episode.FieldFileInStorage) {
-		fields = append(fields, episode.FieldFileInStorage)
-	}
 	return fields
 }
 
@@ -1659,9 +1592,6 @@ func (m *EpisodeMutation) ClearField(name string) error {
 	switch name {
 	case episode.FieldMediaID:
 		m.ClearMediaID()
-		return nil
-	case episode.FieldFileInStorage:
-		m.ClearFileInStorage()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode nullable field %s", name)
@@ -1691,9 +1621,6 @@ func (m *EpisodeMutation) ResetField(name string) error {
 		return nil
 	case episode.FieldStatus:
 		m.ResetStatus()
-		return nil
-	case episode.FieldFileInStorage:
-		m.ResetFileInStorage()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)

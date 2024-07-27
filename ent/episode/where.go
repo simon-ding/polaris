@@ -84,11 +84,6 @@ func AirDate(v string) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldAirDate, v))
 }
 
-// FileInStorage applies equality check predicate on the "file_in_storage" field. It's identical to FileInStorageEQ.
-func FileInStorage(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldEQ(FieldFileInStorage, v))
-}
-
 // MediaIDEQ applies the EQ predicate on the "media_id" field.
 func MediaIDEQ(v int) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldMediaID, v))
@@ -412,81 +407,6 @@ func StatusIn(vs ...Status) predicate.Episode {
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.Episode {
 	return predicate.Episode(sql.FieldNotIn(FieldStatus, vs...))
-}
-
-// FileInStorageEQ applies the EQ predicate on the "file_in_storage" field.
-func FileInStorageEQ(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldEQ(FieldFileInStorage, v))
-}
-
-// FileInStorageNEQ applies the NEQ predicate on the "file_in_storage" field.
-func FileInStorageNEQ(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldNEQ(FieldFileInStorage, v))
-}
-
-// FileInStorageIn applies the In predicate on the "file_in_storage" field.
-func FileInStorageIn(vs ...string) predicate.Episode {
-	return predicate.Episode(sql.FieldIn(FieldFileInStorage, vs...))
-}
-
-// FileInStorageNotIn applies the NotIn predicate on the "file_in_storage" field.
-func FileInStorageNotIn(vs ...string) predicate.Episode {
-	return predicate.Episode(sql.FieldNotIn(FieldFileInStorage, vs...))
-}
-
-// FileInStorageGT applies the GT predicate on the "file_in_storage" field.
-func FileInStorageGT(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldGT(FieldFileInStorage, v))
-}
-
-// FileInStorageGTE applies the GTE predicate on the "file_in_storage" field.
-func FileInStorageGTE(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldGTE(FieldFileInStorage, v))
-}
-
-// FileInStorageLT applies the LT predicate on the "file_in_storage" field.
-func FileInStorageLT(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldLT(FieldFileInStorage, v))
-}
-
-// FileInStorageLTE applies the LTE predicate on the "file_in_storage" field.
-func FileInStorageLTE(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldLTE(FieldFileInStorage, v))
-}
-
-// FileInStorageContains applies the Contains predicate on the "file_in_storage" field.
-func FileInStorageContains(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldContains(FieldFileInStorage, v))
-}
-
-// FileInStorageHasPrefix applies the HasPrefix predicate on the "file_in_storage" field.
-func FileInStorageHasPrefix(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldHasPrefix(FieldFileInStorage, v))
-}
-
-// FileInStorageHasSuffix applies the HasSuffix predicate on the "file_in_storage" field.
-func FileInStorageHasSuffix(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldHasSuffix(FieldFileInStorage, v))
-}
-
-// FileInStorageIsNil applies the IsNil predicate on the "file_in_storage" field.
-func FileInStorageIsNil() predicate.Episode {
-	return predicate.Episode(sql.FieldIsNull(FieldFileInStorage))
-}
-
-// FileInStorageNotNil applies the NotNil predicate on the "file_in_storage" field.
-func FileInStorageNotNil() predicate.Episode {
-	return predicate.Episode(sql.FieldNotNull(FieldFileInStorage))
-}
-
-// FileInStorageEqualFold applies the EqualFold predicate on the "file_in_storage" field.
-func FileInStorageEqualFold(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldEqualFold(FieldFileInStorage, v))
-}
-
-// FileInStorageContainsFold applies the ContainsFold predicate on the "file_in_storage" field.
-func FileInStorageContainsFold(v string) predicate.Episode {
-	return predicate.Episode(sql.FieldContainsFold(FieldFileInStorage, v))
 }
 
 // HasMedia applies the HasEdge predicate on the "media" edge.

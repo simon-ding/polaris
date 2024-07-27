@@ -31,8 +31,6 @@ type Episode struct {
 	AirDate string `json:"air_date,omitempty"`
 	// Status holds the value of the "status" field.
 	Status episode.Status `json:"status,omitempty"`
-	// FileInStorage holds the value of the "file_in_storage" field.
-	FileInStorage string `json:"file_in_storage,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EpisodeQuery when eager-loading is set.
 	Edges        EpisodeEdges `json:"edges"`
@@ -66,7 +64,7 @@ func (*Episode) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case episode.FieldID, episode.FieldMediaID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
 			values[i] = new(sql.NullInt64)
-		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldStatus, episode.FieldFileInStorage:
+		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldStatus:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -131,12 +129,6 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.Status = episode.Status(value.String)
 			}
-		case episode.FieldFileInStorage:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field file_in_storage", values[i])
-			} else if value.Valid {
-				e.FileInStorage = value.String
-			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -198,9 +190,6 @@ func (e *Episode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", e.Status))
-	builder.WriteString(", ")
-	builder.WriteString("file_in_storage=")
-	builder.WriteString(e.FileInStorage)
 	builder.WriteByte(')')
 	return builder.String()
 }
