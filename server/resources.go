@@ -150,7 +150,7 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 		if in.Episode == 0 {
 			//search season package
 			log.Infof("search series season package S%02d", in.Season)
-			res, err = core.SearchSeasonPackage(s.db, in.ID, in.Season, true)
+			res, err = core.SearchSeasonPackage(s.db, in.ID, in.Season, false)
 			if err != nil {
 				return nil, errors.Wrap(err, "search season package")
 			}

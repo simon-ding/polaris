@@ -28,10 +28,10 @@ func isNumberedSeries(detail *db.MediaDetails) bool {
 			if ep.EpisodeNumber == 1 {
 				season2HasEpisode1 = true
 			}
-	
+
 		}
 	}
-	return hasSeason2 && !season2HasEpisode1//only one 1st episode
+	return hasSeason2 && !season2HasEpisode1 //only one 1st episode
 }
 
 func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkResolution bool) ([]torznab.Result, error) {
@@ -54,7 +54,7 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 		if !isNumberedSeries(series) { //do not check season on series that only rely on episode number
 			if meta.Season != seasonNum {
 				continue
-			}	
+			}
 		}
 		if isNumberedSeries(series) && episodeNum == -1 {
 			//should not want season
@@ -63,7 +63,7 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 
 		if episodeNum != -1 && meta.Episode != episodeNum { //not season pack, episode number equals
 			continue
-		} else if seasonNum == -1 && !meta.IsSeasonPack { //want season pack, but not season pack
+		}else if episodeNum == -1 && !meta.IsSeasonPack { //want season pack, but not season pack
 			continue
 		}
 		if checkResolution && meta.Resolution != series.Resolution.String() {
@@ -131,7 +131,7 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 
 	for _, tor := range allTorznab {
 		wg.Add(1)
-		go func ()  {
+		go func() {
 			log.Debugf("search torznab %v with %v", tor.Name, q)
 			defer wg.Done()
 			resp, err := torznab.Search(tor.URL, tor.ApiKey, q)
@@ -140,7 +140,7 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 				return
 			}
 			resChan <- resp
-	
+
 		}()
 	}
 	go func() {
