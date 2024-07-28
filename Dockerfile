@@ -3,7 +3,7 @@ WORKDIR /app
 COPY ./ui/pubspec.yaml ./ui/pubspec.lock ./
 RUN flutter pub get
 COPY ./ui/ ./
-RUN flutter build web 
+RUN flutter build web --no-web-resources-cdn
 
 # 打包依赖阶段使用golang作为基础镜像
 FROM golang:1.22 as builder
@@ -24,7 +24,7 @@ COPY --from=flutter /app/build/web ./ui/build/web/
 # 指定OS等，并go build
 RUN CGO_ENABLED=1 go build -o polaris -ldflags="-X polaris/db.Version=$(git describe --tags --long)"  ./cmd/ 
 
-FROM debian:12
+FROM debian:stable-slim
 ENV TZ="Asia/Shanghai" GIN_MODE=release
 
 WORKDIR /app
@@ -34,5 +34,7 @@ RUN apt-get update && apt-get -y install ca-certificates
 COPY --from=builder /app/polaris .
 
 EXPOSE 8080
+
+USER 1000:1000
 
 ENTRYPOINT ["./polaris"]
