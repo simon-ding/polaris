@@ -16,10 +16,6 @@ import (
 )
 
 func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*string, error) {
-	trc, err := s.getDownloadClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "connect transmission")
-	}
 
 	res, err := core.SearchSeasonPackage(s.db, seriesId, seasonNum, true)
 	if err != nil {
@@ -28,7 +24,15 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 
 	r1 := res[0]
 	log.Infof("found resource to download: %+v", r1)
+	return s.downloadSeasonPackage(r1, seriesId, seasonNum)
 
+}
+
+func (s *Server) downloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum int) (*string, error) {
+	trc, err := s.getDownloadClient()
+	if err != nil {
+		return nil, errors.Wrap(err, "connect transmission")
+	}
 	downloadDir := s.db.GetDownloadDir()
 	size := utils.AvailableSpace(downloadDir)
 	if size < uint64(r1.Size) {
@@ -64,6 +68,7 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 
 	s.tasks[history.ID] = &Task{Torrent: torrent}
 	return &r1.Name, nil
+
 }
 
 func (s *Server) downloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, episodeNum int) (*string, error) {
@@ -142,14 +147,26 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 
 	var res []torznab.Result
 	if m.MediaType == media.MediaTypeTv {
-		res, err = core.SearchEpisode(s.db, in.ID, in.Season, in.Episode, false)
-		if err != nil {
-			if err.Error() == "no resource found" {
-				return []TorznabSearchResult{}, nil
+		if in.Episode == 0 {
+			//search season package
+			log.Infof("search series season package S%02d", in.Season)
+			res, err = core.SearchSeasonPackage(s.db, in.ID, in.Season, true)
+			if err != nil {
+				return nil, errors.Wrap(err, "search season package")
 			}
-			return nil, errors.Wrap(err, "search episode")
+		} else {
+			log.Infof("search series episode S%02dE%02d", in.Season, in.Episode)
+			res, err = core.SearchEpisode(s.db, in.ID, in.Season, in.Episode, false)
+			if err != nil {
+				if err.Error() == "no resource found" {
+					return []TorznabSearchResult{}, nil
+				}
+				return nil, errors.Wrap(err, "search episode")
+			}
+
 		}
 	} else {
+		log.Info("search movie %d", in.ID)
 		res, err = core.SearchMovie(s.db, in.ID, false)
 		if err != nil {
 			if err.Error() == "no resource found" {
@@ -227,6 +244,15 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 		return nil, fmt.Errorf("no tv series of id %v", in.MediaID)
 	}
 	if m.MediaType == media.MediaTypeTv {
+		if in.Episode == 0 {
+			//download season package
+			name := in.Name
+			if name == "" {
+				name = fmt.Sprintf("%v S%02d", m.OriginalName, in.Season)
+			}
+			res := torznab.Result{Name: name, Link: in.Link, Size: in.Size}
+			return s.downloadSeasonPackage(res, in.MediaID, in.Season)
+		}
 		name := in.Name
 		if name == "" {
 			name = fmt.Sprintf("%v S%02dE%02d", m.OriginalName, in.Season, in.Episode)

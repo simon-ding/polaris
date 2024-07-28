@@ -114,19 +114,30 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                   const DataColumn(label: Text("播出时间")),
                   const DataColumn(label: Text("状态")),
                   DataColumn(
-                      label: Tooltip(
-                    message: "搜索下载全部剧集",
-                    child: IconButton(
-                        onPressed: () {
-                          ref
-                              .read(mediaDetailsProvider(widget.seriesId)
-                                  .notifier)
-                              .searchAndDownload(widget.seriesId, k, 0)
-                              .then((v) => Utils.showSnakeBar("开始下载: $v"))
-                              .onError((error, trace) =>
-                                  Utils.showSnakeBar("操作失败: $error"));
-                        },
-                        icon: const Icon(Icons.download)),
+                      label: Row(
+                    children: [
+                      Tooltip(
+                        message: "搜索下载全部剧集",
+                        child: IconButton(
+                            onPressed: () {
+                              ref
+                                  .read(mediaDetailsProvider(widget.seriesId)
+                                      .notifier)
+                                  .searchAndDownload(widget.seriesId, k, 0)
+                                  .then((v) => Utils.showSnakeBar("开始下载: $v"))
+                                  .onError((error, trace) =>
+                                      Utils.showSnakeBar("操作失败: $error"));
+                            },
+                            icon: const Icon(Icons.download)),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      IconButton(
+                          onPressed: () =>
+                              showAvailableTorrents(widget.seriesId, k, 0),
+                          icon: const Icon(Icons.manage_search))
+                    ],
                   ))
                 ], rows: m[k]!),
               ],
