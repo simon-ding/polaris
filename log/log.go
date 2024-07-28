@@ -1,6 +1,7 @@
 package log
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -18,12 +19,16 @@ func init() {
 	atom = zap.NewAtomicLevel()
 	atom.SetLevel(zap.DebugLevel)
 
-	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   filepath.Join(dataPath, "logs", "polaris.log"),
-		MaxSize:    50, // megabytes
-		MaxBackups: 3,
-		MaxAge:     30, // days
-	})
+	w := zapcore.Lock(os.Stdout)
+	if os.Getenv("GIN_MODE") == "release" {
+		w = zapcore.AddSync(&lumberjack.Logger{
+			Filename:   filepath.Join(dataPath, "logs", "polaris.log"),
+			MaxSize:    50, // megabytes
+			MaxBackups: 3,
+			MaxAge:     30, // days
+		})
+	
+	}
 
 	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 
