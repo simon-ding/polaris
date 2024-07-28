@@ -294,7 +294,7 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 		s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 	}()
 
-	log.Infof("success add %s to download task", media.NameEn)
-	return media.NameEn, nil
+	log.Infof("success add %s to download task", in.Name)
+	return in.Name, nil
 
 }
