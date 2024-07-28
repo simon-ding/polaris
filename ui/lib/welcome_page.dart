@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:quiver/strings.dart';
 import 'package:ui/movie_watchlist.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/welcome_data.dart';

@@ -166,8 +166,6 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         loading: () => const MyProgressIndicator());
 
     var authData = ref.watch(authSettingProvider);
-    TextEditingController userController = TextEditingController();
-    TextEditingController passController = TextEditingController();
     var authSetting = authData.when(
         data: (data) {
           if (_enableAuth == null) {
@@ -175,7 +173,6 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
               _enableAuth = data.enable;
             });
           }
-          userController.text = data.user;
           return FormBuilder(
               key: _formKey2,
               initialValue: {
@@ -285,7 +282,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
 
   Future<void> showIndexerDetails(Indexer indexer) {
     final _formKey = GlobalKey<FormBuilderState>();
-    var selectImpl = "torznab";
+
     var body = FormBuilder(
       key: _formKey,
       initialValue: {

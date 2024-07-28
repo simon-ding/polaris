@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -249,13 +247,16 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return Consumer(builder: (context, ref, _) {
-              final torrents = ref.watch(mediaTorrentsDataProvider(
-        (mediaId: id, seasonNumber: season, episodeNumber: episode)));
+          final torrents = ref.watch(mediaTorrentsDataProvider(
+              (mediaId: id, seasonNumber: season, episodeNumber: episode)));
 
-        return AlertDialog(
-            //title: Text("资源"),
-            content: SelectionArea(
-              child: SizedBox(width: 800, height: 400,child: torrents.when(
+          return AlertDialog(
+              //title: Text("资源"),
+              content: SelectionArea(
+            child: SizedBox(
+              width: 800,
+              height: 400,
+              child: torrents.when(
                   data: (v) {
                     return SingleChildScrollView(
                         child: DataTable(
@@ -300,8 +301,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     return Text("$err");
                   },
                   loading: () => const MyProgressIndicator()),
-            ),) );
-
+            ),
+          ));
         });
       },
     );
