@@ -28,7 +28,7 @@ func (Media) Fields() []ent.Field {
 		field.Enum("resolution").Values("720p", "1080p", "4k").Default("1080p"),
 		field.Int("storage_id").Optional(),
 		field.String("target_dir").Optional(),
-		//field.Bool("download_history_episodes").Optional().Default(false).Comment("tv series only"),
+		field.Bool("download_history_episodes").Optional().Default(false).Comment("tv series only"),
 	}
 }
 

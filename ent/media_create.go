@@ -141,6 +141,20 @@ func (mc *MediaCreate) SetNillableTargetDir(s *string) *MediaCreate {
 	return mc
 }
 
+// SetDownloadHistoryEpisodes sets the "download_history_episodes" field.
+func (mc *MediaCreate) SetDownloadHistoryEpisodes(b bool) *MediaCreate {
+	mc.mutation.SetDownloadHistoryEpisodes(b)
+	return mc
+}
+
+// SetNillableDownloadHistoryEpisodes sets the "download_history_episodes" field if the given value is not nil.
+func (mc *MediaCreate) SetNillableDownloadHistoryEpisodes(b *bool) *MediaCreate {
+	if b != nil {
+		mc.SetDownloadHistoryEpisodes(*b)
+	}
+	return mc
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mc *MediaCreate) AddEpisodeIDs(ids ...int) *MediaCreate {
 	mc.mutation.AddEpisodeIDs(ids...)
@@ -202,6 +216,10 @@ func (mc *MediaCreate) defaults() {
 	if _, ok := mc.mutation.Resolution(); !ok {
 		v := media.DefaultResolution
 		mc.mutation.SetResolution(v)
+	}
+	if _, ok := mc.mutation.DownloadHistoryEpisodes(); !ok {
+		v := media.DefaultDownloadHistoryEpisodes
+		mc.mutation.SetDownloadHistoryEpisodes(v)
 	}
 }
 
@@ -317,6 +335,10 @@ func (mc *MediaCreate) createSpec() (*Media, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.TargetDir(); ok {
 		_spec.SetField(media.FieldTargetDir, field.TypeString, value)
 		_node.TargetDir = value
+	}
+	if value, ok := mc.mutation.DownloadHistoryEpisodes(); ok {
+		_spec.SetField(media.FieldDownloadHistoryEpisodes, field.TypeBool, value)
+		_node.DownloadHistoryEpisodes = value
 	}
 	if nodes := mc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

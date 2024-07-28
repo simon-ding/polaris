@@ -146,6 +146,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               int storageSelected = 0;
               var storage = ref.watch(storageSettingProvider);
               var name = ref.watch(suggestNameDataProvider(item.id!));
+              bool downloadHistoryEpisodes = false;
+              bool buttonTapped = false;
 
               var pathController = TextEditingController();
               return AlertDialog(
@@ -230,6 +232,19 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                           ),
                                         )
                                       : Text(""),
+                                  item.mediaType == "tv"
+                                      ? SizedBox(
+                                          width: 250,
+                                          child: CheckboxListTile(
+                                              title: const Text("是否下载往期剧集"),
+                                              value: downloadHistoryEpisodes,
+                                              onChanged: (v) {
+                                                setState(() {
+                                                  downloadHistoryEpisodes = v!;
+                                                });
+                                              }),
+                                        )
+                                      : const SizedBox(),
                                 ],
                               );
                             });
@@ -254,17 +269,32 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       textStyle: Theme.of(context).textTheme.labelLarge,
                     ),
                     child: const Text('确定'),
-                    onPressed: () {
-                      ref
+                    onPressed: () async {
+                      if (buttonTapped) {
+                        return;
+                      }
+                      setState(() {
+                        buttonTapped = true;
+                      });
+
+                      await ref
                           .read(searchPageDataProvider(widget.query ?? "")
                               .notifier)
-                          .submit2Watchlist(item.id!, storageSelected,
-                              resSelected, item.mediaType!, pathController.text)
+                          .submit2Watchlist(
+                              item.id!,
+                              storageSelected,
+                              resSelected,
+                              item.mediaType!,
+                              pathController.text,
+                              downloadHistoryEpisodes)
                           .then((v) {
                         Utils.showSnakeBar("添加成功");
                         Navigator.of(context).pop();
                       }).onError((error, trace) {
                         Utils.showSnakeBar("添加失败：$error");
+                      });
+                      setState(() {
+                        buttonTapped = false;
                       });
                     },
                   ),

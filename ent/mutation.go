@@ -3129,30 +3129,31 @@ func (m *IndexersMutation) ResetEdge(name string) error {
 // MediaMutation represents an operation that mutates the Media nodes in the graph.
 type MediaMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	tmdb_id         *int
-	addtmdb_id      *int
-	imdb_id         *string
-	media_type      *media.MediaType
-	name_cn         *string
-	name_en         *string
-	original_name   *string
-	overview        *string
-	created_at      *time.Time
-	air_date        *string
-	resolution      *media.Resolution
-	storage_id      *int
-	addstorage_id   *int
-	target_dir      *string
-	clearedFields   map[string]struct{}
-	episodes        map[int]struct{}
-	removedepisodes map[int]struct{}
-	clearedepisodes bool
-	done            bool
-	oldValue        func(context.Context) (*Media, error)
-	predicates      []predicate.Media
+	op                        Op
+	typ                       string
+	id                        *int
+	tmdb_id                   *int
+	addtmdb_id                *int
+	imdb_id                   *string
+	media_type                *media.MediaType
+	name_cn                   *string
+	name_en                   *string
+	original_name             *string
+	overview                  *string
+	created_at                *time.Time
+	air_date                  *string
+	resolution                *media.Resolution
+	storage_id                *int
+	addstorage_id             *int
+	target_dir                *string
+	download_history_episodes *bool
+	clearedFields             map[string]struct{}
+	episodes                  map[int]struct{}
+	removedepisodes           map[int]struct{}
+	clearedepisodes           bool
+	done                      bool
+	oldValue                  func(context.Context) (*Media, error)
+	predicates                []predicate.Media
 }
 
 var _ ent.Mutation = (*MediaMutation)(nil)
@@ -3765,6 +3766,55 @@ func (m *MediaMutation) ResetTargetDir() {
 	delete(m.clearedFields, media.FieldTargetDir)
 }
 
+// SetDownloadHistoryEpisodes sets the "download_history_episodes" field.
+func (m *MediaMutation) SetDownloadHistoryEpisodes(b bool) {
+	m.download_history_episodes = &b
+}
+
+// DownloadHistoryEpisodes returns the value of the "download_history_episodes" field in the mutation.
+func (m *MediaMutation) DownloadHistoryEpisodes() (r bool, exists bool) {
+	v := m.download_history_episodes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDownloadHistoryEpisodes returns the old "download_history_episodes" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MediaMutation) OldDownloadHistoryEpisodes(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDownloadHistoryEpisodes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDownloadHistoryEpisodes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDownloadHistoryEpisodes: %w", err)
+	}
+	return oldValue.DownloadHistoryEpisodes, nil
+}
+
+// ClearDownloadHistoryEpisodes clears the value of the "download_history_episodes" field.
+func (m *MediaMutation) ClearDownloadHistoryEpisodes() {
+	m.download_history_episodes = nil
+	m.clearedFields[media.FieldDownloadHistoryEpisodes] = struct{}{}
+}
+
+// DownloadHistoryEpisodesCleared returns if the "download_history_episodes" field was cleared in this mutation.
+func (m *MediaMutation) DownloadHistoryEpisodesCleared() bool {
+	_, ok := m.clearedFields[media.FieldDownloadHistoryEpisodes]
+	return ok
+}
+
+// ResetDownloadHistoryEpisodes resets all changes to the "download_history_episodes" field.
+func (m *MediaMutation) ResetDownloadHistoryEpisodes() {
+	m.download_history_episodes = nil
+	delete(m.clearedFields, media.FieldDownloadHistoryEpisodes)
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
 func (m *MediaMutation) AddEpisodeIDs(ids ...int) {
 	if m.episodes == nil {
@@ -3853,7 +3903,7 @@ func (m *MediaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MediaMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.tmdb_id != nil {
 		fields = append(fields, media.FieldTmdbID)
 	}
@@ -3890,6 +3940,9 @@ func (m *MediaMutation) Fields() []string {
 	if m.target_dir != nil {
 		fields = append(fields, media.FieldTargetDir)
 	}
+	if m.download_history_episodes != nil {
+		fields = append(fields, media.FieldDownloadHistoryEpisodes)
+	}
 	return fields
 }
 
@@ -3922,6 +3975,8 @@ func (m *MediaMutation) Field(name string) (ent.Value, bool) {
 		return m.StorageID()
 	case media.FieldTargetDir:
 		return m.TargetDir()
+	case media.FieldDownloadHistoryEpisodes:
+		return m.DownloadHistoryEpisodes()
 	}
 	return nil, false
 }
@@ -3955,6 +4010,8 @@ func (m *MediaMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStorageID(ctx)
 	case media.FieldTargetDir:
 		return m.OldTargetDir(ctx)
+	case media.FieldDownloadHistoryEpisodes:
+		return m.OldDownloadHistoryEpisodes(ctx)
 	}
 	return nil, fmt.Errorf("unknown Media field %s", name)
 }
@@ -4048,6 +4105,13 @@ func (m *MediaMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTargetDir(v)
 		return nil
+	case media.FieldDownloadHistoryEpisodes:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDownloadHistoryEpisodes(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)
 }
@@ -4114,6 +4178,9 @@ func (m *MediaMutation) ClearedFields() []string {
 	if m.FieldCleared(media.FieldTargetDir) {
 		fields = append(fields, media.FieldTargetDir)
 	}
+	if m.FieldCleared(media.FieldDownloadHistoryEpisodes) {
+		fields = append(fields, media.FieldDownloadHistoryEpisodes)
+	}
 	return fields
 }
 
@@ -4136,6 +4203,9 @@ func (m *MediaMutation) ClearField(name string) error {
 		return nil
 	case media.FieldTargetDir:
 		m.ClearTargetDir()
+		return nil
+	case media.FieldDownloadHistoryEpisodes:
+		m.ClearDownloadHistoryEpisodes()
 		return nil
 	}
 	return fmt.Errorf("unknown Media nullable field %s", name)
@@ -4180,6 +4250,9 @@ func (m *MediaMutation) ResetField(name string) error {
 		return nil
 	case media.FieldTargetDir:
 		m.ResetTargetDir()
+		return nil
+	case media.FieldDownloadHistoryEpisodes:
+		m.ResetDownloadHistoryEpisodes()
 		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)

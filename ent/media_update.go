@@ -229,6 +229,26 @@ func (mu *MediaUpdate) ClearTargetDir() *MediaUpdate {
 	return mu
 }
 
+// SetDownloadHistoryEpisodes sets the "download_history_episodes" field.
+func (mu *MediaUpdate) SetDownloadHistoryEpisodes(b bool) *MediaUpdate {
+	mu.mutation.SetDownloadHistoryEpisodes(b)
+	return mu
+}
+
+// SetNillableDownloadHistoryEpisodes sets the "download_history_episodes" field if the given value is not nil.
+func (mu *MediaUpdate) SetNillableDownloadHistoryEpisodes(b *bool) *MediaUpdate {
+	if b != nil {
+		mu.SetDownloadHistoryEpisodes(*b)
+	}
+	return mu
+}
+
+// ClearDownloadHistoryEpisodes clears the value of the "download_history_episodes" field.
+func (mu *MediaUpdate) ClearDownloadHistoryEpisodes() *MediaUpdate {
+	mu.mutation.ClearDownloadHistoryEpisodes()
+	return mu
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mu *MediaUpdate) AddEpisodeIDs(ids ...int) *MediaUpdate {
 	mu.mutation.AddEpisodeIDs(ids...)
@@ -374,6 +394,12 @@ func (mu *MediaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if mu.mutation.TargetDirCleared() {
 		_spec.ClearField(media.FieldTargetDir, field.TypeString)
+	}
+	if value, ok := mu.mutation.DownloadHistoryEpisodes(); ok {
+		_spec.SetField(media.FieldDownloadHistoryEpisodes, field.TypeBool, value)
+	}
+	if mu.mutation.DownloadHistoryEpisodesCleared() {
+		_spec.ClearField(media.FieldDownloadHistoryEpisodes, field.TypeBool)
 	}
 	if mu.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -640,6 +666,26 @@ func (muo *MediaUpdateOne) ClearTargetDir() *MediaUpdateOne {
 	return muo
 }
 
+// SetDownloadHistoryEpisodes sets the "download_history_episodes" field.
+func (muo *MediaUpdateOne) SetDownloadHistoryEpisodes(b bool) *MediaUpdateOne {
+	muo.mutation.SetDownloadHistoryEpisodes(b)
+	return muo
+}
+
+// SetNillableDownloadHistoryEpisodes sets the "download_history_episodes" field if the given value is not nil.
+func (muo *MediaUpdateOne) SetNillableDownloadHistoryEpisodes(b *bool) *MediaUpdateOne {
+	if b != nil {
+		muo.SetDownloadHistoryEpisodes(*b)
+	}
+	return muo
+}
+
+// ClearDownloadHistoryEpisodes clears the value of the "download_history_episodes" field.
+func (muo *MediaUpdateOne) ClearDownloadHistoryEpisodes() *MediaUpdateOne {
+	muo.mutation.ClearDownloadHistoryEpisodes()
+	return muo
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (muo *MediaUpdateOne) AddEpisodeIDs(ids ...int) *MediaUpdateOne {
 	muo.mutation.AddEpisodeIDs(ids...)
@@ -815,6 +861,12 @@ func (muo *MediaUpdateOne) sqlSave(ctx context.Context) (_node *Media, err error
 	}
 	if muo.mutation.TargetDirCleared() {
 		_spec.ClearField(media.FieldTargetDir, field.TypeString)
+	}
+	if value, ok := muo.mutation.DownloadHistoryEpisodes(); ok {
+		_spec.SetField(media.FieldDownloadHistoryEpisodes, field.TypeBool, value)
+	}
+	if muo.mutation.DownloadHistoryEpisodesCleared() {
+		_spec.ClearField(media.FieldDownloadHistoryEpisodes, field.TypeBool)
 	}
 	if muo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{

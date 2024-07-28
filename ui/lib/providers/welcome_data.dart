@@ -84,14 +84,15 @@ class SearchPageData
   }
 
   Future<void> submit2Watchlist(int tmdbId, int storageId, String resolution,
-      String mediaType, String folder) async {
+      String mediaType, String folder, bool downloadHistoryEpisodes) async {
     final dio = await APIs.getDio();
     if (mediaType == "tv") {
       var resp = await dio.post(APIs.watchlistTvUrl, data: {
         "tmdb_id": tmdbId,
         "storage_id": storageId,
         "resolution": resolution,
-        "folder": folder
+        "folder": folder,
+        "download_history_episodes":downloadHistoryEpisodes
       });
       var sp = ServerResponse.fromJson(resp.data);
       if (sp.code != 0) {

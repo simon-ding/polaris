@@ -221,14 +221,17 @@ func (s *Server) downloadTvSeries() {
 	for _, series := range allSeries {
 		tvDetail := s.db.GetMediaDetails(series.ID)
 		for _, ep := range tvDetail.Episodes {
-			t, err := time.Parse("2006-01-02", ep.AirDate)
-			if err != nil {
-				log.Error("air date not known, skip: %v", ep.Title)
-				continue
+			if !series.DownloadHistoryEpisodes { //设置不下载历史已播出剧集，只下载将来剧集
+				t, err := time.Parse("2006-01-02", ep.AirDate)
+				if err != nil {
+					log.Error("air date not known, skip: %v", ep.Title)
+					continue
+				}
+				if series.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
+					continue
+				}	
 			}
-			if series.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
-				continue
-			}
+			
 			if ep.Status != episode.StatusMissing { //已经下载的不去下载
 				continue
 			}

@@ -57,10 +57,11 @@ func (s *Server) SearchMedia(c *gin.Context) (interface{}, error) {
 }
 
 type addWatchlistIn struct {
-	TmdbID     int    `json:"tmdb_id" binding:"required"`
-	StorageID  int    `json:"storage_id" `
-	Resolution string `json:"resolution" binding:"required"`
-	Folder     string `json:"folder"`
+	TmdbID                  int    `json:"tmdb_id" binding:"required"`
+	StorageID               int    `json:"storage_id" `
+	Resolution              string `json:"resolution" binding:"required"`
+	Folder                  string `json:"folder"`
+	DownloadHistoryEpisodes bool   `json:"download_history_episodes"` //for tv
 }
 
 func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
@@ -121,6 +122,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
 		TargetDir:    in.Folder,
+		DownloadHistoryEpisodes: in.DownloadHistoryEpisodes,
 	}, epIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
@@ -273,7 +275,7 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 				}
 				if ep.Status == episode.StatusMissing {
 					ms.Status = "monitoring"
-				}	
+				}
 			}
 		}
 		res[i] = ms

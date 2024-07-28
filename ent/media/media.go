@@ -39,6 +39,8 @@ const (
 	FieldStorageID = "storage_id"
 	// FieldTargetDir holds the string denoting the target_dir field in the database.
 	FieldTargetDir = "target_dir"
+	// FieldDownloadHistoryEpisodes holds the string denoting the download_history_episodes field in the database.
+	FieldDownloadHistoryEpisodes = "download_history_episodes"
 	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
 	EdgeEpisodes = "episodes"
 	// Table holds the table name of the media in the database.
@@ -67,6 +69,7 @@ var Columns = []string{
 	FieldResolution,
 	FieldStorageID,
 	FieldTargetDir,
+	FieldDownloadHistoryEpisodes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -84,6 +87,8 @@ var (
 	DefaultCreatedAt time.Time
 	// DefaultAirDate holds the default value on creation for the "air_date" field.
 	DefaultAirDate string
+	// DefaultDownloadHistoryEpisodes holds the default value on creation for the "download_history_episodes" field.
+	DefaultDownloadHistoryEpisodes bool
 )
 
 // MediaType defines the type for the "media_type" enum field.
@@ -202,6 +207,11 @@ func ByStorageID(opts ...sql.OrderTermOption) OrderOption {
 // ByTargetDir orders the results by the target_dir field.
 func ByTargetDir(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTargetDir, opts...).ToFunc()
+}
+
+// ByDownloadHistoryEpisodes orders the results by the download_history_episodes field.
+func ByDownloadHistoryEpisodes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDownloadHistoryEpisodes, opts...).ToFunc()
 }
 
 // ByEpisodesCount orders the results by episodes count.

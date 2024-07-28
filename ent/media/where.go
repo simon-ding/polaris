@@ -105,6 +105,11 @@ func TargetDir(v string) predicate.Media {
 	return predicate.Media(sql.FieldEQ(FieldTargetDir, v))
 }
 
+// DownloadHistoryEpisodes applies equality check predicate on the "download_history_episodes" field. It's identical to DownloadHistoryEpisodesEQ.
+func DownloadHistoryEpisodes(v bool) predicate.Media {
+	return predicate.Media(sql.FieldEQ(FieldDownloadHistoryEpisodes, v))
+}
+
 // TmdbIDEQ applies the EQ predicate on the "tmdb_id" field.
 func TmdbIDEQ(v int) predicate.Media {
 	return predicate.Media(sql.FieldEQ(FieldTmdbID, v))
@@ -748,6 +753,26 @@ func TargetDirEqualFold(v string) predicate.Media {
 // TargetDirContainsFold applies the ContainsFold predicate on the "target_dir" field.
 func TargetDirContainsFold(v string) predicate.Media {
 	return predicate.Media(sql.FieldContainsFold(FieldTargetDir, v))
+}
+
+// DownloadHistoryEpisodesEQ applies the EQ predicate on the "download_history_episodes" field.
+func DownloadHistoryEpisodesEQ(v bool) predicate.Media {
+	return predicate.Media(sql.FieldEQ(FieldDownloadHistoryEpisodes, v))
+}
+
+// DownloadHistoryEpisodesNEQ applies the NEQ predicate on the "download_history_episodes" field.
+func DownloadHistoryEpisodesNEQ(v bool) predicate.Media {
+	return predicate.Media(sql.FieldNEQ(FieldDownloadHistoryEpisodes, v))
+}
+
+// DownloadHistoryEpisodesIsNil applies the IsNil predicate on the "download_history_episodes" field.
+func DownloadHistoryEpisodesIsNil() predicate.Media {
+	return predicate.Media(sql.FieldIsNull(FieldDownloadHistoryEpisodes))
+}
+
+// DownloadHistoryEpisodesNotNil applies the NotNil predicate on the "download_history_episodes" field.
+func DownloadHistoryEpisodesNotNil() predicate.Media {
+	return predicate.Media(sql.FieldNotNull(FieldDownloadHistoryEpisodes))
 }
 
 // HasEpisodes applies the HasEdge predicate on the "episodes" edge.

@@ -70,6 +70,10 @@ func init() {
 	mediaDescAirDate := mediaFields[8].Descriptor()
 	// media.DefaultAirDate holds the default value on creation for the air_date field.
 	media.DefaultAirDate = mediaDescAirDate.Default.(string)
+	// mediaDescDownloadHistoryEpisodes is the schema descriptor for download_history_episodes field.
+	mediaDescDownloadHistoryEpisodes := mediaFields[12].Descriptor()
+	// media.DefaultDownloadHistoryEpisodes holds the default value on creation for the download_history_episodes field.
+	media.DefaultDownloadHistoryEpisodes = mediaDescDownloadHistoryEpisodes.Default.(bool)
 	storageFields := schema.Storage{}.Fields()
 	_ = storageFields
 	// storageDescDeleted is the schema descriptor for deleted field.
