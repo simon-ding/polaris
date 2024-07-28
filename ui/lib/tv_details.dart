@@ -244,83 +244,65 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
   }
 
   Future<void> showAvailableTorrents(String id, int season, int episode) {
-    final torrents = ref.watch(mediaTorrentsDataProvider(TorrentQuery(
-            mediaId: id, seasonNumber: season, episodeNumber: episode))
-        .future);
-
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
+        return Consumer(builder: (context, ref, _) {
+              final torrents = ref.watch(mediaTorrentsDataProvider(
+        (mediaId: id, seasonNumber: season, episodeNumber: episode)));
+
         return AlertDialog(
-            title: Text("资源"),
-            content: FutureBuilder(
-                future: torrents,
-                builder: (context, snapshot) {
-                  return SelectionArea(
-                      child: Container(
-                          constraints:
-                              BoxConstraints(maxHeight: 400, maxWidth: 1000),
-                          child: () {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              if (snapshot.hasError) {
-                                // 请求失败，显示错误
-                                return Text("Error: ${snapshot.error}");
-                              } else {
-                                // 请求成功，显示数据
-                                final v = snapshot.data;
-                                return SingleChildScrollView(
-                                    child: DataTable(
-                                        dataTextStyle:
-                                            TextStyle(fontSize: 14, height: 0),
-                                        columns: const [
-                                          DataColumn(label: Text("名称")),
-                                          DataColumn(label: Text("大小")),
-                                          DataColumn(label: Text("seeders")),
-                                          DataColumn(label: Text("peers")),
-                                          DataColumn(label: Text("操作"))
-                                        ],
-                                        rows: List.generate(v!.length, (i) {
-                                          final torrent = v[i];
-                                          return DataRow(cells: [
-                                            DataCell(Text("${torrent.name}")),
-                                            DataCell(Text(
-                                                "${torrent.size?.readableFileSize()}")),
-                                            DataCell(
-                                                Text("${torrent.seeders}")),
-                                            DataCell(Text("${torrent.peers}")),
-                                            DataCell(IconButton(
-                                              icon: const Icon(Icons.download),
-                                              onPressed: () async {
-                                                await ref
-                                                    .read(mediaTorrentsDataProvider(
-                                                            TorrentQuery(
-                                                                mediaId: id,
-                                                                seasonNumber:
-                                                                    season,
-                                                                episodeNumber:
-                                                                    episode))
-                                                        .notifier)
-                                                    .download(torrent)
-                                                    .then((v) {
-                                                  Navigator.of(context).pop();
-                                                  Utils.showSnakeBar(
-                                                      "开始下载：${torrent.name}");
-                                                }).onError((error, trace) =>
-                                                        Utils.showSnakeBar(
-                                                            "下载失败：$error"));
-                                              },
-                                            ))
-                                          ]);
-                                        })));
-                              }
-                            } else {
-                              // 请求未结束，显示loading
-                              return MyProgressIndicator();
-                            }
-                          }()));
-                }));
+            //title: Text("资源"),
+            content: SelectionArea(
+              child: SizedBox(width: 800, height: 400,child: torrents.when(
+                  data: (v) {
+                    return SingleChildScrollView(
+                        child: DataTable(
+                            dataTextStyle: TextStyle(fontSize: 12, height: 0),
+                            columns: const [
+                              DataColumn(label: Text("名称")),
+                              DataColumn(label: Text("大小")),
+                              DataColumn(label: Text("seeders")),
+                              DataColumn(label: Text("peers")),
+                              DataColumn(label: Text("操作"))
+                            ],
+                            rows: List.generate(v.length, (i) {
+                              final torrent = v[i];
+                              return DataRow(cells: [
+                                DataCell(Text("${torrent.name}")),
+                                DataCell(Text(
+                                    "${torrent.size?.readableFileSize()}")),
+                                DataCell(Text("${torrent.seeders}")),
+                                DataCell(Text("${torrent.peers}")),
+                                DataCell(IconButton(
+                                  icon: const Icon(Icons.download),
+                                  onPressed: () async {
+                                    await ref
+                                        .read(mediaTorrentsDataProvider((
+                                          mediaId: id,
+                                          seasonNumber: season,
+                                          episodeNumber: episode
+                                        )).notifier)
+                                        .download(torrent)
+                                        .then((v) {
+                                      Navigator.of(context).pop();
+                                      Utils.showSnakeBar(
+                                          "开始下载：${torrent.name}");
+                                    }).onError((error, trace) =>
+                                            Utils.showSnakeBar("下载失败：$error"));
+                                  },
+                                ))
+                              ]);
+                            })));
+                  },
+                  error: (err, trace) {
+                    return Text("$err");
+                  },
+                  loading: () => const MyProgressIndicator()),
+            ),) );
+
+        });
       },
     );
   }

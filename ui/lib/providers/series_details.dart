@@ -131,29 +131,35 @@ var mediaTorrentsDataProvider = AsyncNotifierProvider.autoDispose
     .family<MediaTorrentResource, List<TorrentResource>, TorrentQuery>(
         MediaTorrentResource.new);
 
-class TorrentQuery {
-  final String mediaId;
-  final int seasonNumber;
-  final int episodeNumber;
-  TorrentQuery(
-      {required this.mediaId, this.seasonNumber = 0, this.episodeNumber = 0});
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data["id"] = int.parse(mediaId);
-    data["season"] = seasonNumber;
-    data["episode"] = episodeNumber;
-    return data;
-  }
-}
+// class TorrentQuery {
+//   final String mediaId;
+//   final int seasonNumber;
+//   final int episodeNumber;
+//   TorrentQuery(
+//       {required this.mediaId, this.seasonNumber = 0, this.episodeNumber = 0});
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data["id"] = int.parse(mediaId);
+//     data["season"] = seasonNumber;
+//     data["episode"] = episodeNumber;
+//     return data;
+//   }
+// }
+
+typedef TorrentQuery =({String mediaId, int seasonNumber, int episodeNumber});
 
 class MediaTorrentResource extends AutoDisposeFamilyAsyncNotifier<
     List<TorrentResource>, TorrentQuery> {
-  TorrentQuery? query;
+
   @override
   FutureOr<List<TorrentResource>> build(TorrentQuery arg) async {
-    query = arg;
+
     final dio = await APIs.getDio();
-    var resp = await dio.post(APIs.availableTorrentsUrl, data: arg.toJson());
+    var resp = await dio.post(APIs.availableTorrentsUrl, data: {
+      "id": int.parse(arg.mediaId),
+      "season": arg.seasonNumber,
+      "episode": arg.episodeNumber
+    });
     var rsp = ServerResponse.fromJson(resp.data);
     if (rsp.code != 0) {
       throw rsp.message;
@@ -163,7 +169,11 @@ class MediaTorrentResource extends AutoDisposeFamilyAsyncNotifier<
 
   Future<void> download(TorrentResource res) async {
     final data = res.toJson();
-    data.addAll(query!.toJson());
+    data.addAll({
+      "id": int.parse(arg.mediaId),
+      "season": arg.seasonNumber,
+      "episode": arg.episodeNumber
+    });
     final dio = await APIs.getDio();
     var resp = await dio.post(APIs.downloadTorrentUrl, data: data);
     var rsp = ServerResponse.fromJson(resp.data);

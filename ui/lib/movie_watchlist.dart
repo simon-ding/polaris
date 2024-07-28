@@ -222,18 +222,12 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                 error: (error, trace) => Text("$error"),
                 loading: () => const MyProgressIndicator());
           } else {
-            var torrents = ref.watch(
-                mediaTorrentsDataProvider(TorrentQuery(mediaId: widget.id))
-                    .future);
-            return FutureBuilder(
-                future: torrents,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasError) {
-                      // 请求失败，显示错误
-                      return Text("Error: ${snapshot.error}");
-                    } else {
-                      final v = snapshot.data!;
+            return Consumer(
+              builder: (context, ref, child) {
+                var torrents = ref.watch(mediaTorrentsDataProvider(
+                    (mediaId: widget.id, seasonNumber: 0, episodeNumber: 0)));
+                return torrents.when(
+                    data: (v) {
                       if (v.isEmpty) {
                         return const Center(
                           child: Text("无可用资源"),
@@ -260,9 +254,11 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                               icon: const Icon(Icons.download),
                               onPressed: () {
                                 ref
-                                    .read(mediaTorrentsDataProvider(
-                                            TorrentQuery(mediaId: widget.id))
-                                        .notifier)
+                                    .read(mediaTorrentsDataProvider((
+                                      mediaId: widget.id,
+                                      seasonNumber: 0,
+                                      episodeNumber: 0
+                                    )).notifier)
                                     .download(torrent)
                                     .then((v) => Utils.showSnakeBar(
                                         "开始下载：${torrent.name}"))
@@ -273,11 +269,11 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                           ]);
                         }),
                       );
-                    }
-                  } else {
-                    return MyProgressIndicator();
-                  }
-                });
+                    },
+                    error: (error, trace) => Text("$error"),
+                    loading: () => const MyProgressIndicator());
+              },
+            );
           }
         })
       ],
