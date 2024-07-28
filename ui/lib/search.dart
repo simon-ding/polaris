@@ -50,7 +50,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           child: Image.network(
                             "${APIs.tmdbImgBaseUrl}${item.posterPath}",
                             fit: BoxFit.contain,
-                            headers: APIs.authHeaders,
                           ),
                         ),
                       ),

@@ -49,9 +49,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                             DataCell(Text((item.size ?? 0).readableFileSize())),
                             DataCell(InkWell(
                               child: const Icon(Icons.download),
-                              onTap: () => launchUrl(uri,
-                                  webViewConfiguration: WebViewConfiguration(
-                                      headers: APIs.authHeaders)),
+                              onTap: () => launchUrl(uri),
                             ))
                           ]);
                         }));

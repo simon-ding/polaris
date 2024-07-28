@@ -63,6 +63,7 @@ func (s *Server) Serve() error {
 
 	setting := api.Group("/setting")
 	{
+		setting.GET("/logout", HttpHandler(s.Logout))
 		setting.POST("/general", HttpHandler(s.SetSetting))
 		setting.GET("/general", HttpHandler(s.GetSetting))
 		setting.POST("/auth", HttpHandler(s.EnableAuth))

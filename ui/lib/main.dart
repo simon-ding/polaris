@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ui/activity.dart';
 import 'package:ui/login_page.dart';
 import 'package:ui/movie_watchlist.dart';
@@ -177,41 +176,30 @@ class _MainSkeletonState extends State<MainSkeleton> {
                   (BuildContext context, SearchController controller) {
             return [Text("dadada")];
           }),
-          FutureBuilder(
-              future: APIs.isLoggedIn(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data == true) {
-                  return MenuAnchor(
-                    menuChildren: [
-                      MenuItemButton(
-                        leadingIcon: const Icon(Icons.exit_to_app),
-                        child: const Text("登出"),
-                        onPressed: () async {
-                          final SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          await prefs.remove('token');
-                          if (context.mounted) {
-                            context.go(LoginScreen.route);
-                          }
-                        },
-                      ),
-                    ],
-                    builder: (context, controller, child) {
-                      return TextButton(
-                        onPressed: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        child: const Icon(Icons.account_circle),
-                      );
-                    },
-                  );
-                }
-                return Container();
-              })
+          MenuAnchor(
+                  menuChildren: [
+                    MenuItemButton(
+                      leadingIcon: const Icon(Icons.exit_to_app),
+                      child: const Text("登出"),
+                      onPressed: () async {
+                        await APIs.logout();
+                      },
+                    ),
+                  ],
+                  builder: (context, controller, child) {
+                    return TextButton(
+                      onPressed: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                      child: const Icon(Icons.account_circle),
+                    );
+                  },
+                )
+              
         ],
       ),
       useDrawer: false,

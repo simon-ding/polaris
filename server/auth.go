@@ -5,7 +5,6 @@ import (
 	"polaris/db"
 	"polaris/log"
 	"polaris/pkg/utils"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,16 +22,15 @@ func (s *Server) authModdleware(c *gin.Context) {
 		c.Next()
 		return
 	}
-
-	auth := c.GetHeader("Authorization")
-	if auth == "" {
-		log.Infof("token is not present, abort")
+	token, err := c.Cookie("token")
+	if err != nil {
+		log.Errorf("token error: %v", err)
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
-	auth = strings.TrimPrefix(auth, "Bearer ")
+
 	//log.Debugf("current token: %v", auth)
-	token, err := jwt.ParseWithClaims(auth, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {	
+	tokenParsed, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
 		return []byte(s.jwtSerect), nil
 	})
 	if err != nil {
@@ -40,15 +38,15 @@ func (s *Server) authModdleware(c *gin.Context) {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
-	if !token.Valid {
-		log.Errorf("token is not valid: %v", auth)
+	if !tokenParsed.Valid {
+		log.Errorf("token is not valid: %v", token)
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
-	claim := token.Claims.(*jwt.RegisteredClaims)
+	claim := tokenParsed.Claims.(*jwt.RegisteredClaims)
 
 	if time.Until(claim.ExpiresAt.Time) <= 0 {
-		log.Infof("token is no longer valid: %s", auth)
+		log.Infof("token is no longer valid: %s", token)
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
@@ -60,7 +58,6 @@ type LoginIn struct {
 	User     string `json:"user"`
 	Password string `json:"password"`
 }
-
 
 func (s *Server) Login(c *gin.Context) (interface{}, error) {
 	var in LoginIn
@@ -93,9 +90,21 @@ func (s *Server) Login(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "sign")
 	}
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("token", sig, 0, "/", "", true, false)
 	return gin.H{
 		"token": sig,
 	}, nil
+}
+
+func (s *Server) Logout(c *gin.Context) (interface{}, error) {
+	if !s.isAuthEnabled() {
+		return nil, errors.New( "auth is not enabled")
+	}
+
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("token", "", -1, "/", "", true, false)
+	return nil, nil
 }
 
 type EnableAuthIn struct {

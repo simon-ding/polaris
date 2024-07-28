@@ -45,8 +45,8 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                             fit: BoxFit.fitWidth,
                             opacity: 0.5,
                             image: NetworkImage(
-                                "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
-                                headers: APIs.authHeaders))),
+                              "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
+                            ))),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Row(
@@ -58,7 +58,6 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                               child: Image.network(
                                 "${APIs.imagesUrl}/${details.id}/poster.jpg",
                                 fit: BoxFit.contain,
-                                headers: APIs.authHeaders,
                               ),
                             ),
                           ),

@@ -34,7 +34,10 @@ class WelcomePage extends ConsumerWidget {
                     Container(
                         height: MediaQuery.of(context).size.height * 0.6,
                         alignment: Alignment.center,
-                        child: const Text("啥都没有...", style: TextStyle(fontSize: 16),))
+                        child: const Text(
+                          "啥都没有...",
+                          style: TextStyle(fontSize: 16),
+                        ))
                   ]
                 : List.generate(value.length, (i) {
                     var item = value[i];
@@ -56,10 +59,8 @@ class WelcomePage extends ConsumerWidget {
                                 width: 140,
                                 height: 210,
                                 child: Image.network(
-                                  "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                                  fit: BoxFit.fill,
-                                  headers: APIs.authHeaders,
-                                ),
+                                    "${APIs.imagesUrl}/${item.id}/poster.jpg",
+                                    fit: BoxFit.fill),
                               ),
                               SizedBox(
                                   width: 140,
