@@ -56,7 +56,7 @@ func (c *Client) init() {
 	downloadDir := c.GetSetting(SettingDownloadDir)
 	if downloadDir == "" {
 		log.Infof("set default download dir")
-		c.SetSetting(downloadDir, "/downloads")
+		c.SetSetting(SettingDownloadDir, "/downloads")
 	}
 	logLevel := c.GetSetting(SettingLogLevel)
 	if logLevel == "" {

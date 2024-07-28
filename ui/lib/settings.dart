@@ -564,7 +564,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
                 "user": values["user"],
                 "password": values["password"],
                 "change_file_hash":
-                    values["change_file_hash"] as bool ? "true" : "false"
+                    (values["change_file_hash"]??false) as bool ? "true" : "false"
               },
             ));
       } else {

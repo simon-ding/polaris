@@ -271,7 +271,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                   data: (v) {
                     return SingleChildScrollView(
                         child: DataTable(
-                            dataTextStyle: TextStyle(fontSize: 12, height: 0),
+                            dataTextStyle: const TextStyle(fontSize: 12, height: 0),
                             columns: const [
                               DataColumn(label: Text("名称")),
                               DataColumn(label: Text("大小")),
