@@ -29,50 +29,57 @@ class WelcomePage extends ConsumerWidget {
           child: Wrap(
             spacing: 10,
             runSpacing: 20,
-            children: List.generate(value.length, (i) {
-              var item = value[i];
-              return Card(
-                  margin: const EdgeInsets.all(4),
-                  clipBehavior: Clip.hardEdge,
-                  child: InkWell(
-                    //splashColor: Colors.blue.withAlpha(30),
-                    onTap: () {
-                      if (uri == routeMoivie) {
-                        context.go(MovieDetailsPage.toRoute(item.id!));
-                      } else {
-                        context.go(TvDetailsPage.toRoute(item.id!));
-                      }
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          width: 140,
-                          height: 210,
-                          child: Image.network(
-                            "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                            fit: BoxFit.fill,
-                            headers: APIs.authHeaders,
+            children: value.isEmpty
+                ? [
+                    Container(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        alignment: Alignment.center,
+                        child: const Text("啥都没有...", style: TextStyle(fontSize: 16),))
+                  ]
+                : List.generate(value.length, (i) {
+                    var item = value[i];
+                    return Card(
+                        margin: const EdgeInsets.all(4),
+                        clipBehavior: Clip.hardEdge,
+                        child: InkWell(
+                          //splashColor: Colors.blue.withAlpha(30),
+                          onTap: () {
+                            if (uri == routeMoivie) {
+                              context.go(MovieDetailsPage.toRoute(item.id!));
+                            } else {
+                              context.go(TvDetailsPage.toRoute(item.id!));
+                            }
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                width: 140,
+                                height: 210,
+                                child: Image.network(
+                                  "${APIs.imagesUrl}/${item.id}/poster.jpg",
+                                  fit: BoxFit.fill,
+                                  headers: APIs.authHeaders,
+                                ),
+                              ),
+                              SizedBox(
+                                  width: 140,
+                                  child: LinearProgressIndicator(
+                                    value: 1,
+                                    color: item.status == "downloaded"
+                                        ? Colors.green
+                                        : Colors.blue,
+                                  )),
+                              Text(
+                                item.name!,
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    height: 2.5),
+                              ),
+                            ],
                           ),
-                        ),
-                        SizedBox(
-                            width: 140,
-                            child: LinearProgressIndicator(
-                              value: 1,
-                              color: item.status == "downloaded"
-                                  ? Colors.green
-                                  : Colors.blue,
-                            )),
-                        Text(
-                          item.name!,
-                          style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              height: 2.5),
-                        ),
-                      ],
-                    ),
-                  ));
-            }),
+                        ));
+                  }),
           ),
         ),
       _ => const MyProgressIndicator(),

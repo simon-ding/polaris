@@ -98,7 +98,7 @@ func (c *Client) generateDefaultLocalStorage() error {
 func (c *Client) GetSetting(key string) string {
 	v, err := c.ent.Settings.Query().Where(settings.Key(key)).Only(context.TODO())
 	if err != nil {
-		log.Errorf("get setting by key: %s error: %v", key, err)
+		log.Warnf("get setting by key: %s error: %v", key, err)
 		return ""
 	}
 	return v.Value
