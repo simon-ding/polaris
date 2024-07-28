@@ -63,10 +63,10 @@ func (c *Client) init() {
 		log.Infof("set default log level")
 		c.SetSetting(SettingLogLevel, "info")
 	}
-	// if tr := c.GetTransmission(); tr == nil {
-	// 	log.Warnf("no download client, set default download client")
-	// 	c.SaveTransmission("transmission", "http://transmission:9091", "", "")
-	// }
+	if tr := c.GetTransmission(); tr == nil {
+		log.Warnf("no download client, set default download client")
+		c.SaveTransmission("transmission", "http://transmission:9091", "", "")
+	}
 }
 
 func (c *Client) generateJwtSerectIfNotExist() {
