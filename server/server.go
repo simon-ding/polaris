@@ -115,6 +115,13 @@ func (s *Server) Serve() error {
 		storage.POST("/", HttpHandler(s.AddStorage))
 		storage.DELETE("/:id", HttpHandler(s.DeleteStorage))
 	}
+	notifier := api.Group("/notifier")
+	{
+		notifier.GET("/all", HttpHandler(s.GetAllNotificationClients))
+		notifier.GET("/id/:id", HttpHandler(s.GetNotificationClient))
+		notifier.DELETE("/id/:id", HttpHandler(s.DeleteNotificationClient))
+		notifier.POST("/add", HttpHandler(s.AddNotificationClient))
+	}
 
 	s.language = s.db.GetLanguage()
 	return s.r.Run(":8080")

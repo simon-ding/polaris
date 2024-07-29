@@ -21,6 +21,9 @@ type Indexers func(*sql.Selector)
 // Media is the predicate function for media builders.
 type Media func(*sql.Selector)
 
+// NotificationClient is the predicate function for notificationclient builders.
+type NotificationClient func(*sql.Selector)
+
 // Settings is the predicate function for settings builders.
 type Settings func(*sql.Selector)
 

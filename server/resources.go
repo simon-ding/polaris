@@ -7,6 +7,7 @@ import (
 	"polaris/ent/history"
 	"polaris/ent/media"
 	"polaris/log"
+	"polaris/pkg/notifier/message"
 	"polaris/pkg/torznab"
 	"polaris/pkg/utils"
 	"polaris/server/core"
@@ -67,6 +68,8 @@ func (s *Server) downloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum in
 	s.db.SetSeasonAllEpisodeStatus(seriesId, seasonNum, episode.StatusDownloading)
 
 	s.tasks[history.ID] = &Task{Torrent: torrent}
+
+	s.sendMsg(fmt.Sprintf(message.BeginDownload, r1.Name))
 	return &r1.Name, nil
 
 }
@@ -112,6 +115,7 @@ func (s *Server) downloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 
 	s.tasks[history.ID] = &Task{Torrent: torrent}
+	s.sendMsg(fmt.Sprintf(message.BeginDownload, r1.Name))
 
 	log.Infof("success add %s to download task", r1.Name)
 	return &r1.Name, nil
@@ -293,7 +297,8 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 
 		s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 	}()
-
+	
+	s.sendMsg(fmt.Sprintf(message.BeginDownload, in.Name))
 	log.Infof("success add %s to download task", in.Name)
 	return in.Name, nil
 

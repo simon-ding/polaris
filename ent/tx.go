@@ -22,6 +22,8 @@ type Tx struct {
 	Indexers *IndexersClient
 	// Media is the client for interacting with the Media builders.
 	Media *MediaClient
+	// NotificationClient is the client for interacting with the NotificationClient builders.
+	NotificationClient *NotificationClientClient
 	// Settings is the client for interacting with the Settings builders.
 	Settings *SettingsClient
 	// Storage is the client for interacting with the Storage builders.
@@ -162,6 +164,7 @@ func (tx *Tx) init() {
 	tx.History = NewHistoryClient(tx.config)
 	tx.Indexers = NewIndexersClient(tx.config)
 	tx.Media = NewMediaClient(tx.config)
+	tx.NotificationClient = NewNotificationClientClient(tx.config)
 	tx.Settings = NewSettingsClient(tx.config)
 	tx.Storage = NewStorageClient(tx.config)
 }

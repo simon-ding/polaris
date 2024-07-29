@@ -68,6 +68,18 @@ func (f MediaFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MediaMutation", m)
 }
 
+// The NotificationClientFunc type is an adapter to allow the use of ordinary
+// function as NotificationClient mutator.
+type NotificationClientFunc func(context.Context, *ent.NotificationClientMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f NotificationClientFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.NotificationClientMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NotificationClientMutation", m)
+}
+
 // The SettingsFunc type is an adapter to allow the use of ordinary
 // function as Settings mutator.
 type SettingsFunc func(context.Context, *ent.SettingsMutation) (ent.Value, error)

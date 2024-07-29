@@ -11,6 +11,7 @@ import (
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
+	"polaris/ent/notificationclient"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"reflect"
@@ -79,13 +80,14 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			downloadclients.Table: downloadclients.ValidColumn,
-			episode.Table:         episode.ValidColumn,
-			history.Table:         history.ValidColumn,
-			indexers.Table:        indexers.ValidColumn,
-			media.Table:           media.ValidColumn,
-			settings.Table:        settings.ValidColumn,
-			storage.Table:         storage.ValidColumn,
+			downloadclients.Table:    downloadclients.ValidColumn,
+			episode.Table:            episode.ValidColumn,
+			history.Table:            history.ValidColumn,
+			indexers.Table:           indexers.ValidColumn,
+			media.Table:              media.ValidColumn,
+			notificationclient.Table: notificationclient.ValidColumn,
+			settings.Table:           settings.ValidColumn,
+			storage.Table:            storage.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

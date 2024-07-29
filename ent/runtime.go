@@ -7,6 +7,7 @@ import (
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
+	"polaris/ent/notificationclient"
 	"polaris/ent/schema"
 	"polaris/ent/storage"
 	"time"
@@ -74,6 +75,12 @@ func init() {
 	mediaDescDownloadHistoryEpisodes := mediaFields[12].Descriptor()
 	// media.DefaultDownloadHistoryEpisodes holds the default value on creation for the download_history_episodes field.
 	media.DefaultDownloadHistoryEpisodes = mediaDescDownloadHistoryEpisodes.Default.(bool)
+	notificationclientFields := schema.NotificationClient{}.Fields()
+	_ = notificationclientFields
+	// notificationclientDescEnabled is the schema descriptor for enabled field.
+	notificationclientDescEnabled := notificationclientFields[3].Descriptor()
+	// notificationclient.DefaultEnabled holds the default value on creation for the enabled field.
+	notificationclient.DefaultEnabled = notificationclientDescEnabled.Default.(bool)
 	storageFields := schema.Storage{}.Fields()
 	_ = storageFields
 	// storageDescDeleted is the schema descriptor for deleted field.

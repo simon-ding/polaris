@@ -16,6 +16,7 @@ import (
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
+	"polaris/ent/notificationclient"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 
@@ -40,6 +41,8 @@ type Client struct {
 	Indexers *IndexersClient
 	// Media is the client for interacting with the Media builders.
 	Media *MediaClient
+	// NotificationClient is the client for interacting with the NotificationClient builders.
+	NotificationClient *NotificationClientClient
 	// Settings is the client for interacting with the Settings builders.
 	Settings *SettingsClient
 	// Storage is the client for interacting with the Storage builders.
@@ -60,6 +63,7 @@ func (c *Client) init() {
 	c.History = NewHistoryClient(c.config)
 	c.Indexers = NewIndexersClient(c.config)
 	c.Media = NewMediaClient(c.config)
+	c.NotificationClient = NewNotificationClientClient(c.config)
 	c.Settings = NewSettingsClient(c.config)
 	c.Storage = NewStorageClient(c.config)
 }
@@ -152,15 +156,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		DownloadClients: NewDownloadClientsClient(cfg),
-		Episode:         NewEpisodeClient(cfg),
-		History:         NewHistoryClient(cfg),
-		Indexers:        NewIndexersClient(cfg),
-		Media:           NewMediaClient(cfg),
-		Settings:        NewSettingsClient(cfg),
-		Storage:         NewStorageClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		DownloadClients:    NewDownloadClientsClient(cfg),
+		Episode:            NewEpisodeClient(cfg),
+		History:            NewHistoryClient(cfg),
+		Indexers:           NewIndexersClient(cfg),
+		Media:              NewMediaClient(cfg),
+		NotificationClient: NewNotificationClientClient(cfg),
+		Settings:           NewSettingsClient(cfg),
+		Storage:            NewStorageClient(cfg),
 	}, nil
 }
 
@@ -178,15 +183,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		DownloadClients: NewDownloadClientsClient(cfg),
-		Episode:         NewEpisodeClient(cfg),
-		History:         NewHistoryClient(cfg),
-		Indexers:        NewIndexersClient(cfg),
-		Media:           NewMediaClient(cfg),
-		Settings:        NewSettingsClient(cfg),
-		Storage:         NewStorageClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		DownloadClients:    NewDownloadClientsClient(cfg),
+		Episode:            NewEpisodeClient(cfg),
+		History:            NewHistoryClient(cfg),
+		Indexers:           NewIndexersClient(cfg),
+		Media:              NewMediaClient(cfg),
+		NotificationClient: NewNotificationClientClient(cfg),
+		Settings:           NewSettingsClient(cfg),
+		Storage:            NewStorageClient(cfg),
 	}, nil
 }
 
@@ -216,8 +222,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media, c.Settings,
-		c.Storage,
+		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media,
+		c.NotificationClient, c.Settings, c.Storage,
 	} {
 		n.Use(hooks...)
 	}
@@ -227,8 +233,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media, c.Settings,
-		c.Storage,
+		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media,
+		c.NotificationClient, c.Settings, c.Storage,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -247,6 +253,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Indexers.mutate(ctx, m)
 	case *MediaMutation:
 		return c.Media.mutate(ctx, m)
+	case *NotificationClientMutation:
+		return c.NotificationClient.mutate(ctx, m)
 	case *SettingsMutation:
 		return c.Settings.mutate(ctx, m)
 	case *StorageMutation:
@@ -953,6 +961,139 @@ func (c *MediaClient) mutate(ctx context.Context, m *MediaMutation) (Value, erro
 	}
 }
 
+// NotificationClientClient is a client for the NotificationClient schema.
+type NotificationClientClient struct {
+	config
+}
+
+// NewNotificationClientClient returns a client for the NotificationClient from the given config.
+func NewNotificationClientClient(c config) *NotificationClientClient {
+	return &NotificationClientClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `notificationclient.Hooks(f(g(h())))`.
+func (c *NotificationClientClient) Use(hooks ...Hook) {
+	c.hooks.NotificationClient = append(c.hooks.NotificationClient, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `notificationclient.Intercept(f(g(h())))`.
+func (c *NotificationClientClient) Intercept(interceptors ...Interceptor) {
+	c.inters.NotificationClient = append(c.inters.NotificationClient, interceptors...)
+}
+
+// Create returns a builder for creating a NotificationClient entity.
+func (c *NotificationClientClient) Create() *NotificationClientCreate {
+	mutation := newNotificationClientMutation(c.config, OpCreate)
+	return &NotificationClientCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of NotificationClient entities.
+func (c *NotificationClientClient) CreateBulk(builders ...*NotificationClientCreate) *NotificationClientCreateBulk {
+	return &NotificationClientCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NotificationClientClient) MapCreateBulk(slice any, setFunc func(*NotificationClientCreate, int)) *NotificationClientCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NotificationClientCreateBulk{err: fmt.Errorf("calling to NotificationClientClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NotificationClientCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NotificationClientCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for NotificationClient.
+func (c *NotificationClientClient) Update() *NotificationClientUpdate {
+	mutation := newNotificationClientMutation(c.config, OpUpdate)
+	return &NotificationClientUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NotificationClientClient) UpdateOne(nc *NotificationClient) *NotificationClientUpdateOne {
+	mutation := newNotificationClientMutation(c.config, OpUpdateOne, withNotificationClient(nc))
+	return &NotificationClientUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NotificationClientClient) UpdateOneID(id int) *NotificationClientUpdateOne {
+	mutation := newNotificationClientMutation(c.config, OpUpdateOne, withNotificationClientID(id))
+	return &NotificationClientUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for NotificationClient.
+func (c *NotificationClientClient) Delete() *NotificationClientDelete {
+	mutation := newNotificationClientMutation(c.config, OpDelete)
+	return &NotificationClientDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NotificationClientClient) DeleteOne(nc *NotificationClient) *NotificationClientDeleteOne {
+	return c.DeleteOneID(nc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NotificationClientClient) DeleteOneID(id int) *NotificationClientDeleteOne {
+	builder := c.Delete().Where(notificationclient.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NotificationClientDeleteOne{builder}
+}
+
+// Query returns a query builder for NotificationClient.
+func (c *NotificationClientClient) Query() *NotificationClientQuery {
+	return &NotificationClientQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNotificationClient},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a NotificationClient entity by its id.
+func (c *NotificationClientClient) Get(ctx context.Context, id int) (*NotificationClient, error) {
+	return c.Query().Where(notificationclient.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NotificationClientClient) GetX(ctx context.Context, id int) *NotificationClient {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *NotificationClientClient) Hooks() []Hook {
+	return c.hooks.NotificationClient
+}
+
+// Interceptors returns the client interceptors.
+func (c *NotificationClientClient) Interceptors() []Interceptor {
+	return c.inters.NotificationClient
+}
+
+func (c *NotificationClientClient) mutate(ctx context.Context, m *NotificationClientMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NotificationClientCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NotificationClientUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NotificationClientUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NotificationClientDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown NotificationClient mutation op: %q", m.Op())
+	}
+}
+
 // SettingsClient is a client for the Settings schema.
 type SettingsClient struct {
 	config
@@ -1222,10 +1363,11 @@ func (c *StorageClient) mutate(ctx context.Context, m *StorageMutation) (Value, 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		DownloadClients, Episode, History, Indexers, Media, Settings, Storage []ent.Hook
+		DownloadClients, Episode, History, Indexers, Media, NotificationClient,
+		Settings, Storage []ent.Hook
 	}
 	inters struct {
-		DownloadClients, Episode, History, Indexers, Media, Settings,
-		Storage []ent.Interceptor
+		DownloadClients, Episode, History, Indexers, Media, NotificationClient,
+		Settings, Storage []ent.Interceptor
 	}
 )

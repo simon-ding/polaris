@@ -33,6 +33,10 @@ class APIs {
   static final logFilesUrl = "$_baseUrl/api/v1/setting/logfiles";
   static final aboutUrl = "$_baseUrl/api/v1/setting/about";
 
+  static final notifierAllUrl = "$_baseUrl/api/v1/notifier/all";
+  static final notifierDeleteUrl = "$_baseUrl/api/v1/notifier/id/";
+  static final notifierAddUrl = "$_baseUrl/api/v1/notifier/add/";
+
   static final tmdbImgBaseUrl = "$_baseUrl/api/v1/posters";
 
   static const tmdbApiKey = "tmdb_api_key";

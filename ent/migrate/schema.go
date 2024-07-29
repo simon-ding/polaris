@@ -110,6 +110,20 @@ var (
 		Columns:    MediaColumns,
 		PrimaryKey: []*schema.Column{MediaColumns[0]},
 	}
+	// NotificationClientsColumns holds the columns for the "notification_clients" table.
+	NotificationClientsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "service", Type: field.TypeString},
+		{Name: "settings", Type: field.TypeString},
+		{Name: "enabled", Type: field.TypeBool, Default: true},
+	}
+	// NotificationClientsTable holds the schema information for the "notification_clients" table.
+	NotificationClientsTable = &schema.Table{
+		Name:       "notification_clients",
+		Columns:    NotificationClientsColumns,
+		PrimaryKey: []*schema.Column{NotificationClientsColumns[0]},
+	}
 	// SettingsColumns holds the columns for the "settings" table.
 	SettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -144,6 +158,7 @@ var (
 		HistoriesTable,
 		IndexersTable,
 		MediaTable,
+		NotificationClientsTable,
 		SettingsTable,
 		StoragesTable,
 	}
