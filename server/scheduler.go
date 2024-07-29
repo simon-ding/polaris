@@ -21,11 +21,11 @@ import (
 
 func (s *Server) scheduler() {
 	s.mustAddCron("@every 1m", s.checkTasks)
-	s.mustAddCron("@every 1h", func() {
+	s.mustAddCron("0 0 * * * *", func() {
 		s.downloadTvSeries()
 		s.downloadMovie()
 	})
-	s.mustAddCron("@every 12h", s.checkAllSeriesNewSeason)
+	s.mustAddCron("0 0 */12 * * *", s.checkAllSeriesNewSeason)
 	s.cron.Start()
 }
 
