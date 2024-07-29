@@ -42,7 +42,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                 child: Container(
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                            fit: BoxFit.fitWidth,
+                            fit: BoxFit.cover,
                             opacity: 0.5,
                             image: NetworkImage(
                               "${APIs.imagesUrl}/${details.id}/backdrop.jpg",

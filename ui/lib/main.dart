@@ -25,6 +25,19 @@ class MyApp extends ConsumerStatefulWidget {
   }
 }
 
+CustomTransitionPage buildPageWithDefaultTransition<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  );
+}
+
 class _MyAppState extends ConsumerState<MyApp> {
   // This widget is the root of your application.
   @override
@@ -45,38 +58,51 @@ class _MyAppState extends ConsumerState<MyApp> {
         ),
         GoRoute(
           path: WelcomePage.routeTv,
-          builder: (context, state) => const WelcomePage(),
-        ),
-        GoRoute(
-          path: TvDetailsPage.route,
-          builder: (context, state) =>
-              TvDetailsPage(seriesId: state.pathParameters['id']!),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context, state: state, child: const WelcomePage()),
         ),
         GoRoute(
           path: WelcomePage.routeMoivie,
-          builder: (context, state) => const WelcomePage(),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context, state: state, child: const WelcomePage()),
+        ),
+        GoRoute(
+          path: TvDetailsPage.route,
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: TvDetailsPage(seriesId: state.pathParameters['id']!)),
         ),
         GoRoute(
           path: MovieDetailsPage.route,
-          builder: (context, state) =>
-              MovieDetailsPage(id: state.pathParameters['id']!),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: MovieDetailsPage(id: state.pathParameters['id']!)),
         ),
         GoRoute(
           path: SearchPage.route,
-          builder: (context, state) =>
-              SearchPage(query: state.uri.queryParameters["query"]),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: SearchPage(query: state.uri.queryParameters["query"])),
         ),
         GoRoute(
           path: SystemSettingsPage.route,
-          builder: (context, state) => const SystemSettingsPage(),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: const SystemSettingsPage()),
         ),
         GoRoute(
           path: ActivityPage.route,
-          builder: (context, state) => const ActivityPage(),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context, state: state, child: const ActivityPage()),
         ),
         GoRoute(
           path: SystemPage.route,
-          builder: (context, state) => const SystemPage(),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context, state: state, child: const SystemPage()),
         )
       ],
     );
@@ -177,29 +203,28 @@ class _MainSkeletonState extends State<MainSkeleton> {
             return [Text("dadada")];
           }),
           MenuAnchor(
-                  menuChildren: [
-                    MenuItemButton(
-                      leadingIcon: const Icon(Icons.exit_to_app),
-                      child: const Text("登出"),
-                      onPressed: () async {
-                        await APIs.logout();
-                      },
-                    ),
-                  ],
-                  builder: (context, controller, child) {
-                    return TextButton(
-                      onPressed: () {
-                        if (controller.isOpen) {
-                          controller.close();
-                        } else {
-                          controller.open();
-                        }
-                      },
-                      child: const Icon(Icons.account_circle),
-                    );
-                  },
-                )
-              
+            menuChildren: [
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.exit_to_app),
+                child: const Text("登出"),
+                onPressed: () async {
+                  await APIs.logout();
+                },
+              ),
+            ],
+            builder: (context, controller, child) {
+              return TextButton(
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+                child: const Icon(Icons.account_circle),
+              );
+            },
+          )
         ],
       ),
       useDrawer: false,

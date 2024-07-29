@@ -221,8 +221,10 @@ func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
 		SetEpisodeNumber(d.EpisodeNumber).
 		SetOverview(d.Overview).
 		SetTitle(d.Title).Save(context.TODO())
-
-	return ep.ID, err
+	if err != nil {
+		return 0, errors.Wrap(err, "save episode")
+	}
+	return ep.ID, nil
 }
 
 func (c *Client) SaveEposideDetail2(d *ent.Episode) (int, error) {
