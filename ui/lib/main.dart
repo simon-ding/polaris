@@ -31,10 +31,11 @@ CustomTransitionPage buildPageWithDefaultTransition<T>({
   required Widget child,
 }) {
   return CustomTransitionPage<T>(
+    transitionDuration: Duration.zero,
+    reverseTransitionDuration: Duration.zero,
     key: state.pageKey,
     child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-        FadeTransition(opacity: animation, child: child),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) => child,
   );
 }
 
