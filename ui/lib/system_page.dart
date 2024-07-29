@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 
 import 'package:ui/providers/settings.dart';
-import 'package:ui/utils.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 

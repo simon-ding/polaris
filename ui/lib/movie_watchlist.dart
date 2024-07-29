@@ -5,7 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/activity.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/providers/settings.dart';
-import 'package:ui/utils.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 

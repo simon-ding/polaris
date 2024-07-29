@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/settings.dart';
 import 'package:ui/providers/welcome_data.dart';
-import 'package:ui/utils.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class SearchPage extends ConsumerStatefulWidget {

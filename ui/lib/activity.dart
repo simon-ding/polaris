@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:ui/providers/activity.dart';
-import 'package:ui/utils.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 
 class ActivityPage extends ConsumerStatefulWidget {
