@@ -71,6 +71,8 @@ func toNotificationClient(cl *ent.NotificationClient) (*NotificationClient, erro
 		settings = notifier.DingTalkConfig{}
 	case "telegram":
 		settings = notifier.TelegramConfig{}
+	case "bark":
+		settings = notifier.BarkConfig{}
 	}
 	err := json.Unmarshal([]byte(cl.Settings), &settings)
 	if err != nil {

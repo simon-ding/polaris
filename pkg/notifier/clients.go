@@ -3,6 +3,7 @@ package notifier
 import (
 	"encoding/json"
 
+	"github.com/nikoksr/notify/service/bark"
 	"github.com/nikoksr/notify/service/dingding"
 	po "github.com/nikoksr/notify/service/pushover"
 	"github.com/nikoksr/notify/service/telegram"
@@ -67,4 +68,23 @@ func NewTelegramClient(s string) (NotificationClient, error) {
 	}
 	svc.AddReceivers(cfg.ChatID)
 	return &Notifier{service: svc}, nil
+}
+
+
+type BarkConfig struct {
+	DeviceKey string `json:"device_key"`
+	URL string `json:"url"`
+}
+
+func NewbarkClient(s string) (NotificationClient, error) {
+	var cfg BarkConfig
+	if err := json.Unmarshal([]byte(s), &cfg); err != nil {
+		return nil, errors.Wrap(err, "json")
+	}
+	url := cfg.URL
+	if url == "" {
+		url = bark.DefaultServerURL
+	}
+	b := bark.NewWithServers(cfg.DeviceKey, url)
+	return &Notifier{service: b}, nil
 }
