@@ -28,7 +28,7 @@ type LocalStorage struct {
 
 func (l *LocalStorage) Move(src, dest string) error {
 	targetDir := filepath.Join(l.dir, dest)
-	os.MkdirAll(filepath.Dir(targetDir), 0655)
+	os.MkdirAll(filepath.Dir(targetDir), os.ModePerm)
 	err := filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -40,13 +40,13 @@ func (l *LocalStorage) Move(src, dest string) error {
 		destName := filepath.Join(targetDir, rel)
 
 		if info.IsDir() {
-			os.Mkdir(destName, 0655)
+			os.Mkdir(destName, os.ModePerm)
 		} else { //is file
 			if writer, err := os.Create(destName); err != nil {
 				return errors.Wrapf(err, "create file %s", destName)
 			} else {
 				defer writer.Close()
-				if f, err := os.OpenFile(path, os.O_RDONLY, 0666); err != nil {
+				if f, err := os.OpenFile(path, os.O_RDONLY, os.ModePerm); err != nil {
 					return errors.Wrapf(err, "read file %v", path)
 				} else { //open success
 					defer f.Close()

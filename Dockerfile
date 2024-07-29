@@ -35,6 +35,6 @@ COPY --from=builder /app/polaris .
 
 EXPOSE 8080
 
-USER 1000:1000
+#USER 1000:1000
 
 ENTRYPOINT ["./polaris"]

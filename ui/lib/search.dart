@@ -29,6 +29,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     List<Widget> res = searchList.when(
         data: (data) {
+          if (data.isEmpty) {
+            return [Container(
+                height: MediaQuery.of(context).size.height * 0.6,
+                alignment: Alignment.center,
+                child: const Text(
+                  "啥都没有...",
+                  style: TextStyle(fontSize: 16),
+                ))];
+          }
           var cards = List<Widget>.empty(growable: true);
           for (final item in data) {
             cards.add(Card(
