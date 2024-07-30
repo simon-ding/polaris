@@ -4,10 +4,14 @@ import (
 	"polaris/db"
 	"polaris/log"
 	"polaris/server"
+	"syscall"
 )
 
 func main() {
 	log.Infof("------------------- Starting Polaris ---------------------")
+
+	syscall.Umask(0011) //max permission 0766
+
 	dbClient, err := db.Open()
 	if err != nil {
 		log.Panicf("init db error: %v", err)
