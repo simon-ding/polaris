@@ -284,7 +284,7 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 			MediaID:     m.ID,
 			EpisodeID:   ep.ID,
 			SourceTitle: name,
-			TargetDir:   "./",
+			TargetDir:   m.TargetDir,
 			Status:      history.StatusRunning,
 			Size:        in.Size,
 			Saved:       torrent.Save(),
@@ -297,7 +297,7 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 
 		s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 	}()
-	
+
 	s.sendMsg(fmt.Sprintf(message.BeginDownload, in.Name))
 	log.Infof("success add %s to download task", in.Name)
 	return in.Name, nil

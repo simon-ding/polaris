@@ -37,6 +37,7 @@ func (l *LocalStorage) Move(src, destDir string) error {
 	if info.IsDir() { //如果是路径，则只移动路径里面的文件，不管当前路径, 行为类似 move dirname/* target_dir/
 		targetBase = filepath.Join(l.dir, destDir)
 	}
+	log.Debugf("local storage target base dir is: %v", targetBase)
 	
 	
 	err = filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
