@@ -72,6 +72,7 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 		log.Errorf("get task download client error: %v, use default one", err)
 		downloadclient = &ent.DownloadClients{RemoveCompletedDownloads: true, RemoveFailedDownloads: true}
 	}
+	torrentName := torrent.Name()
 
 	defer func() {
 
@@ -83,7 +84,8 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 				s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
 			}
 			s.sendMsg(fmt.Sprintf(message.ProcessingFailed, err))
-			if downloadclient.RemoveCompletedDownloads {
+			if downloadclient.RemoveFailedDownloads {
+				log.Debugf("task failed, remove failed torrent and files related")
 				delete(s.tasks, r.ID)
 				torrent.Remove()		
 			}
@@ -102,12 +104,12 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 	}
 
 	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
-	if err := stImpl.Copy(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
+	if err := stImpl.Copy(filepath.Join(s.db.GetDownloadDir(), torrentName), r.TargetDir); err != nil {
 		return errors.Wrap(err, "move file")
 	}
 
 	// .plexmatch file
-	if err := s.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrent.Name()); err != nil {
+	if err := s.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrentName); err != nil {
 		log.Errorf("create .plexmatch file error: %v", err)
 	}
 
@@ -118,16 +120,17 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 	} else {
 		s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
 	}
-	s.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrent.Name()))
+	s.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
 
 	//判断是否需要删除本地文件
 	if downloadclient.RemoveCompletedDownloads {
+		log.Debugf("download complete,remove torrent and files related")
 		delete(s.tasks, r.ID)
 		torrent.Remove()
 	}
 
 
-	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)
+	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrentName, r.TargetDir)
 	return nil
 }
 
