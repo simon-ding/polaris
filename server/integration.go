@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *Server) writePlexmatch(seriesId int, episodeNum int, targetDir, name string) error {
+func (s *Server) writePlexmatch(seriesId int, episodeId int, targetDir, name string) error {
 
 	if !s.plexmatchEnabled() {
 		return nil
@@ -28,6 +28,7 @@ func (s *Server) writePlexmatch(seriesId int, episodeNum int, targetDir, name st
 		return errors.Wrap(err, "get storage")
 	}
 
+	//series plexmatch file
 	_, err = st.ReadFile(filepath.Join(series.TargetDir, ".plexmatch"))
 	if err != nil { 
 		//create new
@@ -37,8 +38,10 @@ func (s *Server) writePlexmatch(seriesId int, episodeNum int, targetDir, name st
 		}
 	} 
 
-	if episodeNum == 0 {
-		return nil
+	//season plexmatch file
+	ep, err := s.db.GetEpisodeByID(episodeId)
+	if err != nil {
+		return errors.Wrap(err, "query episode")
 	}
 	buff := bytes.Buffer{}
 	seasonPlex := filepath.Join(targetDir, ".plexmatch")
@@ -48,7 +51,7 @@ func (s *Server) writePlexmatch(seriesId int, episodeNum int, targetDir, name st
 	} else {
 		buff.Write(data)
 	}
-	buff.WriteString(fmt.Sprintf("\nep: %d: %s\n", episodeNum, name))
+	buff.WriteString(fmt.Sprintf("\nep: %d: %s\n", ep.EpisodeNumber, name))
 	log.Infof("write season plexmatch file content: %s", buff.String())
 	return st.WriteFile(seasonPlex, buff.Bytes())
 }

@@ -167,6 +167,10 @@ func (c *Client) GetEpisode(seriesId, seasonNum, episodeNum int) (*ent.Episode, 
 	return c.ent.Episode.Query().Where(episode.MediaID(seriesId), episode.SeasonNumber(seasonNum),
 		episode.EpisodeNumber(episodeNum)).First(context.TODO())
 }
+func (c *Client) GetEpisodeByID(epID int) (*ent.Episode, error) {
+	return c.ent.Episode.Query().Where(episode.ID(epID)).First(context.TODO())
+}
+
 
 func (c *Client) UpdateEpiode(episodeId int, name, overview string) error {
 	return c.ent.Episode.Update().Where(episode.ID(episodeId)).SetTitle(name).SetOverview(overview).Exec(context.TODO())
