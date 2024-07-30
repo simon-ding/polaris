@@ -71,9 +71,6 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 			log.Errorf("no season id: %v", r.TargetDir)
 			seasonNum = -1
 		}
-		if err := s.createPlexmatchIfNotExists(r.MediaID); err != nil {
-			log.Errorf("create .plexmatch file error: %v", err)
-		}
 
 		if err1 != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
@@ -84,6 +81,11 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 			}
 			s.sendMsg(fmt.Sprintf(message.ProcessingFailed, err))
 		} else {
+			// .plexmatch file
+			if err := s.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrent.Name()); err != nil {
+				log.Errorf("create .plexmatch file error: %v", err)
+			}
+	
 			delete(s.tasks, r.ID)
 			s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 			if r.EpisodeID != 0 {

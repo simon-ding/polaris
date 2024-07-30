@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 	"polaris/db"
@@ -10,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *Server) createPlexmatchIfNotExists(seriesId int) error {
+func (s *Server) writePlexmatch(seriesId int, episodeNum int, targetDir, name string) error {
 
 	if !s.plexmatchEnabled() {
 		return nil
@@ -33,7 +34,21 @@ func (s *Server) createPlexmatchIfNotExists(seriesId int) error {
 		log.Warnf(".plexmatch file not found, create new one: %s", series.NameEn)
 		return st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"), []byte(fmt.Sprintf("tmdbid: %d\n",series.TmdbID)))
 	} 
-	return nil
+
+	if episodeNum == 0 {
+		return nil
+	}
+	buff := bytes.Buffer{}
+	seasonPlex := filepath.Join(targetDir, ".plexmatch")
+	data, err := st.ReadFile(seasonPlex)
+	if err != nil {
+		log.Infof("read season plexmatch: %v", err)
+	} else {
+		buff.Write(data)
+	}
+	buff.WriteString(fmt.Sprintf("ep: %d: %s\n", episodeNum, name))
+	log.Infof("write season plexmatch file content: %s", buff.String())
+	return st.WriteFile(seasonPlex, buff.Bytes())
 }
 
 func (s *Server) plexmatchEnabled() bool {
