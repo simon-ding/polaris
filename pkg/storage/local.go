@@ -85,10 +85,10 @@ func (l *LocalStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
 }
 
 func (l *LocalStorage) ReadFile(name string) ([]byte, error) {
-	return os.ReadFile(name)
+	return os.ReadFile(filepath.Join(l.dir, name))
 }
 
 
 func (l *LocalStorage) WriteFile(name string, data []byte) error  {
-	return os.WriteFile(name, data, os.ModePerm)
+	return os.WriteFile(filepath.Join(l.dir, name), data, os.ModePerm)
 }

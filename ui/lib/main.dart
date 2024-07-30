@@ -248,23 +248,28 @@ class _MainSkeletonState extends State<MainSkeleton> {
       },
       destinations: const <NavigationDestination>[
         NavigationDestination(
-          icon: Icon(Icons.live_tv),
+          icon: Icon(Icons.live_tv_outlined),
+          selectedIcon: Icon(Icons.live_tv),
           label: '剧集',
         ),
         NavigationDestination(
-          icon: Icon(Icons.movie),
+          icon: Icon(Icons.movie_outlined),
+          selectedIcon: Icon(Icons.movie),
           label: '电影',
         ),
         NavigationDestination(
-          icon: Icon(Icons.download),
+          icon: Icon(Icons.download_outlined),
+          selectedIcon: Icon(Icons.download),
           label: '活动',
         ),
         NavigationDestination(
-          icon: Icon(Icons.settings),
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings),
           label: '设置',
         ),
         NavigationDestination(
-          icon: Icon(Icons.computer_rounded),
+          icon: Icon(Icons.computer_outlined),
+          selectedIcon: Icon(Icons.computer),
           label: '系统',
         ),
       ],

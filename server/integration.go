@@ -31,8 +31,7 @@ func (s *Server) createPlexmatchIfNotExists(seriesId int) error {
 	if err != nil { 
 		//create new
 		log.Warnf(".plexmatch file not found, create new one: %s", series.NameEn)
-		st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"), []byte(fmt.Sprintf("tmdbid=%d\n",series.TmdbID)))
-		return nil
+		return st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"), []byte(fmt.Sprintf("tmdbid=%d\n",series.TmdbID)))
 	} 
 	return nil
 }
