@@ -52,7 +52,7 @@ func (l *LocalStorage) Move(src, destDir string) error {
 		if info.IsDir() {
 			os.Mkdir(destName, os.ModePerm)
 		} else { //is file
-			if writer, err := os.Create(destName); err != nil {
+			if writer, err := os.OpenFile(destName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm); err != nil {
 				return errors.Wrapf(err, "create file %s", destName)
 			} else {
 				defer writer.Close()
