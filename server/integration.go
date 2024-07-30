@@ -32,7 +32,9 @@ func (s *Server) writePlexmatch(seriesId int, episodeNum int, targetDir, name st
 	if err != nil { 
 		//create new
 		log.Warnf(".plexmatch file not found, create new one: %s", series.NameEn)
-		return st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"), []byte(fmt.Sprintf("tmdbid: %d\n",series.TmdbID)))
+		if err := st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"), []byte(fmt.Sprintf("tmdbid: %d\n",series.TmdbID))); err != nil {
+			return errors.Wrap(err, "series plexmatch")
+		}
 	} 
 
 	if episodeNum == 0 {
@@ -46,7 +48,7 @@ func (s *Server) writePlexmatch(seriesId int, episodeNum int, targetDir, name st
 	} else {
 		buff.Write(data)
 	}
-	buff.WriteString(fmt.Sprintf("ep: %d: %s\n", episodeNum, name))
+	buff.WriteString(fmt.Sprintf("\nep: %d: %s\n", episodeNum, name))
 	log.Infof("write season plexmatch file content: %s", buff.String())
 	return st.WriteFile(seasonPlex, buff.Bytes())
 }

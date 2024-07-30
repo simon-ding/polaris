@@ -75,7 +75,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               .read(mediaDetailsProvider(widget.seriesId)
                                   .notifier)
                               .searchAndDownload(widget.seriesId,
-                                  ep.seasonNumber!, ep.episodeNumber!);
+                                  ep.seasonNumber!, ep.episodeNumber!).then((v) => showSnakeBar("开始下载: $v"));
                           showLoadingWithFuture(f);
                         },
                         icon: const Icon(Icons.download)),
@@ -257,8 +257,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               //title: Text("资源"),
               content: SelectionArea(
             child: SizedBox(
-              width: 800,
-              height: 400,
+              width: MediaQuery.of(context).size.width*0.7,
+              height: MediaQuery.of(context).size.height*0.6,
               child: torrents.when(
                   data: (v) {
                     return SingleChildScrollView(

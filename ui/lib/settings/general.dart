@@ -81,7 +81,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                 ),
                 SizedBox(
                   width: 300,
-                  child: FormBuilderSwitch(
+                  child: FormBuilderSwitch(decoration: const InputDecoration(icon: Icon(Icons.token)),
                       name: "enable_plexmatch", title: const Text("Plex 刮削支持")),
                 ),
                 Center(
