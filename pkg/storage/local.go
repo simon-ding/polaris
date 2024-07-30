@@ -14,6 +14,8 @@ import (
 type Storage interface {
 	Move(src, dest string) error
 	ReadDir(dir string) ([]fs.FileInfo, error)
+	ReadFile(string)([]byte, error)
+	WriteFile(string, []byte) error
 }
 
 func NewLocalStorage(dir string) (*LocalStorage, error) {
@@ -80,4 +82,13 @@ func (l *LocalStorage) Move(src, destDir string) error {
 
 func (l *LocalStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
 	return ioutil.ReadDir(filepath.Join(l.dir, dir))
+}
+
+func (l *LocalStorage) ReadFile(name string) ([]byte, error) {
+	return os.ReadFile(name)
+}
+
+
+func (l *LocalStorage) WriteFile(name string, data []byte) error  {
+	return os.WriteFile(name, data, os.ModePerm)
 }

@@ -98,3 +98,13 @@ func (w *WebdavStorage) Move(local, remoteDir string) error {
 func (w *WebdavStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
 	return w.fs.ReadDir(filepath.Join(w.dir, dir))
 }
+
+
+func (w *WebdavStorage) ReadFile(name string) ([]byte, error) {
+	return w.fs.Read(filepath.Join(w.dir, name))
+}
+
+
+func (w *WebdavStorage) WriteFile(name string, data []byte) error  {
+	return w.fs.Write(filepath.Join(w.dir, name), data, os.ModePerm)
+}

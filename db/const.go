@@ -10,6 +10,7 @@ const (
 	SettingDownloadDir = "download_dir"
 	SettingLogLevel = "log_level"
 	SettingProxy = "proxy"
+	SettingPlexMatchEnabled = "plexmatch_enabled"
 )
 
 const (

@@ -71,6 +71,9 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 			log.Errorf("no season id: %v", r.TargetDir)
 			seasonNum = -1
 		}
+		if err := s.createPlexmatchIfNotExists(r.MediaID); err != nil {
+			log.Errorf("create .plexmatch file error: %v", err)
+		}
 
 		if err1 != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
@@ -143,29 +146,12 @@ func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
 		return nil
 	}
 	log.Infof("check files in directory: %s", m.TargetDir)
-	st := s.db.GetStorage(m.StorageID)
 
-	var storageImpl storage.Storage
-
-	switch st.Implementation {
-	case storage1.ImplementationLocal:
-		ls := st.ToLocalSetting()
-		targetPath := ls.TvPath
-		storageImpl1, err := storage.NewLocalStorage(targetPath)
-		if err != nil {
-			return errors.Wrap(err, "new local")
-		}
-		storageImpl = storageImpl1
-
-	case storage1.ImplementationWebdav:
-		ws := st.ToWebDavSetting()
-		targetPath := ws.TvPath
-		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
-		if err != nil {
-			return errors.Wrap(err, "new webdav")
-		}
-		storageImpl = storageImpl1
+	var storageImpl, err = s.getStorage(m.StorageID, media.MediaTypeTv)
+	if err != nil {
+		return err
 	}
+
 	files, err := storageImpl.ReadDir(m.TargetDir)
 	if err != nil {
 		return errors.Wrapf(err, "read dir %s", m.TargetDir)

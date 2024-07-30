@@ -14,10 +14,11 @@ import (
 )
 
 type GeneralSettings struct {
-	TmdbApiKey  string `json:"tmdb_api_key"`
-	DownloadDir string `json:"download_dir"`
-	LogLevel    string `json:"log_level"`
-	Proxy       string `json:"proxy"`
+	TmdbApiKey      string `json:"tmdb_api_key"`
+	DownloadDir     string `json:"download_dir"`
+	LogLevel        string `json:"log_level"`
+	Proxy           string `json:"proxy"`
+	EnablePlexmatch bool   `json:"enable_plexmatch"`
 }
 
 func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
@@ -43,6 +44,13 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 			return nil, errors.Wrap(err, "save log level")
 		}
 
+	}
+
+	plexmatchEnabled := s.db.GetSetting(db.SettingPlexMatchEnabled)
+	if in.EnablePlexmatch && plexmatchEnabled != "true" {
+		s.db.SetSetting(db.SettingPlexMatchEnabled, "true")
+	} else if !in.EnablePlexmatch && plexmatchEnabled != "false" {
+		s.db.SetSetting(db.SettingPlexMatchEnabled, "false")
 	}
 
 	s.setProxy(in.Proxy)
@@ -72,11 +80,13 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	tmdb := s.db.GetSetting(db.SettingTmdbApiKey)
 	downloadDir := s.db.GetSetting(db.SettingDownloadDir)
 	logLevel := s.db.GetSetting(db.SettingLogLevel)
+	plexmatchEnabled := s.db.GetSetting(db.SettingPlexMatchEnabled)
 	return &GeneralSettings{
-		TmdbApiKey:  tmdb,
-		DownloadDir: downloadDir,
-		LogLevel:    logLevel,
-		Proxy:       s.db.GetSetting(db.SettingProxy),
+		TmdbApiKey:      tmdb,
+		DownloadDir:     downloadDir,
+		LogLevel:        logLevel,
+		Proxy:           s.db.GetSetting(db.SettingProxy),
+		EnablePlexmatch: plexmatchEnabled == "true",
 	}, nil
 }
 

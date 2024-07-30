@@ -3,6 +3,8 @@ package server
 import (
 	"fmt"
 	"polaris/db"
+	"polaris/ent/media"
+	storage1 "polaris/ent/storage"
 	"polaris/log"
 	"polaris/pkg/storage"
 	"polaris/pkg/utils"
@@ -105,4 +107,36 @@ func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
 	}
 	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
 	return gin.H{"name": name}, nil
+}
+
+
+func (s *Server) getStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {
+	st := s.db.GetStorage(storageId)
+	switch st.Implementation {
+	case storage1.ImplementationLocal:
+		ls := st.ToLocalSetting()
+		targetPath := ls.TvPath
+		if mediaType == media.MediaTypeMovie {
+			targetPath = ls.MoviePath
+		}
+		storageImpl1, err := storage.NewLocalStorage(targetPath)
+		if err != nil {
+			return nil, errors.Wrap(err, "new local")
+		}
+		return storageImpl1, nil
+
+	case storage1.ImplementationWebdav:
+		ws := st.ToWebDavSetting()
+		targetPath := ws.TvPath
+		if mediaType == media.MediaTypeMovie {
+			targetPath = ws.MoviePath
+		}
+
+		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
+		if err != nil {
+			return nil, errors.Wrap(err, "new webdav")
+		}
+		return storageImpl1, nil
+	}
+	return nil, errors.New("no storage found")
 }

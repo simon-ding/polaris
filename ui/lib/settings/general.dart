@@ -34,6 +34,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
               "download_dir": v.downloadDIr,
               "log_level": v.logLevel,
               "proxy": v.proxy,
+              "enable_plexmatch": v.enablePlexmatch
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,6 +79,11 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                     validator: FormBuilderValidators.required(),
                   ),
                 ),
+                SizedBox(
+                  width: 300,
+                  child: FormBuilderSwitch(
+                      name: "enable_plexmatch", title: const Text("Plex 刮削支持")),
+                ),
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 28.0),
@@ -95,7 +101,10 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                                     tmdbApiKey: values["tmdb_api"],
                                     downloadDIr: values["download_dir"],
                                     logLevel: values["log_level"],
-                                    proxy: values["proxy"])).then((v) => showSnakeBar("更新成功"));
+                                    proxy: values["proxy"],
+                                    enablePlexmatch:
+                                        values["enable_plexmatch"]))
+                                .then((v) => showSnakeBar("更新成功"));
                             showLoadingWithFuture(f);
                           }
                         }),

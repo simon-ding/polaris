@@ -51,16 +51,22 @@ class GeneralSetting {
   String? downloadDIr;
   String? logLevel;
   String? proxy;
+  bool? enablePlexmatch;
 
   GeneralSetting(
-      {this.tmdbApiKey, this.downloadDIr, this.logLevel, this.proxy});
+      {this.tmdbApiKey,
+      this.downloadDIr,
+      this.logLevel,
+      this.proxy,
+      this.enablePlexmatch});
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
     return GeneralSetting(
         tmdbApiKey: json["tmdb_api_key"],
         downloadDIr: json["download_dir"],
         logLevel: json["log_level"],
-        proxy: json["proxy"]);
+        proxy: json["proxy"],
+        enablePlexmatch: json["enable_plexmatch"] ?? false);
   }
 
   Map<String, dynamic> toJson() {
@@ -69,6 +75,7 @@ class GeneralSetting {
     data['download_dir'] = downloadDIr;
     data["log_level"] = logLevel;
     data["proxy"] = proxy;
+    data["enable_plexmatch"] = enablePlexmatch;
     return data;
   }
 }
