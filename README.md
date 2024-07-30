@@ -12,6 +12,11 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 - [x] 电视剧自动追踪下载
 - [x] 电影自动追踪下载
 - [x] webdav 存储支持，配合 [alist](https://github.com/alist-org/alist) 或阿里云等实现更多功能
+- [x] 事件通知推送，目前支持 Pushover和 Bark，还在扩充中
+- [x] 后台代理支持
+- [x] 用户认证
+- [x] plex 刮削支持
+- [x] and more...
 
 ## 使用
 
