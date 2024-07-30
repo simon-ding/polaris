@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:ui/providers/activity.dart';
-import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
+import 'package:ui/widgets/widgets.dart';
 
 class ActivityPage extends ConsumerStatefulWidget {
   const ActivityPage({super.key});
@@ -68,7 +68,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                       DataColumn(label: Text("名称")),
                       DataColumn(label: Text("开始时间")),
                       DataColumn(label: Text("状态")),
-                     DataColumn(label: Text("操作"))
+                      DataColumn(label: Text("操作"))
                     ],
                     source: ActivityDataSource(
                         activities: activities,
@@ -85,11 +85,10 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
 
   Function(int) onDelete() {
     return (id) {
-      ref
+      final f = ref
           .read(activitiesDataProvider("active").notifier)
-          .deleteActivity(id)
-          .then((v) => Utils.showSnakeBar("删除成功"))
-          .onError((error, trace) => Utils.showSnakeBar("删除失败：$error"));
+          .deleteActivity(id);
+      showLoadingWithFuture(f);
     };
   }
 }

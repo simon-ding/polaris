@@ -32,7 +32,9 @@ class Utils {
     );
   }
 
-  static showSnakeBar(String msg) {
+}
+
+ showSnakeBar(String msg) {
     final context = APIs.navigatorKey.currentContext;
     if (context != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -41,17 +43,6 @@ class Utils {
       ));
     }
   }
-
-  static bool showError(BuildContext context, AsyncSnapshot snapshot) {
-    final isErrored = snapshot.hasError &&
-        snapshot.connectionState != ConnectionState.waiting;
-    if (isErrored) {
-      Utils.showSnakeBar("当前操作出错: ${snapshot.error}");
-      return true;
-    }
-    return false;
-  }
-}
 
 extension FileFormatter on num {
   String readableFileSize({bool base1024 = true}) {

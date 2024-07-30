@@ -18,7 +18,7 @@ class AuthSettings extends ConsumerStatefulWidget {
 }
 
 class _AuthState extends ConsumerState<AuthSettings> {
-    final _formKey2 = GlobalKey<FormBuilderState>();
+  final _formKey2 = GlobalKey<FormBuilderState>();
   bool? _enableAuth;
 
   @override
@@ -84,12 +84,11 @@ class _AuthState extends ConsumerState<AuthSettings> {
                               var f = ref
                                   .read(authSettingProvider.notifier)
                                   .updateAuthSetting(_enableAuth!,
-                                      values["user"], values["password"]);
-                              f.then((v) {
-                                Utils.showSnakeBar("更新成功");
-                              }).onError((e, s) {
-                                Utils.showSnakeBar("更新失败：$e");
+                                      values["user"], values["password"])
+                                  .then((v) {
+                                showSnakeBar("更新成功");
                               });
+                              showLoadingWithFuture(f);
                             }
                           }))
                 ],
@@ -98,5 +97,4 @@ class _AuthState extends ConsumerState<AuthSettings> {
         error: (err, trace) => Text("$err"),
         loading: () => const MyProgressIndicator());
   }
-
 }

@@ -4,9 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/providers/settings.dart';
-import 'package:ui/widgets/utils.dart';
 import 'package:ui/welcome_page.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
+import 'package:ui/widgets/widgets.dart';
 
 class TvDetailsPage extends ConsumerStatefulWidget {
   static const route = "/series/:id";
@@ -70,14 +71,12 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     message: "搜索下载对应剧集",
                     child: IconButton(
                         onPressed: () {
-                          ref
+                          var f = ref
                               .read(mediaDetailsProvider(widget.seriesId)
                                   .notifier)
                               .searchAndDownload(widget.seriesId,
-                                  ep.seasonNumber!, ep.episodeNumber!)
-                              .then((v) => Utils.showSnakeBar("开始下载: $v"))
-                              .onError((error, trace) =>
-                                  Utils.showSnakeBar("操作失败: $error"));
+                                  ep.seasonNumber!, ep.episodeNumber!);
+                          showLoadingWithFuture(f);
                         },
                         icon: const Icon(Icons.download)),
                   ),
@@ -120,13 +119,11 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                         message: "搜索下载全部剧集",
                         child: IconButton(
                             onPressed: () {
-                              ref
+                              final f = ref
                                   .read(mediaDetailsProvider(widget.seriesId)
                                       .notifier)
-                                  .searchAndDownload(widget.seriesId, k, 0)
-                                  .then((v) => Utils.showSnakeBar("开始下载: $v"))
-                                  .onError((error, trace) =>
-                                      Utils.showSnakeBar("操作失败: $error"));
+                                  .searchAndDownload(widget.seriesId, k, 0).then((v) => showSnakeBar("开始下载: $v"));
+                              showLoadingWithFuture(f);
                             },
                             icon: const Icon(Icons.download)),
                       ),
@@ -154,7 +151,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                       image: DecorationImage(
                           fit: BoxFit.cover,
                           opacity: 0.3,
-                          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.dstATop),
+                          colorFilter: ColorFilter.mode(
+                              Colors.black.withOpacity(0.3), BlendMode.dstATop),
                           image: NetworkImage(
                               "${APIs.imagesUrl}/${details.id}/backdrop.jpg"))),
                   child: Padding(
@@ -166,9 +164,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(10),
                             child: Image.network(
-                              "${APIs.imagesUrl}/${details.id}/poster.jpg",
-                              fit: BoxFit.contain
-                            ),
+                                "${APIs.imagesUrl}/${details.id}/poster.jpg",
+                                fit: BoxFit.contain),
                           ),
                         ),
                         Flexible(
@@ -217,16 +214,12 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                 children: [
                                   IconButton(
                                       onPressed: () {
-                                        ref
+                                        var f = ref
                                             .read(mediaDetailsProvider(
                                                     widget.seriesId)
                                                 .notifier)
-                                            .delete()
-                                            .then((v) =>
-                                                context.go(WelcomePage.routeTv))
-                                            .onError((error, trace) =>
-                                                Utils.showSnakeBar(
-                                                    "删除失败： $error"));
+                                            .delete().then((v) => context.go(WelcomePage.routeTv));
+                                        showLoadingWithFuture(f);
                                       },
                                       icon: const Icon(Icons.delete))
                                 ],
@@ -270,7 +263,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                   data: (v) {
                     return SingleChildScrollView(
                         child: DataTable(
-                            dataTextStyle: const TextStyle(fontSize: 12, height: 0),
+                            dataTextStyle:
+                                const TextStyle(fontSize: 12, height: 0),
                             columns: const [
                               DataColumn(label: Text("名称")),
                               DataColumn(label: Text("大小")),
@@ -289,19 +283,14 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                 DataCell(IconButton(
                                   icon: const Icon(Icons.download),
                                   onPressed: () async {
-                                    await ref
+                                    var f = ref
                                         .read(mediaTorrentsDataProvider((
                                           mediaId: id,
                                           seasonNumber: season,
                                           episodeNumber: episode
                                         )).notifier)
-                                        .download(torrent)
-                                        .then((v) {
-                                      Navigator.of(context).pop();
-                                      Utils.showSnakeBar(
-                                          "开始下载：${torrent.name}");
-                                    }).onError((error, trace) =>
-                                            Utils.showSnakeBar("下载失败：$error"));
+                                        .download(torrent).then((v) => showSnakeBar("开始下载：${torrent.name}"));
+                                    showLoadingWithFuture(f);
                                   },
                                 ))
                               ]);

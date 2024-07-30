@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ui/providers/APIs.dart';
 
 class Commons {
   static InputDecoration requiredTextFieldStyle({
@@ -40,4 +41,48 @@ class SettingsCard extends StatelessWidget {
               SizedBox(width: 150, height: 150, child: Center(child: child))),
     );
   }
+}
+
+showLoadingWithFuture(Future f) {
+  final context = APIs.navigatorKey.currentContext;
+  if (context == null) {
+    return;
+  }
+  showDialog(
+    context: context,
+    barrierDismissible: false, //点击遮罩不关闭对话框
+    builder: (context) {
+      return FutureBuilder(
+          future: f,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return AlertDialog(
+                  content: Text("处理失败：${snapshot.error}"),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text("好"))
+                  ],
+                );
+              }
+              Navigator.of(context).pop();
+              return Container();
+            } else {
+              return const AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    Padding(
+                      padding: EdgeInsets.only(top: 26.0),
+                      child: Text("正在处理，请稍后..."),
+                    )
+                  ],
+                ),
+              );
+            }
+          });
+    },
+  );
 }

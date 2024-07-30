@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:ui/widgets/utils.dart';
+import 'package:ui/widgets/widgets.dart';
 
-Future<void> showSettingDialog(BuildContext context,String title, bool showDelete, Widget body,
-    Future Function() onSubmit, Future Function() onDelete) {
+Future<void> showSettingDialog(
+    BuildContext context,
+    String title,
+    bool showDelete,
+    Widget body,
+    Future Function() onSubmit,
+    Future Function() onDelete) {
   return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -19,13 +24,8 @@ Future<void> showSettingDialog(BuildContext context,String title, bool showDelet
             showDelete
                 ? TextButton(
                     onPressed: () {
-                      final f = onDelete();
-                      f.then((v) {
-                        Utils.showSnakeBar("删除成功");
-                        Navigator.of(context).pop();
-                      }).onError((e, s) {
-                        Utils.showSnakeBar("删除失败：$e");
-                      });
+                      final f = onDelete().then((v) => Navigator.of(context).pop());
+                      showLoadingWithFuture(f);
                     },
                     child: const Text(
                       '删除',
@@ -38,15 +38,8 @@ Future<void> showSettingDialog(BuildContext context,String title, bool showDelet
             TextButton(
               child: const Text('确定'),
               onPressed: () {
-                final f = onSubmit();
-                f.then((v) {
-                  Utils.showSnakeBar("操作成功");
-                  Navigator.of(context).pop();
-                }).onError((e, s) {
-                  if (e.toString() != "validation_error") {
-                    Utils.showSnakeBar("操作失败：$e");
-                  }
-                });
+                final f = onSubmit().then((v) => Navigator.of(context).pop());
+                showLoadingWithFuture(f);
               },
             ),
           ],

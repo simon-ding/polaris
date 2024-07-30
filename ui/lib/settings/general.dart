@@ -3,8 +3,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:ui/providers/settings.dart';
-import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/widgets.dart';
 
 class GeneralSettings extends ConsumerStatefulWidget {
@@ -17,9 +17,8 @@ class GeneralSettings extends ConsumerStatefulWidget {
   }
 }
 
-
 class _GeneralState extends ConsumerState<GeneralSettings> {
-    final _formKey = GlobalKey<FormBuilderState>();
+  final _formKey = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +95,8 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                                     tmdbApiKey: values["tmdb_api"],
                                     downloadDIr: values["download_dir"],
                                     logLevel: values["log_level"],
-                                    proxy: values["proxy"]));
-                            f.then((v) {
-                              Utils.showSnakeBar("更新成功");
-                            }).onError((e, s) {
-                              Utils.showSnakeBar("更新失败：$e");
-                            });
+                                    proxy: values["proxy"])).then((v) => showSnakeBar("更新成功"));
+                            showLoadingWithFuture(f);
                           }
                         }),
                   ),
@@ -113,5 +108,4 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
         error: (err, trace) => Text("$err"),
         loading: () => const MyProgressIndicator());
   }
-
 }

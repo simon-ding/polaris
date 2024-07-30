@@ -5,9 +5,10 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/activity.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/providers/settings.dart';
-import 'package:ui/widgets/utils.dart';
 import 'package:ui/welcome_page.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
+import 'package:ui/widgets/widgets.dart';
 
 class MovieDetailsPage extends ConsumerStatefulWidget {
   static const route = "/movie/:id";
@@ -44,7 +45,9 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                         image: DecorationImage(
                             fit: BoxFit.cover,
                             opacity: 0.3,
-                            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.dstATop),
+                            colorFilter: ColorFilter.mode(
+                                Colors.black.withOpacity(0.3),
+                                BlendMode.dstATop),
                             image: NetworkImage(
                               "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
                             ))),
@@ -101,7 +104,7 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                                     ),
                                     const Text(""),
                                     Text(
-                                      details.overview!,
+                                      details.overview??"",
                                     ),
                                   ],
                                 )),
@@ -109,16 +112,12 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
                                   children: [
                                     IconButton(
                                         onPressed: () {
-                                          ref
+                                          var f = ref
                                               .read(mediaDetailsProvider(
                                                       widget.id)
                                                   .notifier)
-                                              .delete()
-                                              .then((v) => context
-                                                  .go(WelcomePage.routeMoivie))
-                                              .onError((error, trace) =>
-                                                  Utils.showSnakeBar(
-                                                      "删除失败：$error"));
+                                              .delete().then((v) => context.go(WelcomePage.routeMoivie));
+                                          showLoadingWithFuture(f);
                                         },
                                         icon: const Icon(Icons.delete))
                                   ],
@@ -252,17 +251,18 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                             DataCell(IconButton(
                               icon: const Icon(Icons.download),
                               onPressed: () {
-                                ref
+                                final f = ref
                                     .read(mediaTorrentsDataProvider((
                                       mediaId: widget.id,
                                       seasonNumber: 0,
                                       episodeNumber: 0
                                     )).notifier)
                                     .download(torrent)
-                                    .then((v) => Utils.showSnakeBar(
-                                        "开始下载：${torrent.name}"))
-                                    .onError((error, trace) =>
-                                        Utils.showSnakeBar("操作失败: $error"));
+                                .then((v) => showSnakeBar(
+                                    "开始下载：${torrent.name}"));
+                                // .onError((error, trace) =>
+                                //     Utils.showSnakeBar("操作失败: $error"));
+                                showLoadingWithFuture(f);
                               },
                             ))
                           ]);

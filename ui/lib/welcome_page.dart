@@ -74,7 +74,7 @@ class WelcomePage extends ConsumerWidget {
                                       ),
                                       Text(
                                         item.name!,
-                                        style: const TextStyle(
+                                        style: const TextStyle(   
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                             height: 2.5),

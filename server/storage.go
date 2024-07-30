@@ -69,7 +69,7 @@ func (s *Server) SuggestedSeriesFolderName(c *gin.Context) (interface{}, error) 
 	year := strings.Split(d.FirstAirDate, "-")[0]
 
 
-	if utils.ContainsChineseChar(originalName) {
+	if utils.ContainsChineseChar(originalName) || name == originalName {
 		name = originalName
 	} else {
 		name = fmt.Sprintf("%s %s", name, originalName)
@@ -95,9 +95,7 @@ func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
 	originalName := d1.OriginalTitle
 	year := strings.Split(d1.ReleaseDate, "-")[0]
 
-	name = fmt.Sprintf("%s %s", name, originalName)
-
-	if utils.ContainsChineseChar(originalName) {
+	if utils.ContainsChineseChar(originalName) || name == originalName {
 		name = originalName
 	} else {
 		name = fmt.Sprintf("%s %s", name, originalName)
