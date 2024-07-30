@@ -10,7 +10,6 @@ import (
 	"polaris/pkg/tmdb"
 	"polaris/pkg/transmission"
 	"polaris/ui"
-	"time"
 
 	ginzap "github.com/gin-contrib/zap"
 
@@ -48,7 +47,7 @@ func (s *Server) Serve() error {
 	s.jwtSerect = s.db.GetSetting(db.JwtSerectKey)
 	//st, _ := fs.Sub(ui.Web, "build/web")
 	s.r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
-	s.r.Use(ginzap.Ginzap(log.Logger().Desugar(), time.RFC3339, false))
+	//s.r.Use(ginzap.Ginzap(log.Logger().Desugar(), time.RFC3339, false))
 	s.r.Use(ginzap.RecoveryWithZap(log.Logger().Desugar(), true))
 
 	log.SetLogLevel(s.db.GetSetting(db.SettingLogLevel)) //restore log level

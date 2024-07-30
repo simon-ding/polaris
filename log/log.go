@@ -32,7 +32,7 @@ func init() {
 
 	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 
-	logger := zap.New(zapcore.NewCore(consoleEncoder, w, atom), zap.AddCallerSkip(1))
+	logger := zap.New(zapcore.NewCore(consoleEncoder, w, atom), zap.AddCallerSkip(1),zap.AddCaller())
 
 	sugar = logger.Sugar()
 
