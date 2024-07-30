@@ -60,22 +60,40 @@ func (s *Server) SuggestedSeriesFolderName(c *gin.Context) (interface{}, error) 
 	if err != nil {
 		return nil, fmt.Errorf("id is not int: %v", ids)
 	}
-	var name, originalName, year string
 	d, err := s.MustTMDB().GetTvDetails(id, s.language)
 	if err != nil {
-		d1, err := s.MustTMDB().GetMovieDetails(id, s.language)
-		if err != nil {
-			return nil, errors.Wrap(err, "get movie details")
-		}
-		name = d1.Title
-		originalName = d1.OriginalTitle
-		year = strings.Split(d1.ReleaseDate, "-")[0]
-		
-	} else {
-		name = d.Name
-		originalName = d.OriginalName
-		year = strings.Split(d.FirstAirDate, "-")[0]
+		return nil, errors.Wrap(err, "get tv details")
+	} 
+	name := d.Name
+	originalName := d.OriginalName
+	year := strings.Split(d.FirstAirDate, "-")[0]
+
+	name = fmt.Sprintf("%s %s", name, originalName)
+
+	if !utils.ContainsChineseChar(name) {
+		name = originalName
 	}
+	if year != "" {
+		name = fmt.Sprintf("%s (%s)", name, year)
+	}
+	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
+	return gin.H{"name": name}, nil
+}
+
+func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
+	ids := c.Param("tmdb_id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, fmt.Errorf("id is not int: %v", ids)
+	}
+	d1, err := s.MustTMDB().GetMovieDetails(id, s.language)
+	if err != nil {
+		return nil, errors.Wrap(err, "get movie details")
+	}
+	name := d1.Title
+	originalName := d1.OriginalTitle
+	year := strings.Split(d1.ReleaseDate, "-")[0]
+
 	name = fmt.Sprintf("%s %s", name, originalName)
 
 	if !utils.ContainsChineseChar(name) {

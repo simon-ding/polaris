@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiver/strings.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
 final tvWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
-  final dio = await APIs.getDio();
+  final dio =  APIs.getDio();
   var resp = await dio.get(APIs.watchlistTvUrl);
   var sp = ServerResponse.fromJson(resp.data);
   List<MediaDetail> favList = List.empty(growable: true);
@@ -17,10 +18,17 @@ final tvWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
   return favList;
 });
 
+typedef NamingType = ({int id, String mediaType});
+
 final suggestNameDataProvider = FutureProvider.autoDispose.family(
-  (ref, int arg) async {
-    final dio = await APIs.getDio();
-    var resp = await dio.get(APIs.suggestedTvName + arg.toString());
+  (ref, NamingType arg) async {
+    final dio = APIs.getDio();
+    Response<dynamic> resp;
+    if (arg.mediaType == "tv") {
+      resp = await dio.get(APIs.suggestedTvName + arg.id.toString());
+    } else {
+      resp = await dio.get(APIs.suggestedMovieName + arg.id.toString());
+    }
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;
@@ -92,7 +100,7 @@ class SearchPageData
         "storage_id": storageId,
         "resolution": resolution,
         "folder": folder,
-        "download_history_episodes":downloadHistoryEpisodes
+        "download_history_episodes": downloadHistoryEpisodes
       });
       var sp = ServerResponse.fromJson(resp.data);
       if (sp.code != 0) {
@@ -241,4 +249,3 @@ class SearchResult {
     );
   }
 }
-

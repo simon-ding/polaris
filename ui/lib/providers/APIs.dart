@@ -14,7 +14,8 @@ class APIs {
   static final availableTorrentsUrl = "$_baseUrl/api/v1/media/torrents/";
   static final downloadTorrentUrl = "$_baseUrl/api/v1/media/torrents/download";
   static final seriesDetailUrl = "$_baseUrl/api/v1/media/record/";
-  static final suggestedTvName = "$_baseUrl/api/v1/media/suggest/";
+  static final suggestedTvName = "$_baseUrl/api/v1/media/suggest/tv/";
+  static final suggestedMovieName = "$_baseUrl/api/v1/media/suggest/movie/";
   static final searchAndDownloadUrl = "$_baseUrl/api/v1/indexer/download";
   static final allIndexersUrl = "$_baseUrl/api/v1/indexer/";
   static final addIndexerUrl = "$_baseUrl/api/v1/indexer/add";

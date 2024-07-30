@@ -155,7 +155,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               String resSelected = "1080p";
               int storageSelected = 0;
               var storage = ref.watch(storageSettingProvider);
-              var name = ref.watch(suggestNameDataProvider(item.id!));
+              var name = ref.watch(suggestNameDataProvider((id: item.id!, mediaType: item.mediaType!)));
               bool downloadHistoryEpisodes = false;
               bool buttonTapped = false;
 

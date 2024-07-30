@@ -93,7 +93,8 @@ func (s *Server) Serve() error {
 		tv.GET("/record/:id", HttpHandler(s.GetMediaDetails))
 		tv.DELETE("/record/:id", HttpHandler(s.DeleteFromWatchlist))
 		tv.GET("/resolutions", HttpHandler(s.GetAvailableResolutions))
-		tv.GET("/suggest/:tmdb_id", HttpHandler(s.SuggestedSeriesFolderName))
+		tv.GET("/suggest/tv/:tmdb_id", HttpHandler(s.SuggestedSeriesFolderName))
+		tv.GET("/suggest/movie/:tmdb_id", HttpHandler(s.SuggestedMovieFolderName))
 	}
 	indexer := api.Group("/indexer")
 	{
