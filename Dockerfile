@@ -3,7 +3,7 @@ WORKDIR /app
 COPY ./ui/pubspec.yaml ./ui/pubspec.lock ./
 RUN flutter pub get
 COPY ./ui/ ./
-RUN flutter build web --no-web-resources-cdn
+RUN flutter build web --no-web-resources-cdn --web-renderer html
 
 # 打包依赖阶段使用golang作为基础镜像
 FROM golang:1.22 as builder

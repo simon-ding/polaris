@@ -153,7 +153,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                   decoration: BoxDecoration(
                       image: DecorationImage(
                           fit: BoxFit.cover,
-                          opacity: 0.5,
+                          opacity: 0.3,
+                          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.dstATop),
                           image: NetworkImage(
                               "${APIs.imagesUrl}/${details.id}/backdrop.jpg"))),
                   child: Padding(

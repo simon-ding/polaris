@@ -64,19 +64,23 @@ class WelcomePage extends ConsumerWidget {
                               ),
                               SizedBox(
                                   width: 140,
-                                  child: LinearProgressIndicator(
-                                    value: 1,
-                                    color: item.status == "downloaded"
-                                        ? Colors.green
-                                        : Colors.blue,
+                                  child: Column(
+                                    children: [
+                                      LinearProgressIndicator(
+                                        value: 1,
+                                        color: item.status == "downloaded"
+                                            ? Colors.green
+                                            : Colors.blue,
+                                      ),
+                                      Text(
+                                        item.name!,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            height: 2.5),
+                                      ),
+                                    ],
                                   )),
-                              Text(
-                                item.name!,
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    height: 2.5),
-                              ),
                             ],
                           ),
                         ));
