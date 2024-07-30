@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"polaris/db"
+	"polaris/ent"
 	"polaris/log"
 	"polaris/pkg/transmission"
 	"strconv"
@@ -129,7 +130,7 @@ func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
 	return indexers, nil
 }
 
-func (s *Server) getDownloadClient() (*transmission.Client, error) {
+func (s *Server) getDownloadClient() (*transmission.Client, *ent.DownloadClients, error) {
 	tr := s.db.GetTransmission()
 	trc, err := transmission.NewClient(transmission.Config{
 		URL:      tr.URL,
@@ -137,9 +138,9 @@ func (s *Server) getDownloadClient() (*transmission.Client, error) {
 		Password: tr.Password,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "connect transmission")
+		return nil, nil, errors.Wrap(err, "connect transmission")
 	}
-	return trc, nil
+	return trc, tr, nil
 }
 
 type downloadClientIn struct {

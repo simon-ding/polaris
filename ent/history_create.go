@@ -72,6 +72,20 @@ func (hc *HistoryCreate) SetNillableSize(i *int) *HistoryCreate {
 	return hc
 }
 
+// SetDownloadClientID sets the "download_client_id" field.
+func (hc *HistoryCreate) SetDownloadClientID(i int) *HistoryCreate {
+	hc.mutation.SetDownloadClientID(i)
+	return hc
+}
+
+// SetNillableDownloadClientID sets the "download_client_id" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableDownloadClientID(i *int) *HistoryCreate {
+	if i != nil {
+		hc.SetDownloadClientID(*i)
+	}
+	return hc
+}
+
 // SetStatus sets the "status" field.
 func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
 	hc.mutation.SetStatus(h)
@@ -207,6 +221,10 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 	if value, ok := hc.mutation.Size(); ok {
 		_spec.SetField(history.FieldSize, field.TypeInt, value)
 		_node.Size = value
+	}
+	if value, ok := hc.mutation.DownloadClientID(); ok {
+		_spec.SetField(history.FieldDownloadClientID, field.TypeInt, value)
+		_node.DownloadClientID = value
 	}
 	if value, ok := hc.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)

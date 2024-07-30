@@ -29,6 +29,8 @@ type History struct {
 	TargetDir string `json:"target_dir,omitempty"`
 	// Size holds the value of the "size" field.
 	Size int `json:"size,omitempty"`
+	// DownloadClientID holds the value of the "download_client_id" field.
+	DownloadClientID int `json:"download_client_id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status history.Status `json:"status,omitempty"`
 	// Saved holds the value of the "saved" field.
@@ -41,7 +43,7 @@ func (*History) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case history.FieldID, history.FieldMediaID, history.FieldEpisodeID, history.FieldSize:
+		case history.FieldID, history.FieldMediaID, history.FieldEpisodeID, history.FieldSize, history.FieldDownloadClientID:
 			values[i] = new(sql.NullInt64)
 		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldStatus, history.FieldSaved:
 			values[i] = new(sql.NullString)
@@ -103,6 +105,12 @@ func (h *History) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
 				h.Size = int(value.Int64)
+			}
+		case history.FieldDownloadClientID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field download_client_id", values[i])
+			} else if value.Valid {
+				h.DownloadClientID = int(value.Int64)
 			}
 		case history.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -169,6 +177,9 @@ func (h *History) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("size=")
 	builder.WriteString(fmt.Sprintf("%v", h.Size))
+	builder.WriteString(", ")
+	builder.WriteString("download_client_id=")
+	builder.WriteString(fmt.Sprintf("%v", h.DownloadClientID))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", h.Status))

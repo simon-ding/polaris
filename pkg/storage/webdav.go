@@ -14,8 +14,8 @@ import (
 )
 
 type WebdavStorage struct {
-	fs *gowebdav.Client
-	dir string
+	fs              *gowebdav.Client
+	dir             string
 	changeMediaHash bool
 }
 
@@ -25,14 +25,13 @@ func NewWebdavStorage(url, user, password, path string, changeMediaHash bool) (*
 		return nil, errors.Wrap(err, "connect webdav")
 	}
 	return &WebdavStorage{
-		fs: c,
+		fs:  c,
 		dir: path,
 	}, nil
 }
 
-func (w *WebdavStorage) Move(local, remoteDir string) error {
-
-	remoteBase := filepath.Join(w.dir,remoteDir, filepath.Base(local))
+func (w *WebdavStorage) Copy(local, remoteDir string) error {
+	remoteBase := filepath.Join(w.dir, remoteDir, filepath.Base(local))
 	info, err := os.Stat(local)
 	if err != nil {
 		return errors.Wrap(err, "read source dir")
@@ -80,7 +79,7 @@ func (w *WebdavStorage) Move(local, remoteDir string) error {
 					r.Header.Set("Content-Type", mtype.String())
 					r.ContentLength = info.Size()
 				}
-			
+
 				if err := w.fs.WriteStream(remoteName, f, 0666, callback); err != nil {
 					return errors.Wrap(err, "transmitting data error")
 				}
@@ -92,6 +91,13 @@ func (w *WebdavStorage) Move(local, remoteDir string) error {
 	if err != nil {
 		return errors.Wrap(err, "move file error")
 	}
+	return nil
+}
+
+func (w *WebdavStorage) Move(local, remoteDir string) error {
+	if err := w.Copy(local, remoteDir); err != nil {
+		return err
+	}
 	return os.RemoveAll(local)
 }
 
@@ -99,12 +105,10 @@ func (w *WebdavStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
 	return w.fs.ReadDir(filepath.Join(w.dir, dir))
 }
 
-
 func (w *WebdavStorage) ReadFile(name string) ([]byte, error) {
 	return w.fs.Read(filepath.Join(w.dir, name))
 }
 
-
-func (w *WebdavStorage) WriteFile(name string, data []byte) error  {
+func (w *WebdavStorage) WriteFile(name string, data []byte) error {
 	return w.fs.Write(filepath.Join(w.dir, name), data, os.ModePerm)
 }

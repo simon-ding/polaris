@@ -13,6 +13,7 @@ import (
 
 type Storage interface {
 	Move(src, dest string) error
+	Copy(src, dest string) error
 	ReadDir(dir string) ([]fs.FileInfo, error)
 	ReadFile(string)([]byte, error)
 	WriteFile(string, []byte) error
@@ -28,7 +29,7 @@ type LocalStorage struct {
 	dir string
 }
 
-func (l *LocalStorage) Move(src, destDir string) error {
+func (l *LocalStorage) Copy(src, destDir string) error {
 	os.MkdirAll(filepath.Join(l.dir, destDir), os.ModePerm)
 
 	targetBase := filepath.Join(l.dir, destDir, filepath.Base(src)) //文件的场景，要加上文件名, move filename ./dir/
@@ -80,8 +81,14 @@ func (l *LocalStorage) Move(src, destDir string) error {
 	if err != nil {
 		return errors.Wrap(err, "move file error")
 	}
-	return os.RemoveAll(src)
+	return nil
+}
 
+func (l *LocalStorage) Move(src, destDir string) error {
+	if err := l.Copy(src, destDir); err != nil {
+		return err
+	}
+	return os.RemoveAll(src)
 }
 
 func (l *LocalStorage) ReadDir(dir string) ([]fs.FileInfo, error) {

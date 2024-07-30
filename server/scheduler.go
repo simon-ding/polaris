@@ -7,11 +7,9 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/media"
-	storage1 "polaris/ent/storage"
 	"polaris/log"
 	"polaris/pkg"
 	"polaris/pkg/notifier/message"
-	"polaris/pkg/storage"
 	"polaris/pkg/utils"
 	"polaris/server/core"
 	"time"
@@ -64,13 +62,18 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 		return nil
 	}
 	s.db.SetHistoryStatus(r.ID, history.StatusUploading)
+	seasonNum, err := utils.SeasonId(r.TargetDir)
+	if err != nil {
+		log.Errorf("no season id: %v", r.TargetDir)
+		seasonNum = -1
+	}
+	downloadclient, err := s.db.GetDownloadClient(r.DownloadClientID)
+	if err != nil {
+		log.Errorf("get task download client error: %v, use default one", err)
+		downloadclient = &ent.DownloadClients{RemoveCompletedDownloads: true, RemoveFailedDownloads: true}
+	}
 
 	defer func() {
-		seasonNum, err := utils.SeasonId(r.TargetDir)
-		if err != nil {
-			log.Errorf("no season id: %v", r.TargetDir)
-			seasonNum = -1
-		}
 
 		if err1 != nil {
 			s.db.SetHistoryStatus(r.ID, history.StatusFail)
@@ -80,22 +83,10 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 				s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
 			}
 			s.sendMsg(fmt.Sprintf(message.ProcessingFailed, err))
-		} else {
-			// .plexmatch file
-			if err := s.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrent.Name()); err != nil {
-				log.Errorf("create .plexmatch file error: %v", err)
+			if downloadclient.RemoveCompletedDownloads {
+				delete(s.tasks, r.ID)
+				torrent.Remove()		
 			}
-	
-			delete(s.tasks, r.ID)
-			s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
-			if r.EpisodeID != 0 {
-				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
-			} else {
-				s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
-			}
-			s.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrent.Name()))
-
-			torrent.Remove()
 		}
 	}()
 
@@ -105,39 +96,36 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 	}
 	st := s.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
-	var stImpl storage.Storage
-	if st.Implementation == storage1.ImplementationWebdav {
-		ws := st.ToWebDavSetting()
-		targetPath := ws.TvPath
-		if series.MediaType == media.MediaTypeMovie {
-			targetPath = ws.MoviePath
-		}
-		storageImpl, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
-		if err != nil {
-			return errors.Wrap(err, "new webdav")
-		}
-		stImpl = storageImpl
-
-	} else if st.Implementation == storage1.ImplementationLocal {
-		ls := st.ToLocalSetting()
-		targetPath := ls.TvPath
-		if series.MediaType == media.MediaTypeMovie {
-			targetPath = ls.MoviePath
-		}
-
-		storageImpl, err := storage.NewLocalStorage(targetPath)
-		if err != nil {
-			return errors.Wrap(err, "new storage")
-
-		}
-		stImpl = storageImpl
-
+	stImpl, err := s.getStorage(st.ID, series.MediaType)
+	if err != nil {
+		return err
 	}
 
 	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
-	if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
+	if err := stImpl.Copy(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
 		return errors.Wrap(err, "move file")
 	}
+
+	// .plexmatch file
+	if err := s.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrent.Name()); err != nil {
+		log.Errorf("create .plexmatch file error: %v", err)
+	}
+
+	
+	s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
+	if r.EpisodeID != 0 {
+		s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
+	} else {
+		s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
+	}
+	s.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrent.Name()))
+
+	//判断是否需要删除本地文件
+	if downloadclient.RemoveCompletedDownloads {
+		delete(s.tasks, r.ID)
+		torrent.Remove()
+	}
+
 
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)
 	return nil
@@ -253,7 +241,7 @@ func (s *Server) downloadMovie() {
 }
 
 func (s *Server) downloadMovieSingleEpisode(ep *ent.Episode) error {
-	trc, err := s.getDownloadClient()
+	trc, dlc, err := s.getDownloadClient()
 	if err != nil {
 		return errors.Wrap(err, "connect transmission")
 	}
@@ -272,13 +260,14 @@ func (s *Server) downloadMovieSingleEpisode(ep *ent.Episode) error {
 	torrent.Start()
 
 	history, err := s.db.SaveHistoryRecord(ent.History{
-		MediaID:     ep.MediaID,
-		EpisodeID:   ep.ID,
-		SourceTitle: r1.Name,
-		TargetDir:   "./",
-		Status:      history.StatusRunning,
-		Size:        r1.Size,
-		Saved:       torrent.Save(),
+		MediaID:          ep.MediaID,
+		EpisodeID:        ep.ID,
+		SourceTitle:      r1.Name,
+		TargetDir:        "./",
+		Status:           history.StatusRunning,
+		Size:             r1.Size,
+		Saved:            torrent.Save(),
+		DownloadClientID: dlc.ID,
 	})
 	if err != nil {
 		log.Errorf("save history error: %v", err)

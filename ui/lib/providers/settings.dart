@@ -200,7 +200,8 @@ class DownloadClient {
   String? url;
   String? user;
   String? password;
-
+  bool? removeCompletedDownloads;
+  bool? removeFailedDownloads;
   DownloadClient(
       {this.id,
       this.enable,
@@ -208,7 +209,9 @@ class DownloadClient {
       this.implementation,
       this.url,
       this.user,
-      this.password});
+      this.password,
+      this.removeCompletedDownloads,
+      this.removeFailedDownloads});
 
   DownloadClient.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -218,6 +221,8 @@ class DownloadClient {
     url = json['url'];
     user = json['user'];
     password = json['password'];
+    removeCompletedDownloads = json["remove_completed_downloads"] ?? false;
+    removeFailedDownloads = json["remove_failed_downloads"] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -229,6 +234,8 @@ class DownloadClient {
     data['url'] = url;
     data['user'] = user;
     data['password'] = password;
+    data["remove_completed_downloads"] = removeCompletedDownloads;
+    data["remove_failed_downloads"] = removeFailedDownloads;
     return data;
   }
 }

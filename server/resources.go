@@ -30,7 +30,7 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 }
 
 func (s *Server) downloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum int) (*string, error) {
-	trc, err := s.getDownloadClient()
+	trc, dlClient, err := s.getDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
@@ -61,6 +61,7 @@ func (s *Server) downloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum in
 		Status:      history.StatusRunning,
 		Size:        r1.Size,
 		Saved:       torrent.Save(),
+		DownloadClientID: dlClient.ID,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
@@ -75,7 +76,7 @@ func (s *Server) downloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum in
 }
 
 func (s *Server) downloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, episodeNum int) (*string, error) {
-	trc, err := s.getDownloadClient()
+	trc, dlc, err := s.getDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
@@ -108,6 +109,7 @@ func (s *Server) downloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 		Status:      history.StatusRunning,
 		Size:        r1.Size,
 		Saved:       torrent.Save(),
+		DownloadClientID: dlc.ID,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
@@ -264,7 +266,7 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 		res := torznab.Result{Name: name, Link: in.Link, Size: in.Size}
 		return s.downloadEpisodeTorrent(res, in.MediaID, in.Season, in.Episode)
 	}
-	trc, err := s.getDownloadClient()
+	trc, dlc, err := s.getDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
@@ -288,6 +290,7 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 			Status:      history.StatusRunning,
 			Size:        in.Size,
 			Saved:       torrent.Save(),
+			DownloadClientID: dlc.ID,
 		})
 		if err != nil {
 			log.Errorf("save history error: %v", err)

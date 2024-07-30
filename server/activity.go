@@ -102,7 +102,7 @@ type TorrentInfo struct {
 }
 
 func (s *Server) GetAllTorrents(c *gin.Context) (interface{}, error) {
-	trc, err := s.getDownloadClient()
+	trc, _, err := s.getDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}

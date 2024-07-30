@@ -84,6 +84,11 @@ func Size(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSize, v))
 }
 
+// DownloadClientID applies equality check predicate on the "download_client_id" field. It's identical to DownloadClientIDEQ.
+func DownloadClientID(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldDownloadClientID, v))
+}
+
 // Saved applies equality check predicate on the "saved" field. It's identical to SavedEQ.
 func Saved(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSaved, v))
@@ -387,6 +392,56 @@ func SizeLT(v int) predicate.History {
 // SizeLTE applies the LTE predicate on the "size" field.
 func SizeLTE(v int) predicate.History {
 	return predicate.History(sql.FieldLTE(FieldSize, v))
+}
+
+// DownloadClientIDEQ applies the EQ predicate on the "download_client_id" field.
+func DownloadClientIDEQ(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldDownloadClientID, v))
+}
+
+// DownloadClientIDNEQ applies the NEQ predicate on the "download_client_id" field.
+func DownloadClientIDNEQ(v int) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldDownloadClientID, v))
+}
+
+// DownloadClientIDIn applies the In predicate on the "download_client_id" field.
+func DownloadClientIDIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldIn(FieldDownloadClientID, vs...))
+}
+
+// DownloadClientIDNotIn applies the NotIn predicate on the "download_client_id" field.
+func DownloadClientIDNotIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldDownloadClientID, vs...))
+}
+
+// DownloadClientIDGT applies the GT predicate on the "download_client_id" field.
+func DownloadClientIDGT(v int) predicate.History {
+	return predicate.History(sql.FieldGT(FieldDownloadClientID, v))
+}
+
+// DownloadClientIDGTE applies the GTE predicate on the "download_client_id" field.
+func DownloadClientIDGTE(v int) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldDownloadClientID, v))
+}
+
+// DownloadClientIDLT applies the LT predicate on the "download_client_id" field.
+func DownloadClientIDLT(v int) predicate.History {
+	return predicate.History(sql.FieldLT(FieldDownloadClientID, v))
+}
+
+// DownloadClientIDLTE applies the LTE predicate on the "download_client_id" field.
+func DownloadClientIDLTE(v int) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldDownloadClientID, v))
+}
+
+// DownloadClientIDIsNil applies the IsNil predicate on the "download_client_id" field.
+func DownloadClientIDIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldDownloadClientID))
+}
+
+// DownloadClientIDNotNil applies the NotNil predicate on the "download_client_id" field.
+func DownloadClientIDNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldDownloadClientID))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

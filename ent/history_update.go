@@ -139,6 +139,33 @@ func (hu *HistoryUpdate) AddSize(i int) *HistoryUpdate {
 	return hu
 }
 
+// SetDownloadClientID sets the "download_client_id" field.
+func (hu *HistoryUpdate) SetDownloadClientID(i int) *HistoryUpdate {
+	hu.mutation.ResetDownloadClientID()
+	hu.mutation.SetDownloadClientID(i)
+	return hu
+}
+
+// SetNillableDownloadClientID sets the "download_client_id" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableDownloadClientID(i *int) *HistoryUpdate {
+	if i != nil {
+		hu.SetDownloadClientID(*i)
+	}
+	return hu
+}
+
+// AddDownloadClientID adds i to the "download_client_id" field.
+func (hu *HistoryUpdate) AddDownloadClientID(i int) *HistoryUpdate {
+	hu.mutation.AddDownloadClientID(i)
+	return hu
+}
+
+// ClearDownloadClientID clears the value of the "download_client_id" field.
+func (hu *HistoryUpdate) ClearDownloadClientID() *HistoryUpdate {
+	hu.mutation.ClearDownloadClientID()
+	return hu
+}
+
 // SetStatus sets the "status" field.
 func (hu *HistoryUpdate) SetStatus(h history.Status) *HistoryUpdate {
 	hu.mutation.SetStatus(h)
@@ -256,6 +283,15 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := hu.mutation.AddedSize(); ok {
 		_spec.AddField(history.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := hu.mutation.DownloadClientID(); ok {
+		_spec.SetField(history.FieldDownloadClientID, field.TypeInt, value)
+	}
+	if value, ok := hu.mutation.AddedDownloadClientID(); ok {
+		_spec.AddField(history.FieldDownloadClientID, field.TypeInt, value)
+	}
+	if hu.mutation.DownloadClientIDCleared() {
+		_spec.ClearField(history.FieldDownloadClientID, field.TypeInt)
 	}
 	if value, ok := hu.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
@@ -394,6 +430,33 @@ func (huo *HistoryUpdateOne) SetNillableSize(i *int) *HistoryUpdateOne {
 // AddSize adds i to the "size" field.
 func (huo *HistoryUpdateOne) AddSize(i int) *HistoryUpdateOne {
 	huo.mutation.AddSize(i)
+	return huo
+}
+
+// SetDownloadClientID sets the "download_client_id" field.
+func (huo *HistoryUpdateOne) SetDownloadClientID(i int) *HistoryUpdateOne {
+	huo.mutation.ResetDownloadClientID()
+	huo.mutation.SetDownloadClientID(i)
+	return huo
+}
+
+// SetNillableDownloadClientID sets the "download_client_id" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableDownloadClientID(i *int) *HistoryUpdateOne {
+	if i != nil {
+		huo.SetDownloadClientID(*i)
+	}
+	return huo
+}
+
+// AddDownloadClientID adds i to the "download_client_id" field.
+func (huo *HistoryUpdateOne) AddDownloadClientID(i int) *HistoryUpdateOne {
+	huo.mutation.AddDownloadClientID(i)
+	return huo
+}
+
+// ClearDownloadClientID clears the value of the "download_client_id" field.
+func (huo *HistoryUpdateOne) ClearDownloadClientID() *HistoryUpdateOne {
+	huo.mutation.ClearDownloadClientID()
 	return huo
 }
 
@@ -544,6 +607,15 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if value, ok := huo.mutation.AddedSize(); ok {
 		_spec.AddField(history.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := huo.mutation.DownloadClientID(); ok {
+		_spec.SetField(history.FieldDownloadClientID, field.TypeInt, value)
+	}
+	if value, ok := huo.mutation.AddedDownloadClientID(); ok {
+		_spec.AddField(history.FieldDownloadClientID, field.TypeInt, value)
+	}
+	if huo.mutation.DownloadClientIDCleared() {
+		_spec.ClearField(history.FieldDownloadClientID, field.TypeInt)
 	}
 	if value, ok := huo.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)

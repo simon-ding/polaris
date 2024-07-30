@@ -552,3 +552,7 @@ func (c *Client) GetMovieDummyEpisode(movieId int) (*ent.Episode, error) {
 	}
 	return ep, nil
 }
+
+func (c *Client) GetDownloadClient(id int) (*ent.DownloadClients, error) {
+	return c.ent.DownloadClients.Query().Where(downloadclients.ID(id)).First(context.Background())
+}

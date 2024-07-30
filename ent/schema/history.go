@@ -19,6 +19,7 @@ func (History) Fields() []ent.Field {
 		field.Time("date"),
 		field.String("target_dir"),
 		field.Int("size").Default(0),
+		field.Int("download_client_id").Optional(),
 		field.Enum("status").Values("running", "success", "fail", "uploading"),
 		field.String("saved").Optional(),
 	}

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,7 +55,9 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
             "url": client.url,
             "user": client.user,
             "password": client.password,
-            "impl": "transmission"
+            "impl": "transmission",
+            "remove_completed_downloads": client.removeCompletedDownloads,
+            "remove_failed_downloads": client.removeFailedDownloads,
           },
           child: Column(
             children: [
@@ -82,6 +86,12 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: FormBuilderValidators.required(),
               ),
+              FormBuilderSwitch(
+                  name: "remove_completed_downloads",
+                  title: const Text("任务完成后删除")),
+              FormBuilderSwitch(
+                  name: "remove_failed_downloads",
+                  title: const Text("任务失败后删除")),
               StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                 return Column(
@@ -137,7 +147,9 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                 implementation: values["impl"],
                 url: values["url"],
                 user: _enableAuth ? values["user"] : null,
-                password: _enableAuth ? values["password"] : null));
+                password: _enableAuth ? values["password"] : null,
+                removeCompletedDownloads: values["remove_completed_downloads"],
+                removeFailedDownloads: values["remove_failed_downloads"]));
       } else {
         throw "validation_error";
       }

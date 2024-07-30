@@ -25,6 +25,8 @@ const (
 	FieldTargetDir = "target_dir"
 	// FieldSize holds the string denoting the size field in the database.
 	FieldSize = "size"
+	// FieldDownloadClientID holds the string denoting the download_client_id field in the database.
+	FieldDownloadClientID = "download_client_id"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldSaved holds the string denoting the saved field in the database.
@@ -42,6 +44,7 @@ var Columns = []string{
 	FieldDate,
 	FieldTargetDir,
 	FieldSize,
+	FieldDownloadClientID,
 	FieldStatus,
 	FieldSaved,
 }
@@ -122,6 +125,11 @@ func ByTargetDir(opts ...sql.OrderTermOption) OrderOption {
 // BySize orders the results by the size field.
 func BySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSize, opts...).ToFunc()
+}
+
+// ByDownloadClientID orders the results by the download_client_id field.
+func ByDownloadClientID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDownloadClientID, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

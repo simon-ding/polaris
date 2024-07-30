@@ -1705,24 +1705,26 @@ func (m *EpisodeMutation) ResetEdge(name string) error {
 // HistoryMutation represents an operation that mutates the History nodes in the graph.
 type HistoryMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	media_id      *int
-	addmedia_id   *int
-	episode_id    *int
-	addepisode_id *int
-	source_title  *string
-	date          *time.Time
-	target_dir    *string
-	size          *int
-	addsize       *int
-	status        *history.Status
-	saved         *string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*History, error)
-	predicates    []predicate.History
+	op                    Op
+	typ                   string
+	id                    *int
+	media_id              *int
+	addmedia_id           *int
+	episode_id            *int
+	addepisode_id         *int
+	source_title          *string
+	date                  *time.Time
+	target_dir            *string
+	size                  *int
+	addsize               *int
+	download_client_id    *int
+	adddownload_client_id *int
+	status                *history.Status
+	saved                 *string
+	clearedFields         map[string]struct{}
+	done                  bool
+	oldValue              func(context.Context) (*History, error)
+	predicates            []predicate.History
 }
 
 var _ ent.Mutation = (*HistoryMutation)(nil)
@@ -2113,6 +2115,76 @@ func (m *HistoryMutation) ResetSize() {
 	m.addsize = nil
 }
 
+// SetDownloadClientID sets the "download_client_id" field.
+func (m *HistoryMutation) SetDownloadClientID(i int) {
+	m.download_client_id = &i
+	m.adddownload_client_id = nil
+}
+
+// DownloadClientID returns the value of the "download_client_id" field in the mutation.
+func (m *HistoryMutation) DownloadClientID() (r int, exists bool) {
+	v := m.download_client_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDownloadClientID returns the old "download_client_id" field's value of the History entity.
+// If the History object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *HistoryMutation) OldDownloadClientID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDownloadClientID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDownloadClientID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDownloadClientID: %w", err)
+	}
+	return oldValue.DownloadClientID, nil
+}
+
+// AddDownloadClientID adds i to the "download_client_id" field.
+func (m *HistoryMutation) AddDownloadClientID(i int) {
+	if m.adddownload_client_id != nil {
+		*m.adddownload_client_id += i
+	} else {
+		m.adddownload_client_id = &i
+	}
+}
+
+// AddedDownloadClientID returns the value that was added to the "download_client_id" field in this mutation.
+func (m *HistoryMutation) AddedDownloadClientID() (r int, exists bool) {
+	v := m.adddownload_client_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearDownloadClientID clears the value of the "download_client_id" field.
+func (m *HistoryMutation) ClearDownloadClientID() {
+	m.download_client_id = nil
+	m.adddownload_client_id = nil
+	m.clearedFields[history.FieldDownloadClientID] = struct{}{}
+}
+
+// DownloadClientIDCleared returns if the "download_client_id" field was cleared in this mutation.
+func (m *HistoryMutation) DownloadClientIDCleared() bool {
+	_, ok := m.clearedFields[history.FieldDownloadClientID]
+	return ok
+}
+
+// ResetDownloadClientID resets all changes to the "download_client_id" field.
+func (m *HistoryMutation) ResetDownloadClientID() {
+	m.download_client_id = nil
+	m.adddownload_client_id = nil
+	delete(m.clearedFields, history.FieldDownloadClientID)
+}
+
 // SetStatus sets the "status" field.
 func (m *HistoryMutation) SetStatus(h history.Status) {
 	m.status = &h
@@ -2232,7 +2304,7 @@ func (m *HistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.media_id != nil {
 		fields = append(fields, history.FieldMediaID)
 	}
@@ -2250,6 +2322,9 @@ func (m *HistoryMutation) Fields() []string {
 	}
 	if m.size != nil {
 		fields = append(fields, history.FieldSize)
+	}
+	if m.download_client_id != nil {
+		fields = append(fields, history.FieldDownloadClientID)
 	}
 	if m.status != nil {
 		fields = append(fields, history.FieldStatus)
@@ -2277,6 +2352,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.TargetDir()
 	case history.FieldSize:
 		return m.Size()
+	case history.FieldDownloadClientID:
+		return m.DownloadClientID()
 	case history.FieldStatus:
 		return m.Status()
 	case history.FieldSaved:
@@ -2302,6 +2379,8 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldTargetDir(ctx)
 	case history.FieldSize:
 		return m.OldSize(ctx)
+	case history.FieldDownloadClientID:
+		return m.OldDownloadClientID(ctx)
 	case history.FieldStatus:
 		return m.OldStatus(ctx)
 	case history.FieldSaved:
@@ -2357,6 +2436,13 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSize(v)
 		return nil
+	case history.FieldDownloadClientID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDownloadClientID(v)
+		return nil
 	case history.FieldStatus:
 		v, ok := value.(history.Status)
 		if !ok {
@@ -2388,6 +2474,9 @@ func (m *HistoryMutation) AddedFields() []string {
 	if m.addsize != nil {
 		fields = append(fields, history.FieldSize)
 	}
+	if m.adddownload_client_id != nil {
+		fields = append(fields, history.FieldDownloadClientID)
+	}
 	return fields
 }
 
@@ -2402,6 +2491,8 @@ func (m *HistoryMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedEpisodeID()
 	case history.FieldSize:
 		return m.AddedSize()
+	case history.FieldDownloadClientID:
+		return m.AddedDownloadClientID()
 	}
 	return nil, false
 }
@@ -2432,6 +2523,13 @@ func (m *HistoryMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddSize(v)
 		return nil
+	case history.FieldDownloadClientID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDownloadClientID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown History numeric field %s", name)
 }
@@ -2442,6 +2540,9 @@ func (m *HistoryMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(history.FieldEpisodeID) {
 		fields = append(fields, history.FieldEpisodeID)
+	}
+	if m.FieldCleared(history.FieldDownloadClientID) {
+		fields = append(fields, history.FieldDownloadClientID)
 	}
 	if m.FieldCleared(history.FieldSaved) {
 		fields = append(fields, history.FieldSaved)
@@ -2462,6 +2563,9 @@ func (m *HistoryMutation) ClearField(name string) error {
 	switch name {
 	case history.FieldEpisodeID:
 		m.ClearEpisodeID()
+		return nil
+	case history.FieldDownloadClientID:
+		m.ClearDownloadClientID()
 		return nil
 	case history.FieldSaved:
 		m.ClearSaved()
@@ -2491,6 +2595,9 @@ func (m *HistoryMutation) ResetField(name string) error {
 		return nil
 	case history.FieldSize:
 		m.ResetSize()
+		return nil
+	case history.FieldDownloadClientID:
+		m.ResetDownloadClientID()
 		return nil
 	case history.FieldStatus:
 		m.ResetStatus()
