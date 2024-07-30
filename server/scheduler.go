@@ -39,6 +39,7 @@ func (s *Server) checkTasks() {
 	for id, t := range s.tasks {
 		if !t.Exists() {
 			log.Infof("task no longer exists: %v", id)
+			delete(s.tasks, id)
 			continue
 		}
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
