@@ -60,7 +60,7 @@ type addWatchlistIn struct {
 	TmdbID                  int    `json:"tmdb_id" binding:"required"`
 	StorageID               int    `json:"storage_id" `
 	Resolution              string `json:"resolution" binding:"required"`
-	Folder                  string `json:"folder"`
+	Folder                  string `json:"folder" binding:"required"`
 	DownloadHistoryEpisodes bool   `json:"download_history_episodes"` //for tv
 }
 
@@ -187,7 +187,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		AirDate:      detail.ReleaseDate,
 		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
-		TargetDir:    "./",
+		TargetDir:    in.Folder,
 	}, []int{epid})
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")

@@ -26,10 +26,20 @@ type LocalStorage struct {
 	dir string
 }
 
-func (l *LocalStorage) Move(src, dest string) error {
-	targetDir := filepath.Join(l.dir, dest)
-	os.MkdirAll(filepath.Dir(targetDir), os.ModePerm)
-	err := filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
+func (l *LocalStorage) Move(src, destDir string) error {
+	os.MkdirAll(filepath.Join(l.dir, destDir), os.ModePerm)
+
+	targetBase := filepath.Join(l.dir, destDir, filepath.Base(src)) //文件的场景，要加上文件名, move filename ./dir/
+	info, err := os.Stat(src)
+	if err != nil {
+		return errors.Wrap(err, "read source dir")
+	}
+	if info.IsDir() { //如果是路径，则只移动路径里面的文件，不管当前路径, 行为类似 move dirname/* target_dir/
+		targetBase = filepath.Join(l.dir, destDir)
+	}
+	
+	
+	err = filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -37,7 +47,7 @@ func (l *LocalStorage) Move(src, dest string) error {
 		if err != nil {
 			return errors.Wrapf(err, "relation between %s and %s", src, path)
 		}
-		destName := filepath.Join(targetDir, rel)
+		destName := filepath.Join(targetBase, rel)
 
 		if info.IsDir() {
 			os.Mkdir(destName, os.ModePerm)

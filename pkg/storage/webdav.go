@@ -30,13 +30,20 @@ func NewWebdavStorage(url, user, password, path string, changeMediaHash bool) (*
 	}, nil
 }
 
-func (w *WebdavStorage) Move(local, remote string) error {
+func (w *WebdavStorage) Move(local, remoteDir string) error {
 
-	remoteBase := filepath.Join(w.dir,remote)
+	remoteBase := filepath.Join(w.dir,remoteDir, filepath.Base(local))
+	info, err := os.Stat(local)
+	if err != nil {
+		return errors.Wrap(err, "read source dir")
+	}
+	if info.IsDir() { //如果是路径，则只移动路径里面的文件，不管当前路径, 行为类似 move dirname/* target_dir/
+		remoteBase = filepath.Join(w.dir, remoteDir)
+	}
 
 	//log.Infof("remove all content in %s", remoteBase)
 	//w.fs.RemoveAll(remoteBase)
-	err := filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return errors.Wrapf(err, "read file %v", path)
 		}

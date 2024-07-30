@@ -128,18 +128,10 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 		stImpl = storageImpl
 
 	}
-	if r.EpisodeID == 0 {
-		//season package download
-		if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
-			return errors.Wrap(err, "move file")
 
-		}
-
-	} else {
-		if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), filepath.Join(r.TargetDir, torrent.Name())); err != nil {
-			return errors.Wrap(err, "move file")
-
-		}
+	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
+	if err := stImpl.Move(filepath.Join(s.db.GetDownloadDir(), torrent.Name()), r.TargetDir); err != nil {
+		return errors.Wrap(err, "move file")
 	}
 
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrent.Name(), r.TargetDir)

@@ -30,13 +30,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     List<Widget> res = searchList.when(
         data: (data) {
           if (data.isEmpty) {
-            return [Container(
-                height: MediaQuery.of(context).size.height * 0.6,
-                alignment: Alignment.center,
-                child: const Text(
-                  "啥都没有...",
-                  style: TextStyle(fontSize: 16),
-                ))];
+            return [
+              Container(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  alignment: Alignment.center,
+                  child: const Text(
+                    "啥都没有...",
+                    style: TextStyle(fontSize: 16),
+                  ))
+            ];
           }
           var cards = List<Widget>.empty(growable: true);
           for (final item in data) {
@@ -202,44 +204,39 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                       });
                                     },
                                   ),
-                                  item.mediaType == "tv"
-                                      ? name.when(
-                                          data: (s) {
-                                            return storageSelected == 0
-                                                ? const Text("")
-                                                : () {
-                                                    final storage = v
-                                                        .where((e) =>
-                                                            e.id ==
-                                                            storageSelected)
-                                                        .first;
-                                                    final path = storage
-                                                        .settings!["tv_path"];
+                                  name.when(
+                                    data: (s) {
+                                      return storageSelected == 0
+                                          ? const Text("")
+                                          : () {
+                                              final storage = v
+                                                  .where((e) =>
+                                                      e.id == storageSelected)
+                                                  .first;
+                                              final path = item.mediaType ==
+                                                      "tv"
+                                                  ? storage.settings!["tv_path"]
+                                                  : storage
+                                                      .settings!["movie_path"];
 
-                                                    pathController.text = s;
-                                                    return SizedBox(
-                                                      //width: 300,
-                                                      child: TextField(
-                                                        controller:
-                                                            pathController,
-                                                        decoration:
-                                                            InputDecoration(
-                                                                labelText:
-                                                                    "存储路径",
-                                                                prefix:
-                                                                    Text(path)),
-                                                      ),
-                                                    );
-                                                  }();
-                                          },
-                                          error: (error, stackTrace) =>
-                                              Text("$error"),
-                                          loading: () =>
-                                              const MyProgressIndicator(
-                                            size: 20,
-                                          ),
-                                        )
-                                      : Text(""),
+                                              pathController.text = s;
+                                              return SizedBox(
+                                                //width: 300,
+                                                child: TextField(
+                                                  controller: pathController,
+                                                  decoration: InputDecoration(
+                                                      labelText: "存储路径",
+                                                      prefix: Text(path)),
+                                                ),
+                                              );
+                                            }();
+                                    },
+                                    error: (error, stackTrace) =>
+                                        Text("$error"),
+                                    loading: () => const MyProgressIndicator(
+                                      size: 20,
+                                    ),
+                                  ),
                                   item.mediaType == "tv"
                                       ? SizedBox(
                                           width: 250,
