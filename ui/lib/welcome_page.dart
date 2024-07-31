@@ -74,6 +74,7 @@ class WelcomePage extends ConsumerWidget {
                                       ),
                                       Text(
                                         item.name!,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(   
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
