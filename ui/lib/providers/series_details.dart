@@ -65,6 +65,7 @@ class SeriesDetails {
   String? mediaType;
   Storage? storage;
   String? targetDir;
+  bool? downloadHistoryEpisodes;
 
   SeriesDetails(
       {this.id,
@@ -80,7 +81,8 @@ class SeriesDetails {
       this.episodes,
       this.mediaType,
       this.targetDir,
-      this.storage});
+      this.storage,
+      this.downloadHistoryEpisodes});
 
   SeriesDetails.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -96,6 +98,7 @@ class SeriesDetails {
     mediaType = json["media_type"];
     storage = Storage.fromJson(json["storage"]);
     targetDir = json["target_dir"];
+    downloadHistoryEpisodes = json["download_history_episodes"]??false;
     if (json['episodes'] != null) {
       episodes = <Episodes>[];
       json['episodes'].forEach((v) {

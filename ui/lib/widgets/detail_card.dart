@@ -70,7 +70,16 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             ),
                             Text(
                                 "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
-                                "${widget.details.targetDir}")
+                                "${widget.details.targetDir}"),
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            widget.details.mediaType == 'tv'
+                                ? (widget.details.downloadHistoryEpisodes ==
+                                        true
+                                    ? const Text("下载往期剧集")
+                                    : const Text("只下载更新剧集"))
+                                : const Text("")
                           ],
                         ),
                         const Divider(thickness: 1, height: 1),
@@ -82,6 +91,8 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                         const Text(""),
                         Expanded(
                             child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 9,
                           widget.details.overview ?? "",
                         )),
                         Row(
