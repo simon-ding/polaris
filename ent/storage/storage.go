@@ -17,6 +17,10 @@ const (
 	FieldName = "name"
 	// FieldImplementation holds the string denoting the implementation field in the database.
 	FieldImplementation = "implementation"
+	// FieldTvPath holds the string denoting the tv_path field in the database.
+	FieldTvPath = "tv_path"
+	// FieldMoviePath holds the string denoting the movie_path field in the database.
+	FieldMoviePath = "movie_path"
 	// FieldSettings holds the string denoting the settings field in the database.
 	FieldSettings = "settings"
 	// FieldDeleted holds the string denoting the deleted field in the database.
@@ -32,6 +36,8 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldImplementation,
+	FieldTvPath,
+	FieldMoviePath,
 	FieldSettings,
 	FieldDeleted,
 	FieldDefault,
@@ -93,6 +99,16 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByImplementation orders the results by the implementation field.
 func ByImplementation(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldImplementation, opts...).ToFunc()
+}
+
+// ByTvPath orders the results by the tv_path field.
+func ByTvPath(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTvPath, opts...).ToFunc()
+}
+
+// ByMoviePath orders the results by the movie_path field.
+func ByMoviePath(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMoviePath, opts...).ToFunc()
 }
 
 // BySettings orders the results by the settings field.

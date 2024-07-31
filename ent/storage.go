@@ -20,6 +20,10 @@ type Storage struct {
 	Name string `json:"name,omitempty"`
 	// Implementation holds the value of the "implementation" field.
 	Implementation storage.Implementation `json:"implementation,omitempty"`
+	// TvPath holds the value of the "tv_path" field.
+	TvPath string `json:"tv_path,omitempty"`
+	// MoviePath holds the value of the "movie_path" field.
+	MoviePath string `json:"movie_path,omitempty"`
 	// Settings holds the value of the "settings" field.
 	Settings string `json:"settings,omitempty"`
 	// Deleted holds the value of the "deleted" field.
@@ -38,7 +42,7 @@ func (*Storage) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case storage.FieldID:
 			values[i] = new(sql.NullInt64)
-		case storage.FieldName, storage.FieldImplementation, storage.FieldSettings:
+		case storage.FieldName, storage.FieldImplementation, storage.FieldTvPath, storage.FieldMoviePath, storage.FieldSettings:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -72,6 +76,18 @@ func (s *Storage) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field implementation", values[i])
 			} else if value.Valid {
 				s.Implementation = storage.Implementation(value.String)
+			}
+		case storage.FieldTvPath:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field tv_path", values[i])
+			} else if value.Valid {
+				s.TvPath = value.String
+			}
+		case storage.FieldMoviePath:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field movie_path", values[i])
+			} else if value.Valid {
+				s.MoviePath = value.String
 			}
 		case storage.FieldSettings:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -132,6 +148,12 @@ func (s *Storage) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("implementation=")
 	builder.WriteString(fmt.Sprintf("%v", s.Implementation))
+	builder.WriteString(", ")
+	builder.WriteString("tv_path=")
+	builder.WriteString(s.TvPath)
+	builder.WriteString(", ")
+	builder.WriteString("movie_path=")
+	builder.WriteString(s.MoviePath)
 	builder.WriteString(", ")
 	builder.WriteString("settings=")
 	builder.WriteString(s.Settings)

@@ -84,11 +84,11 @@ func init() {
 	storageFields := schema.Storage{}.Fields()
 	_ = storageFields
 	// storageDescDeleted is the schema descriptor for deleted field.
-	storageDescDeleted := storageFields[3].Descriptor()
+	storageDescDeleted := storageFields[5].Descriptor()
 	// storage.DefaultDeleted holds the default value on creation for the deleted field.
 	storage.DefaultDeleted = storageDescDeleted.Default.(bool)
 	// storageDescDefault is the schema descriptor for default field.
-	storageDescDefault := storageFields[4].Descriptor()
+	storageDescDefault := storageFields[6].Descriptor()
 	// storage.DefaultDefault holds the default value on creation for the default field.
 	storage.DefaultDefault = storageDescDefault.Default.(bool)
 }

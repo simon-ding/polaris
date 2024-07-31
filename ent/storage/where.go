@@ -58,6 +58,16 @@ func Name(v string) predicate.Storage {
 	return predicate.Storage(sql.FieldEQ(FieldName, v))
 }
 
+// TvPath applies equality check predicate on the "tv_path" field. It's identical to TvPathEQ.
+func TvPath(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldTvPath, v))
+}
+
+// MoviePath applies equality check predicate on the "movie_path" field. It's identical to MoviePathEQ.
+func MoviePath(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldMoviePath, v))
+}
+
 // Settings applies equality check predicate on the "settings" field. It's identical to SettingsEQ.
 func Settings(v string) predicate.Storage {
 	return predicate.Storage(sql.FieldEQ(FieldSettings, v))
@@ -156,6 +166,156 @@ func ImplementationIn(vs ...Implementation) predicate.Storage {
 // ImplementationNotIn applies the NotIn predicate on the "implementation" field.
 func ImplementationNotIn(vs ...Implementation) predicate.Storage {
 	return predicate.Storage(sql.FieldNotIn(FieldImplementation, vs...))
+}
+
+// TvPathEQ applies the EQ predicate on the "tv_path" field.
+func TvPathEQ(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldTvPath, v))
+}
+
+// TvPathNEQ applies the NEQ predicate on the "tv_path" field.
+func TvPathNEQ(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldNEQ(FieldTvPath, v))
+}
+
+// TvPathIn applies the In predicate on the "tv_path" field.
+func TvPathIn(vs ...string) predicate.Storage {
+	return predicate.Storage(sql.FieldIn(FieldTvPath, vs...))
+}
+
+// TvPathNotIn applies the NotIn predicate on the "tv_path" field.
+func TvPathNotIn(vs ...string) predicate.Storage {
+	return predicate.Storage(sql.FieldNotIn(FieldTvPath, vs...))
+}
+
+// TvPathGT applies the GT predicate on the "tv_path" field.
+func TvPathGT(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldGT(FieldTvPath, v))
+}
+
+// TvPathGTE applies the GTE predicate on the "tv_path" field.
+func TvPathGTE(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldGTE(FieldTvPath, v))
+}
+
+// TvPathLT applies the LT predicate on the "tv_path" field.
+func TvPathLT(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldLT(FieldTvPath, v))
+}
+
+// TvPathLTE applies the LTE predicate on the "tv_path" field.
+func TvPathLTE(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldLTE(FieldTvPath, v))
+}
+
+// TvPathContains applies the Contains predicate on the "tv_path" field.
+func TvPathContains(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldContains(FieldTvPath, v))
+}
+
+// TvPathHasPrefix applies the HasPrefix predicate on the "tv_path" field.
+func TvPathHasPrefix(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldHasPrefix(FieldTvPath, v))
+}
+
+// TvPathHasSuffix applies the HasSuffix predicate on the "tv_path" field.
+func TvPathHasSuffix(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldHasSuffix(FieldTvPath, v))
+}
+
+// TvPathIsNil applies the IsNil predicate on the "tv_path" field.
+func TvPathIsNil() predicate.Storage {
+	return predicate.Storage(sql.FieldIsNull(FieldTvPath))
+}
+
+// TvPathNotNil applies the NotNil predicate on the "tv_path" field.
+func TvPathNotNil() predicate.Storage {
+	return predicate.Storage(sql.FieldNotNull(FieldTvPath))
+}
+
+// TvPathEqualFold applies the EqualFold predicate on the "tv_path" field.
+func TvPathEqualFold(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEqualFold(FieldTvPath, v))
+}
+
+// TvPathContainsFold applies the ContainsFold predicate on the "tv_path" field.
+func TvPathContainsFold(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldContainsFold(FieldTvPath, v))
+}
+
+// MoviePathEQ applies the EQ predicate on the "movie_path" field.
+func MoviePathEQ(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldMoviePath, v))
+}
+
+// MoviePathNEQ applies the NEQ predicate on the "movie_path" field.
+func MoviePathNEQ(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldNEQ(FieldMoviePath, v))
+}
+
+// MoviePathIn applies the In predicate on the "movie_path" field.
+func MoviePathIn(vs ...string) predicate.Storage {
+	return predicate.Storage(sql.FieldIn(FieldMoviePath, vs...))
+}
+
+// MoviePathNotIn applies the NotIn predicate on the "movie_path" field.
+func MoviePathNotIn(vs ...string) predicate.Storage {
+	return predicate.Storage(sql.FieldNotIn(FieldMoviePath, vs...))
+}
+
+// MoviePathGT applies the GT predicate on the "movie_path" field.
+func MoviePathGT(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldGT(FieldMoviePath, v))
+}
+
+// MoviePathGTE applies the GTE predicate on the "movie_path" field.
+func MoviePathGTE(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldGTE(FieldMoviePath, v))
+}
+
+// MoviePathLT applies the LT predicate on the "movie_path" field.
+func MoviePathLT(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldLT(FieldMoviePath, v))
+}
+
+// MoviePathLTE applies the LTE predicate on the "movie_path" field.
+func MoviePathLTE(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldLTE(FieldMoviePath, v))
+}
+
+// MoviePathContains applies the Contains predicate on the "movie_path" field.
+func MoviePathContains(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldContains(FieldMoviePath, v))
+}
+
+// MoviePathHasPrefix applies the HasPrefix predicate on the "movie_path" field.
+func MoviePathHasPrefix(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldHasPrefix(FieldMoviePath, v))
+}
+
+// MoviePathHasSuffix applies the HasSuffix predicate on the "movie_path" field.
+func MoviePathHasSuffix(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldHasSuffix(FieldMoviePath, v))
+}
+
+// MoviePathIsNil applies the IsNil predicate on the "movie_path" field.
+func MoviePathIsNil() predicate.Storage {
+	return predicate.Storage(sql.FieldIsNull(FieldMoviePath))
+}
+
+// MoviePathNotNil applies the NotNil predicate on the "movie_path" field.
+func MoviePathNotNil() predicate.Storage {
+	return predicate.Storage(sql.FieldNotNull(FieldMoviePath))
+}
+
+// MoviePathEqualFold applies the EqualFold predicate on the "movie_path" field.
+func MoviePathEqualFold(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldEqualFold(FieldMoviePath, v))
+}
+
+// MoviePathContainsFold applies the ContainsFold predicate on the "movie_path" field.
+func MoviePathContainsFold(v string) predicate.Storage {
+	return predicate.Storage(sql.FieldContainsFold(FieldMoviePath, v))
 }
 
 // SettingsEQ applies the EQ predicate on the "settings" field.

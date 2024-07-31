@@ -55,6 +55,46 @@ func (su *StorageUpdate) SetNillableImplementation(s *storage.Implementation) *S
 	return su
 }
 
+// SetTvPath sets the "tv_path" field.
+func (su *StorageUpdate) SetTvPath(s string) *StorageUpdate {
+	su.mutation.SetTvPath(s)
+	return su
+}
+
+// SetNillableTvPath sets the "tv_path" field if the given value is not nil.
+func (su *StorageUpdate) SetNillableTvPath(s *string) *StorageUpdate {
+	if s != nil {
+		su.SetTvPath(*s)
+	}
+	return su
+}
+
+// ClearTvPath clears the value of the "tv_path" field.
+func (su *StorageUpdate) ClearTvPath() *StorageUpdate {
+	su.mutation.ClearTvPath()
+	return su
+}
+
+// SetMoviePath sets the "movie_path" field.
+func (su *StorageUpdate) SetMoviePath(s string) *StorageUpdate {
+	su.mutation.SetMoviePath(s)
+	return su
+}
+
+// SetNillableMoviePath sets the "movie_path" field if the given value is not nil.
+func (su *StorageUpdate) SetNillableMoviePath(s *string) *StorageUpdate {
+	if s != nil {
+		su.SetMoviePath(*s)
+	}
+	return su
+}
+
+// ClearMoviePath clears the value of the "movie_path" field.
+func (su *StorageUpdate) ClearMoviePath() *StorageUpdate {
+	su.mutation.ClearMoviePath()
+	return su
+}
+
 // SetSettings sets the "settings" field.
 func (su *StorageUpdate) SetSettings(s string) *StorageUpdate {
 	su.mutation.SetSettings(s)
@@ -163,6 +203,18 @@ func (su *StorageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Implementation(); ok {
 		_spec.SetField(storage.FieldImplementation, field.TypeEnum, value)
 	}
+	if value, ok := su.mutation.TvPath(); ok {
+		_spec.SetField(storage.FieldTvPath, field.TypeString, value)
+	}
+	if su.mutation.TvPathCleared() {
+		_spec.ClearField(storage.FieldTvPath, field.TypeString)
+	}
+	if value, ok := su.mutation.MoviePath(); ok {
+		_spec.SetField(storage.FieldMoviePath, field.TypeString, value)
+	}
+	if su.mutation.MoviePathCleared() {
+		_spec.ClearField(storage.FieldMoviePath, field.TypeString)
+	}
 	if value, ok := su.mutation.Settings(); ok {
 		_spec.SetField(storage.FieldSettings, field.TypeString, value)
 	}
@@ -220,6 +272,46 @@ func (suo *StorageUpdateOne) SetNillableImplementation(s *storage.Implementation
 	if s != nil {
 		suo.SetImplementation(*s)
 	}
+	return suo
+}
+
+// SetTvPath sets the "tv_path" field.
+func (suo *StorageUpdateOne) SetTvPath(s string) *StorageUpdateOne {
+	suo.mutation.SetTvPath(s)
+	return suo
+}
+
+// SetNillableTvPath sets the "tv_path" field if the given value is not nil.
+func (suo *StorageUpdateOne) SetNillableTvPath(s *string) *StorageUpdateOne {
+	if s != nil {
+		suo.SetTvPath(*s)
+	}
+	return suo
+}
+
+// ClearTvPath clears the value of the "tv_path" field.
+func (suo *StorageUpdateOne) ClearTvPath() *StorageUpdateOne {
+	suo.mutation.ClearTvPath()
+	return suo
+}
+
+// SetMoviePath sets the "movie_path" field.
+func (suo *StorageUpdateOne) SetMoviePath(s string) *StorageUpdateOne {
+	suo.mutation.SetMoviePath(s)
+	return suo
+}
+
+// SetNillableMoviePath sets the "movie_path" field if the given value is not nil.
+func (suo *StorageUpdateOne) SetNillableMoviePath(s *string) *StorageUpdateOne {
+	if s != nil {
+		suo.SetMoviePath(*s)
+	}
+	return suo
+}
+
+// ClearMoviePath clears the value of the "movie_path" field.
+func (suo *StorageUpdateOne) ClearMoviePath() *StorageUpdateOne {
+	suo.mutation.ClearMoviePath()
 	return suo
 }
 
@@ -360,6 +452,18 @@ func (suo *StorageUpdateOne) sqlSave(ctx context.Context) (_node *Storage, err e
 	}
 	if value, ok := suo.mutation.Implementation(); ok {
 		_spec.SetField(storage.FieldImplementation, field.TypeEnum, value)
+	}
+	if value, ok := suo.mutation.TvPath(); ok {
+		_spec.SetField(storage.FieldTvPath, field.TypeString, value)
+	}
+	if suo.mutation.TvPathCleared() {
+		_spec.ClearField(storage.FieldTvPath, field.TypeString)
+	}
+	if value, ok := suo.mutation.MoviePath(); ok {
+		_spec.SetField(storage.FieldMoviePath, field.TypeString, value)
+	}
+	if suo.mutation.MoviePathCleared() {
+		_spec.ClearField(storage.FieldMoviePath, field.TypeString)
 	}
 	if value, ok := suo.mutation.Settings(); ok {
 		_spec.SetField(storage.FieldSettings, field.TypeString, value)

@@ -54,13 +54,13 @@ func (s *Server) downloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum in
 	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
 
 	history, err := s.db.SaveHistoryRecord(ent.History{
-		MediaID:     seriesId,
-		EpisodeID:   0,
-		SourceTitle: r1.Name,
-		TargetDir:   dir,
-		Status:      history.StatusRunning,
-		Size:        r1.Size,
-		Saved:       torrent.Save(),
+		MediaID:          seriesId,
+		EpisodeID:        0,
+		SourceTitle:      r1.Name,
+		TargetDir:        dir,
+		Status:           history.StatusRunning,
+		Size:             r1.Size,
+		Saved:            torrent.Save(),
 		DownloadClientID: dlClient.ID,
 	})
 	if err != nil {
@@ -102,13 +102,13 @@ func (s *Server) downloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
 
 	history, err := s.db.SaveHistoryRecord(ent.History{
-		MediaID:     ep.MediaID,
-		EpisodeID:   ep.ID,
-		SourceTitle: r1.Name,
-		TargetDir:   dir,
-		Status:      history.StatusRunning,
-		Size:        r1.Size,
-		Saved:       torrent.Save(),
+		MediaID:          ep.MediaID,
+		EpisodeID:        ep.ID,
+		SourceTitle:      r1.Name,
+		TargetDir:        dir,
+		Status:           history.StatusRunning,
+		Size:             r1.Size,
+		Saved:            torrent.Save(),
 		DownloadClientID: dlc.ID,
 	})
 	if err != nil {
@@ -265,44 +265,46 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 		}
 		res := torznab.Result{Name: name, Link: in.Link, Size: in.Size}
 		return s.downloadEpisodeTorrent(res, in.MediaID, in.Season, in.Episode)
-	}
-	trc, dlc, err := s.getDownloadClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "connect transmission")
-	}
-
-	torrent, err := trc.Download(in.Link, s.db.GetDownloadDir())
-	if err != nil {
-		return nil, errors.Wrap(err, "downloading")
-	}
-	torrent.Start()
-	name := in.Name
-	if name == "" {
-		name = m.OriginalName
-	}
-	go func() {
-		ep, _ := s.db.GetMovieDummyEpisode(m.ID)
-		history, err := s.db.SaveHistoryRecord(ent.History{
-			MediaID:     m.ID,
-			EpisodeID:   ep.ID,
-			SourceTitle: name,
-			TargetDir:   m.TargetDir,
-			Status:      history.StatusRunning,
-			Size:        in.Size,
-			Saved:       torrent.Save(),
-			DownloadClientID: dlc.ID,
-		})
+	} else {
+		//movie
+		trc, dlc, err := s.getDownloadClient()
 		if err != nil {
-			log.Errorf("save history error: %v", err)
+			return nil, errors.Wrap(err, "connect transmission")
 		}
 
-		s.tasks[history.ID] = &Task{Torrent: torrent}
+		torrent, err := trc.Download(in.Link, s.db.GetDownloadDir())
+		if err != nil {
+			return nil, errors.Wrap(err, "downloading")
+		}
+		torrent.Start()
+		name := in.Name
+		if name == "" {
+			name = m.OriginalName
+		}
+		go func() {
+			ep, _ := s.db.GetMovieDummyEpisode(m.ID)
+			history, err := s.db.SaveHistoryRecord(ent.History{
+				MediaID:          m.ID,
+				EpisodeID:        ep.ID,
+				SourceTitle:      name,
+				TargetDir:        m.TargetDir,
+				Status:           history.StatusRunning,
+				Size:             in.Size,
+				Saved:            torrent.Save(),
+				DownloadClientID: dlc.ID,
+			})
+			if err != nil {
+				log.Errorf("save history error: %v", err)
+			}
 
-		s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
-	}()
+			s.tasks[history.ID] = &Task{Torrent: torrent}
 
-	s.sendMsg(fmt.Sprintf(message.BeginDownload, in.Name))
-	log.Infof("success add %s to download task", in.Name)
-	return in.Name, nil
+			s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+		}()
+
+		s.sendMsg(fmt.Sprintf(message.BeginDownload, in.Name))
+		log.Infof("success add %s to download task", in.Name)
+		return in.Name, nil
+	}
 
 }

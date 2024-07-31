@@ -5327,6 +5327,8 @@ type StorageMutation struct {
 	id             *int
 	name           *string
 	implementation *storage.Implementation
+	tv_path        *string
+	movie_path     *string
 	settings       *string
 	deleted        *bool
 	_default       *bool
@@ -5506,6 +5508,104 @@ func (m *StorageMutation) ResetImplementation() {
 	m.implementation = nil
 }
 
+// SetTvPath sets the "tv_path" field.
+func (m *StorageMutation) SetTvPath(s string) {
+	m.tv_path = &s
+}
+
+// TvPath returns the value of the "tv_path" field in the mutation.
+func (m *StorageMutation) TvPath() (r string, exists bool) {
+	v := m.tv_path
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTvPath returns the old "tv_path" field's value of the Storage entity.
+// If the Storage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StorageMutation) OldTvPath(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTvPath is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTvPath requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTvPath: %w", err)
+	}
+	return oldValue.TvPath, nil
+}
+
+// ClearTvPath clears the value of the "tv_path" field.
+func (m *StorageMutation) ClearTvPath() {
+	m.tv_path = nil
+	m.clearedFields[storage.FieldTvPath] = struct{}{}
+}
+
+// TvPathCleared returns if the "tv_path" field was cleared in this mutation.
+func (m *StorageMutation) TvPathCleared() bool {
+	_, ok := m.clearedFields[storage.FieldTvPath]
+	return ok
+}
+
+// ResetTvPath resets all changes to the "tv_path" field.
+func (m *StorageMutation) ResetTvPath() {
+	m.tv_path = nil
+	delete(m.clearedFields, storage.FieldTvPath)
+}
+
+// SetMoviePath sets the "movie_path" field.
+func (m *StorageMutation) SetMoviePath(s string) {
+	m.movie_path = &s
+}
+
+// MoviePath returns the value of the "movie_path" field in the mutation.
+func (m *StorageMutation) MoviePath() (r string, exists bool) {
+	v := m.movie_path
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMoviePath returns the old "movie_path" field's value of the Storage entity.
+// If the Storage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StorageMutation) OldMoviePath(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMoviePath is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMoviePath requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMoviePath: %w", err)
+	}
+	return oldValue.MoviePath, nil
+}
+
+// ClearMoviePath clears the value of the "movie_path" field.
+func (m *StorageMutation) ClearMoviePath() {
+	m.movie_path = nil
+	m.clearedFields[storage.FieldMoviePath] = struct{}{}
+}
+
+// MoviePathCleared returns if the "movie_path" field was cleared in this mutation.
+func (m *StorageMutation) MoviePathCleared() bool {
+	_, ok := m.clearedFields[storage.FieldMoviePath]
+	return ok
+}
+
+// ResetMoviePath resets all changes to the "movie_path" field.
+func (m *StorageMutation) ResetMoviePath() {
+	m.movie_path = nil
+	delete(m.clearedFields, storage.FieldMoviePath)
+}
+
 // SetSettings sets the "settings" field.
 func (m *StorageMutation) SetSettings(s string) {
 	m.settings = &s
@@ -5661,12 +5761,18 @@ func (m *StorageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StorageMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, storage.FieldName)
 	}
 	if m.implementation != nil {
 		fields = append(fields, storage.FieldImplementation)
+	}
+	if m.tv_path != nil {
+		fields = append(fields, storage.FieldTvPath)
+	}
+	if m.movie_path != nil {
+		fields = append(fields, storage.FieldMoviePath)
 	}
 	if m.settings != nil {
 		fields = append(fields, storage.FieldSettings)
@@ -5689,6 +5795,10 @@ func (m *StorageMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case storage.FieldImplementation:
 		return m.Implementation()
+	case storage.FieldTvPath:
+		return m.TvPath()
+	case storage.FieldMoviePath:
+		return m.MoviePath()
 	case storage.FieldSettings:
 		return m.Settings()
 	case storage.FieldDeleted:
@@ -5708,6 +5818,10 @@ func (m *StorageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case storage.FieldImplementation:
 		return m.OldImplementation(ctx)
+	case storage.FieldTvPath:
+		return m.OldTvPath(ctx)
+	case storage.FieldMoviePath:
+		return m.OldMoviePath(ctx)
 	case storage.FieldSettings:
 		return m.OldSettings(ctx)
 	case storage.FieldDeleted:
@@ -5736,6 +5850,20 @@ func (m *StorageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImplementation(v)
+		return nil
+	case storage.FieldTvPath:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTvPath(v)
+		return nil
+	case storage.FieldMoviePath:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMoviePath(v)
 		return nil
 	case storage.FieldSettings:
 		v, ok := value.(string)
@@ -5788,6 +5916,12 @@ func (m *StorageMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *StorageMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(storage.FieldTvPath) {
+		fields = append(fields, storage.FieldTvPath)
+	}
+	if m.FieldCleared(storage.FieldMoviePath) {
+		fields = append(fields, storage.FieldMoviePath)
+	}
 	if m.FieldCleared(storage.FieldSettings) {
 		fields = append(fields, storage.FieldSettings)
 	}
@@ -5805,6 +5939,12 @@ func (m *StorageMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *StorageMutation) ClearField(name string) error {
 	switch name {
+	case storage.FieldTvPath:
+		m.ClearTvPath()
+		return nil
+	case storage.FieldMoviePath:
+		m.ClearMoviePath()
+		return nil
 	case storage.FieldSettings:
 		m.ClearSettings()
 		return nil
@@ -5821,6 +5961,12 @@ func (m *StorageMutation) ResetField(name string) error {
 		return nil
 	case storage.FieldImplementation:
 		m.ResetImplementation()
+		return nil
+	case storage.FieldTvPath:
+		m.ResetTvPath()
+		return nil
+	case storage.FieldMoviePath:
+		m.ResetMoviePath()
 		return nil
 	case storage.FieldSettings:
 		m.ResetSettings()

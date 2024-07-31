@@ -283,6 +283,8 @@ class Storage {
     this.id,
     this.name,
     this.implementation,
+    this.tvPath,
+    this.moviePath,
     this.settings,
     this.isDefault,
   });
@@ -290,6 +292,8 @@ class Storage {
   final int? id;
   final String? name;
   final String? implementation;
+  final String? tvPath;
+  final String? moviePath;
   final Map<String, dynamic>? settings;
   final bool? isDefault;
 
@@ -298,6 +302,8 @@ class Storage {
         id: json1["id"],
         name: json1["name"],
         implementation: json1["implementation"],
+        tvPath: json1["tv_path"],
+        moviePath: json1["movie_path"],
         settings: json.decode(json1["settings"]),
         isDefault: json1["default"]);
   }
@@ -306,6 +312,8 @@ class Storage {
         "id": id,
         "name": name,
         "implementation": implementation,
+        "tv_path": tvPath,
+        "movie_path": moviePath,
         "settings": settings,
         "default": isDefault,
       };

@@ -112,16 +112,16 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		}
 	}
 	r, err := s.db.AddMediaWatchlist(&ent.Media{
-		TmdbID:       int(detail.ID),
-		MediaType:    media.MediaTypeTv,
-		NameCn:       nameCn,
-		NameEn:       nameEn,
-		OriginalName: detail.OriginalName,
-		Overview:     detail.Overview,
-		AirDate:      detail.FirstAirDate,
-		Resolution:   media.Resolution(in.Resolution),
-		StorageID:    in.StorageID,
-		TargetDir:    in.Folder,
+		TmdbID:                  int(detail.ID),
+		MediaType:               media.MediaTypeTv,
+		NameCn:                  nameCn,
+		NameEn:                  nameEn,
+		OriginalName:            detail.OriginalName,
+		Overview:                detail.Overview,
+		AirDate:                 detail.FirstAirDate,
+		Resolution:              media.Resolution(in.Resolution),
+		StorageID:               in.StorageID,
+		TargetDir:               in.Folder,
 		DownloadHistoryEpisodes: in.DownloadHistoryEpisodes,
 	}, epIds)
 	if err != nil {
@@ -304,6 +304,11 @@ func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
 	return res, nil
 }
 
+type MediaDetails struct {
+	*db.MediaDetails
+	Storage *ent.Storage `json:"storage"`
+}
+
 func (s *Server) GetMediaDetails(c *gin.Context) (interface{}, error) {
 	ids := c.Param("id")
 	id, err := strconv.Atoi(ids)
@@ -311,7 +316,8 @@ func (s *Server) GetMediaDetails(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "convert")
 	}
 	detail := s.db.GetMediaDetails(id)
-	return detail, nil
+	st := s.db.GetStorage(detail.StorageID)
+	return MediaDetails{MediaDetails: detail, Storage: &st.Storage}, nil
 }
 
 func (s *Server) GetAvailableResolutions(c *gin.Context) (interface{}, error) {

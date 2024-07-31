@@ -15,6 +15,8 @@ func (Storage) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").Unique(),
 		field.Enum("implementation").Values("webdav", "local"),
+		field.String("tv_path").Optional(),
+		field.String("movie_path").Optional(),
 		field.String("settings").Optional(),
 		field.Bool("deleted").Default(false),
 		field.Bool("default").Default(false),

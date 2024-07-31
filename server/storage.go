@@ -29,7 +29,7 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 	if in.Implementation == "webdav" {
 		//test webdav
 		wd := in.ToWebDavSetting()
-		st, err := storage.NewWebdavStorage(wd.URL, wd.User, wd.Password, wd.TvPath, false)
+		st, err := storage.NewWebdavStorage(wd.URL, wd.User, wd.Password, in.TvPath, false)
 		if err != nil {
 			return nil, errors.Wrap(err, "new webdav")
 		}
@@ -112,13 +112,14 @@ func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
 
 func (s *Server) getStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {
 	st := s.db.GetStorage(storageId)
+	targetPath := st.TvPath
+	if mediaType == media.MediaTypeMovie {
+		targetPath = st.MoviePath
+	}
+
 	switch st.Implementation {
 	case storage1.ImplementationLocal:
-		ls := st.ToLocalSetting()
-		targetPath := ls.TvPath
-		if mediaType == media.MediaTypeMovie {
-			targetPath = ls.MoviePath
-		}
+
 		storageImpl1, err := storage.NewLocalStorage(targetPath)
 		if err != nil {
 			return nil, errors.Wrap(err, "new local")
@@ -127,11 +128,6 @@ func (s *Server) getStorage(storageId int, mediaType media.MediaType) (storage.S
 
 	case storage1.ImplementationWebdav:
 		ws := st.ToWebDavSetting()
-		targetPath := ws.TvPath
-		if mediaType == media.MediaTypeMovie {
-			targetPath = ws.MoviePath
-		}
-
 		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
 		if err != nil {
 			return nil, errors.Wrap(err, "new webdav")

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/activity.dart';
 import 'package:ui/providers/series_details.dart';
-import 'package:ui/providers/settings.dart';
-import 'package:ui/welcome_page.dart';
+import 'package:ui/widgets/detail_card.dart';
 import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:ui/widgets/widgets.dart';
@@ -31,104 +28,12 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
   @override
   Widget build(BuildContext context) {
     var seriesDetails = ref.watch(mediaDetailsProvider(widget.id));
-    var storage = ref.watch(storageSettingProvider);
 
     return seriesDetails.when(
         data: (details) {
           return ListView(
             children: [
-              Card(
-                margin: const EdgeInsets.all(4),
-                clipBehavior: Clip.hardEdge,
-                child: Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            opacity: 0.3,
-                            colorFilter: ColorFilter.mode(
-                                Colors.black.withOpacity(0.3),
-                                BlendMode.dstATop),
-                            image: NetworkImage(
-                              "${APIs.imagesUrl}/${details.id}/backdrop.jpg",
-                            ))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        children: <Widget>[
-                          Flexible(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Image.network(
-                                "${APIs.imagesUrl}/${details.id}/poster.jpg",
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 6,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                    child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text("${details.resolution}"),
-                                        const SizedBox(
-                                          width: 30,
-                                        ),
-                                        storage.when(
-                                            data: (value) {
-                                              for (final s in value) {
-                                                if (s.id == details.storageId) {
-                                                  return Text(
-                                                      "${s.name}(${s.implementation})");
-                                                }
-                                              }
-                                              return const Text("未知存储");
-                                            },
-                                            error: (error, stackTrace) =>
-                                                Text("$error"),
-                                            loading: () =>
-                                                const MyProgressIndicator()),
-                                      ],
-                                    ),
-                                    const Divider(thickness: 1, height: 1),
-                                    Text(
-                                      "${details.name} (${details.airDate!.split("-")[0]})",
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    const Text(""),
-                                    Text(
-                                      details.overview??"",
-                                    ),
-                                  ],
-                                )),
-                                Column(
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {
-                                          var f = ref
-                                              .read(mediaDetailsProvider(
-                                                      widget.id)
-                                                  .notifier)
-                                              .delete().then((v) => context.go(WelcomePage.routeMoivie));
-                                          showLoadingWithFuture(f);
-                                        },
-                                        icon: const Icon(Icons.delete))
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
+              DetailCard(details: details),
               NestedTabBar(
                 id: widget.id,
               )
@@ -157,7 +62,7 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
   @override
   void initState() {
     super.initState();
-    _nestedTabController = new TabController(length: 2, vsync: this);
+    _nestedTabController = TabController(length: 2, vsync: this);
   }
 
   @override

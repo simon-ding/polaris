@@ -31,6 +31,34 @@ func (sc *StorageCreate) SetImplementation(s storage.Implementation) *StorageCre
 	return sc
 }
 
+// SetTvPath sets the "tv_path" field.
+func (sc *StorageCreate) SetTvPath(s string) *StorageCreate {
+	sc.mutation.SetTvPath(s)
+	return sc
+}
+
+// SetNillableTvPath sets the "tv_path" field if the given value is not nil.
+func (sc *StorageCreate) SetNillableTvPath(s *string) *StorageCreate {
+	if s != nil {
+		sc.SetTvPath(*s)
+	}
+	return sc
+}
+
+// SetMoviePath sets the "movie_path" field.
+func (sc *StorageCreate) SetMoviePath(s string) *StorageCreate {
+	sc.mutation.SetMoviePath(s)
+	return sc
+}
+
+// SetNillableMoviePath sets the "movie_path" field if the given value is not nil.
+func (sc *StorageCreate) SetNillableMoviePath(s *string) *StorageCreate {
+	if s != nil {
+		sc.SetMoviePath(*s)
+	}
+	return sc
+}
+
 // SetSettings sets the "settings" field.
 func (sc *StorageCreate) SetSettings(s string) *StorageCreate {
 	sc.mutation.SetSettings(s)
@@ -170,6 +198,14 @@ func (sc *StorageCreate) createSpec() (*Storage, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Implementation(); ok {
 		_spec.SetField(storage.FieldImplementation, field.TypeEnum, value)
 		_node.Implementation = value
+	}
+	if value, ok := sc.mutation.TvPath(); ok {
+		_spec.SetField(storage.FieldTvPath, field.TypeString, value)
+		_node.TvPath = value
+	}
+	if value, ok := sc.mutation.MoviePath(); ok {
+		_spec.SetField(storage.FieldMoviePath, field.TypeString, value)
+		_node.MoviePath = value
 	}
 	if value, ok := sc.mutation.Settings(); ok {
 		_spec.SetField(storage.FieldSettings, field.TypeString, value)

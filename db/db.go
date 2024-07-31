@@ -87,11 +87,9 @@ func (c *Client) generateDefaultLocalStorage() error {
 	return c.AddStorage(&StorageInfo{
 		Name:           "local",
 		Implementation: "local",
+		TvPath: "/data/tv/",
+		MoviePath: "/data/movies/",
 		Default:        true,
-		Settings: map[string]string{
-			"tv_path":    "/data/tv/",
-			"movie_path": "/data/movies/",
-		},
 	})
 }
 
@@ -170,7 +168,6 @@ func (c *Client) GetEpisode(seriesId, seasonNum, episodeNum int) (*ent.Episode, 
 func (c *Client) GetEpisodeByID(epID int) (*ent.Episode, error) {
 	return c.ent.Episode.Query().Where(episode.ID(epID)).First(context.TODO())
 }
-
 
 func (c *Client) UpdateEpiode(episodeId int, name, overview string) error {
 	return c.ent.Episode.Update().Where(episode.ID(episodeId)).SetTitle(name).SetOverview(overview).Exec(context.TODO())
@@ -339,7 +336,9 @@ type StorageInfo struct {
 	Name           string            `json:"name" binding:"required"`
 	Implementation string            `json:"implementation" binding:"required"`
 	Settings       map[string]string `json:"settings" binding:"required"`
-	Default        bool              `json:"default"`
+	TvPath         string            `json:"tv_path" binding:"required"`
+	MoviePath      string            `json:"movie_path" binding:"required"`
+	Default bool `json:"default"`
 }
 
 func (s *StorageInfo) ToWebDavSetting() WebdavSetting {
@@ -348,34 +347,29 @@ func (s *StorageInfo) ToWebDavSetting() WebdavSetting {
 	}
 	return WebdavSetting{
 		URL:            s.Settings["url"],
-		TvPath:         s.Settings["tv_path"],
-		MoviePath:      s.Settings["movie_path"],
 		User:           s.Settings["user"],
 		Password:       s.Settings["password"],
 		ChangeFileHash: s.Settings["change_file_hash"],
 	}
 }
 
-type LocalDirSetting struct {
-	TvPath    string `json:"tv_path"`
-	MoviePath string `json:"movie_path"`
-}
 
 type WebdavSetting struct {
 	URL            string `json:"url"`
-	TvPath         string `json:"tv_path"`
-	MoviePath      string `json:"movie_path"`
 	User           string `json:"user"`
 	Password       string `json:"password"`
 	ChangeFileHash string `json:"change_file_hash"`
 }
 
 func (c *Client) AddStorage(st *StorageInfo) error {
-	if !strings.HasSuffix(st.Settings["tv_path"], "/") {
-		st.Settings["tv_path"] += "/"
+	if !strings.HasSuffix(st.TvPath, "/") {
+		st.TvPath += "/"
 	}
-	if !strings.HasSuffix(st.Settings["movie_path"], "/") {
-		st.Settings["movie_path"] += "/"
+	if !strings.HasSuffix(st.MoviePath, "/") {
+		st.MoviePath += "/"
+	}
+	if st.Settings == nil {
+		st.Settings = map[string]string{}
 	}
 
 	data, err := json.Marshal(st.Settings)
@@ -387,7 +381,7 @@ func (c *Client) AddStorage(st *StorageInfo) error {
 	if count > 0 {
 		//storage already exist, edit exist one
 		return c.ent.Storage.Update().Where(storage.Name(st.Name)).
-			SetImplementation(storage.Implementation(st.Implementation)).
+			SetImplementation(storage.Implementation(st.Implementation)).SetTvPath(st.TvPath).SetMoviePath(st.MoviePath).
 			SetSettings(string(data)).Exec(context.TODO())
 	}
 	countAll := c.ent.Storage.Query().Where(storage.Deleted(false)).CountX(context.TODO())
@@ -396,7 +390,7 @@ func (c *Client) AddStorage(st *StorageInfo) error {
 		st.Default = true
 	}
 	_, err = c.ent.Storage.Create().SetName(st.Name).
-		SetImplementation(storage.Implementation(st.Implementation)).
+		SetImplementation(storage.Implementation(st.Implementation)).SetTvPath(st.TvPath).SetMoviePath(st.MoviePath).
 		SetSettings(string(data)).SetDefault(st.Default).Save(context.TODO())
 	if err != nil {
 		return err
@@ -417,15 +411,6 @@ type Storage struct {
 	ent.Storage
 }
 
-func (s *Storage) ToLocalSetting() LocalDirSetting {
-	if s.Implementation != storage.ImplementationLocal {
-		panic("not local storage")
-	}
-	var localSetting LocalDirSetting
-	json.Unmarshal([]byte(s.Settings), &localSetting)
-	return localSetting
-}
-
 func (s *Storage) ToWebDavSetting() WebdavSetting {
 	if s.Implementation != storage.ImplementationWebdav {
 		panic("not webdav storage")
@@ -433,12 +418,6 @@ func (s *Storage) ToWebDavSetting() WebdavSetting {
 	var webdavSetting WebdavSetting
 	json.Unmarshal([]byte(s.Settings), &webdavSetting)
 	return webdavSetting
-}
-
-func (s *Storage) GetPath() (tvPath string, moviePath string) {
-	var m map[string]string
-	json.Unmarshal([]byte(s.Settings), &m)
-	return m["tv_path"], m["movie_path"]
 }
 
 func (c *Client) GetStorage(id int) *Storage {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
+import 'package:ui/providers/settings.dart';
 
 var mediaDetailsProvider = AsyncNotifierProvider.autoDispose
     .family<SeriesDetailData, SeriesDetails, String>(SeriesDetailData.new);
@@ -61,6 +62,8 @@ class SeriesDetails {
   String? resolution;
   int? storageId;
   String? airDate;
+  String? mediaType;
+  Storage? storage;
 
   SeriesDetails(
       {this.id,
@@ -73,7 +76,9 @@ class SeriesDetails {
       this.resolution,
       this.storageId,
       this.airDate,
-      this.episodes});
+      this.episodes,
+      this.mediaType,
+      this.storage});
 
   SeriesDetails.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -86,6 +91,8 @@ class SeriesDetails {
     resolution = json["resolution"];
     storageId = json["storage_id"];
     airDate = json["air_date"];
+    mediaType = json["media_type"];
+    storage = Storage.fromJson(json["storage"]);
     if (json['episodes'] != null) {
       episodes = <Episodes>[];
       json['episodes'].forEach((v) {
@@ -146,14 +153,12 @@ var mediaTorrentsDataProvider = AsyncNotifierProvider.autoDispose
 //   }
 // }
 
-typedef TorrentQuery =({String mediaId, int seasonNumber, int episodeNumber});
+typedef TorrentQuery = ({String mediaId, int seasonNumber, int episodeNumber});
 
 class MediaTorrentResource extends AutoDisposeFamilyAsyncNotifier<
     List<TorrentResource>, TorrentQuery> {
-
   @override
   FutureOr<List<TorrentResource>> build(TorrentQuery arg) async {
-
     final dio = await APIs.getDio();
     var resp = await dio.post(APIs.availableTorrentsUrl, data: {
       "id": int.parse(arg.mediaId),

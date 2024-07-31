@@ -15,7 +15,7 @@ type Storage interface {
 	Move(src, dest string) error
 	Copy(src, dest string) error
 	ReadDir(dir string) ([]fs.FileInfo, error)
-	ReadFile(string)([]byte, error)
+	ReadFile(string) ([]byte, error)
 	WriteFile(string, []byte) error
 }
 
@@ -41,8 +41,7 @@ func (l *LocalStorage) Copy(src, destDir string) error {
 		targetBase = filepath.Join(l.dir, destDir)
 	}
 	log.Debugf("local storage target base dir is: %v", targetBase)
-	
-	
+
 	err = filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -57,7 +56,7 @@ func (l *LocalStorage) Copy(src, destDir string) error {
 			os.Mkdir(destName, os.ModePerm)
 		} else { //is file
 			if err := os.Link(path, destName); err != nil {
-				log.Warnf("hard file error, will try copy file, source: %s, dest: %s", path, destName)
+				log.Warnf("hard link file error: %v, will try copy file, source: %s, dest: %s", err, path, destName)
 				if writer, err := os.OpenFile(destName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm); err != nil {
 					return errors.Wrapf(err, "create file %s", destName)
 				} else {
@@ -72,7 +71,7 @@ func (l *LocalStorage) Copy(src, destDir string) error {
 						}
 					}
 				}
-	
+
 			}
 		}
 		log.Infof("file copy complete: %v", destName)
@@ -99,7 +98,6 @@ func (l *LocalStorage) ReadFile(name string) ([]byte, error) {
 	return os.ReadFile(filepath.Join(l.dir, name))
 }
 
-
-func (l *LocalStorage) WriteFile(name string, data []byte) error  {
+func (l *LocalStorage) WriteFile(name string, data []byte) error {
 	return os.WriteFile(filepath.Join(l.dir, name), data, os.ModePerm)
 }

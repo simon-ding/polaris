@@ -39,7 +39,7 @@ class _StorageState extends ConsumerState<StorageSettings> {
         loading: () => const MyProgressIndicator());
   }
 
-    Future<void> showStorageDetails(Storage s) {
+  Future<void> showStorageDetails(Storage s) {
     final _formKey = GlobalKey<FormBuilderState>();
 
     String selectImpl = s.implementation == null ? "local" : s.implementation!;
@@ -53,10 +53,9 @@ class _StorageState extends ConsumerState<StorageSettings> {
             "impl": s.implementation == null ? "local" : s.implementation!,
             "user": s.settings != null ? s.settings!["user"] ?? "" : "",
             "password": s.settings != null ? s.settings!["password"] ?? "" : "",
-            "tv_path": s.settings != null ? s.settings!["tv_path"] ?? "" : "",
+            "tv_path": s.tvPath,
             "url": s.settings != null ? s.settings!["url"] ?? "" : "",
-            "movie_path":
-                s.settings != null ? s.settings!["movie_path"] ?? "" : "",
+            "movie_path": s.moviePath,
             "change_file_hash": s.settings != null
                 ? s.settings!["change_file_hash"] == "true"
                     ? true
@@ -147,9 +146,9 @@ class _StorageState extends ConsumerState<StorageSettings> {
         return ref.read(storageSettingProvider.notifier).addStorage(Storage(
               name: values["name"],
               implementation: selectImpl,
+              tvPath: values["tv_path"],
+              moviePath: values["movie_path"],
               settings: {
-                "tv_path": values["tv_path"],
-                "movie_path": values["movie_path"],
                 "url": values["url"],
                 "user": values["user"],
                 "password": values["password"],
@@ -168,7 +167,7 @@ class _StorageState extends ConsumerState<StorageSettings> {
       return ref.read(storageSettingProvider.notifier).deleteStorage(s.id!);
     }
 
-    return showSettingDialog(context,'存储', s.id != null, widgets, onSubmit, onDelete);
+    return showSettingDialog(
+        context, '存储', s.id != null, widgets, onSubmit, onDelete);
   }
-
 }
