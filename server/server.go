@@ -91,7 +91,6 @@ func (s *Server) Serve() error {
 		tv.GET("/movie/watchlist", HttpHandler(s.GetMovieWatchlist))
 		tv.GET("/record/:id", HttpHandler(s.GetMediaDetails))
 		tv.DELETE("/record/:id", HttpHandler(s.DeleteFromWatchlist))
-		tv.GET("/resolutions", HttpHandler(s.GetAvailableResolutions))
 		tv.GET("/suggest/tv/:tmdb_id", HttpHandler(s.SuggestedSeriesFolderName))
 		tv.GET("/suggest/movie/:tmdb_id", HttpHandler(s.SuggestedMovieFolderName))
 	}

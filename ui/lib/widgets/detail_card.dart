@@ -25,7 +25,8 @@ class _DetailCardState extends ConsumerState<DetailCard> {
       margin: const EdgeInsets.all(4),
       clipBehavior: Clip.hardEdge,
       child: Container(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height*0.4),
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.4),
         decoration: BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
@@ -54,7 +55,6 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                     Expanded(
                         child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(""),
                         Row(
@@ -64,7 +64,13 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                               width: 30,
                             ),
                             Text(
-                                "${widget.details.storage!.name} (${widget.details.storage!.implementation})")
+                                "${widget.details.storage!.name} (${widget.details.storage!.implementation})"),
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            Text(
+                                "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
+                                "${widget.details.targetDir}")
                           ],
                         ),
                         const Divider(thickness: 1, height: 1),
@@ -96,16 +102,20 @@ class _DetailCardState extends ConsumerState<DetailCard> {
   }
 
   Widget deleteIcon() {
-    return IconButton(
-        onPressed: () {
-          var f = ref
-              .read(mediaDetailsProvider(widget.details.id.toString()).notifier)
-              .delete()
-              .then((v) => context.go(widget.details.mediaType == "tv"
-                  ? WelcomePage.routeTv
-                  : WelcomePage.routeMoivie));
-          showLoadingWithFuture(f);
-        },
-        icon: const Icon(Icons.delete));
+    return Tooltip(
+      message: widget.details.mediaType == "tv" ? "删除剧集" : "删除电影",
+      child: IconButton(
+          onPressed: () {
+            var f = ref
+                .read(
+                    mediaDetailsProvider(widget.details.id.toString()).notifier)
+                .delete()
+                .then((v) => context.go(widget.details.mediaType == "tv"
+                    ? WelcomePage.routeTv
+                    : WelcomePage.routeMoivie));
+            showLoadingWithFuture(f);
+          },
+          icon: const Icon(Icons.delete)),
+    );
   }
 }

@@ -33,16 +33,4 @@ const (
 
 type ResolutionType string
 
-const (
-	Any ResolutionType = "any" 
-	R720p ResolutionType = "720p"
-	R1080p ResolutionType = "1080p"
-	R4k ResolutionType = "4k"
-)
-
-func (r ResolutionType) String() string {
-	return string(r)
-}
-
-
 const JwtSerectKey = "jwt_secrect_key"

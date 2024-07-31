@@ -121,7 +121,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return ProviderScope(
       child: MaterialApp.router(
-        title: 'Polaris 影视追踪',
+        title: 'Polaris 影视追踪下载',
         theme: ThemeData(
           fontFamily: "NotoSansSC",
           colorScheme: ColorScheme.fromSeed(

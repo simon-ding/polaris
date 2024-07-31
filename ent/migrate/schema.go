@@ -100,7 +100,7 @@ var (
 		{Name: "overview", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "air_date", Type: field.TypeString, Default: ""},
-		{Name: "resolution", Type: field.TypeEnum, Enums: []string{"720p", "1080p", "4k"}, Default: "1080p"},
+		{Name: "resolution", Type: field.TypeEnum, Enums: []string{"720p", "1080p", "2160p"}, Default: "1080p"},
 		{Name: "storage_id", Type: field.TypeInt, Nullable: true},
 		{Name: "target_dir", Type: field.TypeString, Nullable: true},
 		{Name: "download_history_episodes", Type: field.TypeBool, Nullable: true, Default: false},

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
@@ -148,116 +149,122 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Future<void> _showSubmitDialog(BuildContext context, SearchResult item) {
+    final _formKey = GlobalKey<FormBuilderState>();
+
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
           return Consumer(
             builder: (context, ref, _) {
-              String resSelected = "1080p";
               int storageSelected = 0;
               var storage = ref.watch(storageSettingProvider);
               var name = ref.watch(suggestNameDataProvider(
                   (id: item.id!, mediaType: item.mediaType!)));
-              bool downloadHistoryEpisodes = false;
 
               var pathController = TextEditingController();
               return AlertDialog(
-                title: Text('添加剧集: ${item.name}'),
+                title: Text('添加: ${item.name}'),
                 content: SizedBox(
                   width: 500,
                   height: 200,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      DropdownMenu(
-                        width: 200,
-                        label: const Text("清晰度"),
-                        initialSelection: resSelected,
-                        dropdownMenuEntries: const [
-                          DropdownMenuEntry(value: "720p", label: "720p"),
-                          DropdownMenuEntry(value: "1080p", label: "1080p"),
-                          DropdownMenuEntry(value: "4k", label: "4k"),
-                        ],
-                        onSelected: (value) {
-                          setState(() {
-                            resSelected = value!;
-                          });
-                        },
-                      ),
-                      storage.when(
-                          data: (v) {
-                            return StatefulBuilder(
-                                builder: (context, setState) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  DropdownMenu(
-                                    width: 200,
-                                    label: const Text("存储位置"),
-                                    initialSelection: storageSelected,
-                                    dropdownMenuEntries: v
-                                        .map((s) => DropdownMenuEntry(
-                                            label: s.name!, value: s.id))
-                                        .toList(),
-                                    onSelected: (value) {
-                                      setState(() {
-                                        storageSelected = value!;
-                                      });
-                                    },
-                                  ),
-                                  name.when(
-                                    data: (s) {
-                                      return storageSelected == 0
-                                          ? const Text("")
-                                          : () {
-                                              final storage = v
-                                                  .where((e) =>
-                                                      e.id == storageSelected)
-                                                  .first;
-                                              final path = item.mediaType ==
-                                                      "tv"
-                                                  ? storage.settings!["tv_path"]
-                                                  : storage
-                                                      .settings!["movie_path"];
-
-                                              pathController.text = s;
-                                              return SizedBox(
-                                                //width: 300,
-                                                child: TextField(
-                                                  controller: pathController,
-                                                  decoration: InputDecoration(
-                                                      labelText: "存储路径",
-                                                      prefix: Text(path)),
-                                                ),
-                                              );
-                                            }();
-                                    },
-                                    error: (error, stackTrace) =>
-                                        Text("$error"),
-                                    loading: () => const MyProgressIndicator(
-                                      size: 20,
+                  child: FormBuilder(
+                    key: _formKey,
+                    initialValue: const {
+                      "resolution": "1080p",
+                      "storage": null,
+                      "folder": "",
+                      "history_episodes": false,
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FormBuilderDropdown(
+                          name: "resolution",
+                          decoration: const InputDecoration(labelText: "清晰度"),
+                          items: const [
+                            DropdownMenuItem(
+                                value: "720p", child: Text("720p")),
+                            DropdownMenuItem(
+                                value: "1080p", child: Text("1080p")),
+                            DropdownMenuItem(
+                                value: "2160p", child: Text("2160p")),
+                          ],
+                        ),
+                        storage.when(
+                            data: (v) {
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    FormBuilderDropdown(
+                                      onChanged: (v) {
+                                        setState(
+                                          () {
+                                            storageSelected = v!;
+                                          },
+                                        );
+                                      },
+                                      name: "storage",
+                                      decoration: const InputDecoration(
+                                          labelText: "存储位置"),
+                                      items: v
+                                          .map((s) => DropdownMenuItem(
+                                              value: s.id,
+                                              child: Text(s.name!)))
+                                          .toList(),
                                     ),
-                                  ),
-                                  item.mediaType == "tv"
-                                      ? SizedBox(
-                                          width: 250,
-                                          child: CheckboxListTile(
+                                    name.when(
+                                      data: (s) {
+                                        return storageSelected == 0
+                                            ? const Text("")
+                                            : () {
+                                                final storage = v
+                                                    .where((e) =>
+                                                        e.id == storageSelected)
+                                                    .first;
+                                                final path =
+                                                    item.mediaType == "tv"
+                                                        ? storage.tvPath
+                                                        : storage.moviePath;
+
+                                                pathController.text = s;
+                                                return SizedBox(
+                                                  //width: 300,
+                                                  child: FormBuilderTextField(
+                                                    name: "folder",
+                                                    controller: pathController,
+                                                    decoration: InputDecoration(
+                                                        labelText: "存储路径",
+                                                        prefix: Text(
+                                                            path ?? "unknown")),
+                                                  ),
+                                                );
+                                              }();
+                                      },
+                                      error: (error, stackTrace) =>
+                                          Text("$error"),
+                                      loading: () => const MyProgressIndicator(
+                                        size: 20,
+                                      ),
+                                    ),
+                                    item.mediaType == "tv"
+                                        ? SizedBox(
+                                            width: 250,
+                                            child: FormBuilderCheckbox(
+                                              name: "history_episodes",
                                               title: const Text("是否下载往期剧集"),
-                                              value: downloadHistoryEpisodes,
-                                              onChanged: (v) {
-                                                setState(() {
-                                                  downloadHistoryEpisodes = v!;
-                                                });
-                                              }),
-                                        )
-                                      : const SizedBox(),
-                                ],
-                              );
-                            });
-                          },
-                          error: (err, trace) => Text("$err"),
-                          loading: () => const MyProgressIndicator()),
-                    ],
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                  ],
+                                );
+                              });
+                            },
+                            error: (err, trace) => Text("$err"),
+                            loading: () => const MyProgressIndicator()),
+                      ],
+                    ),
                   ),
                 ),
                 actions: <Widget>[
@@ -276,21 +283,25 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     ),
                     child: const Text('确定'),
                     onPressed: () async {
-                      var f = ref
-                          .read(searchPageDataProvider(widget.query ?? "")
-                              .notifier)
-                          .submit2Watchlist(
-                              item.id!,
-                              storageSelected,
-                              resSelected,
-                              item.mediaType!,
-                              pathController.text,
-                              downloadHistoryEpisodes)
-                          .then((v) {
-                        Navigator.of(context).pop();
-                        showSnakeBar("添加成功：${item.name}");
-                      });
-                      showLoadingWithFuture(f);
+                      if (_formKey.currentState!.saveAndValidate()) {
+                        final values = _formKey.currentState!.value;
+                        //print(values);
+                        var f = ref
+                            .read(searchPageDataProvider(widget.query ?? "")
+                                .notifier)
+                            .submit2Watchlist(
+                                item.id!,
+                                values["storage"],
+                                values["resolution"],
+                                item.mediaType!,
+                                values["folder"],
+                                values["history_episodes"] ?? false)
+                            .then((v) {
+                          Navigator.of(context).pop();
+                          showSnakeBar("添加成功：${item.name}");
+                        });
+                        showLoadingWithFuture(f);
+                      }
                     },
                   ),
                 ],

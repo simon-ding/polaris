@@ -69,6 +69,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
+	log.Debugf("add tv watchlist input %+v", in)
 	if in.Folder == "" {
 		return nil, errors.New("folder should be provided")
 	}
@@ -318,14 +319,6 @@ func (s *Server) GetMediaDetails(c *gin.Context) (interface{}, error) {
 	detail := s.db.GetMediaDetails(id)
 	st := s.db.GetStorage(detail.StorageID)
 	return MediaDetails{MediaDetails: detail, Storage: &st.Storage}, nil
-}
-
-func (s *Server) GetAvailableResolutions(c *gin.Context) (interface{}, error) {
-	return []db.ResolutionType{
-		db.R720p,
-		db.R1080p,
-		db.R4k,
-	}, nil
 }
 
 func (s *Server) DeleteFromWatchlist(c *gin.Context) (interface{}, error) {

@@ -64,6 +64,7 @@ class SeriesDetails {
   String? airDate;
   String? mediaType;
   Storage? storage;
+  String? targetDir;
 
   SeriesDetails(
       {this.id,
@@ -78,6 +79,7 @@ class SeriesDetails {
       this.airDate,
       this.episodes,
       this.mediaType,
+      this.targetDir,
       this.storage});
 
   SeriesDetails.fromJson(Map<String, dynamic> json) {
@@ -93,6 +95,7 @@ class SeriesDetails {
     airDate = json["air_date"];
     mediaType = json["media_type"];
     storage = Storage.fromJson(json["storage"]);
+    targetDir = json["target_dir"];
     if (json['episodes'] != null) {
       episodes = <Episodes>[];
       json['episodes'].forEach((v) {
