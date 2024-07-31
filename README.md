@@ -1,4 +1,10 @@
-# polaris
+# Polaris
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/simon-ding/polaris/go.yml)
+![GitHub Release](https://img.shields.io/github/v/release/simon-ding/polaris)
+![GitHub Repo stars](https://img.shields.io/github/stars/simon-ding/polaris)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/simon-ding/polaris)
+
 
 Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧集或者电影播出后，会第一时间下载对应的资源。支持本地存储或者webdav。
 
