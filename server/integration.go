@@ -34,7 +34,7 @@ func (s *Server) writePlexmatch(seriesId int, episodeId int, targetDir, name str
 		//create new
 		log.Warnf(".plexmatch file not found, create new one: %s", series.NameEn)
 		if err := st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"), 
-			[]byte(fmt.Sprintf("tmdbid: %d\nimdbid:%s\n",series.TmdbID, series.ImdbID))); err != nil {
+			[]byte(fmt.Sprintf("tmdbid: %d\n",series.TmdbID))); err != nil {
 			return errors.Wrap(err, "series plexmatch")
 		}
 	} 

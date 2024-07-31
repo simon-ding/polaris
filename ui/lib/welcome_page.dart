@@ -42,8 +42,9 @@ class WelcomePage extends ConsumerWidget {
                 : List.generate(value.length, (i) {
                     final item = value[i];
                     return Card(
-                        margin: const EdgeInsets.all(4),
+                        //margin: const EdgeInsets.all(4),
                         clipBehavior: Clip.hardEdge,
+                        elevation: 5,
                         child: InkWell(
                           //splashColor: Colors.blue.withAlpha(30),
                           onTap: () {
@@ -58,9 +59,9 @@ class WelcomePage extends ConsumerWidget {
                               SizedBox(
                                 width: 140,
                                 height: 210,
-                                child: Image.network(
+                                child: Ink.image(image: NetworkImage(
                                     "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                                    fit: BoxFit.fill),
+                                    )) ,
                               ),
                               SizedBox(
                                   width: 140,
