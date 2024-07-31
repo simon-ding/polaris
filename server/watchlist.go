@@ -43,7 +43,11 @@ func (s *Server) SearchMedia(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "bind query")
 	}
 	log.Infof("search media with keyword: %v", q.Query)
-	r, err := s.MustTMDB().SearchMedia(q.Query, s.language, q.Page)
+	tmdb, err := s.TMDB()
+	if err != nil {
+		return nil, err
+	}
+	r, err := tmdb.SearchMedia(q.Query, s.language, q.Page)
 	if err != nil {
 		return nil, errors.Wrap(err, "search tv")
 	}

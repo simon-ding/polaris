@@ -85,7 +85,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                     ? const Chip(
                                         avatar: Icon(Icons.live_tv),
                                         label: Text(
-                                          "电视剧",
+                                          "剧集",
                                         ))
                                     : const Chip(
                                         avatar: Icon(Icons.movie),
