@@ -7,7 +7,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
 final tvWatchlistDataProvider = FutureProvider.autoDispose((ref) async {
-  final dio =  APIs.getDio();
+  final dio = APIs.getDio();
   var resp = await dio.get(APIs.watchlistTvUrl);
   var sp = ServerResponse.fromJson(resp.data);
   List<MediaDetail> favList = List.empty(growable: true);
@@ -155,22 +155,23 @@ class MediaDetail {
   String? resolution;
   int? storageId;
   String? airDate;
-  String? status;
+  int? monitoredNum;
+  int? downloadedNum;
 
-  MediaDetail({
-    this.id,
-    this.tmdbId,
-    this.mediaType,
-    this.name,
-    this.originalName,
-    this.overview,
-    this.posterPath,
-    this.createdAt,
-    this.resolution,
-    this.storageId,
-    this.airDate,
-    this.status,
-  });
+  MediaDetail(
+      {this.id,
+      this.tmdbId,
+      this.mediaType,
+      this.name,
+      this.originalName,
+      this.overview,
+      this.posterPath,
+      this.createdAt,
+      this.resolution,
+      this.storageId,
+      this.airDate,
+      this.monitoredNum,
+      this.downloadedNum});
 
   MediaDetail.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -184,7 +185,8 @@ class MediaDetail {
     resolution = json["resolution"];
     storageId = json["storage_id"];
     airDate = json["air_date"];
-    status = json["status"];
+    monitoredNum = json["monitored_num"]??0;
+    downloadedNum = json["download_num"]??0;
   }
 }
 

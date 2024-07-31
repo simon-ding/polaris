@@ -247,7 +247,8 @@ func (s *Server) downloadImage(url string, mediaID int, name string) error {
 
 type MediaWithStatus struct {
 	*ent.Media
-	Status string `json:"status"`
+	MonitoredNum  int    `json:"monitored_num"`
+	DownloadedNum int    `json:"downloaded_num"`
 }
 
 //missing: episode aired missing
@@ -260,26 +261,38 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 	res := make([]MediaWithStatus, len(list))
 	for i, item := range list {
 		var ms = MediaWithStatus{
-			Media:  item,
-			Status: "downloaded",
+			Media:      item,
+			MonitoredNum:  0,
+			DownloadedNum: 0,
 		}
 
 		details := s.db.GetMediaDetails(item.ID)
+
 		for _, ep := range details.Episodes {
+			monitored := false
 			if ep.SeasonNumber == 0 {
 				continue
 			}
-			t, err := time.Parse("2006-01-02", ep.AirDate)
-			if err != nil { //airdate not exist
-				ms.Status = "monitoring"
+			if item.DownloadHistoryEpisodes {
+				monitored = true
 			} else {
-				if item.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
-					continue
-				}
-				if ep.Status == episode.StatusMissing {
-					ms.Status = "monitoring"
+				t, err := time.Parse("2006-01-02", ep.AirDate)
+				if err != nil { //airdate not exist, maybe airdate not set yet
+					monitored = true
+				} else {
+					if item.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
+						continue
+					}
+					monitored = true
 				}
 			}
+			if monitored {
+				ms.MonitoredNum++
+				if ep.Status == episode.StatusDownloaded {
+					ms.DownloadedNum++
+				}
+			}
+
 		}
 		res[i] = ms
 	}
@@ -292,14 +305,15 @@ func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
 	for i, item := range list {
 		var ms = MediaWithStatus{
 			Media:  item,
-			Status: "monitoring",
+			MonitoredNum: 1,
+			DownloadedNum: 0,
 		}
 		dummyEp, err := s.db.GetMovieDummyEpisode(item.ID)
 		if err != nil {
 			log.Errorf("get dummy episode: %v", err)
 		} else {
-			if dummyEp.Status != episode.StatusMissing {
-				ms.Status = "downloaded"
+			if dummyEp.Status == episode.StatusDownloaded {
+				ms.DownloadedNum++
 			}
 		}
 		res[i] = ms

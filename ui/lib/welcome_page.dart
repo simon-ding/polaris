@@ -40,7 +40,7 @@ class WelcomePage extends ConsumerWidget {
                         ))
                   ]
                 : List.generate(value.length, (i) {
-                    var item = value[i];
+                    final item = value[i];
                     return Card(
                         margin: const EdgeInsets.all(4),
                         clipBehavior: Clip.hardEdge,
@@ -68,14 +68,15 @@ class WelcomePage extends ConsumerWidget {
                                     children: [
                                       LinearProgressIndicator(
                                         value: 1,
-                                        color: item.status == "downloaded"
+                                        color: item.downloadedNum ==
+                                                item.monitoredNum
                                             ? Colors.green
                                             : Colors.blue,
                                       ),
                                       Text(
                                         item.name!,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(   
+                                        style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                             height: 2.5),
