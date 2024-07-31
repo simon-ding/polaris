@@ -124,6 +124,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		StorageID:               in.StorageID,
 		TargetDir:               in.Folder,
 		DownloadHistoryEpisodes: in.DownloadHistoryEpisodes,
+		ImdbID:                  detail.IMDbID,
 	}, epIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
@@ -189,6 +190,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
 		TargetDir:    in.Folder,
+		ImdbID:       detail.IMDbID,
 	}, []int{epid})
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")

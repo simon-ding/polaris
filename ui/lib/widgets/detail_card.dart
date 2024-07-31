@@ -77,7 +77,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             widget.details.mediaType == 'tv'
                                 ? (widget.details.downloadHistoryEpisodes ==
                                         true
-                                    ? const Text("下载往期剧集")
+                                    ? const Text("下载所有剧集")
                                     : const Text("只下载更新剧集"))
                                 : const Text("")
                           ],

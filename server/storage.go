@@ -7,7 +7,6 @@ import (
 	storage1 "polaris/ent/storage"
 	"polaris/log"
 	"polaris/pkg/storage"
-	"polaris/pkg/utils"
 	"strconv"
 	"strings"
 
@@ -65,20 +64,23 @@ func (s *Server) SuggestedSeriesFolderName(c *gin.Context) (interface{}, error) 
 	d, err := s.MustTMDB().GetTvDetails(id, s.language)
 	if err != nil {
 		return nil, errors.Wrap(err, "get tv details")
-	} 
-	name := d.Name
-	originalName := d.OriginalName
-	year := strings.Split(d.FirstAirDate, "-")[0]
-
-
-	if utils.ContainsChineseChar(originalName) || name == originalName {
-		name = originalName
-	} else {
-		name = fmt.Sprintf("%s %s", name, originalName)
 	}
+
+	name := d.Name
+
+	if s.language == db.LanguageCN {
+		en, err := s.MustTMDB().GetTvDetails(id, db.LanguageEN)
+		if err != nil {
+			log.Errorf("get en tv detail error: %v", err)
+		} else {
+			name = fmt.Sprintf("%s %s", d.Name, en.Name)
+		}
+	}
+	year := strings.Split(d.FirstAirDate, "-")[0]
 	if year != "" {
 		name = fmt.Sprintf("%s (%s)", name, year)
 	}
+
 	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
 	return gin.H{"name": name}, nil
 }
@@ -94,21 +96,23 @@ func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "get movie details")
 	}
 	name := d1.Title
-	originalName := d1.OriginalTitle
-	year := strings.Split(d1.ReleaseDate, "-")[0]
 
-	if utils.ContainsChineseChar(originalName) || name == originalName {
-		name = originalName
-	} else {
-		name = fmt.Sprintf("%s %s", name, originalName)
+	if s.language == db.LanguageCN {
+		en, err := s.MustTMDB().GetMovieDetails(id, db.LanguageEN)
+		if err != nil {
+			log.Errorf("get en movie detail error: %v", err)
+		} else {
+			name = fmt.Sprintf("%s %s", d1.Title, en.Title)
+		}
 	}
+
+	year := strings.Split(d1.ReleaseDate, "-")[0]
 	if year != "" {
 		name = fmt.Sprintf("%s (%s)", name, year)
 	}
 	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
 	return gin.H{"name": name}, nil
 }
-
 
 func (s *Server) getStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {
 	st := s.db.GetStorage(storageId)
