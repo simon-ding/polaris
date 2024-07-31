@@ -59,9 +59,10 @@ class WelcomePage extends ConsumerWidget {
                               SizedBox(
                                 width: 140,
                                 height: 210,
-                                child: Ink.image(image: NetworkImage(
-                                    "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                                    )) ,
+                                child: Ink.image(
+                                    image: NetworkImage(
+                                  "${APIs.imagesUrl}/${item.id}/poster.jpg",
+                                )),
                               ),
                               SizedBox(
                                   width: 140,

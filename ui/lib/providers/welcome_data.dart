@@ -186,7 +186,7 @@ class MediaDetail {
     storageId = json["storage_id"];
     airDate = json["air_date"];
     monitoredNum = json["monitored_num"]??0;
-    downloadedNum = json["download_num"]??0;
+    downloadedNum = json["downloaded_num"]??0;
   }
 }
 
