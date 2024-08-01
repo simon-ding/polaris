@@ -210,8 +210,8 @@ class DownloadClient {
       this.url,
       this.user,
       this.password,
-      this.removeCompletedDownloads,
-      this.removeFailedDownloads});
+      this.removeCompletedDownloads = true,
+      this.removeFailedDownloads = true});
 
   DownloadClient.fromJson(Map<String, dynamic> json) {
     id = json['id'];
