@@ -10,6 +10,7 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 
 ![main_page](./doc/assets/main_page.png)
 ![detail_page](./doc/assets/detail_page.png)
+![anime](./doc/assets/anime_match.png)
 
 交流群： https://t.me/+8R2nzrlSs2JhMDgx
 
