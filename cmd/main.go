@@ -10,7 +10,7 @@ import (
 func main() {
 	log.Infof("------------------- Starting Polaris ---------------------")
 
-	syscall.Umask(0000) //max permission 0777
+	syscall.Umask(0) //max permission 0777
 
 	dbClient, err := db.Open()
 	if err != nil {
