@@ -131,6 +131,9 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 	var wg sync.WaitGroup
 
 	for _, tor := range allTorznab {
+		if tor.Disabled {
+			continue
+		}
 		wg.Add(1)
 		go func() {
 			log.Debugf("search torznab %v with %v", tor.Name, q)
