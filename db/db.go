@@ -275,6 +275,19 @@ func (c *Client) DeleteTorznab(id int) {
 	c.ent.Indexers.Delete().Where(indexers.ID(id)).Exec(context.TODO())
 }
 
+func (c *Client) GetIndexer(id int) (*TorznabInfo, error) {
+	res, err := c.ent.Indexers.Query().Where(indexers.ID(id)).First(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+	var ss TorznabSetting
+	err = json.Unmarshal([]byte(res.Settings), &ss)
+	if err != nil {
+		
+		return nil, fmt.Errorf("unmarshal torznab %s error: %v", res.Name, err)
+	}
+	return &TorznabInfo{Indexers: res, TorznabSetting: ss}, nil
+}
 type TorznabInfo struct {
 	*ent.Indexers
 	TorznabSetting

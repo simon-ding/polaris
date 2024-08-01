@@ -143,17 +143,17 @@ func (s *Server) MustTMDB() *tmdb.Client {
 }
 
 func (s *Server) reloadTasks() {
-	runningTasks := s.db.GetRunningHistories()
-	if len(runningTasks) == 0 {
-		return
-	}
-	for _, t := range runningTasks {
-		log.Infof("reloading task: %d %s", t.ID, t.SourceTitle)
+	allTasks := s.db.GetHistories()
+	for _, t := range allTasks {
 		torrent, err := transmission.ReloadTorrent(t.Saved)
 		if err != nil {
 			log.Errorf("relaod task %s failed: %v", t.SourceTitle, err)
 			continue
 		}
+		if !torrent.Exists() { //只要种子还存在于客户端中，就重新加载，有可能是还在做种中
+			continue
+		}
+		log.Infof("reloading task: %d %s", t.ID, t.SourceTitle)
 		s.tasks[t.ID] = &Task{Torrent: torrent}
 	}
 }

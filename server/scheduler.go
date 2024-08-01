@@ -44,6 +44,24 @@ func (s *Server) checkTasks() {
 		}
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
+			r := s.db.GetHistory(id)
+			if r.Status == history.StatusSuccess {
+				//task already success, check seed ratio
+				torrent := s.tasks[id]
+				ok, err := s.isSeedRatioLimitReached(r.IndexerID, torrent)
+				if err != nil {
+					log.Warnf("getting torrent seed ratio : %v", err)
+					ok = false
+				}
+				if ok {
+					log.Infof("torrent file seed ratio reached, remove: %v", torrent.Name())
+					torrent.Remove()
+					delete(s.tasks, id)
+				} else {
+					log.Infof("torrent file still sedding: %v", torrent.Name())
+				}
+				continue
+			}
 			log.Infof("task is done: %v", t.Name())
 			s.sendMsg(fmt.Sprintf(message.DownloadComplete, t.Name()))
 			go func() {
@@ -88,7 +106,7 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 			if downloadclient.RemoveFailedDownloads {
 				log.Debugf("task failed, remove failed torrent and files related")
 				delete(s.tasks, r.ID)
-				torrent.Remove()		
+				torrent.Remove()
 			}
 		}
 	}()
@@ -114,7 +132,6 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 		log.Errorf("create .plexmatch file error: %v", err)
 	}
 
-	
 	s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 	if r.EpisodeID != 0 {
 		s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
@@ -124,12 +141,16 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 	s.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
 
 	//判断是否需要删除本地文件
-	if downloadclient.RemoveCompletedDownloads {
+	ok, err := s.isSeedRatioLimitReached(r.IndexerID, torrent) 
+	if err != nil {
+		log.Warnf("getting torrent seed ratio %s: %v", torrent.Name(), err)
+		ok = false
+	}
+	if downloadclient.RemoveCompletedDownloads && ok {
 		log.Debugf("download complete,remove torrent and files related")
 		delete(s.tasks, r.ID)
 		torrent.Remove()
 	}
-
 
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrentName, r.TargetDir)
 	return nil
@@ -329,4 +350,16 @@ func (s *Server) checkSeiesNewSeason(media *ent.Media) error {
 		}
 	}
 	return nil
+}
+
+func (s *Server) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (bool, error) {
+	indexer, err := s.db.GetIndexer(indexId)
+	if err != nil {
+		return false, err
+	}
+	currentRatio := t.SeedRatio()
+	if currentRatio == nil {
+		return false, errors.New("seed ratio not exist")
+	}
+	return *currentRatio >= float64(indexer.SeedRatio), nil
 }

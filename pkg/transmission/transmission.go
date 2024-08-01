@@ -130,6 +130,9 @@ func (t *Torrent) Exists() bool {
 }
 
 func (t *Torrent) Name() string {
+	if !t.Exists() {
+		return ""
+	}
 	return *t.getTorrent().Name
 }
 
@@ -153,6 +156,10 @@ func (t *Torrent) Progress() int {
 
 func (t *Torrent) Stop() error {
 	return t.c.TorrentStopIDs(context.TODO(), []int64{t.ID})
+}
+
+func (t *Torrent) SeedRatio() *float64 {
+	return t.getTorrent().UploadRatio
 }
 
 func (t *Torrent) Start() error {

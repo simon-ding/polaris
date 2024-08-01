@@ -8,6 +8,7 @@ type Torrent interface {
 	Remove() error
 	Save() string
 	Exists() bool
+	SeedRatio() *float64
 }
 
 
