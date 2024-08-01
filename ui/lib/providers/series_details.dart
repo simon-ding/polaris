@@ -98,7 +98,7 @@ class SeriesDetails {
     mediaType = json["media_type"];
     storage = Storage.fromJson(json["storage"]);
     targetDir = json["target_dir"];
-    downloadHistoryEpisodes = json["download_history_episodes"]??false;
+    downloadHistoryEpisodes = json["download_history_episodes"] ?? false;
     if (json['episodes'] != null) {
       episodes = <Episodes>[];
       json['episodes'].forEach((v) {
@@ -195,13 +195,27 @@ class MediaTorrentResource extends AutoDisposeFamilyAsyncNotifier<
 }
 
 class TorrentResource {
-  TorrentResource({this.name, this.size, this.seeders, this.peers, this.link});
+  TorrentResource(
+      {this.name,
+      this.size,
+      this.seeders,
+      this.peers,
+      this.link,
+      this.source,
+      this.indexerId,
+      this.downloadFactor,
+      this.uploadFactor, this.isPrivate});
 
   String? name;
   int? size;
   int? seeders;
   int? peers;
   String? link;
+  String? source;
+  int? indexerId;
+  double? downloadFactor;
+  double? uploadFactor;
+  bool? isPrivate;
 
   factory TorrentResource.fromJson(Map<String, dynamic> json) {
     return TorrentResource(
@@ -209,13 +223,20 @@ class TorrentResource {
         size: json["size"],
         seeders: json["seeders"],
         peers: json["peers"],
-        link: json["link"]);
+        link: json["link"],
+        source: json["source"],
+        indexerId: json["indexer_id"],
+        isPrivate: json["is_private"]??false,
+        downloadFactor: json["download_volume_factor"],
+        uploadFactor: json["upload_volume_factor"]);
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = name;
     data['size'] = size;
     data["link"] = link;
+    data["indexer_id"] = indexerId;
+    data["source"] = source;
     return data;
   }
 }

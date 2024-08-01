@@ -62,6 +62,7 @@ func (s *Server) downloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum in
 		Size:             r1.Size,
 		Saved:            torrent.Save(),
 		DownloadClientID: dlClient.ID,
+		IndexerID:        r1.IndexerId,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
@@ -110,6 +111,7 @@ func (s *Server) downloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 		Size:             r1.Size,
 		Saved:            torrent.Save(),
 		DownloadClientID: dlc.ID,
+		IndexerID:        r1.IndexerId,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
@@ -165,7 +167,7 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 			res, err = core.SearchEpisode(s.db, in.ID, in.Season, in.Episode, false)
 			if err != nil {
 				if err.Error() == "no resource found" {
-					return []TorznabSearchResult{}, nil
+					return gin.H{}, nil
 				}
 				return nil, errors.Wrap(err, "search episode")
 			}
@@ -176,22 +178,12 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 		res, err = core.SearchMovie(s.db, in.ID, false)
 		if err != nil {
 			if err.Error() == "no resource found" {
-				return []TorznabSearchResult{}, nil
+				return gin.H{}, nil
 			}
 			return nil, err
 		}
 	}
-	var searchResults []TorznabSearchResult
-	for _, r := range res {
-		searchResults = append(searchResults, TorznabSearchResult{
-			Name:    r.Name,
-			Size:    r.Size,
-			Seeders: r.Seeders,
-			Peers:   r.Peers,
-			Link:    r.Link,
-		})
-	}
-	return searchResults, nil
+	return res, nil
 }
 
 func (s *Server) SearchTvAndDownload(c *gin.Context) (interface{}, error) {
@@ -223,19 +215,11 @@ func (s *Server) SearchTvAndDownload(c *gin.Context) (interface{}, error) {
 	}, nil
 }
 
-type TorznabSearchResult struct {
-	Name    string `json:"name"`
-	Size    int    `json:"size"`
-	Link    string `json:"link"`
-	Seeders int    `json:"seeders"`
-	Peers   int    `json:"peers"`
-	Source  string `json:"source"`
-}
 type downloadTorrentIn struct {
 	MediaID int `json:"id" binding:"required"`
 	Season  int `json:"season"`
 	Episode int `json:"episode"`
-	TorznabSearchResult
+	torznab.Result
 }
 
 func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
@@ -263,7 +247,7 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 		if name == "" {
 			name = fmt.Sprintf("%v S%02dE%02d", m.OriginalName, in.Season, in.Episode)
 		}
-		res := torznab.Result{Name: name, Link: in.Link, Size: in.Size}
+		res := torznab.Result{Name: name, Link: in.Link, Size: in.Size, IndexerId: in.IndexerId}
 		return s.downloadEpisodeTorrent(res, in.MediaID, in.Season, in.Episode)
 	} else {
 		//movie
@@ -292,6 +276,7 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 				Size:             in.Size,
 				Saved:            torrent.Save(),
 				DownloadClientID: dlc.ID,
+				IndexerID:        in.IndexerId,
 			})
 			if err != nil {
 				log.Errorf("save history error: %v", err)

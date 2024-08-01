@@ -166,6 +166,33 @@ func (hu *HistoryUpdate) ClearDownloadClientID() *HistoryUpdate {
 	return hu
 }
 
+// SetIndexerID sets the "indexer_id" field.
+func (hu *HistoryUpdate) SetIndexerID(i int) *HistoryUpdate {
+	hu.mutation.ResetIndexerID()
+	hu.mutation.SetIndexerID(i)
+	return hu
+}
+
+// SetNillableIndexerID sets the "indexer_id" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableIndexerID(i *int) *HistoryUpdate {
+	if i != nil {
+		hu.SetIndexerID(*i)
+	}
+	return hu
+}
+
+// AddIndexerID adds i to the "indexer_id" field.
+func (hu *HistoryUpdate) AddIndexerID(i int) *HistoryUpdate {
+	hu.mutation.AddIndexerID(i)
+	return hu
+}
+
+// ClearIndexerID clears the value of the "indexer_id" field.
+func (hu *HistoryUpdate) ClearIndexerID() *HistoryUpdate {
+	hu.mutation.ClearIndexerID()
+	return hu
+}
+
 // SetStatus sets the "status" field.
 func (hu *HistoryUpdate) SetStatus(h history.Status) *HistoryUpdate {
 	hu.mutation.SetStatus(h)
@@ -292,6 +319,15 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if hu.mutation.DownloadClientIDCleared() {
 		_spec.ClearField(history.FieldDownloadClientID, field.TypeInt)
+	}
+	if value, ok := hu.mutation.IndexerID(); ok {
+		_spec.SetField(history.FieldIndexerID, field.TypeInt, value)
+	}
+	if value, ok := hu.mutation.AddedIndexerID(); ok {
+		_spec.AddField(history.FieldIndexerID, field.TypeInt, value)
+	}
+	if hu.mutation.IndexerIDCleared() {
+		_spec.ClearField(history.FieldIndexerID, field.TypeInt)
 	}
 	if value, ok := hu.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
@@ -460,6 +496,33 @@ func (huo *HistoryUpdateOne) ClearDownloadClientID() *HistoryUpdateOne {
 	return huo
 }
 
+// SetIndexerID sets the "indexer_id" field.
+func (huo *HistoryUpdateOne) SetIndexerID(i int) *HistoryUpdateOne {
+	huo.mutation.ResetIndexerID()
+	huo.mutation.SetIndexerID(i)
+	return huo
+}
+
+// SetNillableIndexerID sets the "indexer_id" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableIndexerID(i *int) *HistoryUpdateOne {
+	if i != nil {
+		huo.SetIndexerID(*i)
+	}
+	return huo
+}
+
+// AddIndexerID adds i to the "indexer_id" field.
+func (huo *HistoryUpdateOne) AddIndexerID(i int) *HistoryUpdateOne {
+	huo.mutation.AddIndexerID(i)
+	return huo
+}
+
+// ClearIndexerID clears the value of the "indexer_id" field.
+func (huo *HistoryUpdateOne) ClearIndexerID() *HistoryUpdateOne {
+	huo.mutation.ClearIndexerID()
+	return huo
+}
+
 // SetStatus sets the "status" field.
 func (huo *HistoryUpdateOne) SetStatus(h history.Status) *HistoryUpdateOne {
 	huo.mutation.SetStatus(h)
@@ -616,6 +679,15 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if huo.mutation.DownloadClientIDCleared() {
 		_spec.ClearField(history.FieldDownloadClientID, field.TypeInt)
+	}
+	if value, ok := huo.mutation.IndexerID(); ok {
+		_spec.SetField(history.FieldIndexerID, field.TypeInt, value)
+	}
+	if value, ok := huo.mutation.AddedIndexerID(); ok {
+		_spec.AddField(history.FieldIndexerID, field.TypeInt, value)
+	}
+	if huo.mutation.IndexerIDCleared() {
+		_spec.ClearField(history.FieldIndexerID, field.TypeInt)
 	}
 	if value, ok := huo.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)

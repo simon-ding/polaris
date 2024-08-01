@@ -86,6 +86,20 @@ func (hc *HistoryCreate) SetNillableDownloadClientID(i *int) *HistoryCreate {
 	return hc
 }
 
+// SetIndexerID sets the "indexer_id" field.
+func (hc *HistoryCreate) SetIndexerID(i int) *HistoryCreate {
+	hc.mutation.SetIndexerID(i)
+	return hc
+}
+
+// SetNillableIndexerID sets the "indexer_id" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableIndexerID(i *int) *HistoryCreate {
+	if i != nil {
+		hc.SetIndexerID(*i)
+	}
+	return hc
+}
+
 // SetStatus sets the "status" field.
 func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
 	hc.mutation.SetStatus(h)
@@ -225,6 +239,10 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 	if value, ok := hc.mutation.DownloadClientID(); ok {
 		_spec.SetField(history.FieldDownloadClientID, field.TypeInt, value)
 		_node.DownloadClientID = value
+	}
+	if value, ok := hc.mutation.IndexerID(); ok {
+		_spec.SetField(history.FieldIndexerID, field.TypeInt, value)
+		_node.IndexerID = value
 	}
 	if value, ok := hc.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)

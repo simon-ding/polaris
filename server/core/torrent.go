@@ -77,7 +77,7 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 	if len(filtered) == 0 {
 		return nil, errors.New("no resource found")
 	}
-
+	filtered = dedup(filtered)
 	return filtered, nil
 
 }
@@ -117,6 +117,7 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool) ([]torznab.R
 	if len(filtered) == 0 {
 		return nil, errors.New("no resource found")
 	}
+	filtered = dedup(filtered)
 
 	return filtered, nil
 
@@ -134,7 +135,7 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 		go func() {
 			log.Debugf("search torznab %v with %v", tor.Name, q)
 			defer wg.Done()
-			resp, err := torznab.Search(tor.URL, tor.ApiKey, q)
+			resp, err := torznab.Search(tor, tor.ApiKey, q)
 			if err != nil {
 				log.Errorf("search %s error: %v", tor.Name, err)
 				return
@@ -152,11 +153,54 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 		res = append(res, result...)
 	}
 
-	sort.Slice(res, func(i, j int) bool {
+	//res = dedup(res)
+
+	sort.SliceStable(res, func(i, j int) bool { //先按做种人数排序
 		var s1 = res[i]
 		var s2 = res[j]
 		return s1.Seeders > s2.Seeders
 	})
 
+	sort.SliceStable(res, func(i, j int) bool { //再按优先级排序，优先级高的种子排前面
+		var s1 = res[i]
+		var s2 = res[j]
+		return s1.Priority > s2.Priority
+	})
+
+	//pt资源中，同一indexer内部，优先下载free的资源
+	sort.SliceStable(res, func(i, j int) bool {
+		var s1 = res[i]
+		var s2 = res[j]
+		if s1.IndexerId == s2.IndexerId && s1.IsPrivate { 
+			return s1.DownloadVolumeFactor < s2.DownloadVolumeFactor
+		}
+		return false
+	})
+
+	//同一indexer内部，如果下载消耗一样，则优先下载上传奖励较多的
+	sort.SliceStable(res, func(i, j int) bool { 
+		var s1 = res[i]
+		var s2 = res[j]
+		if s1.IndexerId == s2.IndexerId && s1.IsPrivate && s1.DownloadVolumeFactor == s2.DownloadVolumeFactor{ 
+			return s1.UploadVolumeFactor > s2.UploadVolumeFactor
+		}
+		return false
+	})
+
+	return res
+}
+
+
+func dedup(list []torznab.Result) []torznab.Result {
+	var res = make([]torznab.Result, 0, len(list))
+	seen := make(map[string]bool, 0)
+	for _, r := range list {
+		key := fmt.Sprintf("%s%s%d%d", r.Name, r.Source, r.Seeders,r.Peers)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		res = append(res, r)
+	}
 	return res
 }

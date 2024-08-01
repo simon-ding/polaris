@@ -64,6 +64,7 @@ var (
 		{Name: "target_dir", Type: field.TypeString},
 		{Name: "size", Type: field.TypeInt, Default: 0},
 		{Name: "download_client_id", Type: field.TypeInt, Nullable: true},
+		{Name: "indexer_id", Type: field.TypeInt, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"running", "success", "fail", "uploading"}},
 		{Name: "saved", Type: field.TypeString, Nullable: true},
 	}

@@ -89,6 +89,11 @@ func DownloadClientID(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldDownloadClientID, v))
 }
 
+// IndexerID applies equality check predicate on the "indexer_id" field. It's identical to IndexerIDEQ.
+func IndexerID(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldIndexerID, v))
+}
+
 // Saved applies equality check predicate on the "saved" field. It's identical to SavedEQ.
 func Saved(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSaved, v))
@@ -442,6 +447,56 @@ func DownloadClientIDIsNil() predicate.History {
 // DownloadClientIDNotNil applies the NotNil predicate on the "download_client_id" field.
 func DownloadClientIDNotNil() predicate.History {
 	return predicate.History(sql.FieldNotNull(FieldDownloadClientID))
+}
+
+// IndexerIDEQ applies the EQ predicate on the "indexer_id" field.
+func IndexerIDEQ(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldIndexerID, v))
+}
+
+// IndexerIDNEQ applies the NEQ predicate on the "indexer_id" field.
+func IndexerIDNEQ(v int) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldIndexerID, v))
+}
+
+// IndexerIDIn applies the In predicate on the "indexer_id" field.
+func IndexerIDIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldIn(FieldIndexerID, vs...))
+}
+
+// IndexerIDNotIn applies the NotIn predicate on the "indexer_id" field.
+func IndexerIDNotIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldIndexerID, vs...))
+}
+
+// IndexerIDGT applies the GT predicate on the "indexer_id" field.
+func IndexerIDGT(v int) predicate.History {
+	return predicate.History(sql.FieldGT(FieldIndexerID, v))
+}
+
+// IndexerIDGTE applies the GTE predicate on the "indexer_id" field.
+func IndexerIDGTE(v int) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldIndexerID, v))
+}
+
+// IndexerIDLT applies the LT predicate on the "indexer_id" field.
+func IndexerIDLT(v int) predicate.History {
+	return predicate.History(sql.FieldLT(FieldIndexerID, v))
+}
+
+// IndexerIDLTE applies the LTE predicate on the "indexer_id" field.
+func IndexerIDLTE(v int) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldIndexerID, v))
+}
+
+// IndexerIDIsNil applies the IsNil predicate on the "indexer_id" field.
+func IndexerIDIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldIndexerID))
+}
+
+// IndexerIDNotNil applies the NotNil predicate on the "indexer_id" field.
+func IndexerIDNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldIndexerID))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

@@ -1719,6 +1719,8 @@ type HistoryMutation struct {
 	addsize               *int
 	download_client_id    *int
 	adddownload_client_id *int
+	indexer_id            *int
+	addindexer_id         *int
 	status                *history.Status
 	saved                 *string
 	clearedFields         map[string]struct{}
@@ -2185,6 +2187,76 @@ func (m *HistoryMutation) ResetDownloadClientID() {
 	delete(m.clearedFields, history.FieldDownloadClientID)
 }
 
+// SetIndexerID sets the "indexer_id" field.
+func (m *HistoryMutation) SetIndexerID(i int) {
+	m.indexer_id = &i
+	m.addindexer_id = nil
+}
+
+// IndexerID returns the value of the "indexer_id" field in the mutation.
+func (m *HistoryMutation) IndexerID() (r int, exists bool) {
+	v := m.indexer_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndexerID returns the old "indexer_id" field's value of the History entity.
+// If the History object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *HistoryMutation) OldIndexerID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndexerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndexerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndexerID: %w", err)
+	}
+	return oldValue.IndexerID, nil
+}
+
+// AddIndexerID adds i to the "indexer_id" field.
+func (m *HistoryMutation) AddIndexerID(i int) {
+	if m.addindexer_id != nil {
+		*m.addindexer_id += i
+	} else {
+		m.addindexer_id = &i
+	}
+}
+
+// AddedIndexerID returns the value that was added to the "indexer_id" field in this mutation.
+func (m *HistoryMutation) AddedIndexerID() (r int, exists bool) {
+	v := m.addindexer_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearIndexerID clears the value of the "indexer_id" field.
+func (m *HistoryMutation) ClearIndexerID() {
+	m.indexer_id = nil
+	m.addindexer_id = nil
+	m.clearedFields[history.FieldIndexerID] = struct{}{}
+}
+
+// IndexerIDCleared returns if the "indexer_id" field was cleared in this mutation.
+func (m *HistoryMutation) IndexerIDCleared() bool {
+	_, ok := m.clearedFields[history.FieldIndexerID]
+	return ok
+}
+
+// ResetIndexerID resets all changes to the "indexer_id" field.
+func (m *HistoryMutation) ResetIndexerID() {
+	m.indexer_id = nil
+	m.addindexer_id = nil
+	delete(m.clearedFields, history.FieldIndexerID)
+}
+
 // SetStatus sets the "status" field.
 func (m *HistoryMutation) SetStatus(h history.Status) {
 	m.status = &h
@@ -2304,7 +2376,7 @@ func (m *HistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.media_id != nil {
 		fields = append(fields, history.FieldMediaID)
 	}
@@ -2325,6 +2397,9 @@ func (m *HistoryMutation) Fields() []string {
 	}
 	if m.download_client_id != nil {
 		fields = append(fields, history.FieldDownloadClientID)
+	}
+	if m.indexer_id != nil {
+		fields = append(fields, history.FieldIndexerID)
 	}
 	if m.status != nil {
 		fields = append(fields, history.FieldStatus)
@@ -2354,6 +2429,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Size()
 	case history.FieldDownloadClientID:
 		return m.DownloadClientID()
+	case history.FieldIndexerID:
+		return m.IndexerID()
 	case history.FieldStatus:
 		return m.Status()
 	case history.FieldSaved:
@@ -2381,6 +2458,8 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldSize(ctx)
 	case history.FieldDownloadClientID:
 		return m.OldDownloadClientID(ctx)
+	case history.FieldIndexerID:
+		return m.OldIndexerID(ctx)
 	case history.FieldStatus:
 		return m.OldStatus(ctx)
 	case history.FieldSaved:
@@ -2443,6 +2522,13 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDownloadClientID(v)
 		return nil
+	case history.FieldIndexerID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndexerID(v)
+		return nil
 	case history.FieldStatus:
 		v, ok := value.(history.Status)
 		if !ok {
@@ -2477,6 +2563,9 @@ func (m *HistoryMutation) AddedFields() []string {
 	if m.adddownload_client_id != nil {
 		fields = append(fields, history.FieldDownloadClientID)
 	}
+	if m.addindexer_id != nil {
+		fields = append(fields, history.FieldIndexerID)
+	}
 	return fields
 }
 
@@ -2493,6 +2582,8 @@ func (m *HistoryMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedSize()
 	case history.FieldDownloadClientID:
 		return m.AddedDownloadClientID()
+	case history.FieldIndexerID:
+		return m.AddedIndexerID()
 	}
 	return nil, false
 }
@@ -2530,6 +2621,13 @@ func (m *HistoryMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddDownloadClientID(v)
 		return nil
+	case history.FieldIndexerID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddIndexerID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown History numeric field %s", name)
 }
@@ -2543,6 +2641,9 @@ func (m *HistoryMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(history.FieldDownloadClientID) {
 		fields = append(fields, history.FieldDownloadClientID)
+	}
+	if m.FieldCleared(history.FieldIndexerID) {
+		fields = append(fields, history.FieldIndexerID)
 	}
 	if m.FieldCleared(history.FieldSaved) {
 		fields = append(fields, history.FieldSaved)
@@ -2566,6 +2667,9 @@ func (m *HistoryMutation) ClearField(name string) error {
 		return nil
 	case history.FieldDownloadClientID:
 		m.ClearDownloadClientID()
+		return nil
+	case history.FieldIndexerID:
+		m.ClearIndexerID()
 		return nil
 	case history.FieldSaved:
 		m.ClearSaved()
@@ -2598,6 +2702,9 @@ func (m *HistoryMutation) ResetField(name string) error {
 		return nil
 	case history.FieldDownloadClientID:
 		m.ResetDownloadClientID()
+		return nil
+	case history.FieldIndexerID:
+		m.ResetIndexerID()
 		return nil
 	case history.FieldStatus:
 		m.ResetStatus()

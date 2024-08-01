@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"polaris/db"
 	"polaris/log"
 	"strconv"
 	"time"
@@ -71,17 +72,22 @@ func (i *Item) GetAttr(key string) string {
 	}
 	return ""
 }
-func (r *Response) ToResults() []Result {
+func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 	var res []Result
 	for _, item := range r.Channel.Item {
 		r := Result{
-			Name:     item.Title,
-			Link:   item.Link,
-			Size:     mustAtoI(item.Size),
-			Seeders:  mustAtoI(item.GetAttr("seeders")),
-			Peers:    mustAtoI(item.GetAttr("peers")),
-			Category: mustAtoI(item.GetAttr("category")),
-			Source:   r.Channel.Title,
+			Name:                 item.Title,
+			Link:                 item.Link,
+			Size:                 mustAtoI(item.Size),
+			Seeders:              mustAtoI(item.GetAttr("seeders")),
+			Peers:                mustAtoI(item.GetAttr("peers")),
+			Category:             mustAtoI(item.GetAttr("category")),
+			DownloadVolumeFactor: tryParseFloat(item.GetAttr("downloadvolumefactor")),
+			UploadVolumeFactor:   tryParseFloat(item.GetAttr("uploadvolumefactor")),
+			Source:               indexer.Name,
+			IndexerId:            indexer.ID,
+			Priority:             indexer.Priority,
+			IsPrivate:            item.Type == "private",
 		}
 		res = append(res, r)
 	}
@@ -96,11 +102,21 @@ func mustAtoI(key string) int {
 	}
 	return i
 }
-func Search(torznabUrl, api, keyWord string) ([]Result, error) {
+
+func tryParseFloat(s string) float32 {
+	r, err := strconv.ParseFloat(s, 32)
+	if err != nil {
+		log.Warnf("parse float error: %v", err)
+		return 0
+	}
+	return float32(r)
+}
+
+func Search(indexer *db.TorznabInfo, api, keyWord string) ([]Result, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, torznabUrl, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, indexer.URL, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "new request")
 	}
@@ -124,15 +140,20 @@ func Search(torznabUrl, api, keyWord string) ([]Result, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "json unmarshal")
 	}
-	return res.ToResults(), nil
+	return res.ToResults(indexer), nil
 }
 
 type Result struct {
-	Name     string
-	Link   string
-	Size     int
-	Seeders  int
-	Peers    int
-	Category int
-	Source   string
+	Name                 string  `json:"name"`
+	Link                 string  `json:"link"`
+	Size                 int     `json:"size"`
+	Seeders              int     `json:"seeders"`
+	Peers                int     `json:"peers"`
+	Category             int     `json:"category"`
+	Source               string  `json:"source"`
+	DownloadVolumeFactor float32 `json:"download_volume_factor"`
+	UploadVolumeFactor   float32 `json:"upload_volume_factor"`
+	IndexerId            int     `json:"indexer_id"`
+	Priority             int     `json:"priority"`
+	IsPrivate            bool    `json:"is_private"`
 }

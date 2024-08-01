@@ -71,7 +71,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               .read(mediaDetailsProvider(widget.seriesId)
                                   .notifier)
                               .searchAndDownload(widget.seriesId,
-                                  ep.seasonNumber!, ep.episodeNumber!).then((v) => showSnakeBar("开始下载: $v"));
+                                  ep.seasonNumber!, ep.episodeNumber!)
+                              .then((v) => showSnakeBar("开始下载: $v"));
                           showLoadingWithFuture(f);
                         },
                         icon: const Icon(Icons.download)),
@@ -118,7 +119,8 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                               final f = ref
                                   .read(mediaDetailsProvider(widget.seriesId)
                                       .notifier)
-                                  .searchAndDownload(widget.seriesId, k, 0).then((v) => showSnakeBar("开始下载: $v"));
+                                  .searchAndDownload(widget.seriesId, k, 0)
+                                  .then((v) => showSnakeBar("开始下载: $v"));
                               showLoadingWithFuture(f);
                             },
                             icon: const Icon(Icons.download)),
@@ -165,47 +167,71 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               //title: Text("资源"),
               content: SelectionArea(
             child: SizedBox(
-              width: MediaQuery.of(context).size.width*0.7,
-              height: MediaQuery.of(context).size.height*0.6,
+              width: MediaQuery.of(context).size.width * 0.7,
+              height: MediaQuery.of(context).size.height * 0.6,
               child: torrents.when(
                   data: (v) {
+                    bool hasPrivate = false;
+                    for (final item in v) {
+                      if (item.isPrivate == true) {
+                        hasPrivate = true;
+                      }
+                    }
+                    final columns = [
+                      const DataColumn(label: Text("名称")),
+                      const DataColumn(label: Text("大小")),
+                      const DataColumn(label: Text("S/P")),
+                      const DataColumn(label: Text("来源")),
+                    ];
+                    if (hasPrivate) {
+                      columns.add(const DataColumn(label: Text("消耗")));
+                    }
+                    columns.add(const DataColumn(label: Text("下载")));
+
                     return SingleChildScrollView(
                         child: DataTable(
-                            dataTextStyle:
-                                const TextStyle(fontSize: 12),
-                            columns: const [
-                              DataColumn(label: Text("名称")),
-                              DataColumn(label: Text("大小")),
-                              DataColumn(label: Text("seeders")),
-                              DataColumn(label: Text("peers")),
-                              DataColumn(label: Text("操作"))
-                            ],
+                            dataTextStyle: const TextStyle(fontSize: 12),
+                            columns: columns,
                             rows: List.generate(v.length, (i) {
                               final torrent = v[i];
-                              return DataRow(cells: [
+                              final rows = [
                                 DataCell(Text("${torrent.name}")),
                                 DataCell(Text(
                                     "${torrent.size?.readableFileSize()}")),
-                                DataCell(Text("${torrent.seeders}")),
-                                DataCell(Text("${torrent.peers}")),
-                                DataCell(IconButton(
-                                  icon: const Icon(Icons.download),
-                                  onPressed: () async {
-                                    var f = ref
-                                        .read(mediaTorrentsDataProvider((
-                                          mediaId: id,
-                                          seasonNumber: season,
-                                          episodeNumber: episode
-                                        )).notifier)
-                                        .download(torrent).then((v) => showSnakeBar("开始下载：${torrent.name}"));
-                                    showLoadingWithFuture(f);
-                                  },
-                                ))
-                              ]);
+                                DataCell(Text(
+                                    "${torrent.seeders}/${torrent.peers}")),
+                                DataCell(Text(torrent.source ?? "-")),
+                              ];
+                              if (hasPrivate) {
+                                rows.add(DataCell(Text(torrent.isPrivate == true
+                                    ? "${torrent.downloadFactor}dl/${torrent.uploadFactor}up"
+                                    : "-")));
+                              }
+
+                              rows.add(DataCell(IconButton(
+                                icon: const Icon(Icons.download),
+                                onPressed: () async {
+                                  var f = ref
+                                      .read(mediaTorrentsDataProvider((
+                                        mediaId: id,
+                                        seasonNumber: season,
+                                        episodeNumber: episode
+                                      )).notifier)
+                                      .download(torrent)
+                                      .then((v) =>
+                                          showSnakeBar("开始下载：${torrent.name}"));
+                                  showLoadingWithFuture(f);
+                                },
+                              )));
+                              return DataRow(cells: rows);
                             })));
                   },
                   error: (err, trace) {
-                    return Text("$err");
+                    return "$err".contains("no resource found")
+                        ? const Center(
+                            child: Text("没有资源"),
+                          )
+                        : Text("$err");
                   },
                   loading: () => const MyProgressIndicator()),
             ),
