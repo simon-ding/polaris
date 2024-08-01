@@ -8,7 +8,6 @@ import 'package:ui/widgets/progress_indicator.dart';
 import 'package:ui/widgets/widgets.dart';
 
 class IndexerSettings extends ConsumerStatefulWidget {
-
   const IndexerSettings({super.key});
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -47,7 +46,10 @@ class _IndexerState extends ConsumerState<IndexerSettings> {
         "name": indexer.name,
         "url": indexer.url,
         "api_key": indexer.apiKey,
-        "impl": "torznab"
+        "impl": "torznab",
+        "priority": indexer.priority.toString(),
+        "seed_ratio": indexer.seedRatio.toString(),
+        "disabled": indexer.disabled
       },
       child: Column(
         children: [
@@ -76,6 +78,26 @@ class _IndexerState extends ConsumerState<IndexerSettings> {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: FormBuilderValidators.required(),
           ),
+          FormBuilderTextField(
+            name: "priority",
+            decoration: const InputDecoration(
+              labelText: "索引优先级",
+              helperText: "取值范围1-128， 数值越大，优先级越高",
+            ),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.positiveNumber(),
+          ),
+          FormBuilderTextField(
+            name: "seed_ratio",
+            decoration: const InputDecoration(
+              labelText: "做种率",
+              helperText: "种子的做种率，达到此做种率后，种子才会被删除, 0表示不做种",
+              hintText: "1.0",
+            ),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.numeric(),
+          ),
+          FormBuilderSwitch(name: "disabled", title: const Text("禁用此索引器"))
         ],
       ),
     );
@@ -87,9 +109,13 @@ class _IndexerState extends ConsumerState<IndexerSettings> {
       if (_formKey.currentState!.saveAndValidate()) {
         var values = _formKey.currentState!.value;
         return ref.read(indexersProvider.notifier).addIndexer(Indexer(
+            id: indexer.id,
             name: values["name"],
             url: values["url"],
-            apiKey: values["api_key"]));
+            apiKey: values["api_key"],
+            priority: int.parse(values["priority"]),
+            seedRatio: double.parse(values["seed_ratio"]),
+            disabled: values["disabled"]));
       } else {
         throw "validation_error";
       }

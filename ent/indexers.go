@@ -25,7 +25,11 @@ type Indexers struct {
 	// EnableRss holds the value of the "enable_rss" field.
 	EnableRss bool `json:"enable_rss,omitempty"`
 	// Priority holds the value of the "priority" field.
-	Priority     int `json:"priority,omitempty"`
+	Priority int `json:"priority,omitempty"`
+	// minimal seed ratio requied, before removing torrent
+	SeedRatio float32 `json:"seed_ratio,omitempty"`
+	// Disabled holds the value of the "disabled" field.
+	Disabled     bool `json:"disabled,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -34,8 +38,10 @@ func (*Indexers) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case indexers.FieldEnableRss:
+		case indexers.FieldEnableRss, indexers.FieldDisabled:
 			values[i] = new(sql.NullBool)
+		case indexers.FieldSeedRatio:
+			values[i] = new(sql.NullFloat64)
 		case indexers.FieldID, indexers.FieldPriority:
 			values[i] = new(sql.NullInt64)
 		case indexers.FieldName, indexers.FieldImplementation, indexers.FieldSettings:
@@ -91,6 +97,18 @@ func (i *Indexers) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.Priority = int(value.Int64)
 			}
+		case indexers.FieldSeedRatio:
+			if value, ok := values[j].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field seed_ratio", values[j])
+			} else if value.Valid {
+				i.SeedRatio = float32(value.Float64)
+			}
+		case indexers.FieldDisabled:
+			if value, ok := values[j].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field disabled", values[j])
+			} else if value.Valid {
+				i.Disabled = value.Bool
+			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
 		}
@@ -141,6 +159,12 @@ func (i *Indexers) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("priority=")
 	builder.WriteString(fmt.Sprintf("%v", i.Priority))
+	builder.WriteString(", ")
+	builder.WriteString("seed_ratio=")
+	builder.WriteString(fmt.Sprintf("%v", i.SeedRatio))
+	builder.WriteString(", ")
+	builder.WriteString("disabled=")
+	builder.WriteString(fmt.Sprintf("%v", i.Disabled))
 	builder.WriteByte(')')
 	return builder.String()
 }

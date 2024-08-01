@@ -2669,6 +2669,9 @@ type IndexersMutation struct {
 	enable_rss     *bool
 	priority       *int
 	addpriority    *int
+	seed_ratio     *float32
+	addseed_ratio  *float32
+	disabled       *bool
 	clearedFields  map[string]struct{}
 	done           bool
 	oldValue       func(context.Context) (*Indexers, error)
@@ -2973,6 +2976,125 @@ func (m *IndexersMutation) ResetPriority() {
 	m.addpriority = nil
 }
 
+// SetSeedRatio sets the "seed_ratio" field.
+func (m *IndexersMutation) SetSeedRatio(f float32) {
+	m.seed_ratio = &f
+	m.addseed_ratio = nil
+}
+
+// SeedRatio returns the value of the "seed_ratio" field in the mutation.
+func (m *IndexersMutation) SeedRatio() (r float32, exists bool) {
+	v := m.seed_ratio
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSeedRatio returns the old "seed_ratio" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldSeedRatio(ctx context.Context) (v float32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSeedRatio is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSeedRatio requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSeedRatio: %w", err)
+	}
+	return oldValue.SeedRatio, nil
+}
+
+// AddSeedRatio adds f to the "seed_ratio" field.
+func (m *IndexersMutation) AddSeedRatio(f float32) {
+	if m.addseed_ratio != nil {
+		*m.addseed_ratio += f
+	} else {
+		m.addseed_ratio = &f
+	}
+}
+
+// AddedSeedRatio returns the value that was added to the "seed_ratio" field in this mutation.
+func (m *IndexersMutation) AddedSeedRatio() (r float32, exists bool) {
+	v := m.addseed_ratio
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSeedRatio clears the value of the "seed_ratio" field.
+func (m *IndexersMutation) ClearSeedRatio() {
+	m.seed_ratio = nil
+	m.addseed_ratio = nil
+	m.clearedFields[indexers.FieldSeedRatio] = struct{}{}
+}
+
+// SeedRatioCleared returns if the "seed_ratio" field was cleared in this mutation.
+func (m *IndexersMutation) SeedRatioCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldSeedRatio]
+	return ok
+}
+
+// ResetSeedRatio resets all changes to the "seed_ratio" field.
+func (m *IndexersMutation) ResetSeedRatio() {
+	m.seed_ratio = nil
+	m.addseed_ratio = nil
+	delete(m.clearedFields, indexers.FieldSeedRatio)
+}
+
+// SetDisabled sets the "disabled" field.
+func (m *IndexersMutation) SetDisabled(b bool) {
+	m.disabled = &b
+}
+
+// Disabled returns the value of the "disabled" field in the mutation.
+func (m *IndexersMutation) Disabled() (r bool, exists bool) {
+	v := m.disabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisabled returns the old "disabled" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldDisabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisabled: %w", err)
+	}
+	return oldValue.Disabled, nil
+}
+
+// ClearDisabled clears the value of the "disabled" field.
+func (m *IndexersMutation) ClearDisabled() {
+	m.disabled = nil
+	m.clearedFields[indexers.FieldDisabled] = struct{}{}
+}
+
+// DisabledCleared returns if the "disabled" field was cleared in this mutation.
+func (m *IndexersMutation) DisabledCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldDisabled]
+	return ok
+}
+
+// ResetDisabled resets all changes to the "disabled" field.
+func (m *IndexersMutation) ResetDisabled() {
+	m.disabled = nil
+	delete(m.clearedFields, indexers.FieldDisabled)
+}
+
 // Where appends a list predicates to the IndexersMutation builder.
 func (m *IndexersMutation) Where(ps ...predicate.Indexers) {
 	m.predicates = append(m.predicates, ps...)
@@ -3007,7 +3129,7 @@ func (m *IndexersMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IndexersMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, indexers.FieldName)
 	}
@@ -3022,6 +3144,12 @@ func (m *IndexersMutation) Fields() []string {
 	}
 	if m.priority != nil {
 		fields = append(fields, indexers.FieldPriority)
+	}
+	if m.seed_ratio != nil {
+		fields = append(fields, indexers.FieldSeedRatio)
+	}
+	if m.disabled != nil {
+		fields = append(fields, indexers.FieldDisabled)
 	}
 	return fields
 }
@@ -3041,6 +3169,10 @@ func (m *IndexersMutation) Field(name string) (ent.Value, bool) {
 		return m.EnableRss()
 	case indexers.FieldPriority:
 		return m.Priority()
+	case indexers.FieldSeedRatio:
+		return m.SeedRatio()
+	case indexers.FieldDisabled:
+		return m.Disabled()
 	}
 	return nil, false
 }
@@ -3060,6 +3192,10 @@ func (m *IndexersMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldEnableRss(ctx)
 	case indexers.FieldPriority:
 		return m.OldPriority(ctx)
+	case indexers.FieldSeedRatio:
+		return m.OldSeedRatio(ctx)
+	case indexers.FieldDisabled:
+		return m.OldDisabled(ctx)
 	}
 	return nil, fmt.Errorf("unknown Indexers field %s", name)
 }
@@ -3104,6 +3240,20 @@ func (m *IndexersMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPriority(v)
 		return nil
+	case indexers.FieldSeedRatio:
+		v, ok := value.(float32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSeedRatio(v)
+		return nil
+	case indexers.FieldDisabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisabled(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Indexers field %s", name)
 }
@@ -3115,6 +3265,9 @@ func (m *IndexersMutation) AddedFields() []string {
 	if m.addpriority != nil {
 		fields = append(fields, indexers.FieldPriority)
 	}
+	if m.addseed_ratio != nil {
+		fields = append(fields, indexers.FieldSeedRatio)
+	}
 	return fields
 }
 
@@ -3125,6 +3278,8 @@ func (m *IndexersMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case indexers.FieldPriority:
 		return m.AddedPriority()
+	case indexers.FieldSeedRatio:
+		return m.AddedSeedRatio()
 	}
 	return nil, false
 }
@@ -3141,6 +3296,13 @@ func (m *IndexersMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddPriority(v)
 		return nil
+	case indexers.FieldSeedRatio:
+		v, ok := value.(float32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSeedRatio(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Indexers numeric field %s", name)
 }
@@ -3148,7 +3310,14 @@ func (m *IndexersMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *IndexersMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(indexers.FieldSeedRatio) {
+		fields = append(fields, indexers.FieldSeedRatio)
+	}
+	if m.FieldCleared(indexers.FieldDisabled) {
+		fields = append(fields, indexers.FieldDisabled)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3161,6 +3330,14 @@ func (m *IndexersMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *IndexersMutation) ClearField(name string) error {
+	switch name {
+	case indexers.FieldSeedRatio:
+		m.ClearSeedRatio()
+		return nil
+	case indexers.FieldDisabled:
+		m.ClearDisabled()
+		return nil
+	}
 	return fmt.Errorf("unknown Indexers nullable field %s", name)
 }
 
@@ -3182,6 +3359,12 @@ func (m *IndexersMutation) ResetField(name string) error {
 		return nil
 	case indexers.FieldPriority:
 		m.ResetPriority()
+		return nil
+	case indexers.FieldSeedRatio:
+		m.ResetSeedRatio()
+		return nil
+	case indexers.FieldDisabled:
+		m.ResetDisabled()
 		return nil
 	}
 	return fmt.Errorf("unknown Indexers field %s", name)

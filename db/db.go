@@ -247,19 +247,23 @@ type TorznabSetting struct {
 	ApiKey string `json:"api_key"`
 }
 
-func (c *Client) SaveTorznabInfo(name string, setting TorznabSetting) error {
-	data, err := json.Marshal(setting)
-	if err != nil {
-		return errors.Wrap(err, "marshal json")
+
+func (c *Client) SaveIndexer(in *ent.Indexers) error {
+
+	if in.ID != 0 {
+		//update setting
+		return c.ent.Indexers.Update().Where(indexers.ID(in.ID)).SetName(in.Name).SetImplementation(in.Implementation).
+			SetPriority(in.Priority).SetSettings(in.Settings).SetSeedRatio(in.SeedRatio).SetDisabled(in.Disabled).Exec(context.Background())
 	}
-	count := c.ent.Indexers.Query().Where(indexers.Name(name)).CountX(context.TODO())
+	//create new one
+	count := c.ent.Indexers.Query().Where(indexers.Name(in.Name)).CountX(context.TODO())
 	if count > 0 {
-		c.ent.Indexers.Update().Where(indexers.Name(name)).SetSettings(string(data)).Save(context.TODO())
-		return err
+		return fmt.Errorf("name already esxits: %v", in.Name)
 	}
 
-	_, err = c.ent.Indexers.Create().
-		SetName(name).SetImplementation(IndexerTorznabImpl).SetPriority(1).SetSettings(string(data)).Save(context.TODO())
+	_, err := c.ent.Indexers.Create().
+		SetName(in.Name).SetImplementation(in.Implementation).SetPriority(in.Priority).SetSettings(in.Settings).SetSeedRatio(in.SeedRatio).
+			SetDisabled(in.Disabled).Save(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "save db")
 	}
@@ -272,8 +276,7 @@ func (c *Client) DeleteTorznab(id int) {
 }
 
 type TorznabInfo struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	*ent.Indexers
 	TorznabSetting
 }
 
@@ -289,8 +292,7 @@ func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
 			continue
 		}
 		l = append(l, &TorznabInfo{
-			ID:             r.ID,
-			Name:           r.Name,
+			Indexers: r,
 			TorznabSetting: ss,
 		})
 	}

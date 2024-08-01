@@ -78,6 +78,16 @@ func Priority(v int) predicate.Indexers {
 	return predicate.Indexers(sql.FieldEQ(FieldPriority, v))
 }
 
+// SeedRatio applies equality check predicate on the "seed_ratio" field. It's identical to SeedRatioEQ.
+func SeedRatio(v float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldSeedRatio, v))
+}
+
+// Disabled applies equality check predicate on the "disabled" field. It's identical to DisabledEQ.
+func Disabled(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldDisabled, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Indexers {
 	return predicate.Indexers(sql.FieldEQ(FieldName, v))
@@ -321,6 +331,76 @@ func PriorityLT(v int) predicate.Indexers {
 // PriorityLTE applies the LTE predicate on the "priority" field.
 func PriorityLTE(v int) predicate.Indexers {
 	return predicate.Indexers(sql.FieldLTE(FieldPriority, v))
+}
+
+// SeedRatioEQ applies the EQ predicate on the "seed_ratio" field.
+func SeedRatioEQ(v float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldSeedRatio, v))
+}
+
+// SeedRatioNEQ applies the NEQ predicate on the "seed_ratio" field.
+func SeedRatioNEQ(v float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldSeedRatio, v))
+}
+
+// SeedRatioIn applies the In predicate on the "seed_ratio" field.
+func SeedRatioIn(vs ...float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldIn(FieldSeedRatio, vs...))
+}
+
+// SeedRatioNotIn applies the NotIn predicate on the "seed_ratio" field.
+func SeedRatioNotIn(vs ...float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotIn(FieldSeedRatio, vs...))
+}
+
+// SeedRatioGT applies the GT predicate on the "seed_ratio" field.
+func SeedRatioGT(v float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGT(FieldSeedRatio, v))
+}
+
+// SeedRatioGTE applies the GTE predicate on the "seed_ratio" field.
+func SeedRatioGTE(v float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGTE(FieldSeedRatio, v))
+}
+
+// SeedRatioLT applies the LT predicate on the "seed_ratio" field.
+func SeedRatioLT(v float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLT(FieldSeedRatio, v))
+}
+
+// SeedRatioLTE applies the LTE predicate on the "seed_ratio" field.
+func SeedRatioLTE(v float32) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLTE(FieldSeedRatio, v))
+}
+
+// SeedRatioIsNil applies the IsNil predicate on the "seed_ratio" field.
+func SeedRatioIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldSeedRatio))
+}
+
+// SeedRatioNotNil applies the NotNil predicate on the "seed_ratio" field.
+func SeedRatioNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldSeedRatio))
+}
+
+// DisabledEQ applies the EQ predicate on the "disabled" field.
+func DisabledEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldDisabled, v))
+}
+
+// DisabledNEQ applies the NEQ predicate on the "disabled" field.
+func DisabledNEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldDisabled, v))
+}
+
+// DisabledIsNil applies the IsNil predicate on the "disabled" field.
+func DisabledIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldDisabled))
+}
+
+// DisabledNotNil applies the NotNil predicate on the "disabled" field.
+func DisabledNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldDisabled))
 }
 
 // And groups predicates with the AND operator between them.

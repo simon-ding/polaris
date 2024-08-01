@@ -21,6 +21,10 @@ const (
 	FieldEnableRss = "enable_rss"
 	// FieldPriority holds the string denoting the priority field in the database.
 	FieldPriority = "priority"
+	// FieldSeedRatio holds the string denoting the seed_ratio field in the database.
+	FieldSeedRatio = "seed_ratio"
+	// FieldDisabled holds the string denoting the disabled field in the database.
+	FieldDisabled = "disabled"
 	// Table holds the table name of the indexers in the database.
 	Table = "indexers"
 )
@@ -33,6 +37,8 @@ var Columns = []string{
 	FieldSettings,
 	FieldEnableRss,
 	FieldPriority,
+	FieldSeedRatio,
+	FieldDisabled,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -48,6 +54,12 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultEnableRss holds the default value on creation for the "enable_rss" field.
 	DefaultEnableRss bool
+	// DefaultPriority holds the default value on creation for the "priority" field.
+	DefaultPriority int
+	// DefaultSeedRatio holds the default value on creation for the "seed_ratio" field.
+	DefaultSeedRatio float32
+	// DefaultDisabled holds the default value on creation for the "disabled" field.
+	DefaultDisabled bool
 )
 
 // OrderOption defines the ordering options for the Indexers queries.
@@ -81,4 +93,14 @@ func ByEnableRss(opts ...sql.OrderTermOption) OrderOption {
 // ByPriority orders the results by the priority field.
 func ByPriority(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPriority, opts...).ToFunc()
+}
+
+// BySeedRatio orders the results by the seed_ratio field.
+func BySeedRatio(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSeedRatio, opts...).ToFunc()
+}
+
+// ByDisabled orders the results by the disabled field.
+func ByDisabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDisabled, opts...).ToFunc()
 }

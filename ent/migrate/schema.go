@@ -80,7 +80,9 @@ var (
 		{Name: "implementation", Type: field.TypeString},
 		{Name: "settings", Type: field.TypeString},
 		{Name: "enable_rss", Type: field.TypeBool, Default: true},
-		{Name: "priority", Type: field.TypeInt},
+		{Name: "priority", Type: field.TypeInt, Default: 50},
+		{Name: "seed_ratio", Type: field.TypeFloat32, Nullable: true, Default: 0},
+		{Name: "disabled", Type: field.TypeBool, Nullable: true, Default: false},
 	}
 	// IndexersTable holds the schema information for the "indexers" table.
 	IndexersTable = &schema.Table{

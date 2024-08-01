@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -92,9 +93,13 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 }
 
 type addTorznabIn struct {
-	Name   string `json:"name" binding:"required"`
-	URL    string `json:"url" binding:"required"`
-	ApiKey string `json:"api_key" binding:"required"`
+	ID        int     `json:"id"`
+	Name      string  `json:"name" binding:"required"`
+	URL       string  `json:"url" binding:"required"`
+	ApiKey    string  `json:"api_key" binding:"required"`
+	Disabled  bool    `json:"disabled"`
+	Priority  int     `json:"priority"`
+	SeedRatio float32 `json:"seed_ratio"`
 }
 
 func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
@@ -102,10 +107,31 @@ func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
-	err := s.db.SaveTorznabInfo(in.Name, db.TorznabSetting{
+
+	log.Infof("add indexer settings: %+v", in)
+	setting := db.TorznabSetting{
 		URL:    in.URL,
 		ApiKey: in.ApiKey,
-	})
+	}
+
+	data, err := json.Marshal(setting)
+	if err != nil {
+		return nil, errors.Wrap(err, "marshal json")
+	}
+	if in.Priority > 128 {
+		in.Priority = 128
+	}
+
+	indexer := ent.Indexers{
+		ID:             in.ID,
+		Name:           in.Name,
+		Implementation: "torznab",
+		Settings:       string(data),
+		Priority:       in.Priority,
+		Disabled:       in.Disabled,
+		SeedRatio:      in.SeedRatio,
+	}
+	err = s.db.SaveIndexer(&indexer)
 	if err != nil {
 		return nil, errors.Wrap(err, "add ")
 	}

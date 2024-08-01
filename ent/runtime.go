@@ -61,6 +61,18 @@ func init() {
 	indexersDescEnableRss := indexersFields[3].Descriptor()
 	// indexers.DefaultEnableRss holds the default value on creation for the enable_rss field.
 	indexers.DefaultEnableRss = indexersDescEnableRss.Default.(bool)
+	// indexersDescPriority is the schema descriptor for priority field.
+	indexersDescPriority := indexersFields[4].Descriptor()
+	// indexers.DefaultPriority holds the default value on creation for the priority field.
+	indexers.DefaultPriority = indexersDescPriority.Default.(int)
+	// indexersDescSeedRatio is the schema descriptor for seed_ratio field.
+	indexersDescSeedRatio := indexersFields[5].Descriptor()
+	// indexers.DefaultSeedRatio holds the default value on creation for the seed_ratio field.
+	indexers.DefaultSeedRatio = indexersDescSeedRatio.Default.(float32)
+	// indexersDescDisabled is the schema descriptor for disabled field.
+	indexersDescDisabled := indexersFields[6].Descriptor()
+	// indexers.DefaultDisabled holds the default value on creation for the disabled field.
+	indexers.DefaultDisabled = indexersDescDisabled.Default.(bool)
 	mediaFields := schema.Media{}.Fields()
 	_ = mediaFields
 	// mediaDescCreatedAt is the schema descriptor for created_at field.

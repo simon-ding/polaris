@@ -130,20 +130,30 @@ class Indexer {
   String? url;
   String? apiKey;
   int? id;
+  int? priority;
+  double? seedRatio;
+  bool? disabled;
 
-  Indexer({this.name, this.url, this.apiKey});
+  Indexer({this.name, this.url, this.apiKey, this.id, this.priority=50, this.seedRatio=0, this.disabled});
 
   Indexer.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     url = json['url'];
     apiKey = json['api_key'];
     id = json["id"];
+    priority = json["priority"];
+    seedRatio = json["seed_ratio"]??0;
+    disabled = json["disabled"] ?? false;
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = name;
     data['url'] = url;
     data['api_key'] = apiKey;
+    data["id"] = id;
+    data["priority"] = priority;
+    data["seed_ratio"] = seedRatio;
+    data["disabled"] = disabled;
     return data;
   }
 }

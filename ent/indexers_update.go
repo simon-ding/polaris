@@ -104,6 +104,53 @@ func (iu *IndexersUpdate) AddPriority(i int) *IndexersUpdate {
 	return iu
 }
 
+// SetSeedRatio sets the "seed_ratio" field.
+func (iu *IndexersUpdate) SetSeedRatio(f float32) *IndexersUpdate {
+	iu.mutation.ResetSeedRatio()
+	iu.mutation.SetSeedRatio(f)
+	return iu
+}
+
+// SetNillableSeedRatio sets the "seed_ratio" field if the given value is not nil.
+func (iu *IndexersUpdate) SetNillableSeedRatio(f *float32) *IndexersUpdate {
+	if f != nil {
+		iu.SetSeedRatio(*f)
+	}
+	return iu
+}
+
+// AddSeedRatio adds f to the "seed_ratio" field.
+func (iu *IndexersUpdate) AddSeedRatio(f float32) *IndexersUpdate {
+	iu.mutation.AddSeedRatio(f)
+	return iu
+}
+
+// ClearSeedRatio clears the value of the "seed_ratio" field.
+func (iu *IndexersUpdate) ClearSeedRatio() *IndexersUpdate {
+	iu.mutation.ClearSeedRatio()
+	return iu
+}
+
+// SetDisabled sets the "disabled" field.
+func (iu *IndexersUpdate) SetDisabled(b bool) *IndexersUpdate {
+	iu.mutation.SetDisabled(b)
+	return iu
+}
+
+// SetNillableDisabled sets the "disabled" field if the given value is not nil.
+func (iu *IndexersUpdate) SetNillableDisabled(b *bool) *IndexersUpdate {
+	if b != nil {
+		iu.SetDisabled(*b)
+	}
+	return iu
+}
+
+// ClearDisabled clears the value of the "disabled" field.
+func (iu *IndexersUpdate) ClearDisabled() *IndexersUpdate {
+	iu.mutation.ClearDisabled()
+	return iu
+}
+
 // Mutation returns the IndexersMutation object of the builder.
 func (iu *IndexersUpdate) Mutation() *IndexersMutation {
 	return iu.mutation
@@ -162,6 +209,21 @@ func (iu *IndexersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.AddedPriority(); ok {
 		_spec.AddField(indexers.FieldPriority, field.TypeInt, value)
+	}
+	if value, ok := iu.mutation.SeedRatio(); ok {
+		_spec.SetField(indexers.FieldSeedRatio, field.TypeFloat32, value)
+	}
+	if value, ok := iu.mutation.AddedSeedRatio(); ok {
+		_spec.AddField(indexers.FieldSeedRatio, field.TypeFloat32, value)
+	}
+	if iu.mutation.SeedRatioCleared() {
+		_spec.ClearField(indexers.FieldSeedRatio, field.TypeFloat32)
+	}
+	if value, ok := iu.mutation.Disabled(); ok {
+		_spec.SetField(indexers.FieldDisabled, field.TypeBool, value)
+	}
+	if iu.mutation.DisabledCleared() {
+		_spec.ClearField(indexers.FieldDisabled, field.TypeBool)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -260,6 +322,53 @@ func (iuo *IndexersUpdateOne) AddPriority(i int) *IndexersUpdateOne {
 	return iuo
 }
 
+// SetSeedRatio sets the "seed_ratio" field.
+func (iuo *IndexersUpdateOne) SetSeedRatio(f float32) *IndexersUpdateOne {
+	iuo.mutation.ResetSeedRatio()
+	iuo.mutation.SetSeedRatio(f)
+	return iuo
+}
+
+// SetNillableSeedRatio sets the "seed_ratio" field if the given value is not nil.
+func (iuo *IndexersUpdateOne) SetNillableSeedRatio(f *float32) *IndexersUpdateOne {
+	if f != nil {
+		iuo.SetSeedRatio(*f)
+	}
+	return iuo
+}
+
+// AddSeedRatio adds f to the "seed_ratio" field.
+func (iuo *IndexersUpdateOne) AddSeedRatio(f float32) *IndexersUpdateOne {
+	iuo.mutation.AddSeedRatio(f)
+	return iuo
+}
+
+// ClearSeedRatio clears the value of the "seed_ratio" field.
+func (iuo *IndexersUpdateOne) ClearSeedRatio() *IndexersUpdateOne {
+	iuo.mutation.ClearSeedRatio()
+	return iuo
+}
+
+// SetDisabled sets the "disabled" field.
+func (iuo *IndexersUpdateOne) SetDisabled(b bool) *IndexersUpdateOne {
+	iuo.mutation.SetDisabled(b)
+	return iuo
+}
+
+// SetNillableDisabled sets the "disabled" field if the given value is not nil.
+func (iuo *IndexersUpdateOne) SetNillableDisabled(b *bool) *IndexersUpdateOne {
+	if b != nil {
+		iuo.SetDisabled(*b)
+	}
+	return iuo
+}
+
+// ClearDisabled clears the value of the "disabled" field.
+func (iuo *IndexersUpdateOne) ClearDisabled() *IndexersUpdateOne {
+	iuo.mutation.ClearDisabled()
+	return iuo
+}
+
 // Mutation returns the IndexersMutation object of the builder.
 func (iuo *IndexersUpdateOne) Mutation() *IndexersMutation {
 	return iuo.mutation
@@ -348,6 +457,21 @@ func (iuo *IndexersUpdateOne) sqlSave(ctx context.Context) (_node *Indexers, err
 	}
 	if value, ok := iuo.mutation.AddedPriority(); ok {
 		_spec.AddField(indexers.FieldPriority, field.TypeInt, value)
+	}
+	if value, ok := iuo.mutation.SeedRatio(); ok {
+		_spec.SetField(indexers.FieldSeedRatio, field.TypeFloat32, value)
+	}
+	if value, ok := iuo.mutation.AddedSeedRatio(); ok {
+		_spec.AddField(indexers.FieldSeedRatio, field.TypeFloat32, value)
+	}
+	if iuo.mutation.SeedRatioCleared() {
+		_spec.ClearField(indexers.FieldSeedRatio, field.TypeFloat32)
+	}
+	if value, ok := iuo.mutation.Disabled(); ok {
+		_spec.SetField(indexers.FieldDisabled, field.TypeBool, value)
+	}
+	if iuo.mutation.DisabledCleared() {
+		_spec.ClearField(indexers.FieldDisabled, field.TypeBool)
 	}
 	_node = &Indexers{config: iuo.config}
 	_spec.Assign = _node.assignValues

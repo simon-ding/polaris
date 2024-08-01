@@ -17,7 +17,9 @@ func (Indexers) Fields() []ent.Field {
 		field.String("implementation"),
 		field.String("settings"),
 		field.Bool("enable_rss").Default(true),
-		field.Int("priority"),
+		field.Int("priority").Default(50),
+		field.Float32("seed_ratio").Optional().Default(0).Comment("minimal seed ratio requied, before removing torrent"),
+		field.Bool("disabled").Optional().Default(false),
 	}
 }
 

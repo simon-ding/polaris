@@ -16,7 +16,7 @@ Future<void> showSettingDialog(
           title: Text(title),
           content: SingleChildScrollView(
             child: SizedBox(
-              width: 300,
+              width: 400,
               child: body,
             ),
           ),

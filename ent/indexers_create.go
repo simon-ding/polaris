@@ -57,6 +57,42 @@ func (ic *IndexersCreate) SetPriority(i int) *IndexersCreate {
 	return ic
 }
 
+// SetNillablePriority sets the "priority" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillablePriority(i *int) *IndexersCreate {
+	if i != nil {
+		ic.SetPriority(*i)
+	}
+	return ic
+}
+
+// SetSeedRatio sets the "seed_ratio" field.
+func (ic *IndexersCreate) SetSeedRatio(f float32) *IndexersCreate {
+	ic.mutation.SetSeedRatio(f)
+	return ic
+}
+
+// SetNillableSeedRatio sets the "seed_ratio" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableSeedRatio(f *float32) *IndexersCreate {
+	if f != nil {
+		ic.SetSeedRatio(*f)
+	}
+	return ic
+}
+
+// SetDisabled sets the "disabled" field.
+func (ic *IndexersCreate) SetDisabled(b bool) *IndexersCreate {
+	ic.mutation.SetDisabled(b)
+	return ic
+}
+
+// SetNillableDisabled sets the "disabled" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableDisabled(b *bool) *IndexersCreate {
+	if b != nil {
+		ic.SetDisabled(*b)
+	}
+	return ic
+}
+
 // Mutation returns the IndexersMutation object of the builder.
 func (ic *IndexersCreate) Mutation() *IndexersMutation {
 	return ic.mutation
@@ -95,6 +131,18 @@ func (ic *IndexersCreate) defaults() {
 	if _, ok := ic.mutation.EnableRss(); !ok {
 		v := indexers.DefaultEnableRss
 		ic.mutation.SetEnableRss(v)
+	}
+	if _, ok := ic.mutation.Priority(); !ok {
+		v := indexers.DefaultPriority
+		ic.mutation.SetPriority(v)
+	}
+	if _, ok := ic.mutation.SeedRatio(); !ok {
+		v := indexers.DefaultSeedRatio
+		ic.mutation.SetSeedRatio(v)
+	}
+	if _, ok := ic.mutation.Disabled(); !ok {
+		v := indexers.DefaultDisabled
+		ic.mutation.SetDisabled(v)
 	}
 }
 
@@ -160,6 +208,14 @@ func (ic *IndexersCreate) createSpec() (*Indexers, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Priority(); ok {
 		_spec.SetField(indexers.FieldPriority, field.TypeInt, value)
 		_node.Priority = value
+	}
+	if value, ok := ic.mutation.SeedRatio(); ok {
+		_spec.SetField(indexers.FieldSeedRatio, field.TypeFloat32, value)
+		_node.SeedRatio = value
+	}
+	if value, ok := ic.mutation.Disabled(); ok {
+		_spec.SetField(indexers.FieldDisabled, field.TypeBool, value)
+		_node.Disabled = value
 	}
 	return _node, _spec
 }
