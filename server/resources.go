@@ -167,7 +167,7 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 			res, err = core.SearchEpisode(s.db, in.ID, in.Season, in.Episode, false)
 			if err != nil {
 				if err.Error() == "no resource found" {
-					return gin.H{}, nil
+					return []string{}, nil
 				}
 				return nil, errors.Wrap(err, "search episode")
 			}
@@ -178,7 +178,7 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 		res, err = core.SearchMovie(s.db, in.ID, false)
 		if err != nil {
 			if err.Error() == "no resource found" {
-				return gin.H{}, nil
+				return []string{}, nil
 			}
 			return nil, err
 		}
