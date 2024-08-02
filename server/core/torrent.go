@@ -7,6 +7,7 @@ import (
 	"polaris/pkg/metadata"
 	"polaris/pkg/torznab"
 	"polaris/pkg/utils"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -15,30 +16,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-func SearchSeasonPackage(db1 *db.Client, seriesId, seasonNum int, checkResolution bool) ([]torznab.Result, error) {
-	return SearchEpisode(db1, seriesId, seasonNum, -1, checkResolution)
-}
-
-func isNumberedSeries(detail *db.MediaDetails) bool {
-	hasSeason2 := false
-	season2HasEpisode1 := false
-	for _, ep := range detail.Episodes {
-		if ep.SeasonNumber == 2 {
-			hasSeason2 = true
-			if ep.EpisodeNumber == 1 {
-				season2HasEpisode1 = true
-			}
-
-		}
-	}
-	return hasSeason2 && !season2HasEpisode1 //only one 1st episode
-}
-
-func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkResolution bool) ([]torznab.Result, error) {
+func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, checkResolution bool) ([]torznab.Result, error) {
 	series := db1.GetMediaDetails(seriesId)
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
 	}
+	slices.Contains(episodes, 1)
 
 	res := searchWithTorznab(db1, series.NameEn)
 	resCn := searchWithTorznab(db1, series.NameCn)
@@ -56,14 +39,14 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 				continue
 			}
 		}
-		if isNumberedSeries(series) && episodeNum == -1 {
+		if isNumberedSeries(series) && len(episodes) == 0 {
 			//should not want season
 			continue
 		}
 
-		if episodeNum != -1 && meta.Episode != episodeNum { //not season pack, episode number equals
+		if len(episodes) > 0 && slices.Contains(episodes, meta.Episode) { //not season pack, episode number equals
 			continue
-		}else if episodeNum == -1 && !meta.IsSeasonPack { //want season pack, but not season pack
+		}else if len(episodes) == 0 && !meta.IsSeasonPack { //want season pack, but not season pack
 			continue
 		}
 		if checkResolution && meta.Resolution != series.Resolution.String() {
@@ -80,6 +63,21 @@ func SearchEpisode(db1 *db.Client, seriesId, seasonNum, episodeNum int, checkRes
 	filtered = dedup(filtered)
 	return filtered, nil
 
+}
+
+func isNumberedSeries(detail *db.MediaDetails) bool {
+	hasSeason2 := false
+	season2HasEpisode1 := false
+	for _, ep := range detail.Episodes {
+		if ep.SeasonNumber == 2 {
+			hasSeason2 = true
+			if ep.EpisodeNumber == 1 {
+				season2HasEpisode1 = true
+			}
+
+		}
+	}
+	return hasSeason2 && !season2HasEpisode1 //only one 1st episode
 }
 
 func SearchMovie(db1 *db.Client, movieId int, checkResolution bool) ([]torznab.Result, error) {

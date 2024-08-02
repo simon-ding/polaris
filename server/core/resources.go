@@ -112,7 +112,7 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 }
 func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string, error) {
 
-	res, err := SearchEpisode(c.db, seriesId, seasonNum, episodeNum, true)
+	res, err := SearchTvSeries(c.db, seriesId, seasonNum, []int{episodeNum}, true)
 	if err != nil {
 		return nil, err
 	}

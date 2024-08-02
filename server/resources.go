@@ -13,7 +13,7 @@ import (
 
 func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*string, error) {
 
-	res, err := core.SearchSeasonPackage(s.db, seriesId, seasonNum, true)
+	res, err := core.SearchTvSeries(s.db, seriesId, seasonNum, nil, true)
 	if err != nil {
 		return nil, err
 	}
@@ -46,13 +46,13 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 		if in.Episode == 0 {
 			//search season package
 			log.Infof("search series season package S%02d", in.Season)
-			res, err = core.SearchSeasonPackage(s.db, in.ID, in.Season, false)
+			res, err = core.SearchTvSeries(s.db, in.ID, in.Season, nil, false)
 			if err != nil {
 				return nil, errors.Wrap(err, "search season package")
 			}
 		} else {
 			log.Infof("search series episode S%02dE%02d", in.Season, in.Episode)
-			res, err = core.SearchEpisode(s.db, in.ID, in.Season, in.Episode, false)
+			res, err = core.SearchTvSeries(s.db, in.ID, in.Season, []int{in.Episode}, false)
 			if err != nil {
 				if err.Error() == "no resource found" {
 					return []string{}, nil

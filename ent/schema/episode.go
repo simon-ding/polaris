@@ -21,7 +21,7 @@ func (Episode) Fields() []ent.Field {
 		field.String("overview"),
 		field.String("air_date"),
 		field.Enum("status").Values("missing", "downloading", "downloaded").Default("missing"),
-		field.Bool("monitored").Default(true).StructTag("json:\"monitored\""), //whether this episode is monitored
+		field.Bool("monitored").Default(false).StructTag("json:\"monitored\""), //whether this episode is monitored
 	}
 }
 

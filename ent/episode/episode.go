@@ -28,6 +28,8 @@ const (
 	FieldAirDate = "air_date"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldMonitored holds the string denoting the monitored field in the database.
+	FieldMonitored = "monitored"
 	// EdgeMedia holds the string denoting the media edge name in mutations.
 	EdgeMedia = "media"
 	// Table holds the table name of the episode in the database.
@@ -51,6 +53,7 @@ var Columns = []string{
 	FieldOverview,
 	FieldAirDate,
 	FieldStatus,
+	FieldMonitored,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -62,6 +65,11 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultMonitored holds the default value on creation for the "monitored" field.
+	DefaultMonitored bool
+)
 
 // Status defines the type for the "status" enum field.
 type Status string
@@ -131,6 +139,11 @@ func ByAirDate(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByMonitored orders the results by the monitored field.
+func ByMonitored(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMonitored, opts...).ToFunc()
 }
 
 // ByMediaField orders the results by media field.

@@ -78,6 +78,20 @@ func (ec *EpisodeCreate) SetNillableStatus(e *episode.Status) *EpisodeCreate {
 	return ec
 }
 
+// SetMonitored sets the "monitored" field.
+func (ec *EpisodeCreate) SetMonitored(b bool) *EpisodeCreate {
+	ec.mutation.SetMonitored(b)
+	return ec
+}
+
+// SetNillableMonitored sets the "monitored" field if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableMonitored(b *bool) *EpisodeCreate {
+	if b != nil {
+		ec.SetMonitored(*b)
+	}
+	return ec
+}
+
 // SetMedia sets the "media" edge to the Media entity.
 func (ec *EpisodeCreate) SetMedia(m *Media) *EpisodeCreate {
 	return ec.SetMediaID(m.ID)
@@ -122,6 +136,10 @@ func (ec *EpisodeCreate) defaults() {
 		v := episode.DefaultStatus
 		ec.mutation.SetStatus(v)
 	}
+	if _, ok := ec.mutation.Monitored(); !ok {
+		v := episode.DefaultMonitored
+		ec.mutation.SetMonitored(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -148,6 +166,9 @@ func (ec *EpisodeCreate) check() error {
 		if err := episode.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Episode.status": %w`, err)}
 		}
+	}
+	if _, ok := ec.mutation.Monitored(); !ok {
+		return &ValidationError{Name: "monitored", err: errors.New(`ent: missing required field "Episode.monitored"`)}
 	}
 	return nil
 }
@@ -198,6 +219,10 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.Status(); ok {
 		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := ec.mutation.Monitored(); ok {
+		_spec.SetField(episode.FieldMonitored, field.TypeBool, value)
+		_node.Monitored = value
 	}
 	if nodes := ec.mutation.MediaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -921,6 +921,7 @@ type EpisodeMutation struct {
 	overview          *string
 	air_date          *string
 	status            *episode.Status
+	monitored         *bool
 	clearedFields     map[string]struct{}
 	media             *int
 	clearedmedia      bool
@@ -1332,6 +1333,42 @@ func (m *EpisodeMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetMonitored sets the "monitored" field.
+func (m *EpisodeMutation) SetMonitored(b bool) {
+	m.monitored = &b
+}
+
+// Monitored returns the value of the "monitored" field in the mutation.
+func (m *EpisodeMutation) Monitored() (r bool, exists bool) {
+	v := m.monitored
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMonitored returns the old "monitored" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EpisodeMutation) OldMonitored(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMonitored is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMonitored requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMonitored: %w", err)
+	}
+	return oldValue.Monitored, nil
+}
+
+// ResetMonitored resets all changes to the "monitored" field.
+func (m *EpisodeMutation) ResetMonitored() {
+	m.monitored = nil
+}
+
 // ClearMedia clears the "media" edge to the Media entity.
 func (m *EpisodeMutation) ClearMedia() {
 	m.clearedmedia = true
@@ -1393,7 +1430,7 @@ func (m *EpisodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EpisodeMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.media != nil {
 		fields = append(fields, episode.FieldMediaID)
 	}
@@ -1414,6 +1451,9 @@ func (m *EpisodeMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, episode.FieldStatus)
+	}
+	if m.monitored != nil {
+		fields = append(fields, episode.FieldMonitored)
 	}
 	return fields
 }
@@ -1437,6 +1477,8 @@ func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 		return m.AirDate()
 	case episode.FieldStatus:
 		return m.Status()
+	case episode.FieldMonitored:
+		return m.Monitored()
 	}
 	return nil, false
 }
@@ -1460,6 +1502,8 @@ func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldAirDate(ctx)
 	case episode.FieldStatus:
 		return m.OldStatus(ctx)
+	case episode.FieldMonitored:
+		return m.OldMonitored(ctx)
 	}
 	return nil, fmt.Errorf("unknown Episode field %s", name)
 }
@@ -1517,6 +1561,13 @@ func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case episode.FieldMonitored:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMonitored(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
@@ -1623,6 +1674,9 @@ func (m *EpisodeMutation) ResetField(name string) error {
 		return nil
 	case episode.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case episode.FieldMonitored:
+		m.ResetMonitored()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)

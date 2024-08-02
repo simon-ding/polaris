@@ -31,6 +31,8 @@ type Episode struct {
 	AirDate string `json:"air_date,omitempty"`
 	// Status holds the value of the "status" field.
 	Status episode.Status `json:"status,omitempty"`
+	// Monitored holds the value of the "monitored" field.
+	Monitored bool `json:"monitored"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EpisodeQuery when eager-loading is set.
 	Edges        EpisodeEdges `json:"edges"`
@@ -62,6 +64,8 @@ func (*Episode) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case episode.FieldMonitored:
+			values[i] = new(sql.NullBool)
 		case episode.FieldID, episode.FieldMediaID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
 			values[i] = new(sql.NullInt64)
 		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldStatus:
@@ -129,6 +133,12 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.Status = episode.Status(value.String)
 			}
+		case episode.FieldMonitored:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field monitored", values[i])
+			} else if value.Valid {
+				e.Monitored = value.Bool
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -190,6 +200,9 @@ func (e *Episode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", e.Status))
+	builder.WriteString(", ")
+	builder.WriteString("monitored=")
+	builder.WriteString(fmt.Sprintf("%v", e.Monitored))
 	builder.WriteByte(')')
 	return builder.String()
 }

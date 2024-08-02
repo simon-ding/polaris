@@ -84,6 +84,11 @@ func AirDate(v string) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldAirDate, v))
 }
 
+// Monitored applies equality check predicate on the "monitored" field. It's identical to MonitoredEQ.
+func Monitored(v bool) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldMonitored, v))
+}
+
 // MediaIDEQ applies the EQ predicate on the "media_id" field.
 func MediaIDEQ(v int) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldMediaID, v))
@@ -407,6 +412,16 @@ func StatusIn(vs ...Status) predicate.Episode {
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.Episode {
 	return predicate.Episode(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// MonitoredEQ applies the EQ predicate on the "monitored" field.
+func MonitoredEQ(v bool) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldMonitored, v))
+}
+
+// MonitoredNEQ applies the NEQ predicate on the "monitored" field.
+func MonitoredNEQ(v bool) predicate.Episode {
+	return predicate.Episode(sql.FieldNEQ(FieldMonitored, v))
 }
 
 // HasMedia applies the HasEdge predicate on the "media" edge.

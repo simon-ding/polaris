@@ -4,6 +4,7 @@ package ent
 
 import (
 	"polaris/ent/downloadclients"
+	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
@@ -49,6 +50,10 @@ func init() {
 	downloadclients.DefaultTags = downloadclientsDescTags.Default.(string)
 	episodeFields := schema.Episode{}.Fields()
 	_ = episodeFields
+	// episodeDescMonitored is the schema descriptor for monitored field.
+	episodeDescMonitored := episodeFields[7].Descriptor()
+	// episode.DefaultMonitored holds the default value on creation for the monitored field.
+	episode.DefaultMonitored = episodeDescMonitored.Default.(bool)
 	historyFields := schema.History{}.Fields()
 	_ = historyFields
 	// historyDescSize is the schema descriptor for size field.

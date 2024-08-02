@@ -11,7 +11,6 @@ import (
 	"polaris/pkg"
 	"polaris/pkg/notifier/message"
 	"polaris/pkg/utils"
-	"time"
 
 	"github.com/pkg/errors"
 )
@@ -140,7 +139,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	c.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
 
 	//判断是否需要删除本地文件
-	ok, err := c.isSeedRatioLimitReached(r.IndexerID, torrent) 
+	ok, err := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 	if err != nil {
 		log.Warnf("getting torrent seed ratio %s: %v", torrent.Name(), err)
 		ok = false
@@ -217,15 +216,8 @@ func (c *Client) downloadTvSeries() {
 	for _, series := range allSeries {
 		tvDetail := c.db.GetMediaDetails(series.ID)
 		for _, ep := range tvDetail.Episodes {
-			if !series.DownloadHistoryEpisodes { //设置不下载历史已播出剧集，只下载将来剧集
-				t, err := time.Parse("2006-01-02", ep.AirDate)
-				if err != nil {
-					log.Error("air date not known, skip: %v", ep.Title)
-					continue
-				}
-				if series.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
-					continue
-				}
+			if !ep.Monitored { //未监控的剧集不去下载
+				continue
 			}
 
 			if ep.Status != episode.StatusMissing { //已经下载的不去下载
@@ -338,6 +330,7 @@ func (c *Client) checkSeiesNewSeason(media *ent.Media) error {
 					Overview:      ep.Overview,
 					AirDate:       ep.AirDate,
 					Status:        episode.StatusMissing,
+					Monitored:     true,
 				}
 				c.db.SaveEposideDetail2(episode)
 			}

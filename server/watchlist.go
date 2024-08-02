@@ -102,12 +102,29 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 			continue
 		}
 		for _, ep := range se.Episodes {
+			shouldMonitor := false
+			//如果设置下载往期剧集，则监控所有剧集。如果没有则监控未上映的剧集，考虑时差等问题留24h余量
+			if in.DownloadHistoryEpisodes {
+				shouldMonitor = true
+			} else {
+				t, err := time.Parse("2006-01-02", ep.AirDate)
+				if err != nil {
+					log.Error("air date not known, will not monitor: %v", ep.AirDate)
+
+				} else {
+					if time.Since(t) < 24*time.Hour { //monitor episode air 24h before now
+						shouldMonitor = true
+					}
+				}
+			}
+
 			epid, err := s.db.SaveEposideDetail(&ent.Episode{
 				SeasonNumber:  seasonId,
 				EpisodeNumber: ep.EpisodeNumber,
 				Title:         ep.Name,
 				Overview:      ep.Overview,
 				AirDate:       ep.AirDate,
+				Monitored:     shouldMonitor,
 			})
 			if err != nil {
 				log.Errorf("save episode info error: %v", err)
@@ -176,6 +193,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		Title:         "dummy episode for movies",
 		Overview:      "dummy episode for movies",
 		AirDate:       detail.ReleaseDate,
+		Monitored:     true,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "add dummy episode")
@@ -249,8 +267,8 @@ func (s *Server) downloadImage(url string, mediaID int, name string) error {
 
 type MediaWithStatus struct {
 	*ent.Media
-	MonitoredNum  int    `json:"monitored_num"`
-	DownloadedNum int    `json:"downloaded_num"`
+	MonitoredNum  int `json:"monitored_num"`
+	DownloadedNum int `json:"downloaded_num"`
 }
 
 //missing: episode aired missing
@@ -263,7 +281,7 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 	res := make([]MediaWithStatus, len(list))
 	for i, item := range list {
 		var ms = MediaWithStatus{
-			Media:      item,
+			Media:         item,
 			MonitoredNum:  0,
 			DownloadedNum: 0,
 		}
@@ -271,30 +289,12 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 		details := s.db.GetMediaDetails(item.ID)
 
 		for _, ep := range details.Episodes {
-			monitored := false
-			if ep.SeasonNumber == 0 {
-				continue
-			}
-			if item.DownloadHistoryEpisodes {
-				monitored = true
-			} else {
-				t, err := time.Parse("2006-01-02", ep.AirDate)
-				if err != nil { //airdate not exist, maybe airdate not set yet
-					monitored = true
-				} else {
-					if item.CreatedAt.Sub(t) > 24*time.Hour { //剧集在加入watchlist之前，不去下载
-						continue
-					}
-					monitored = true
-				}
-			}
-			if monitored {
+			if ep.Monitored {
 				ms.MonitoredNum++
-				if ep.Status == episode.StatusDownloaded {
-					ms.DownloadedNum++
-				}
 			}
-
+			if ep.Status == episode.StatusDownloaded {
+				ms.DownloadedNum++
+			}
 		}
 		res[i] = ms
 	}
@@ -306,8 +306,8 @@ func (s *Server) GetMovieWatchlist(c *gin.Context) (interface{}, error) {
 	res := make([]MediaWithStatus, len(list))
 	for i, item := range list {
 		var ms = MediaWithStatus{
-			Media:  item,
-			MonitoredNum: 1,
+			Media:         item,
+			MonitoredNum:  1,
 			DownloadedNum: 0,
 		}
 		dummyEp, err := s.db.GetMovieDummyEpisode(item.ID)

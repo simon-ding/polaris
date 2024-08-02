@@ -146,6 +146,20 @@ func (eu *EpisodeUpdate) SetNillableStatus(e *episode.Status) *EpisodeUpdate {
 	return eu
 }
 
+// SetMonitored sets the "monitored" field.
+func (eu *EpisodeUpdate) SetMonitored(b bool) *EpisodeUpdate {
+	eu.mutation.SetMonitored(b)
+	return eu
+}
+
+// SetNillableMonitored sets the "monitored" field if the given value is not nil.
+func (eu *EpisodeUpdate) SetNillableMonitored(b *bool) *EpisodeUpdate {
+	if b != nil {
+		eu.SetMonitored(*b)
+	}
+	return eu
+}
+
 // SetMedia sets the "media" edge to the Media entity.
 func (eu *EpisodeUpdate) SetMedia(m *Media) *EpisodeUpdate {
 	return eu.SetMediaID(m.ID)
@@ -234,6 +248,9 @@ func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.Status(); ok {
 		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := eu.mutation.Monitored(); ok {
+		_spec.SetField(episode.FieldMonitored, field.TypeBool, value)
 	}
 	if eu.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -402,6 +419,20 @@ func (euo *EpisodeUpdateOne) SetNillableStatus(e *episode.Status) *EpisodeUpdate
 	return euo
 }
 
+// SetMonitored sets the "monitored" field.
+func (euo *EpisodeUpdateOne) SetMonitored(b bool) *EpisodeUpdateOne {
+	euo.mutation.SetMonitored(b)
+	return euo
+}
+
+// SetNillableMonitored sets the "monitored" field if the given value is not nil.
+func (euo *EpisodeUpdateOne) SetNillableMonitored(b *bool) *EpisodeUpdateOne {
+	if b != nil {
+		euo.SetMonitored(*b)
+	}
+	return euo
+}
+
 // SetMedia sets the "media" edge to the Media entity.
 func (euo *EpisodeUpdateOne) SetMedia(m *Media) *EpisodeUpdateOne {
 	return euo.SetMediaID(m.ID)
@@ -520,6 +551,9 @@ func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err e
 	}
 	if value, ok := euo.mutation.Status(); ok {
 		_spec.SetField(episode.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := euo.mutation.Monitored(); ok {
+		_spec.SetField(episode.FieldMonitored, field.TypeBool, value)
 	}
 	if euo.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{
