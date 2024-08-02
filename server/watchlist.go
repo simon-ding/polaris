@@ -109,7 +109,8 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 			} else {
 				t, err := time.Parse("2006-01-02", ep.AirDate)
 				if err != nil {
-					log.Error("air date not known, will not monitor: %v", ep.AirDate)
+					log.Error("air date not known, will monitor: %v", ep.AirDate)
+					shouldMonitor = true
 
 				} else {
 					if time.Since(t) < 24*time.Hour { //monitor episode air 24h before now
