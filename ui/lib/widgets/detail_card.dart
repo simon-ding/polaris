@@ -74,12 +74,6 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             const SizedBox(
                               width: 30,
                             ),
-                            widget.details.mediaType == 'tv'
-                                ? (widget.details.downloadHistoryEpisodes ==
-                                        true
-                                    ? const Text("下载所有剧集")
-                                    : const Text("只下载更新剧集"))
-                                : const Text("")
                           ],
                         ),
                         const Divider(thickness: 1, height: 1),
