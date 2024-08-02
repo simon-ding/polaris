@@ -291,9 +291,9 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 		for _, ep := range details.Episodes {
 			if ep.Monitored {
 				ms.MonitoredNum++
-			}
-			if ep.Status == episode.StatusDownloaded {
-				ms.DownloadedNum++
+				if ep.Status == episode.StatusDownloaded {
+					ms.DownloadedNum++
+				}	
 			}
 		}
 		res[i] = ms

@@ -70,8 +70,8 @@ class WelcomePage extends ConsumerWidget {
                                     children: [
                                       LinearProgressIndicator(
                                         value: 1,
-                                        color: item.downloadedNum ==
-                                                item.monitoredNum
+                                        color: item.downloadedNum! >=
+                                                item.monitoredNum!
                                             ? Colors.green
                                             : Colors.blue,
                                       ),
