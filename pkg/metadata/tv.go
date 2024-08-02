@@ -154,9 +154,11 @@ func parseEnglishName(name string) *Metadata {
 }
 
 func parseChineseName(name string) *Metadata {
-	var meta = &Metadata{
-		Season: 1,
+	var meta = parseEnglishName(name)
+	if meta.Season != -1 && (meta.Episode != -1 || meta.IsSeasonPack) {
+		return meta
 	}
+	meta = &Metadata{Season: 1}
 	//season pack
 	packRe := regexp.MustCompile(`(\d{1,2}-\d{1,2})|(全集)`)
 	if packRe.MatchString(name) {
