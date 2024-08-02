@@ -112,21 +112,6 @@ func FindSeasonPackageInfo(name string) (se int, err error) {
 	return se, err
 }
 
-func IsSeasonPackageName(name string) bool {
-	seRe := regexp.MustCompile(`S\d+`)
-	epRe := regexp.MustCompile(`E\d+`)
-	nameUpper := strings.ToUpper(name)
-	matchEp := epRe.FindAllString(nameUpper, -1)
-	if len(matchEp) != 0 {
-		return false //episode number should not exist
-	}
-	matchSe := seRe.FindAllString(nameUpper, -1)
-	if len(matchSe) == 0 {
-		return false //no season num
-	}
-	return true
-}
-
 func ContainsIgnoreCase(s, substr string) bool {
 	return strings.Contains(strings.ToLower(s), strings.ToLower(substr))
 }
