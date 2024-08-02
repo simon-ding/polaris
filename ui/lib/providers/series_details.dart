@@ -117,6 +117,7 @@ class Episodes {
   int? seasonNumber;
   String? overview;
   String? status;
+  bool? monitored;
 
   Episodes(
       {this.id,
@@ -126,6 +127,7 @@ class Episodes {
       this.airDate,
       this.seasonNumber,
       this.status,
+      this.monitored,
       this.overview});
 
   Episodes.fromJson(Map<String, dynamic> json) {
@@ -137,6 +139,7 @@ class Episodes {
     seasonNumber = json['season_number'];
     status = json['status'];
     overview = json['overview'];
+    monitored = json["monitored"];
   }
 }
 
@@ -204,7 +207,8 @@ class TorrentResource {
       this.source,
       this.indexerId,
       this.downloadFactor,
-      this.uploadFactor, this.isPrivate});
+      this.uploadFactor,
+      this.isPrivate});
 
   String? name;
   int? size;
@@ -226,7 +230,7 @@ class TorrentResource {
         link: json["link"],
         source: json["source"],
         indexerId: json["indexer_id"],
-        isPrivate: json["is_private"]??false,
+        isPrivate: json["is_private"] ?? false,
         downloadFactor: json["download_volume_factor"],
         uploadFactor: json["upload_volume_factor"]);
   }

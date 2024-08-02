@@ -38,6 +38,18 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
           for (final ep in details.episodes!) {
             var row = DataRow(cells: [
               DataCell(Text("${ep.episodeNumber}")),
+              DataCell(ep.monitored == true
+                  ? const Tooltip(
+                      message: "监控中",
+                      child: Opacity(
+                        opacity: 0.7,
+                        child: Icon(Icons.alarm),
+                      ),
+                    )
+                  : const Opacity(
+                      opacity: 0.5,
+                      child: Icon(Icons.alarm_off),
+                    )),
               DataCell(Text("${ep.title}")),
               DataCell(Opacity(
                 opacity: 0.5,
@@ -104,6 +116,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               children: [
                 DataTable(columns: [
                   const DataColumn(label: Text("#")),
+                  const DataColumn(label: Text("监控")),
                   const DataColumn(
                     label: Text("标题"),
                   ),
