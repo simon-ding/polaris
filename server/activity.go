@@ -32,7 +32,7 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 		a := Activity{
 			History: h,
 		}
-		for id, task := range s.tasks {
+		for id, task := range s.core.GetTasks() {
 			if h.ID == id && task.Exists() {
 				a.Progress = task.Progress()
 			}
@@ -54,13 +54,11 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		log.Errorf("no record of id: %d", id)
 		return nil, nil
 	}
-	torrent := s.tasks[his.ID]
-	if torrent != nil {
-		if err := torrent.Remove(); err != nil {
-			return nil, errors.Wrap(err, "remove torrent")
-		}
-		delete(s.tasks, his.ID)
+
+	if err := s.core.RemoveTaskAndTorrent(his.ID); err != nil {
+		return nil, errors.Wrap(err, "remove torrent")
 	}
+
 	if his.EpisodeID != 0 {
 		s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
 
@@ -96,7 +94,7 @@ func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {
 
 type TorrentInfo struct {
 	Name      string  `json:"name"`
-	ID        int64     `json:"id"`
+	ID        int64   `json:"id"`
 	SeedRatio float32 `json:"seed_ratio"`
 	Progress  int     `json:"progress"`
 }
@@ -116,8 +114,8 @@ func (s *Server) GetAllTorrents(c *gin.Context) (interface{}, error) {
 			continue
 		}
 		infos = append(infos, TorrentInfo{
-			Name: t.Name(),
-			ID: t.ID,
+			Name:     t.Name(),
+			ID:       t.ID,
 			Progress: t.Progress(),
 		})
 	}

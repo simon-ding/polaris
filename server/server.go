@@ -8,13 +8,12 @@ import (
 	"polaris/db"
 	"polaris/log"
 	"polaris/pkg/tmdb"
-	"polaris/pkg/transmission"
+	"polaris/server/core"
 	"polaris/ui"
 
 	ginzap "github.com/gin-contrib/zap"
 
 	"github.com/gin-contrib/static"
-	"github.com/robfig/cron"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -22,26 +21,25 @@ import (
 
 func NewServer(db *db.Client) *Server {
 	r := gin.Default()
-	return &Server{
-		r:     r,
-		db:    db,
-		cron:  cron.New(),
-		tasks: make(map[int]*Task),
+	s := &Server{
+		r:  r,
+		db: db,
 	}
+	s.core = core.NewClient(db, s.language)
+	return s
 }
 
 type Server struct {
 	r         *gin.Engine
 	db        *db.Client
-	cron      *cron.Cron
+	core      *core.Client
 	language  string
-	tasks     map[int]*Task
 	jwtSerect string
 }
 
 func (s *Server) Serve() error {
-	s.scheduler()
-	s.reloadTasks()
+	s.core.Init()
+	
 	s.restoreProxy()
 
 	s.jwtSerect = s.db.GetSetting(db.JwtSerectKey)
@@ -140,22 +138,6 @@ func (s *Server) MustTMDB() *tmdb.Client {
 		log.Panicf("get tmdb: %v", err)
 	}
 	return t
-}
-
-func (s *Server) reloadTasks() {
-	allTasks := s.db.GetHistories()
-	for _, t := range allTasks {
-		torrent, err := transmission.ReloadTorrent(t.Saved)
-		if err != nil {
-			log.Errorf("relaod task %s failed: %v", t.SourceTitle, err)
-			continue
-		}
-		if !torrent.Exists() { //只要种子还存在于客户端中，就重新加载，有可能是还在做种中
-			continue
-		}
-		log.Infof("reloading task: %d %s", t.ID, t.SourceTitle)
-		s.tasks[t.ID] = &Task{Torrent: torrent}
-	}
 }
 
 func (s *Server) proxyPosters(c *gin.Context) {

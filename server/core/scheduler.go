@@ -1,4 +1,4 @@
-package server
+package core
 
 import (
 	"fmt"
@@ -11,44 +11,43 @@ import (
 	"polaris/pkg"
 	"polaris/pkg/notifier/message"
 	"polaris/pkg/utils"
-	"polaris/server/core"
 	"time"
 
 	"github.com/pkg/errors"
 )
 
-func (s *Server) scheduler() {
-	s.mustAddCron("@every 1m", s.checkTasks)
-	s.mustAddCron("0 0 * * * *", func() {
-		s.downloadTvSeries()
-		s.downloadMovie()
+func (c *Client) addSysCron() {
+	c.mustAddCron("@every 1m", c.checkTasks)
+	c.mustAddCron("0 0 * * * *", func() {
+		c.downloadTvSeries()
+		c.downloadMovie()
 	})
-	s.mustAddCron("0 0 */12 * * *", s.checkAllSeriesNewSeason)
-	s.cron.Start()
+	c.mustAddCron("0 0 */12 * * *", c.checkAllSeriesNewSeason)
+	c.cron.Start()
 }
 
-func (s *Server) mustAddCron(spec string, cmd func()) {
-	if err := s.cron.AddFunc(spec, cmd); err != nil {
+func (c *Client) mustAddCron(spec string, cmd func()) {
+	if err := c.cron.AddFunc(spec, cmd); err != nil {
 		log.Errorf("add func error: %v", err)
 		panic(err)
 	}
 }
 
-func (s *Server) checkTasks() {
+func (c *Client) checkTasks() {
 	log.Debug("begin check tasks...")
-	for id, t := range s.tasks {
+	for id, t := range c.tasks {
 		if !t.Exists() {
 			log.Infof("task no longer exists: %v", id)
-			delete(s.tasks, id)
+			delete(c.tasks, id)
 			continue
 		}
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
-			r := s.db.GetHistory(id)
+			r := c.db.GetHistory(id)
 			if r.Status == history.StatusSuccess {
 				//task already success, check seed ratio
-				torrent := s.tasks[id]
-				ok, err := s.isSeedRatioLimitReached(r.IndexerID, torrent)
+				torrent := c.tasks[id]
+				ok, err := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 				if err != nil {
 					log.Warnf("getting torrent seed ratio : %v", err)
 					ok = false
@@ -56,16 +55,16 @@ func (s *Server) checkTasks() {
 				if ok {
 					log.Infof("torrent file seed ratio reached, remove: %v", torrent.Name())
 					torrent.Remove()
-					delete(s.tasks, id)
+					delete(c.tasks, id)
 				} else {
 					log.Infof("torrent file still sedding: %v", torrent.Name())
 				}
 				continue
 			}
 			log.Infof("task is done: %v", t.Name())
-			s.sendMsg(fmt.Sprintf(message.DownloadComplete, t.Name()))
+			c.sendMsg(fmt.Sprintf(message.DownloadComplete, t.Name()))
 			go func() {
-				if err := s.moveCompletedTask(id); err != nil {
+				if err := c.moveCompletedTask(id); err != nil {
 					log.Infof("post tasks for id %v fail: %v", id, err)
 				}
 			}()
@@ -73,20 +72,20 @@ func (s *Server) checkTasks() {
 	}
 }
 
-func (s *Server) moveCompletedTask(id int) (err1 error) {
-	torrent := s.tasks[id]
-	r := s.db.GetHistory(id)
+func (c *Client) moveCompletedTask(id int) (err1 error) {
+	torrent := c.tasks[id]
+	r := c.db.GetHistory(id)
 	if r.Status == history.StatusUploading {
 		log.Infof("task %d is already uploading, skip", id)
 		return nil
 	}
-	s.db.SetHistoryStatus(r.ID, history.StatusUploading)
+	c.db.SetHistoryStatus(r.ID, history.StatusUploading)
 	seasonNum, err := utils.SeasonId(r.TargetDir)
 	if err != nil {
 		log.Errorf("no season id: %v", r.TargetDir)
 		seasonNum = -1
 	}
-	downloadclient, err := s.db.GetDownloadClient(r.DownloadClientID)
+	downloadclient, err := c.db.GetDownloadClient(r.DownloadClientID)
 	if err != nil {
 		log.Errorf("get task download client error: %v, use default one", err)
 		downloadclient = &ent.DownloadClients{RemoveCompletedDownloads: true, RemoveFailedDownloads: true}
@@ -96,59 +95,59 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 	defer func() {
 
 		if err1 != nil {
-			s.db.SetHistoryStatus(r.ID, history.StatusFail)
+			c.db.SetHistoryStatus(r.ID, history.StatusFail)
 			if r.EpisodeID != 0 {
-				s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
+				c.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
 			} else {
-				s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
+				c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
 			}
-			s.sendMsg(fmt.Sprintf(message.ProcessingFailed, err))
+			c.sendMsg(fmt.Sprintf(message.ProcessingFailed, err))
 			if downloadclient.RemoveFailedDownloads {
 				log.Debugf("task failed, remove failed torrent and files related")
-				delete(s.tasks, r.ID)
+				delete(c.tasks, r.ID)
 				torrent.Remove()
 			}
 		}
 	}()
 
-	series := s.db.GetMediaDetails(r.MediaID)
+	series := c.db.GetMediaDetails(r.MediaID)
 	if series == nil {
 		return nil
 	}
-	st := s.db.GetStorage(series.StorageID)
+	st := c.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
-	stImpl, err := s.getStorage(st.ID, series.MediaType)
+	stImpl, err := c.getStorage(st.ID, series.MediaType)
 	if err != nil {
 		return err
 	}
 
 	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
-	if err := stImpl.Copy(filepath.Join(s.db.GetDownloadDir(), torrentName), r.TargetDir); err != nil {
+	if err := stImpl.Copy(filepath.Join(c.db.GetDownloadDir(), torrentName), r.TargetDir); err != nil {
 		return errors.Wrap(err, "move file")
 	}
 
 	// .plexmatch file
-	if err := s.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrentName); err != nil {
+	if err := c.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrentName); err != nil {
 		log.Errorf("create .plexmatch file error: %v", err)
 	}
 
-	s.db.SetHistoryStatus(r.ID, history.StatusSuccess)
+	c.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 	if r.EpisodeID != 0 {
-		s.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
+		c.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
 	} else {
-		s.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
+		c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
 	}
-	s.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
+	c.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
 
 	//判断是否需要删除本地文件
-	ok, err := s.isSeedRatioLimitReached(r.IndexerID, torrent) 
+	ok, err := c.isSeedRatioLimitReached(r.IndexerID, torrent) 
 	if err != nil {
 		log.Warnf("getting torrent seed ratio %s: %v", torrent.Name(), err)
 		ok = false
 	}
 	if downloadclient.RemoveCompletedDownloads && ok {
 		log.Debugf("download complete,remove torrent and files related")
-		delete(s.tasks, r.ID)
+		delete(c.tasks, r.ID)
 		torrent.Remove()
 	}
 
@@ -156,13 +155,13 @@ func (s *Server) moveCompletedTask(id int) (err1 error) {
 	return nil
 }
 
-func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
+func (c *Client) CheckDownloadedSeriesFiles(m *ent.Media) error {
 	if m.MediaType != media.MediaTypeTv {
 		return nil
 	}
 	log.Infof("check files in directory: %s", m.TargetDir)
 
-	var storageImpl, err = s.getStorage(m.StorageID, media.MediaTypeTv)
+	var storageImpl, err = c.getStorage(m.StorageID, media.MediaTypeTv)
 	if err != nil {
 		return err
 	}
@@ -190,12 +189,12 @@ func (s *Server) checkDownloadedSeriesFiles(m *ent.Media) error {
 				continue
 			}
 			log.Infof("found match, season num %d, episode num %d", seNum, epNum)
-			ep, err := s.db.GetEpisode(m.ID, seNum, epNum)
+			ep, err := c.db.GetEpisode(m.ID, seNum, epNum)
 			if err != nil {
 				log.Error("update episode: %v", err)
 				continue
 			}
-			err = s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloaded)
+			err = c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloaded)
 			if err != nil {
 				log.Error("update episode: %v", err)
 				continue
@@ -212,11 +211,11 @@ type Task struct {
 	pkg.Torrent
 }
 
-func (s *Server) downloadTvSeries() {
+func (c *Client) downloadTvSeries() {
 	log.Infof("begin check all tv series resources")
-	allSeries := s.db.GetMediaWatchlist(media.MediaTypeTv)
+	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
-		tvDetail := s.db.GetMediaDetails(series.ID)
+		tvDetail := c.db.GetMediaDetails(series.ID)
 		for _, ep := range tvDetail.Episodes {
 			if !series.DownloadHistoryEpisodes { //设置不下载历史已播出剧集，只下载将来剧集
 				t, err := time.Parse("2006-01-02", ep.AirDate)
@@ -232,7 +231,7 @@ func (s *Server) downloadTvSeries() {
 			if ep.Status != episode.StatusMissing { //已经下载的不去下载
 				continue
 			}
-			name, err := s.searchAndDownload(series.ID, ep.SeasonNumber, ep.EpisodeNumber)
+			name, err := c.SearchAndDownload(series.ID, ep.SeasonNumber, ep.EpisodeNumber)
 			if err != nil {
 				log.Infof("cannot find resource to download for %s: %v", ep.Title, err)
 			} else {
@@ -244,12 +243,12 @@ func (s *Server) downloadTvSeries() {
 	}
 }
 
-func (s *Server) downloadMovie() {
+func (c *Client) downloadMovie() {
 	log.Infof("begin check all movie resources")
-	allSeries := s.db.GetMediaWatchlist(media.MediaTypeMovie)
+	allSeries := c.db.GetMediaWatchlist(media.MediaTypeMovie)
 
 	for _, series := range allSeries {
-		detail := s.db.GetMediaDetails(series.ID)
+		detail := c.db.GetMediaDetails(series.ID)
 		if len(detail.Episodes) == 0 {
 			log.Errorf("no related dummy episode: %v", detail.NameEn)
 			continue
@@ -259,32 +258,32 @@ func (s *Server) downloadMovie() {
 			continue
 		}
 
-		if err := s.downloadMovieSingleEpisode(ep); err != nil {
+		if err := c.downloadMovieSingleEpisode(ep); err != nil {
 			log.Errorf("download movie error: %v", err)
 		}
 	}
 }
 
-func (s *Server) downloadMovieSingleEpisode(ep *ent.Episode) error {
-	trc, dlc, err := s.getDownloadClient()
+func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode) error {
+	trc, dlc, err := c.getDownloadClient()
 	if err != nil {
 		return errors.Wrap(err, "connect transmission")
 	}
 
-	res, err := core.SearchMovie(s.db, ep.MediaID, true)
+	res, err := SearchMovie(c.db, ep.MediaID, true)
 	if err != nil {
 
 		return errors.Wrap(err, "search movie")
 	}
 	r1 := res[0]
 	log.Infof("begin download torrent resource: %v", r1.Name)
-	torrent, err := trc.Download(r1.Link, s.db.GetDownloadDir())
+	torrent, err := trc.Download(r1.Link, c.db.GetDownloadDir())
 	if err != nil {
 		return errors.Wrap(err, "downloading")
 	}
 	torrent.Start()
 
-	history, err := s.db.SaveHistoryRecord(ent.History{
+	history, err := c.db.SaveHistoryRecord(ent.History{
 		MediaID:          ep.MediaID,
 		EpisodeID:        ep.ID,
 		SourceTitle:      r1.Name,
@@ -298,36 +297,36 @@ func (s *Server) downloadMovieSingleEpisode(ep *ent.Episode) error {
 		log.Errorf("save history error: %v", err)
 	}
 
-	s.tasks[history.ID] = &Task{Torrent: torrent}
+	c.tasks[history.ID] = &Task{Torrent: torrent}
 
-	s.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+	c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
 	return nil
 }
 
-func (s *Server) checkAllSeriesNewSeason() {
+func (c *Client) checkAllSeriesNewSeason() {
 	log.Infof("begin checking series all new season")
-	allSeries := s.db.GetMediaWatchlist(media.MediaTypeTv)
+	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
-		err := s.checkSeiesNewSeason(series)
+		err := c.checkSeiesNewSeason(series)
 		if err != nil {
 			log.Errorf("check series new season error: series name %v, error: %v", series.NameEn, err)
 		}
 	}
 }
 
-func (s *Server) checkSeiesNewSeason(media *ent.Media) error {
-	d, err := s.MustTMDB().GetTvDetails(media.TmdbID, s.language)
+func (c *Client) checkSeiesNewSeason(media *ent.Media) error {
+	d, err := c.MustTMDB().GetTvDetails(media.TmdbID, c.language)
 	if err != nil {
 		return errors.Wrap(err, "tmdb")
 	}
 	lastsSason := d.NumberOfSeasons
-	seasonDetail, err := s.MustTMDB().GetSeasonDetails(media.TmdbID, lastsSason, s.language)
+	seasonDetail, err := c.MustTMDB().GetSeasonDetails(media.TmdbID, lastsSason, c.language)
 	if err != nil {
 		return errors.Wrap(err, "tmdb season")
 	}
 
 	for _, ep := range seasonDetail.Episodes {
-		epDb, err := s.db.GetEpisode(media.ID, ep.SeasonNumber, ep.EpisodeNumber)
+		epDb, err := c.db.GetEpisode(media.ID, ep.SeasonNumber, ep.EpisodeNumber)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				log.Infof("add new episode: %+v", ep)
@@ -340,20 +339,20 @@ func (s *Server) checkSeiesNewSeason(media *ent.Media) error {
 					AirDate:       ep.AirDate,
 					Status:        episode.StatusMissing,
 				}
-				s.db.SaveEposideDetail2(episode)
+				c.db.SaveEposideDetail2(episode)
 			}
 		} else { //update episode
 			if ep.Name != epDb.Title || ep.Overview != epDb.Overview || ep.AirDate != epDb.AirDate {
 				log.Infof("update new episode: %+v", ep)
-				s.db.UpdateEpiode2(epDb.ID, ep.Name, ep.Overview, ep.AirDate)
+				c.db.UpdateEpiode2(epDb.ID, ep.Name, ep.Overview, ep.AirDate)
 			}
 		}
 	}
 	return nil
 }
 
-func (s *Server) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (bool, error) {
-	indexer, err := s.db.GetIndexer(indexId)
+func (c *Client) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (bool, error) {
+	indexer, err := c.db.GetIndexer(indexId)
 	if err != nil {
 		return false, err
 	}
