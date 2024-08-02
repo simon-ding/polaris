@@ -222,6 +222,7 @@ func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
 		SetSeasonNumber(d.SeasonNumber).
 		SetEpisodeNumber(d.EpisodeNumber).
 		SetOverview(d.Overview).
+		SetMonitored(d.Monitored).
 		SetTitle(d.Title).Save(context.TODO())
 	if err != nil {
 		return 0, errors.Wrap(err, "save episode")
