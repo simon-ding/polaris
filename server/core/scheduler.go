@@ -46,11 +46,7 @@ func (c *Client) checkTasks() {
 			if r.Status == history.StatusSuccess {
 				//task already success, check seed ratio
 				torrent := c.tasks[id]
-				ok, err := c.isSeedRatioLimitReached(r.IndexerID, torrent)
-				if err != nil {
-					log.Warnf("getting torrent seed ratio : %v", err)
-					ok = false
-				}
+				ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 				if ok {
 					log.Infof("torrent file seed ratio reached, remove: %v", torrent.Name())
 					torrent.Remove()
@@ -139,11 +135,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	c.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
 
 	//判断是否需要删除本地文件
-	ok, err := c.isSeedRatioLimitReached(r.IndexerID, torrent)
-	if err != nil {
-		log.Warnf("getting torrent seed ratio %s: %v", torrent.Name(), err)
-		ok = false
-	}
+	ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 	if downloadclient.RemoveCompletedDownloads && ok {
 		log.Debugf("download complete,remove torrent and files related")
 		delete(c.tasks, r.ID)
@@ -344,14 +336,15 @@ func (c *Client) checkSeiesNewSeason(media *ent.Media) error {
 	return nil
 }
 
-func (c *Client) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (bool, error) {
+func (c *Client) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (bool) {
 	indexer, err := c.db.GetIndexer(indexId)
 	if err != nil {
-		return false, err
+		return true
 	}
 	currentRatio := t.SeedRatio()
 	if currentRatio == nil {
-		return false, errors.New("seed ratio not exist")
+		log.Warnf("get current seed ratio error, current ratio is nil")
+		return indexer.SeedRatio == 0
 	}
-	return *currentRatio >= float64(indexer.SeedRatio), nil
+	return *currentRatio >= float64(indexer.SeedRatio)
 }
