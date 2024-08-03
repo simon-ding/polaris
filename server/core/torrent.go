@@ -21,7 +21,7 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
 	}
-	slices.Contains(episodes, 1)
+	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, seasonNum, episodes)
 
 	res := searchWithTorznab(db1, series.NameEn)
 	resCn := searchWithTorznab(db1, series.NameCn)
@@ -34,19 +34,19 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 		if meta == nil { //cannot parse name
 			continue
 		}
-		if !isNumberedSeries(series) { //do not check season on series that only rely on episode number
-			if meta.Season != seasonNum {
-				continue
-			}
+		if !isNumberedSeries(series) && meta.Season != seasonNum { //do not check season on series that only rely on episode number
+			continue
+
 		}
 		if isNumberedSeries(series) && len(episodes) == 0 {
 			//should not want season
 			continue
 		}
 
-		if len(episodes) > 0 && slices.Contains(episodes, meta.Episode) { //not season pack, episode number equals
+		if len(episodes) > 0 && !slices.Contains(episodes, meta.Episode) { //not season pack, but episode number not equal
 			continue
-		}else if len(episodes) == 0 && !meta.IsSeasonPack { //want season pack, but not season pack
+
+		} else if len(episodes) == 0 && !meta.IsSeasonPack { //want season pack, but not season pack
 			continue
 		}
 		if checkResolution && meta.Resolution != series.Resolution.String() {
@@ -56,8 +56,8 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 			continue
 		}
 
-		if checkFileSize && series.Limiter != nil  {
-			if series.Limiter.SizeMin > 0 &&  r.Size < series.Limiter.SizeMin {
+		if checkFileSize && series.Limiter != nil {
+			if series.Limiter.SizeMin > 0 && r.Size < series.Limiter.SizeMin {
 				//min size not satified
 				continue
 			}
@@ -115,8 +115,8 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 			continue
 		}
 
-		if checkFileSize && movieDetail.Limiter != nil  {
-			if movieDetail.Limiter.SizeMin > 0 &&  r.Size < movieDetail.Limiter.SizeMin {
+		if checkFileSize && movieDetail.Limiter != nil {
+			if movieDetail.Limiter.SizeMin > 0 && r.Size < movieDetail.Limiter.SizeMin {
 				//min size not satified
 				continue
 			}
@@ -195,17 +195,17 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 	sort.SliceStable(res, func(i, j int) bool {
 		var s1 = res[i]
 		var s2 = res[j]
-		if s1.IndexerId == s2.IndexerId && s1.IsPrivate { 
+		if s1.IndexerId == s2.IndexerId && s1.IsPrivate {
 			return s1.DownloadVolumeFactor < s2.DownloadVolumeFactor
 		}
 		return false
 	})
 
 	//同一indexer内部，如果下载消耗一样，则优先下载上传奖励较多的
-	sort.SliceStable(res, func(i, j int) bool { 
+	sort.SliceStable(res, func(i, j int) bool {
 		var s1 = res[i]
 		var s2 = res[j]
-		if s1.IndexerId == s2.IndexerId && s1.IsPrivate && s1.DownloadVolumeFactor == s2.DownloadVolumeFactor{ 
+		if s1.IndexerId == s2.IndexerId && s1.IsPrivate && s1.DownloadVolumeFactor == s2.DownloadVolumeFactor {
 			return s1.UploadVolumeFactor > s2.UploadVolumeFactor
 		}
 		return false
@@ -214,12 +214,11 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 	return res
 }
 
-
 func dedup(list []torznab.Result) []torznab.Result {
 	var res = make([]torznab.Result, 0, len(list))
 	seen := make(map[string]bool, 0)
 	for _, r := range list {
-		key := fmt.Sprintf("%s%s%d%d", r.Name, r.Source, r.Seeders,r.Peers)
+		key := fmt.Sprintf("%s%s%d%d", r.Name, r.Source, r.Seeders, r.Peers)
 		if seen[key] {
 			continue
 		}

@@ -7,8 +7,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/adrg/strutil"
-	"github.com/adrg/strutil/metrics"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
@@ -65,7 +63,7 @@ func IsNameAcceptable(name1, name2 string) bool {
 	if strings.Contains(name1, name2) || strings.Contains(name2, name1) {
 		return true
 	}
-	return strutil.Similarity(name1, name2, metrics.NewHamming()) > 0.4
+	return false
 }
 
 func FindSeasonEpisodeNum(name string) (se int, ep int, err error) {

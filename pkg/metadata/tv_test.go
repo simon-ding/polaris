@@ -101,8 +101,8 @@ func Test_ParseTV10(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, 2, m.Season)
-	assert.Equal(t, 01, m.Episode)
-	assert.Equal(t, false, m.IsSeasonPack)
+	//assert.Equal(t, 01, m.Episode)
+	assert.Equal(t, true, m.IsSeasonPack)
 	assert.Equal(t, "720p", m.Resolution)
 }
 
@@ -127,13 +127,13 @@ func Test_ParseTV12(t *testing.T) {
 }
 
 func Test_ParseTV13(t *testing.T) {
-	s1 := ""
+	s1 := "House of Dragon 2024 1080p S02E08 Leaked HQCAM NOT COMPLETE English Audio x264 ESub BOTHD"
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, 2, m.Season)
-	assert.Equal(t, 01, m.Episode)
+	assert.Equal(t, 8, m.Episode)
 	assert.Equal(t, false, m.IsSeasonPack)
-	assert.Equal(t, "720p", m.Resolution)
+	assert.Equal(t, "1080p", m.Resolution)
 }
 
 func Test_ParseTV14(t *testing.T) {

@@ -29,20 +29,11 @@ func ParseTv(name string) *Metadata {
 func parseEnglishName(name string) *Metadata {
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
 	name = re.ReplaceAllString(strings.ToLower(name), " ")
-
-	splits := strings.Split(strings.TrimSpace(name), " ")
-	var newSplits []string
-	for _, p := range splits {
-		p = strings.TrimSpace(p)
-		if p == "" {
-			continue
-		}
-		newSplits = append(newSplits, p)
-	}
+	newSplits := strings.Split(strings.TrimSpace(name), " ")
 
 	seasonRe := regexp.MustCompile(`^s\d{1,2}`)
 	resRe := regexp.MustCompile(`^\d{3,4}p`)
-	episodeRe := regexp.MustCompile(`e\d{1,2}`)
+	episodeRe := regexp.MustCompile(`e\d{1,3}`)
 
 	var seasonIndex = -1
 	var episodeIndex = -1
@@ -58,7 +49,7 @@ func parseEnglishName(name string) *Metadata {
 		} else if resRe.MatchString(p) {
 			resIndex = i
 		}
-		if episodeRe.MatchString(p) {
+		if i >= seasonIndex && episodeRe.MatchString(p) {
 			episodeIndex = i
 		}
 	}
@@ -137,7 +128,7 @@ func parseEnglishName(name string) *Metadata {
 		//resolution exists
 		meta.Resolution = newSplits[resIndex]
 	}
-	if meta.Episode == -1 || strings.Contains(name, "complete") {
+	if meta.Episode == -1 {
 		meta.Episode = -1
 		meta.IsSeasonPack = true
 	}
