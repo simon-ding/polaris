@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/widgets/detail_card.dart';
+import 'package:ui/widgets/resource_list.dart';
 import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:ui/widgets/widgets.dart';
@@ -106,10 +107,13 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                   const SizedBox(
                     width: 10,
                   ),
-                  Tooltip(message: "查看可用资源",child: IconButton(
-                      onPressed: () => showAvailableTorrents(widget.seriesId,
-                          ep.seasonNumber ?? 0, ep.episodeNumber ?? 0),
-                      icon: const Icon(Icons.manage_search)),)
+                  Tooltip(
+                    message: "查看可用资源",
+                    child: IconButton(
+                        onPressed: () => showAvailableTorrents(widget.seriesId,
+                            ep.seasonNumber ?? 0, ep.episodeNumber ?? 0),
+                        icon: const Icon(Icons.manage_search)),
+                  )
                 ],
               ))
             ]);
@@ -154,10 +158,13 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Tooltip(message: "查看可用资源",child: IconButton(
-                          onPressed: () =>
-                              showAvailableTorrents(widget.seriesId, k, 0),
-                          icon: const Icon(Icons.manage_search)),)
+                      Tooltip(
+                        message: "查看可用资源",
+                        child: IconButton(
+                            onPressed: () =>
+                                showAvailableTorrents(widget.seriesId, k, 0),
+                            icon: const Icon(Icons.manage_search)),
+                      )
                     ],
                   ))
                 ], rows: m[k]!),
@@ -185,84 +192,21 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        return Consumer(builder: (context, ref, _) {
-          final torrents = ref.watch(mediaTorrentsDataProvider(
-              (mediaId: id, seasonNumber: season, episodeNumber: episode)));
-
-          return AlertDialog(
-              //title: Text("资源"),
-              content: SelectionArea(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: MediaQuery.of(context).size.height * 0.6,
-              child: torrents.when(
-                  data: (v) {
-                    bool hasPrivate = false;
-                    for (final item in v) {
-                      if (item.isPrivate == true) {
-                        hasPrivate = true;
-                      }
-                    }
-                    final columns = [
-                      const DataColumn(label: Text("名称")),
-                      const DataColumn(label: Text("大小")),
-                      const DataColumn(label: Text("S/P")),
-                      const DataColumn(label: Text("来源")),
-                    ];
-                    if (hasPrivate) {
-                      columns.add(const DataColumn(label: Text("消耗")));
-                    }
-                    columns.add(const DataColumn(label: Text("下载")));
-
-                    return SingleChildScrollView(
-                        child: DataTable(
-                            dataTextStyle: const TextStyle(fontSize: 12),
-                            columns: columns,
-                            rows: List.generate(v.length, (i) {
-                              final torrent = v[i];
-                              final rows = [
-                                DataCell(Text("${torrent.name}")),
-                                DataCell(Text(
-                                    "${torrent.size?.readableFileSize()}")),
-                                DataCell(Text(
-                                    "${torrent.seeders}/${torrent.peers}")),
-                                DataCell(Text(torrent.source ?? "-")),
-                              ];
-                              if (hasPrivate) {
-                                rows.add(DataCell(Text(torrent.isPrivate == true
-                                    ? "${torrent.downloadFactor}dl/${torrent.uploadFactor}up"
-                                    : "-")));
-                              }
-
-                              rows.add(DataCell(IconButton(
-                                icon: const Icon(Icons.download),
-                                onPressed: () async {
-                                  var f = ref
-                                      .read(mediaTorrentsDataProvider((
-                                        mediaId: id,
-                                        seasonNumber: season,
-                                        episodeNumber: episode
-                                      )).notifier)
-                                      .download(torrent)
-                                      .then((v) =>
-                                          showSnakeBar("开始下载：${torrent.name}"));
-                                  showLoadingWithFuture(f);
-                                },
-                              )));
-                              return DataRow(cells: rows);
-                            })));
-                  },
-                  error: (err, trace) {
-                    return "$err".contains("no resource found")
-                        ? const Center(
-                            child: Text("没有资源"),
-                          )
-                        : Text("$err");
-                  },
-                  loading: () => const MyProgressIndicator()),
+        return AlertDialog(
+            //title: Text("资源"),
+            content: SelectionArea(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.7,
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: SingleChildScrollView(
+              child: ResourceList(
+                mediaId: id,
+                seasonNum: season,
+                episodeNum: episode,
+              ),
             ),
-          ));
-        });
+          ),
+        ));
       },
     );
   }

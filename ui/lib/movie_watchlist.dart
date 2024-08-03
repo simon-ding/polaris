@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/activity.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/widgets/detail_card.dart';
-import 'package:ui/widgets/utils.dart';
+import 'package:ui/widgets/resource_list.dart';
 import 'package:ui/widgets/progress_indicator.dart';
-import 'package:ui/widgets/widgets.dart';
 
 class MovieDetailsPage extends ConsumerStatefulWidget {
   static const route = "/movie/:id";
@@ -125,59 +124,7 @@ class _NestedTabBarState extends ConsumerState<NestedTabBar>
                 error: (error, trace) => Text("$error"),
                 loading: () => const MyProgressIndicator());
           } else {
-            return Consumer(
-              builder: (context, ref, child) {
-                var torrents = ref.watch(mediaTorrentsDataProvider(
-                    (mediaId: widget.id, seasonNumber: 0, episodeNumber: 0)));
-                return torrents.when(
-                    data: (v) {
-                      if (v.isEmpty) {
-                        return const Center(
-                          child: Text("无可用资源"),
-                        );
-                      }
-
-                      return DataTable(
-                        columns: const [
-                          DataColumn(label: Text("名称")),
-                          DataColumn(label: Text("大小")),
-                          DataColumn(label: Text("seeders")),
-                          DataColumn(label: Text("peers")),
-                          DataColumn(label: Text("操作"))
-                        ],
-                        rows: List.generate(v.length, (i) {
-                          final torrent = v[i];
-                          return DataRow(cells: [
-                            DataCell(Text("${torrent.name}")),
-                            DataCell(
-                                Text("${torrent.size?.readableFileSize()}")),
-                            DataCell(Text("${torrent.seeders}")),
-                            DataCell(Text("${torrent.peers}")),
-                            DataCell(IconButton(
-                              icon: const Icon(Icons.download),
-                              onPressed: () {
-                                final f = ref
-                                    .read(mediaTorrentsDataProvider((
-                                      mediaId: widget.id,
-                                      seasonNumber: 0,
-                                      episodeNumber: 0
-                                    )).notifier)
-                                    .download(torrent)
-                                .then((v) => showSnakeBar(
-                                    "开始下载：${torrent.name}"));
-                                // .onError((error, trace) =>
-                                //     Utils.showSnakeBar("操作失败: $error"));
-                                showLoadingWithFuture(f);
-                              },
-                            ))
-                          ]);
-                        }),
-                      );
-                    },
-                    error: (error, trace) => Text("$error"),
-                    loading: () => const MyProgressIndicator());
-              },
-            );
+            return ResourceList(mediaId: widget.id);
           }
         })
       ],
