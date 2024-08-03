@@ -48,6 +48,19 @@ class SeriesDetailData
     var name = (sp.data as Map<String, dynamic>)["name"];
     return name;
   }
+
+  Future<void> changeMonitoringStatus(int episodeId, bool b) async {
+    final dio = APIs.getDio();
+    var resp = await dio.post(APIs.changeMonitoringUrl, data: {
+      "episode_id": episodeId,
+      "monitor": b,
+    });
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
+  }
 }
 
 class SeriesDetails {

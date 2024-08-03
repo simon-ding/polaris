@@ -57,15 +57,33 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                                 child: Icon(Icons.download_done),
                               )
                             : (ep.monitored == true
-                                ? const Tooltip(
+                                ? Tooltip(
                                     message: "监控中",
-                                    child: Icon(Icons.alarm),
+                                    child: IconButton(
+                                        onPressed: () {
+                                          ref
+                                              .read(mediaDetailsProvider(
+                                                      widget.seriesId)
+                                                  .notifier)
+                                              .changeMonitoringStatus(
+                                                  ep.id!, false);
+                                        },
+                                        icon: const Icon(Icons.alarm)),
                                   )
-                                : const Opacity(
+                                : Opacity(
                                     opacity: 0.7,
                                     child: Tooltip(
                                       message: "未监控",
-                                      child: Icon(Icons.alarm_off),
+                                      child: IconButton(
+                                          onPressed: () {
+                                            ref
+                                                .read(mediaDetailsProvider(
+                                                        widget.seriesId)
+                                                    .notifier)
+                                                .changeMonitoringStatus(
+                                                    ep.id!, true);
+                                          },
+                                          icon: const Icon(Icons.alarm_off)),
                                     ),
                                   )))),
               ),
@@ -88,10 +106,10 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                   const SizedBox(
                     width: 10,
                   ),
-                  IconButton(
+                  Tooltip(message: "查看可用资源",child: IconButton(
                       onPressed: () => showAvailableTorrents(widget.seriesId,
                           ep.seasonNumber ?? 0, ep.episodeNumber ?? 0),
-                      icon: const Icon(Icons.manage_search))
+                      icon: const Icon(Icons.manage_search)),)
                 ],
               ))
             ]);
@@ -136,10 +154,10 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                       const SizedBox(
                         width: 10,
                       ),
-                      IconButton(
+                      Tooltip(message: "查看可用资源",child: IconButton(
                           onPressed: () =>
                               showAvailableTorrents(widget.seriesId, k, 0),
-                          icon: const Icon(Icons.manage_search))
+                          icon: const Icon(Icons.manage_search)),)
                     ],
                   ))
                 ], rows: m[k]!),

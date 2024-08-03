@@ -67,6 +67,7 @@ func (s *Server) Serve() error {
 		setting.GET("/about", HttpHandler(s.About))
 		setting.POST("/parse/tv", HttpHandler(s.ParseTv))
 		setting.POST("/parse/movie", HttpHandler(s.ParseMovie))
+		setting.POST("/monitoring", HttpHandler(s.ChangeEpisodeMonitoring))
 	}
 	activity := api.Group("/activity")
 	{

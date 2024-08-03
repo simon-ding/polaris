@@ -552,3 +552,8 @@ func (c *Client) GetMovieDummyEpisode(movieId int) (*ent.Episode, error) {
 func (c *Client) GetDownloadClient(id int) (*ent.DownloadClients, error) {
 	return c.ent.DownloadClients.Query().Where(downloadclients.ID(id)).First(context.Background())
 }
+
+
+func (c *Client) SetEpisodeMonitoring(id int, b bool) error {
+	return c.ent.Episode.Update().Where(episode.ID(id)).SetMonitored(b).Exec(context.Background())
+}

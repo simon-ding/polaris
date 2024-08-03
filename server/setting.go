@@ -193,3 +193,17 @@ func (s *Server) DeleteDownloadCLient(c *gin.Context) (interface{}, error) {
 	s.db.DeleteDownloadCLient(id)
 	return "success", nil
 }
+
+type episodeMonitoringIn struct {
+	EpisodeID int `json:"episode_id"`
+	Monitor bool `json:"monitor"`
+}
+
+func (s *Server) ChangeEpisodeMonitoring(c *gin.Context) (interface{}, error) {
+	var in episodeMonitoringIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind")
+	}
+	s.db.SetEpisodeMonitoring(in.EpisodeID, in.Monitor)
+	return "success", nil
+}

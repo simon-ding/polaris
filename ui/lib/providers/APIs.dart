@@ -33,6 +33,7 @@ class APIs {
   static final logsBaseUrl = "$_baseUrl/api/v1/logs/";
   static final logFilesUrl = "$_baseUrl/api/v1/setting/logfiles";
   static final aboutUrl = "$_baseUrl/api/v1/setting/about";
+  static final changeMonitoringUrl = "$_baseUrl/api/v1/setting/monitoring";
 
   static final notifierAllUrl = "$_baseUrl/api/v1/notifier/all";
   static final notifierDeleteUrl = "$_baseUrl/api/v1/notifier/id/";

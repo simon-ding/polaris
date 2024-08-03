@@ -35,7 +35,8 @@ CustomTransitionPage buildPageWithDefaultTransition<T>({
     reverseTransitionDuration: Duration.zero,
     key: state.pageKey,
     child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        child,
   );
 }
 
@@ -123,14 +124,22 @@ class _MyAppState extends ConsumerState<MyApp> {
       child: MaterialApp.router(
         title: 'Polaris 影视追踪下载',
         theme: ThemeData(
-          fontFamily: "NotoSansSC",
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.blueAccent,
-              brightness: Brightness.dark,
-              surface: Colors.black54),
-          useMaterial3: true,
-          //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
-        ),
+            fontFamily: "NotoSansSC",
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.blueAccent,
+                brightness: Brightness.dark,
+                surface: Colors.black54),
+            useMaterial3: true,
+            //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
+            tooltipTheme: TooltipThemeData(
+              textStyle: const TextStyle(
+                color: Colors.grey,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            )),
         routerConfig: router,
       ),
     );
