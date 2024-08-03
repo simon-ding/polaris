@@ -1,9 +1,12 @@
 package tmdb
 
 import (
+	"net/http"
+	"net/url"
 	"polaris/log"
 	"strconv"
 	"strings"
+	"time"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/pkg/errors"
@@ -14,10 +17,28 @@ type Client struct {
 	tmdbClient *tmdb.Client
 }
 
-func NewClient(apiKey string) (*Client, error) {
+func NewClient(apiKey, proxyUrl string) (*Client, error) {
+
 	tmdbClient, err := tmdb.Init(apiKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "new tmdb client")
+	}
+	if proxyUrl != "" {
+		//set proxy
+		u, err := url.Parse(proxyUrl)
+		if err != nil {
+			log.Errorf("parse proxy %v error, skip: %v", proxyUrl, err)
+		} else {
+			tmdbClient.SetClientConfig(http.Client{
+				Timeout: time.Second * 10,
+				Transport: &http.Transport{
+					Proxy:           http.ProxyURL(u),
+					MaxIdleConns:    10,
+					IdleConnTimeout: 15 * time.Second,
+				},
+			})
+		}
+
 	}
 
 	return &Client{
@@ -49,7 +70,6 @@ func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) 
 			}
 		}
 	}
-
 
 	return d, err
 }
@@ -152,7 +172,7 @@ func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language 
 			return d, err
 		}
 		d.Name = detailEN.Name
-		d.Overview = detailEN.Overview	
+		d.Overview = detailEN.Overview
 	}
 
 	return d, err
@@ -172,7 +192,7 @@ func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.
 	}
 
 	for i, ep := range detailCN.Episodes {
-		if !episodeNameUseful(ep.Name) && episodeNameUseful(detailEN.Episodes[i].Name){
+		if !episodeNameUseful(ep.Name) && episodeNameUseful(detailEN.Episodes[i].Name) {
 			detailCN.Episodes[i].Name = detailEN.Episodes[i].Name
 			detailCN.Episodes[i].Overview = detailEN.Episodes[i].Overview
 		}
@@ -197,7 +217,6 @@ func withLangOption(language string) map[string]string {
 		"language": language,
 	}
 }
-
 
 func episodeNameUseful(name string) bool {
 	return !strings.HasSuffix(name, "集") && !strings.HasPrefix(strings.ToLower(name), "episode")

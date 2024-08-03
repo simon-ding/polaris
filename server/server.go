@@ -39,8 +39,6 @@ type Server struct {
 
 func (s *Server) Serve() error {
 	s.core.Init()
-	
-	s.restoreProxy()
 
 	s.jwtSerect = s.db.GetSetting(db.JwtSerectKey)
 	//st, _ := fs.Sub(ui.Web, "build/web")
@@ -129,7 +127,8 @@ func (s *Server) TMDB() (*tmdb.Client, error) {
 	if api == "" {
 		return nil, errors.New("TMDB apiKey not set")
 	}
-	return tmdb.NewClient(api)
+	proxy := s.db.GetSetting(db.SettingProxy)
+	return tmdb.NewClient(api, proxy)
 }
 
 func (s *Server) MustTMDB() *tmdb.Client {

@@ -3,8 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/url"
 	"polaris/db"
 	"polaris/ent"
 	"polaris/log"
@@ -55,27 +53,8 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		s.db.SetSetting(db.SettingPlexMatchEnabled, "false")
 	}
 
-	s.setProxy(in.Proxy)
+	s.db.SetSetting(db.SettingProxy, in.Proxy)
 	return nil, nil
-}
-
-func (s *Server) setProxy(proxy string) {
-	proxyUrl, err := url.Parse(proxy)
-	tp := http.DefaultTransport.(*http.Transport)
-	if proxy == "" || err != nil {
-		log.Warnf("proxy url not valid, disabling: %v", proxy)
-		tp.Proxy = nil
-		s.db.SetSetting(db.SettingProxy, "")
-	} else {
-		log.Infof("set proxy to %v", proxy)
-		tp.Proxy = http.ProxyURL(proxyUrl)
-		s.db.SetSetting(db.SettingProxy, proxy)
-	}
-}
-
-func (s *Server) restoreProxy() {
-	p := s.db.GetSetting(db.SettingProxy)
-	s.setProxy(p)
 }
 
 func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
