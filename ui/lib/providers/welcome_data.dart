@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiver/strings.dart';
 import 'package:ui/providers/APIs.dart';
@@ -91,16 +92,24 @@ class SearchPageData
     state = newState;
   }
 
-  Future<void> submit2Watchlist(int tmdbId, int storageId, String resolution,
-      String mediaType, String folder, bool downloadHistoryEpisodes) async {
-    final dio = await APIs.getDio();
+  Future<void> submit2Watchlist(
+      int tmdbId,
+      int storageId,
+      String resolution,
+      String mediaType,
+      String folder,
+      bool downloadHistoryEpisodes,
+      RangeValues limiter) async {
+    final dio = APIs.getDio();
     if (mediaType == "tv") {
       var resp = await dio.post(APIs.watchlistTvUrl, data: {
         "tmdb_id": tmdbId,
         "storage_id": storageId,
         "resolution": resolution,
         "folder": folder,
-        "download_history_episodes": downloadHistoryEpisodes
+        "download_history_episodes": downloadHistoryEpisodes,
+        "size_min": (limiter.start * 1000).toInt(),
+        "size_max": (limiter.end * 1000).toInt(),
       });
       var sp = ServerResponse.fromJson(resp.data);
       if (sp.code != 0) {
@@ -112,7 +121,9 @@ class SearchPageData
         "tmdb_id": tmdbId,
         "storage_id": storageId,
         "resolution": resolution,
-        "folder": folder
+        "folder": folder,
+        "size_min": (limiter.start * 1000).toInt(),
+        "size_max": (limiter.end * 1000).toInt(),
       });
       var sp = ServerResponse.fromJson(resp.data);
       if (sp.code != 0) {
@@ -185,8 +196,8 @@ class MediaDetail {
     resolution = json["resolution"];
     storageId = json["storage_id"];
     airDate = json["air_date"];
-    monitoredNum = json["monitored_num"]??0;
-    downloadedNum = json["downloaded_num"]??0;
+    monitoredNum = json["monitored_num"] ?? 0;
+    downloadedNum = json["downloaded_num"] ?? 0;
   }
 }
 

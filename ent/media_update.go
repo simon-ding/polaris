@@ -9,6 +9,7 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/media"
 	"polaris/ent/predicate"
+	"polaris/ent/schema"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -249,6 +250,18 @@ func (mu *MediaUpdate) ClearDownloadHistoryEpisodes() *MediaUpdate {
 	return mu
 }
 
+// SetLimiter sets the "limiter" field.
+func (mu *MediaUpdate) SetLimiter(sl *schema.MediaLimiter) *MediaUpdate {
+	mu.mutation.SetLimiter(sl)
+	return mu
+}
+
+// ClearLimiter clears the value of the "limiter" field.
+func (mu *MediaUpdate) ClearLimiter() *MediaUpdate {
+	mu.mutation.ClearLimiter()
+	return mu
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mu *MediaUpdate) AddEpisodeIDs(ids ...int) *MediaUpdate {
 	mu.mutation.AddEpisodeIDs(ids...)
@@ -400,6 +413,12 @@ func (mu *MediaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if mu.mutation.DownloadHistoryEpisodesCleared() {
 		_spec.ClearField(media.FieldDownloadHistoryEpisodes, field.TypeBool)
+	}
+	if value, ok := mu.mutation.Limiter(); ok {
+		_spec.SetField(media.FieldLimiter, field.TypeJSON, value)
+	}
+	if mu.mutation.LimiterCleared() {
+		_spec.ClearField(media.FieldLimiter, field.TypeJSON)
 	}
 	if mu.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -686,6 +705,18 @@ func (muo *MediaUpdateOne) ClearDownloadHistoryEpisodes() *MediaUpdateOne {
 	return muo
 }
 
+// SetLimiter sets the "limiter" field.
+func (muo *MediaUpdateOne) SetLimiter(sl *schema.MediaLimiter) *MediaUpdateOne {
+	muo.mutation.SetLimiter(sl)
+	return muo
+}
+
+// ClearLimiter clears the value of the "limiter" field.
+func (muo *MediaUpdateOne) ClearLimiter() *MediaUpdateOne {
+	muo.mutation.ClearLimiter()
+	return muo
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (muo *MediaUpdateOne) AddEpisodeIDs(ids ...int) *MediaUpdateOne {
 	muo.mutation.AddEpisodeIDs(ids...)
@@ -867,6 +898,12 @@ func (muo *MediaUpdateOne) sqlSave(ctx context.Context) (_node *Media, err error
 	}
 	if muo.mutation.DownloadHistoryEpisodesCleared() {
 		_spec.ClearField(media.FieldDownloadHistoryEpisodes, field.TypeBool)
+	}
+	if value, ok := muo.mutation.Limiter(); ok {
+		_spec.SetField(media.FieldLimiter, field.TypeJSON, value)
+	}
+	if muo.mutation.LimiterCleared() {
+		_spec.ClearField(media.FieldLimiter, field.TypeJSON)
 	}
 	if muo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{

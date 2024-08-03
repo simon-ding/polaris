@@ -41,6 +41,8 @@ const (
 	FieldTargetDir = "target_dir"
 	// FieldDownloadHistoryEpisodes holds the string denoting the download_history_episodes field in the database.
 	FieldDownloadHistoryEpisodes = "download_history_episodes"
+	// FieldLimiter holds the string denoting the limiter field in the database.
+	FieldLimiter = "limiter"
 	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
 	EdgeEpisodes = "episodes"
 	// Table holds the table name of the media in the database.
@@ -70,6 +72,7 @@ var Columns = []string{
 	FieldStorageID,
 	FieldTargetDir,
 	FieldDownloadHistoryEpisodes,
+	FieldLimiter,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

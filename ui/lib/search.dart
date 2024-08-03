@@ -150,6 +150,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Future<void> _showSubmitDialog(BuildContext context, SearchResult item) {
     final _formKey = GlobalKey<FormBuilderState>();
+    bool enabledSizedLimiter = false;
+    double sizeMax = 5000;
 
     return showDialog<void>(
         context: context,
@@ -166,7 +168,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 title: Text('添加: ${item.name}'),
                 content: SizedBox(
                   width: 500,
-                  height: 200,
+                  height: 400,
                   child: FormBuilder(
                     key: _formKey,
                     initialValue: const {
@@ -174,6 +176,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       "storage": null,
                       "folder": "",
                       "history_episodes": false,
+                      "eanble_size_limier": false,
+                      "size_limiter": RangeValues(400, 4000),
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,6 +252,51 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                         size: 20,
                                       ),
                                     ),
+                                    FormBuilderSwitch(
+                                      name: "eanble_size_limier",
+                                      title: Text(item.mediaType == "tv"
+                                          ? "是否限制每集文件大小"
+                                          : "是否限制电影文件大小"),
+                                      onChanged: (value) {
+                                        setState(
+                                          () {
+                                            enabledSizedLimiter = value!;
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    enabledSizedLimiter
+                                        ? FormBuilderRangeSlider(
+                                            maxValueWidget: (max) =>
+                                                Text("${sizeMax / 1000} GB"),
+                                            minValueWidget: (min) => Text("0"),
+                                            valueWidget: (value) {
+                                              final sss = value.split(" ");
+                                              return Text(
+                                                  "${readableSize(sss[0])} - ${readableSize(sss[2])}");
+                                            },
+                                            onChangeEnd: (value) {
+                                              if (value.end > sizeMax * 0.9) {
+                                                setState(
+                                                  () {
+                                                    sizeMax = sizeMax * 5;
+                                                  },
+                                                );
+                                              } else if (value.end <
+                                                  sizeMax * 0.2) {
+                                                if (sizeMax > 5000) {
+                                                  setState(
+                                                    () {
+                                                      sizeMax = sizeMax / 5;
+                                                    },
+                                                  );
+                                                }
+                                              }
+                                            },
+                                            name: "size_limiter",
+                                            min: 0,
+                                            max: sizeMax)
+                                        : const SizedBox(),
                                     item.mediaType == "tv"
                                         ? SizedBox(
                                             width: 250,
@@ -285,7 +334,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.saveAndValidate()) {
                         final values = _formKey.currentState!.value;
-                        //print(values);
                         var f = ref
                             .read(searchPageDataProvider(widget.query ?? "")
                                 .notifier)
@@ -295,7 +343,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 values["resolution"],
                                 item.mediaType!,
                                 values["folder"],
-                                values["history_episodes"] ?? false)
+                                values["history_episodes"] ?? false,
+                                enabledSizedLimiter ? values["size_limiter"] : const RangeValues(-1, -1))
                             .then((v) {
                           Navigator.of(context).pop();
                           showSnakeBar("添加成功：${item.name}");
@@ -309,6 +358,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             },
           );
         });
+  }
+
+  String readableSize(String v) {
+    if (v.endsWith("K")) {
+      return v.replaceAll("K", " GB");
+    }
+    return "$v MB";
   }
 }
 

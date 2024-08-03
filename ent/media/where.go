@@ -775,6 +775,16 @@ func DownloadHistoryEpisodesNotNil() predicate.Media {
 	return predicate.Media(sql.FieldNotNull(FieldDownloadHistoryEpisodes))
 }
 
+// LimiterIsNil applies the IsNil predicate on the "limiter" field.
+func LimiterIsNil() predicate.Media {
+	return predicate.Media(sql.FieldIsNull(FieldLimiter))
+}
+
+// LimiterNotNil applies the NotNil predicate on the "limiter" field.
+func LimiterNotNil() predicate.Media {
+	return predicate.Media(sql.FieldNotNull(FieldLimiter))
+}
+
 // HasEpisodes applies the HasEdge predicate on the "episodes" edge.
 func HasEpisodes() predicate.Media {
 	return predicate.Media(func(s *sql.Selector) {

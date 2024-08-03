@@ -13,6 +13,7 @@ import (
 	"polaris/ent/media"
 	"polaris/ent/notificationclient"
 	"polaris/ent/predicate"
+	"polaris/ent/schema"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"sync"
@@ -3600,6 +3601,7 @@ type MediaMutation struct {
 	addstorage_id             *int
 	target_dir                *string
 	download_history_episodes *bool
+	limiter                   **schema.MediaLimiter
 	clearedFields             map[string]struct{}
 	episodes                  map[int]struct{}
 	removedepisodes           map[int]struct{}
@@ -4268,6 +4270,55 @@ func (m *MediaMutation) ResetDownloadHistoryEpisodes() {
 	delete(m.clearedFields, media.FieldDownloadHistoryEpisodes)
 }
 
+// SetLimiter sets the "limiter" field.
+func (m *MediaMutation) SetLimiter(sl *schema.MediaLimiter) {
+	m.limiter = &sl
+}
+
+// Limiter returns the value of the "limiter" field in the mutation.
+func (m *MediaMutation) Limiter() (r *schema.MediaLimiter, exists bool) {
+	v := m.limiter
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLimiter returns the old "limiter" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MediaMutation) OldLimiter(ctx context.Context) (v *schema.MediaLimiter, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLimiter is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLimiter requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLimiter: %w", err)
+	}
+	return oldValue.Limiter, nil
+}
+
+// ClearLimiter clears the value of the "limiter" field.
+func (m *MediaMutation) ClearLimiter() {
+	m.limiter = nil
+	m.clearedFields[media.FieldLimiter] = struct{}{}
+}
+
+// LimiterCleared returns if the "limiter" field was cleared in this mutation.
+func (m *MediaMutation) LimiterCleared() bool {
+	_, ok := m.clearedFields[media.FieldLimiter]
+	return ok
+}
+
+// ResetLimiter resets all changes to the "limiter" field.
+func (m *MediaMutation) ResetLimiter() {
+	m.limiter = nil
+	delete(m.clearedFields, media.FieldLimiter)
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
 func (m *MediaMutation) AddEpisodeIDs(ids ...int) {
 	if m.episodes == nil {
@@ -4356,7 +4407,7 @@ func (m *MediaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MediaMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.tmdb_id != nil {
 		fields = append(fields, media.FieldTmdbID)
 	}
@@ -4396,6 +4447,9 @@ func (m *MediaMutation) Fields() []string {
 	if m.download_history_episodes != nil {
 		fields = append(fields, media.FieldDownloadHistoryEpisodes)
 	}
+	if m.limiter != nil {
+		fields = append(fields, media.FieldLimiter)
+	}
 	return fields
 }
 
@@ -4430,6 +4484,8 @@ func (m *MediaMutation) Field(name string) (ent.Value, bool) {
 		return m.TargetDir()
 	case media.FieldDownloadHistoryEpisodes:
 		return m.DownloadHistoryEpisodes()
+	case media.FieldLimiter:
+		return m.Limiter()
 	}
 	return nil, false
 }
@@ -4465,6 +4521,8 @@ func (m *MediaMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldTargetDir(ctx)
 	case media.FieldDownloadHistoryEpisodes:
 		return m.OldDownloadHistoryEpisodes(ctx)
+	case media.FieldLimiter:
+		return m.OldLimiter(ctx)
 	}
 	return nil, fmt.Errorf("unknown Media field %s", name)
 }
@@ -4565,6 +4623,13 @@ func (m *MediaMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDownloadHistoryEpisodes(v)
 		return nil
+	case media.FieldLimiter:
+		v, ok := value.(*schema.MediaLimiter)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLimiter(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)
 }
@@ -4634,6 +4699,9 @@ func (m *MediaMutation) ClearedFields() []string {
 	if m.FieldCleared(media.FieldDownloadHistoryEpisodes) {
 		fields = append(fields, media.FieldDownloadHistoryEpisodes)
 	}
+	if m.FieldCleared(media.FieldLimiter) {
+		fields = append(fields, media.FieldLimiter)
+	}
 	return fields
 }
 
@@ -4659,6 +4727,9 @@ func (m *MediaMutation) ClearField(name string) error {
 		return nil
 	case media.FieldDownloadHistoryEpisodes:
 		m.ClearDownloadHistoryEpisodes()
+		return nil
+	case media.FieldLimiter:
+		m.ClearLimiter()
 		return nil
 	}
 	return fmt.Errorf("unknown Media nullable field %s", name)
@@ -4706,6 +4777,9 @@ func (m *MediaMutation) ResetField(name string) error {
 		return nil
 	case media.FieldDownloadHistoryEpisodes:
 		m.ResetDownloadHistoryEpisodes()
+		return nil
+	case media.FieldLimiter:
+		m.ResetLimiter()
 		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)

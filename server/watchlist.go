@@ -10,6 +10,7 @@ import (
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/media"
+	"polaris/ent/schema"
 	"polaris/log"
 	"strconv"
 	"time"
@@ -66,6 +67,8 @@ type addWatchlistIn struct {
 	Resolution              string `json:"resolution" binding:"required"`
 	Folder                  string `json:"folder" binding:"required"`
 	DownloadHistoryEpisodes bool   `json:"download_history_episodes"` //for tv
+	SizeMin                 int    `json:"size_min"`
+	SizeMax                 int    `json:"size_max"`
 }
 
 func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
@@ -134,7 +137,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 			epIds = append(epIds, epid)
 		}
 	}
-	r, err := s.db.AddMediaWatchlist(&ent.Media{
+	m := &ent.Media{
 		TmdbID:                  int(detail.ID),
 		MediaType:               media.MediaTypeTv,
 		NameCn:                  nameCn,
@@ -146,7 +149,10 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		StorageID:               in.StorageID,
 		TargetDir:               in.Folder,
 		DownloadHistoryEpisodes: in.DownloadHistoryEpisodes,
-	}, epIds)
+		Limiter:                 &schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
+	}
+
+	r, err := s.db.AddMediaWatchlist(m, epIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}
@@ -172,6 +178,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
+	log.Infof("add movie watchlist input: %+v", in)
 	detailCn, err := s.MustTMDB().GetMovieDetails(in.TmdbID, db.LanguageCN)
 	if err != nil {
 		return nil, errors.Wrap(err, "get movie detail")
@@ -212,6 +219,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
 		TargetDir:    in.Folder,
+		Limiter:      &schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
 	}, []int{epid})
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
@@ -294,7 +302,7 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 				ms.MonitoredNum++
 				if ep.Status == episode.StatusDownloaded {
 					ms.DownloadedNum++
-				}	
+				}
 			}
 		}
 		res[i] = ms

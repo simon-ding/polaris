@@ -3,8 +3,10 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"polaris/ent/media"
+	"polaris/ent/schema"
 	"strings"
 	"time"
 
@@ -43,6 +45,8 @@ type Media struct {
 	TargetDir string `json:"target_dir,omitempty"`
 	// tv series only
 	DownloadHistoryEpisodes bool `json:"download_history_episodes,omitempty"`
+	// Limiter holds the value of the "limiter" field.
+	Limiter *schema.MediaLimiter `json:"limiter,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MediaQuery when eager-loading is set.
 	Edges        MediaEdges `json:"edges"`
@@ -72,6 +76,8 @@ func (*Media) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case media.FieldLimiter:
+			values[i] = new([]byte)
 		case media.FieldDownloadHistoryEpisodes:
 			values[i] = new(sql.NullBool)
 		case media.FieldID, media.FieldTmdbID, media.FieldStorageID:
@@ -179,6 +185,14 @@ func (m *Media) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.DownloadHistoryEpisodes = value.Bool
 			}
+		case media.FieldLimiter:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field limiter", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &m.Limiter); err != nil {
+					return fmt.Errorf("unmarshal field limiter: %w", err)
+				}
+			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -258,6 +272,9 @@ func (m *Media) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("download_history_episodes=")
 	builder.WriteString(fmt.Sprintf("%v", m.DownloadHistoryEpisodes))
+	builder.WriteString(", ")
+	builder.WriteString("limiter=")
+	builder.WriteString(fmt.Sprintf("%v", m.Limiter))
 	builder.WriteByte(')')
 	return builder.String()
 }

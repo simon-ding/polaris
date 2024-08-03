@@ -108,6 +108,7 @@ var (
 		{Name: "storage_id", Type: field.TypeInt, Nullable: true},
 		{Name: "target_dir", Type: field.TypeString, Nullable: true},
 		{Name: "download_history_episodes", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "limiter", Type: field.TypeJSON, Nullable: true},
 	}
 	// MediaTable holds the schema information for the "media" table.
 	MediaTable = &schema.Table{

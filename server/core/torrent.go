@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, checkResolution bool) ([]torznab.Result, error) {
+func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, checkResolution bool, checkFileSize bool) ([]torznab.Result, error) {
 	series := db1.GetMediaDetails(seriesId)
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
@@ -55,6 +55,17 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 		if !utils.IsNameAcceptable(meta.NameEn, series.NameEn) && !utils.IsNameAcceptable(meta.NameCn, series.NameCn) {
 			continue
 		}
+
+		if checkFileSize && series.Limiter != nil  {
+			if series.Limiter.SizeMin > 0 &&  r.Size < series.Limiter.SizeMin {
+				//min size not satified
+				continue
+			}
+			if series.Limiter.SizeMax > 0 && r.Size > series.Limiter.SizeMax {
+				//max size not satified
+				continue
+			}
+		}
 		filtered = append(filtered, r)
 	}
 	if len(filtered) == 0 {
@@ -80,7 +91,7 @@ func isNumberedSeries(detail *db.MediaDetails) bool {
 	return hasSeason2 && !season2HasEpisode1 //only one 1st episode
 }
 
-func SearchMovie(db1 *db.Client, movieId int, checkResolution bool) ([]torznab.Result, error) {
+func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSize bool) ([]torznab.Result, error) {
 	movieDetail := db1.GetMediaDetails(movieId)
 	if movieDetail == nil {
 		return nil, errors.New("no media found of id")
@@ -103,6 +114,18 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool) ([]torznab.R
 		if checkResolution && meta.Resolution != movieDetail.Resolution.String() {
 			continue
 		}
+
+		if checkFileSize && movieDetail.Limiter != nil  {
+			if movieDetail.Limiter.SizeMin > 0 &&  r.Size < movieDetail.Limiter.SizeMin {
+				//min size not satified
+				continue
+			}
+			if movieDetail.Limiter.SizeMax > 0 && r.Size > movieDetail.Limiter.SizeMax {
+				//max size not satified
+				continue
+			}
+		}
+
 		ss := strings.Split(movieDetail.AirDate, "-")[0]
 		year, _ := strconv.Atoi(ss)
 		if meta.Year != year && meta.Year != year-1 && meta.Year != year+1 { //year not match

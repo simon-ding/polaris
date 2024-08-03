@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"polaris/ent/episode"
 	"polaris/ent/media"
+	"polaris/ent/schema"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -152,6 +153,12 @@ func (mc *MediaCreate) SetNillableDownloadHistoryEpisodes(b *bool) *MediaCreate 
 	if b != nil {
 		mc.SetDownloadHistoryEpisodes(*b)
 	}
+	return mc
+}
+
+// SetLimiter sets the "limiter" field.
+func (mc *MediaCreate) SetLimiter(sl *schema.MediaLimiter) *MediaCreate {
+	mc.mutation.SetLimiter(sl)
 	return mc
 }
 
@@ -339,6 +346,10 @@ func (mc *MediaCreate) createSpec() (*Media, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.DownloadHistoryEpisodes(); ok {
 		_spec.SetField(media.FieldDownloadHistoryEpisodes, field.TypeBool, value)
 		_node.DownloadHistoryEpisodes = value
+	}
+	if value, ok := mc.mutation.Limiter(); ok {
+		_spec.SetField(media.FieldLimiter, field.TypeJSON, value)
+		_node.Limiter = value
 	}
 	if nodes := mc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
