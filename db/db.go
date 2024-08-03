@@ -472,7 +472,8 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 
 func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
 	return c.ent.History.Create().SetMediaID(h.MediaID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
-		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetSaved(h.Saved).Save(context.TODO())
+		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID). 
+		SetSaved(h.Saved).Save(context.TODO())
 }
 
 func (c *Client) SetHistoryStatus(id int, status history.Status) error {

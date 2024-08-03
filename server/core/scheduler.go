@@ -276,6 +276,7 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode) error {
 		Size:             r1.Size,
 		Saved:            torrent.Save(),
 		DownloadClientID: dlc.ID,
+		IndexerID:        r1.IndexerId,
 	})
 	if err != nil {
 		log.Errorf("save history error: %v", err)
@@ -336,7 +337,7 @@ func (c *Client) checkSeiesNewSeason(media *ent.Media) error {
 	return nil
 }
 
-func (c *Client) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (bool) {
+func (c *Client) isSeedRatioLimitReached(indexId int, t pkg.Torrent) bool {
 	indexer, err := c.db.GetIndexer(indexId)
 	if err != nil {
 		return true
