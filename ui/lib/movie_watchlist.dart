@@ -52,7 +52,7 @@ class NestedTabBar extends ConsumerStatefulWidget {
   const NestedTabBar({super.key, required this.id});
 
   @override
-  _NestedTabBarState createState() => _NestedTabBarState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _NestedTabBarState();
 }
 
 class _NestedTabBarState extends ConsumerState<NestedTabBar>

@@ -10,7 +10,7 @@ class ActivityPage extends ConsumerStatefulWidget {
   static const route = "/activities";
 
   @override
-  _ActivityPageState createState() => _ActivityPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ActivityPageState();
 }
 
 class _ActivityPageState extends ConsumerState<ActivityPage>

@@ -50,12 +50,12 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                     child: ep.status == "downloading"
                         ? const Tooltip(
                             message: "下载中",
-                            child: Icon(Icons.downloading),
+                            child: IconButton(onPressed: null, icon: Icon(Icons.downloading)),
                           )
                         : (ep.status == "downloaded"
                             ? const Tooltip(
                                 message: "已下载",
-                                child: Icon(Icons.download_done),
+                                child: IconButton(onPressed: null, icon: Icon(Icons.download_done)),
                               )
                             : (ep.monitored == true
                                 ? Tooltip(
