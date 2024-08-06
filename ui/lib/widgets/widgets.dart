@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:ui/providers/APIs.dart';
 
 class Commons {
@@ -85,4 +86,55 @@ showLoadingWithFuture(Future f) {
           });
     },
   );
+}
+
+class MyRangeSlider extends StatefulWidget {
+  final String name;
+  const MyRangeSlider({super.key, required this.name});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _MySliderState();
+  }
+}
+
+class _MySliderState extends State<MyRangeSlider> {
+  double sizeMax = 5000;
+  @override
+  Widget build(BuildContext context) {
+    return FormBuilderRangeSlider(
+        maxValueWidget: (max) => Text("${sizeMax / 1000} GB"),
+        minValueWidget: (min) => Text("0"),
+        valueWidget: (value) {
+          final sss = value.split(" ");
+          return Text("${readableSize(sss[0])} - ${readableSize(sss[2])}");
+        },
+        onChangeEnd: (value) {
+          if (value.end > sizeMax * 0.9) {
+            setState(
+              () {
+                sizeMax = sizeMax * 5;
+              },
+            );
+          } else if (value.end < sizeMax * 0.2) {
+            if (sizeMax > 5000) {
+              setState(
+                () {
+                  sizeMax = sizeMax / 5;
+                },
+              );
+            }
+          }
+        },
+        name: widget.name,
+        min: 0,
+        max: sizeMax);
+  }
+
+  String readableSize(String v) {
+    if (v.endsWith("K")) {
+      return v.replaceAll("K", " GB");
+    }
+    return "$v MB";
+  }
 }

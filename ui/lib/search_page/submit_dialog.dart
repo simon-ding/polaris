@@ -125,35 +125,7 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
                             },
                           ),
                           enabledSizedLimiter
-                              ? FormBuilderRangeSlider(
-                                  maxValueWidget: (max) =>
-                                      Text("${sizeMax / 1000} GB"),
-                                  minValueWidget: (min) => Text("0"),
-                                  valueWidget: (value) {
-                                    final sss = value.split(" ");
-                                    return Text(
-                                        "${readableSize(sss[0])} - ${readableSize(sss[2])}");
-                                  },
-                                  onChangeEnd: (value) {
-                                    if (value.end > sizeMax * 0.9) {
-                                      setState(
-                                        () {
-                                          sizeMax = sizeMax * 5;
-                                        },
-                                      );
-                                    } else if (value.end < sizeMax * 0.2) {
-                                      if (sizeMax > 5000) {
-                                        setState(
-                                          () {
-                                            sizeMax = sizeMax / 5;
-                                          },
-                                        );
-                                      }
-                                    }
-                                  },
-                                  name: "size_limiter",
-                                  min: 0,
-                                  max: sizeMax)
+                              ? const MyRangeSlider(name: "size_limiter")
                               : const SizedBox(),
                           widget.item.mediaType == "tv"
                               ? SizedBox(
@@ -193,7 +165,7 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
             if (_formKey.currentState!.saveAndValidate()) {
               final values = _formKey.currentState!.value;
               var f = ref
-                  .read(searchPageDataProvider(widget.query ?? "").notifier)
+                  .read(searchPageDataProvider(widget.query).notifier)
                   .submit2Watchlist(
                       widget.item.id!,
                       values["storage"],
@@ -223,3 +195,4 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
     return "$v MB";
   }
 }
+

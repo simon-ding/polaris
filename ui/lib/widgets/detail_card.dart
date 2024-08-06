@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
@@ -68,10 +70,12 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             const SizedBox(
                               width: 30,
                             ),
-                            Expanded(child: Text(
-                                "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
-                                "${widget.details.targetDir}"),)
-                                                      ],
+                            Expanded(
+                              child: Text(
+                                  "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
+                                  "${widget.details.targetDir}"),
+                            )
+                          ],
                         ),
                         const Divider(thickness: 1, height: 1),
                         Text(
@@ -88,6 +92,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                         )),
                         Row(
                           children: [
+                            editIcon(widget.details),
                             deleteIcon(),
                           ],
                         )
@@ -118,6 +123,79 @@ class _DetailCardState extends ConsumerState<DetailCard> {
             showLoadingWithFuture(f);
           },
           icon: const Icon(Icons.delete)),
+    );
+  }
+
+  Widget editIcon(SeriesDetails details) {
+    return IconButton(
+        onPressed: () => showEditDialog(details), icon: const Icon(Icons.edit));
+  }
+
+  showEditDialog(SeriesDetails details) {
+    final _formKey = GlobalKey<FormBuilderState>();
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("编辑 ${details.name}"),
+          content: SelectionArea(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.5,
+              height: MediaQuery.of(context).size.height * 0.3,
+              child: SingleChildScrollView(
+                  child: FormBuilder(
+                key: _formKey,
+                initialValue: {
+                  "resolution": details.resolution,
+                  "target_dir": details.targetDir,
+                  "limiter": details.limiter != null
+                      ? RangeValues(details.limiter!.sizeMin.toDouble(),
+                          details.limiter!.sizeMax.toDouble())
+                      : const RangeValues(0, 0)
+                },
+                child: Column(
+                  children: [
+                    FormBuilderDropdown(
+                      name: "resolution",
+                      decoration: const InputDecoration(labelText: "清晰度"),
+                      items: const [
+                        DropdownMenuItem(value: "720p", child: Text("720p")),
+                        DropdownMenuItem(value: "1080p", child: Text("1080p")),
+                        DropdownMenuItem(value: "2160p", child: Text("2160p")),
+                      ],
+                    ),
+                    FormBuilderTextField(
+                      name: "target_dir",
+                      validator: FormBuilderValidators.required(),
+                    ),
+                    const MyRangeSlider(name: "limiter"),
+                  ],
+                ),
+              )),
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("取消")),
+            TextButton(
+                onPressed: () {
+                  if (_formKey.currentState!.saveAndValidate()) {
+                    final values = _formKey.currentState!.value;
+                  var f = ref
+                      .read(mediaDetailsProvider(widget.details.id.toString())
+                          .notifier)
+                      .edit(values["resolution"], values["target_dir"], values["limiter"])
+                      .then((v) => Navigator.of(context).pop());
+                  showLoadingWithFuture(f);
+
+                  }
+                },
+                child: const Text("确认"))
+          ],
+        );
+      },
     );
   }
 }

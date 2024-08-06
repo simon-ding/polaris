@@ -80,6 +80,7 @@ func (s *Server) Serve() error {
 	tv := api.Group("/media")
 	{
 		tv.GET("/search", HttpHandler(s.SearchMedia))
+		tv.POST("/edit", HttpHandler(s.EditMediaMetadata))
 		tv.POST("/tv/watchlist", HttpHandler(s.AddTv2Watchlist))
 		tv.GET("/tv/watchlist", HttpHandler(s.GetTvWatchlist))
 		tv.POST("/torrents", HttpHandler(s.SearchAvailableTorrents))

@@ -11,6 +11,7 @@ import (
 	"polaris/ent/history"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
+	"polaris/ent/schema"
 	"polaris/ent/settings"
 	"polaris/ent/storage"
 	"polaris/log"
@@ -87,8 +88,8 @@ func (c *Client) generateDefaultLocalStorage() error {
 	return c.AddStorage(&StorageInfo{
 		Name:           "local",
 		Implementation: "local",
-		TvPath: "/data/tv/",
-		MoviePath: "/data/movies/",
+		TvPath:         "/data/tv/",
+		MoviePath:      "/data/movies/",
 		Default:        true,
 	})
 }
@@ -249,7 +250,6 @@ type TorznabSetting struct {
 	ApiKey string `json:"api_key"`
 }
 
-
 func (c *Client) SaveIndexer(in *ent.Indexers) error {
 
 	if in.ID != 0 {
@@ -265,7 +265,7 @@ func (c *Client) SaveIndexer(in *ent.Indexers) error {
 
 	_, err := c.ent.Indexers.Create().
 		SetName(in.Name).SetImplementation(in.Implementation).SetPriority(in.Priority).SetSettings(in.Settings).SetSeedRatio(in.SeedRatio).
-			SetDisabled(in.Disabled).Save(context.TODO())
+		SetDisabled(in.Disabled).Save(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "save db")
 	}
@@ -285,11 +285,12 @@ func (c *Client) GetIndexer(id int) (*TorznabInfo, error) {
 	var ss TorznabSetting
 	err = json.Unmarshal([]byte(res.Settings), &ss)
 	if err != nil {
-		
+
 		return nil, fmt.Errorf("unmarshal torznab %s error: %v", res.Name, err)
 	}
 	return &TorznabInfo{Indexers: res, TorznabSetting: ss}, nil
 }
+
 type TorznabInfo struct {
 	*ent.Indexers
 	TorznabSetting
@@ -307,7 +308,7 @@ func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
 			continue
 		}
 		l = append(l, &TorznabInfo{
-			Indexers: r,
+			Indexers:       r,
 			TorznabSetting: ss,
 		})
 	}
@@ -356,7 +357,7 @@ type StorageInfo struct {
 	Settings       map[string]string `json:"settings" binding:"required"`
 	TvPath         string            `json:"tv_path" binding:"required"`
 	MoviePath      string            `json:"movie_path" binding:"required"`
-	Default bool `json:"default"`
+	Default        bool              `json:"default"`
 }
 
 func (s *StorageInfo) ToWebDavSetting() WebdavSetting {
@@ -370,7 +371,6 @@ func (s *StorageInfo) ToWebDavSetting() WebdavSetting {
 		ChangeFileHash: s.Settings["change_file_hash"],
 	}
 }
-
 
 type WebdavSetting struct {
 	URL            string `json:"url"`
@@ -472,7 +472,7 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 
 func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
 	return c.ent.History.Create().SetMediaID(h.MediaID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
-		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID). 
+		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID).
 		SetDownloadClientID(h.DownloadClientID).SetSaved(h.Saved).Save(context.TODO())
 }
 
@@ -555,7 +555,18 @@ func (c *Client) GetDownloadClient(id int) (*ent.DownloadClients, error) {
 	return c.ent.DownloadClients.Query().Where(downloadclients.ID(id)).First(context.Background())
 }
 
-
 func (c *Client) SetEpisodeMonitoring(id int, b bool) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetMonitored(b).Exec(context.Background())
+}
+
+type EditMediaData struct {
+	ID         int                  `json:"id"`
+	Resolution media.Resolution     `json:"resolution"`
+	TargetDir  string               `json:"target_dir"`
+	Limiter    *schema.MediaLimiter `json:"limiter"`
+}
+
+func (c *Client) EditMediaMetadata(in EditMediaData) error {
+	return c.ent.Media.Update().Where(media.ID(in.ID)).SetResolution(in.Resolution).SetTargetDir(in.TargetDir).SetLimiter(in.Limiter).
+		Exec(context.Background())
 }

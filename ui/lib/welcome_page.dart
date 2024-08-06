@@ -41,57 +41,66 @@ class WelcomePage extends ConsumerWidget {
                   ]
                 : List.generate(value.length, (i) {
                     final item = value[i];
-                    return Card(
-                        //margin: const EdgeInsets.all(4),
-                        clipBehavior: Clip.hardEdge,
-                        elevation: 5,
-                        child: InkWell(
-                          //splashColor: Colors.blue.withAlpha(30),
-                          onTap: () {
-                            if (uri == routeMoivie) {
-                              context.go(MovieDetailsPage.toRoute(item.id!));
-                            } else {
-                              context.go(TvDetailsPage.toRoute(item.id!));
-                            }
-                          },
-                          child: Column(
-                            children: <Widget>[
-                              SizedBox(
-                                width: 140,
-                                height: 210,
-                                child: Ink.image(
-                                    image: NetworkImage(
-                                  "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                                )),
-                              ),
-                              SizedBox(
-                                  width: 140,
-                                  child: Column(
-                                    children: [
-                                      LinearProgressIndicator(
-                                        value: 1,
-                                        color: item.downloadedNum! >=
-                                                item.monitoredNum!
-                                            ? Colors.green
-                                            : Colors.blue,
-                                      ),
-                                      Text(
-                                        item.name!,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            height: 2.5),
-                                      ),
-                                    ],
-                                  )),
-                            ],
-                          ),
-                        ));
+                    return MediaCard(item: item);
                   }),
           ),
         ),
       _ => const MyProgressIndicator(),
     };
+  }
+}
+
+class MediaCard extends StatelessWidget {
+  final MediaDetail item;
+
+  const MediaCard({super.key, required this.item});
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+        //margin: const EdgeInsets.all(4),
+        clipBehavior: Clip.hardEdge,
+        elevation: 10,
+        child: InkWell(
+          //splashColor: Colors.blue.withAlpha(30),
+          onTap: () {
+            if (item.mediaType == "movie") {
+              context.go(MovieDetailsPage.toRoute(item.id!));
+            } else {
+              context.go(TvDetailsPage.toRoute(item.id!));
+            }
+          },
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                width: 140,
+                height: 210,
+                child: Ink.image(
+                    image: NetworkImage(
+                  "${APIs.imagesUrl}/${item.id}/poster.jpg",
+                )),
+              ),
+              SizedBox(
+                  width: 140,
+                  child: Column(
+                    children: [
+                      LinearProgressIndicator(
+                        value: 1,
+                        color: item.downloadedNum! >= item.monitoredNum!
+                            ? Colors.green
+                            : Colors.blue,
+                      ),
+                      Text(
+                        item.name!,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            height: 2.5),
+                      ),
+                    ],
+                  )),
+            ],
+          ),
+        ));
   }
 }

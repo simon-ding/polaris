@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
@@ -34,7 +35,7 @@ class SeriesDetailData
 
   Future<String> searchAndDownload(
       String seriesId, int seasonNum, int episodeNum) async {
-    final dio = await APIs.getDio();
+    final dio = APIs.getDio();
     var resp = await dio.post(APIs.searchAndDownloadUrl, data: {
       "id": int.parse(seriesId),
       "season": seasonNum,
@@ -61,6 +62,22 @@ class SeriesDetailData
     }
     ref.invalidateSelf();
   }
+
+  Future<void> edit(
+      String resolution, String targetDir, RangeValues limiter) async {
+    final dio = APIs.getDio();
+    var resp = await dio.post(APIs.editMediaUrl, data: {
+      "id": int.parse(id!),
+      "resolution": resolution,
+      "target_dir": targetDir,
+      "limiter": {"size_min": limiter.start.toInt(), "size_max": limiter.end.toInt()},
+    });
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
+  }
 }
 
 class SeriesDetails {
@@ -79,6 +96,7 @@ class SeriesDetails {
   Storage? storage;
   String? targetDir;
   bool? downloadHistoryEpisodes;
+  Limiter? limiter;
 
   SeriesDetails(
       {this.id,
@@ -95,7 +113,8 @@ class SeriesDetails {
       this.mediaType,
       this.targetDir,
       this.storage,
-      this.downloadHistoryEpisodes});
+      this.downloadHistoryEpisodes,
+      this.limiter});
 
   SeriesDetails.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -118,6 +137,19 @@ class SeriesDetails {
         episodes!.add(Episodes.fromJson(v));
       });
     }
+    if (json["limiter"] != null) {
+      limiter = Limiter.fromJson(json["limiter"]);
+    }
+  }
+}
+
+class Limiter {
+  int sizeMax;
+  int sizeMin;
+  Limiter({required this.sizeMax, required this.sizeMin});
+
+  factory Limiter.fromJson(Map<String, dynamic> json) {
+    return Limiter(sizeMax: json["size_max"], sizeMin: json["size_min"]);
   }
 }
 

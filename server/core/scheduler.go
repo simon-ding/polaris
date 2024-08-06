@@ -116,14 +116,14 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 		return err
 	}
 
-	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
-	if err := stImpl.Copy(filepath.Join(c.db.GetDownloadDir(), torrentName), r.TargetDir); err != nil {
-		return errors.Wrap(err, "move file")
-	}
-
 	// .plexmatch file
 	if err := c.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrentName); err != nil {
 		log.Errorf("create .plexmatch file error: %v", err)
+	}
+
+	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
+	if err := stImpl.Copy(filepath.Join(c.db.GetDownloadDir(), torrentName), r.TargetDir); err != nil {
+		return errors.Wrap(err, "move file")
 	}
 
 	c.db.SetHistoryStatus(r.ID, history.StatusSuccess)

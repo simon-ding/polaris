@@ -10,6 +10,7 @@ import (
 	"polaris/log"
 	"polaris/pkg/notifier"
 	"polaris/pkg/storage"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -54,6 +55,10 @@ func (c *Client) writePlexmatch(seriesId int, episodeId int, targetDir, name str
 		log.Infof("read season plexmatch: %v", err)
 	} else {
 		buff.Write(data)
+	}
+	if strings.Contains(buff.String(), name) {
+		log.Debugf("already write plex episode line: %v", name)
+		return nil
 	}
 	buff.WriteString(fmt.Sprintf("\nep: %d: %s\n", ep.EpisodeNumber, name))
 	log.Infof("write season plexmatch file content: %s", buff.String())

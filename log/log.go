@@ -26,6 +26,7 @@ func init() {
 			MaxSize:    50, // megabytes
 			MaxBackups: 3,
 			MaxAge:     30, // days
+			Compress:   true,
 		})
 	
 	}

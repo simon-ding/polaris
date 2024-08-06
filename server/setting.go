@@ -195,8 +195,8 @@ func (s *Server) DeleteDownloadCLient(c *gin.Context) (interface{}, error) {
 }
 
 type episodeMonitoringIn struct {
-	EpisodeID int `json:"episode_id"`
-	Monitor bool `json:"monitor"`
+	EpisodeID int  `json:"episode_id"`
+	Monitor   bool `json:"monitor"`
 }
 
 func (s *Server) ChangeEpisodeMonitoring(c *gin.Context) (interface{}, error) {
@@ -205,5 +205,17 @@ func (s *Server) ChangeEpisodeMonitoring(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "bind")
 	}
 	s.db.SetEpisodeMonitoring(in.EpisodeID, in.Monitor)
+	return "success", nil
+}
+
+func (s *Server) EditMediaMetadata(c *gin.Context) (interface{}, error) {
+	var in db.EditMediaData
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind")
+	}
+	err := s.db.EditMediaMetadata(in)
+	if err != nil {
+		return nil, errors.Wrap(err, "save db")
+	}
 	return "success", nil
 }
