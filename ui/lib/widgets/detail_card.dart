@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/welcome_page.dart';
+import 'package:ui/widgets/utils.dart';
 
 import 'widgets.dart';
 
@@ -59,7 +60,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(""),
-                        Row(
+                        Wrap(
                           children: [
                             Text("${widget.details.resolution}"),
                             const SizedBox(
@@ -70,11 +71,17 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             const SizedBox(
                               width: 30,
                             ),
-                            Expanded(
-                              child: Text(
-                                  "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
-                                  "${widget.details.targetDir}"),
-                            )
+                            Text(
+                                "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
+                                "${widget.details.targetDir}"),
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            widget.details.limiter != null &&
+                                    widget.details.limiter!.sizeMax > 0
+                                ? Text(
+                                    "${(widget.details.limiter!.sizeMin * 1000 * 1000).readableFileSize()} - ${(widget.details.limiter!.sizeMax * 1000 * 1000).readableFileSize()}")
+                                : const SizedBox()
                           ],
                         ),
                         const Divider(thickness: 1, height: 1),

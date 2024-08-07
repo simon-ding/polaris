@@ -45,7 +45,7 @@ class Utils {
   }
 
 extension FileFormatter on num {
-  String readableFileSize({bool base1024 = true}) {
+  String readableFileSize({bool base1024 = false}) {
     final base = base1024 ? 1024 : 1000;
     if (this <= 0) return "0";
     final units = ["B", "kB", "MB", "GB", "TB"];
