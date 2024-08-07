@@ -159,7 +159,7 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 		go func() {
 			log.Debugf("search torznab %v with %v", tor.Name, q)
 			defer wg.Done()
-			resp, err := torznab.Search(tor, tor.ApiKey, q)
+			resp, err := torznab.Search(tor, q)
 			if err != nil {
 				log.Errorf("search %s error: %v", tor.Name, err)
 				return

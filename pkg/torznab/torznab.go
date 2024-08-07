@@ -3,6 +3,7 @@ package torznab
 import (
 	"context"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -112,7 +113,7 @@ func tryParseFloat(s string) float32 {
 	return float32(r)
 }
 
-func Search(indexer *db.TorznabInfo, api, keyWord string) ([]Result, error) {
+func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancel()
 
@@ -121,26 +122,32 @@ func Search(indexer *db.TorznabInfo, api, keyWord string) ([]Result, error) {
 		return nil, errors.Wrap(err, "new request")
 	}
 	var q = url.Values{}
-	q.Add("apikey", api)
+	q.Add("apikey", indexer.ApiKey)
 	q.Add("t", "search")
 	q.Add("q", keyWord)
 	req.URL.RawQuery = q.Encode()
+	key := fmt.Sprintf("%s: %s", indexer.Name, keyWord)
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "do http")
+	cacheRes, ok := cache.Load(key)
+	if !ok {
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, errors.Wrap(err, "do http")
+		}
+		defer resp.Body.Close()
+		data, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, errors.Wrap(err, "read http body")
+		}
+		var res Response
+		err = xml.Unmarshal(data, &res)
+		if err != nil {
+			return nil, errors.Wrap(err, "json unmarshal")
+		}
+		cacheRes = TimedResponse{Response: res, T: time.Now()}
+		cache.Store(key, cacheRes)
 	}
-	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "read http body")
-	}
-	var res Response
-	err = xml.Unmarshal(data, &res)
-	if err != nil {
-		return nil, errors.Wrap(err, "json unmarshal")
-	}
-	return res.ToResults(indexer), nil
+	return cacheRes.ToResults(indexer), nil
 }
 
 type Result struct {
