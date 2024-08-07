@@ -128,7 +128,7 @@ func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
 	req.URL.RawQuery = q.Encode()
 	key := fmt.Sprintf("%s: %s", indexer.Name, keyWord)
 
-	cacheRes, ok := cache.Load(key)
+	cacheRes, ok := cc.Get(key)
 	if !ok {
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
@@ -144,8 +144,8 @@ func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "json unmarshal")
 		}
-		cacheRes = TimedResponse{Response: res, T: time.Now()}
-		cache.Store(key, cacheRes)
+		cacheRes = res
+		cc.Set(key, cacheRes)
 	}
 	return cacheRes.ToResults(indexer), nil
 }
