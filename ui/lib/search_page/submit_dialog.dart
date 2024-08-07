@@ -62,10 +62,12 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
               storage.when(
                   data: (v) {
                     return StatefulBuilder(builder: (context, setState) {
+                      final id1 = v.isEmpty ? 0 : v[0].id!;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           FormBuilderDropdown(
+                            initialValue: id1,
                             onChanged: (v) {
                               setState(
                                 () {
@@ -83,6 +85,9 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
                           ),
                           name.when(
                             data: (s) {
+                              if (storageSelected == 0) {
+                                storageSelected = id1;
+                              }
                               return storageSelected == 0
                                   ? const Text("")
                                   : () {
@@ -195,4 +200,3 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
     return "$v MB";
   }
 }
-
