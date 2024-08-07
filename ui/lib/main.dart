@@ -128,7 +128,8 @@ class _MyAppState extends ConsumerState<MyApp> {
             colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.blueAccent,
                 brightness: Brightness.dark,
-                surface: Colors.black54),
+                surface: Colors.black87
+                ),
             useMaterial3: true,
             //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
             tooltipTheme: TooltipThemeData(
