@@ -80,7 +80,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             widget.details.limiter != null &&
                                     widget.details.limiter!.sizeMax > 0
                                 ? Text(
-                                    "${(widget.details.limiter!.sizeMin * 1000 * 1000).readableFileSize()} - ${(widget.details.limiter!.sizeMax * 1000 * 1000).readableFileSize()}")
+                                    "${(widget.details.limiter!.sizeMin).readableFileSize()} - ${(widget.details.limiter!.sizeMax).readableFileSize()}")
                                 : const SizedBox()
                           ],
                         ),
@@ -177,8 +177,8 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                   "resolution": details.resolution,
                   "target_dir": details.targetDir,
                   "limiter": details.limiter != null
-                      ? RangeValues(details.limiter!.sizeMin.toDouble(),
-                          details.limiter!.sizeMax.toDouble())
+                      ? RangeValues(details.limiter!.sizeMin.toDouble()/1000/1000,
+                          details.limiter!.sizeMax.toDouble()/1000/1000)
                       : const RangeValues(0, 0)
                 },
                 child: Column(

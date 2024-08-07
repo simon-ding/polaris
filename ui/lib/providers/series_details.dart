@@ -70,7 +70,7 @@ class SeriesDetailData
       "id": int.parse(id!),
       "resolution": resolution,
       "target_dir": targetDir,
-      "limiter": {"size_min": limiter.start.toInt(), "size_max": limiter.end.toInt()},
+      "limiter": {"size_min": limiter.start.toInt()*1000*1000, "size_max": limiter.end.toInt()*1000*1000},
     });
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {

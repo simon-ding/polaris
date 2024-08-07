@@ -41,6 +41,6 @@ func (Media) Edges() []ent.Edge {
 }
 
 type MediaLimiter struct {
-	SizeMin int `json:"size_min"` //in MB
-	SizeMax int `json:"size_max"` //in MB
+	SizeMin int `json:"size_min"` //in B
+	SizeMax int `json:"size_max"` //in B
 }

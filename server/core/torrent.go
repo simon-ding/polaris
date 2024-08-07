@@ -57,11 +57,11 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 		}
 
 		if checkFileSize {
-			if series.Limiter.SizeMin > 0 && r.Size < series.Limiter.SizeMin*1000*1000 {
+			if series.Limiter.SizeMin > 0 && r.Size < series.Limiter.SizeMin {
 				//min size not satified
 				continue
 			}
-			if series.Limiter.SizeMax > 0 && r.Size > series.Limiter.SizeMax*1000*1000 {
+			if series.Limiter.SizeMax > 0 && r.Size > series.Limiter.SizeMax {
 				//max size not satified
 				continue
 			}
