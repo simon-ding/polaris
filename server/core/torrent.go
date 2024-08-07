@@ -56,7 +56,7 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 			continue
 		}
 
-		if checkFileSize && series.Limiter != nil {
+		if checkFileSize {
 			if series.Limiter.SizeMin > 0 && r.Size < series.Limiter.SizeMin {
 				//min size not satified
 				continue
@@ -115,7 +115,7 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 			continue
 		}
 
-		if checkFileSize && movieDetail.Limiter != nil {
+		if checkFileSize {
 			if movieDetail.Limiter.SizeMin > 0 && r.Size < movieDetail.Limiter.SizeMin {
 				//min size not satified
 				continue

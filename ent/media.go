@@ -46,7 +46,7 @@ type Media struct {
 	// tv series only
 	DownloadHistoryEpisodes bool `json:"download_history_episodes,omitempty"`
 	// Limiter holds the value of the "limiter" field.
-	Limiter *schema.MediaLimiter `json:"limiter,omitempty"`
+	Limiter schema.MediaLimiter `json:"limiter,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MediaQuery when eager-loading is set.
 	Edges        MediaEdges `json:"edges"`

@@ -149,7 +149,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 		StorageID:               in.StorageID,
 		TargetDir:               in.Folder,
 		DownloadHistoryEpisodes: in.DownloadHistoryEpisodes,
-		Limiter:                 &schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
+		Limiter:                 schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
 	}
 
 	r, err := s.db.AddMediaWatchlist(m, epIds)
@@ -219,7 +219,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		Resolution:   media.Resolution(in.Resolution),
 		StorageID:    in.StorageID,
 		TargetDir:    in.Folder,
-		Limiter:      &schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
+		Limiter:      schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
 	}, []int{epid})
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")

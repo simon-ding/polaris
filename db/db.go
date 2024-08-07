@@ -563,7 +563,7 @@ type EditMediaData struct {
 	ID         int                  `json:"id"`
 	Resolution media.Resolution     `json:"resolution"`
 	TargetDir  string               `json:"target_dir"`
-	Limiter    *schema.MediaLimiter `json:"limiter"`
+	Limiter    schema.MediaLimiter `json:"limiter"`
 }
 
 func (c *Client) EditMediaMetadata(in EditMediaData) error {

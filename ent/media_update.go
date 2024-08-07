@@ -251,8 +251,16 @@ func (mu *MediaUpdate) ClearDownloadHistoryEpisodes() *MediaUpdate {
 }
 
 // SetLimiter sets the "limiter" field.
-func (mu *MediaUpdate) SetLimiter(sl *schema.MediaLimiter) *MediaUpdate {
+func (mu *MediaUpdate) SetLimiter(sl schema.MediaLimiter) *MediaUpdate {
 	mu.mutation.SetLimiter(sl)
+	return mu
+}
+
+// SetNillableLimiter sets the "limiter" field if the given value is not nil.
+func (mu *MediaUpdate) SetNillableLimiter(sl *schema.MediaLimiter) *MediaUpdate {
+	if sl != nil {
+		mu.SetLimiter(*sl)
+	}
 	return mu
 }
 
@@ -706,8 +714,16 @@ func (muo *MediaUpdateOne) ClearDownloadHistoryEpisodes() *MediaUpdateOne {
 }
 
 // SetLimiter sets the "limiter" field.
-func (muo *MediaUpdateOne) SetLimiter(sl *schema.MediaLimiter) *MediaUpdateOne {
+func (muo *MediaUpdateOne) SetLimiter(sl schema.MediaLimiter) *MediaUpdateOne {
 	muo.mutation.SetLimiter(sl)
+	return muo
+}
+
+// SetNillableLimiter sets the "limiter" field if the given value is not nil.
+func (muo *MediaUpdateOne) SetNillableLimiter(sl *schema.MediaLimiter) *MediaUpdateOne {
+	if sl != nil {
+		muo.SetLimiter(*sl)
+	}
 	return muo
 }
 

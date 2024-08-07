@@ -157,8 +157,16 @@ func (mc *MediaCreate) SetNillableDownloadHistoryEpisodes(b *bool) *MediaCreate 
 }
 
 // SetLimiter sets the "limiter" field.
-func (mc *MediaCreate) SetLimiter(sl *schema.MediaLimiter) *MediaCreate {
+func (mc *MediaCreate) SetLimiter(sl schema.MediaLimiter) *MediaCreate {
 	mc.mutation.SetLimiter(sl)
+	return mc
+}
+
+// SetNillableLimiter sets the "limiter" field if the given value is not nil.
+func (mc *MediaCreate) SetNillableLimiter(sl *schema.MediaLimiter) *MediaCreate {
+	if sl != nil {
+		mc.SetLimiter(*sl)
+	}
 	return mc
 }
 

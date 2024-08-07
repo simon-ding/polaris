@@ -29,7 +29,7 @@ func (Media) Fields() []ent.Field {
 		field.Int("storage_id").Optional(),
 		field.String("target_dir").Optional(),
 		field.Bool("download_history_episodes").Optional().Default(false).Comment("tv series only"),
-		field.JSON("limiter", &MediaLimiter{}).Optional(),
+		field.JSON("limiter", MediaLimiter{}).Optional(),
 	}
 }
 

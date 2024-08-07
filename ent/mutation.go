@@ -3601,7 +3601,7 @@ type MediaMutation struct {
 	addstorage_id             *int
 	target_dir                *string
 	download_history_episodes *bool
-	limiter                   **schema.MediaLimiter
+	limiter                   *schema.MediaLimiter
 	clearedFields             map[string]struct{}
 	episodes                  map[int]struct{}
 	removedepisodes           map[int]struct{}
@@ -4271,12 +4271,12 @@ func (m *MediaMutation) ResetDownloadHistoryEpisodes() {
 }
 
 // SetLimiter sets the "limiter" field.
-func (m *MediaMutation) SetLimiter(sl *schema.MediaLimiter) {
+func (m *MediaMutation) SetLimiter(sl schema.MediaLimiter) {
 	m.limiter = &sl
 }
 
 // Limiter returns the value of the "limiter" field in the mutation.
-func (m *MediaMutation) Limiter() (r *schema.MediaLimiter, exists bool) {
+func (m *MediaMutation) Limiter() (r schema.MediaLimiter, exists bool) {
 	v := m.limiter
 	if v == nil {
 		return
@@ -4287,7 +4287,7 @@ func (m *MediaMutation) Limiter() (r *schema.MediaLimiter, exists bool) {
 // OldLimiter returns the old "limiter" field's value of the Media entity.
 // If the Media object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MediaMutation) OldLimiter(ctx context.Context) (v *schema.MediaLimiter, err error) {
+func (m *MediaMutation) OldLimiter(ctx context.Context) (v schema.MediaLimiter, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLimiter is only allowed on UpdateOne operations")
 	}
@@ -4624,7 +4624,7 @@ func (m *MediaMutation) SetField(name string, value ent.Value) error {
 		m.SetDownloadHistoryEpisodes(v)
 		return nil
 	case media.FieldLimiter:
-		v, ok := value.(*schema.MediaLimiter)
+		v, ok := value.(schema.MediaLimiter)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
