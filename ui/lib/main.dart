@@ -282,7 +282,7 @@ class _MainSkeletonState extends State<MainSkeleton> {
           label: '系统',
         ),
       ],
-      body: (context) => widget.body,
+      body: (context) => SafeArea(child: widget.body),
       // Define a default secondaryBody.
       // Override the default secondaryBody during the smallBreakpoint to be
       // empty. Must use AdaptiveScaffold.emptyBuilder to ensure it is properly

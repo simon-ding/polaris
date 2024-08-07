@@ -103,8 +103,9 @@ class _MySliderState extends State<MyRangeSlider> {
   @override
   Widget build(BuildContext context) {
     return FormBuilderRangeSlider(
+        decoration: const InputDecoration(labelText: "文件大小限制"),
         maxValueWidget: (max) => Text("${sizeMax / 1000} GB"),
-        minValueWidget: (min) => Text("0"),
+        minValueWidget: (min) => const Text("0"),
         valueWidget: (value) {
           final sss = value.split(" ");
           return Text("${readableSize(sss[0])} - ${readableSize(sss[2])}");

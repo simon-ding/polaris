@@ -134,7 +134,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                 child: const Text("取消")),
             TextButton(
                 onPressed: () {
-                  var f = ref
+                  ref
                       .read(mediaDetailsProvider(widget.details.id.toString())
                           .notifier)
                       .delete()
@@ -165,8 +165,8 @@ class _DetailCardState extends ConsumerState<DetailCard> {
           title: Text("编辑 ${details.name}"),
           content: SelectionArea(
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              height: MediaQuery.of(context).size.height * 0.3,
+              width: MediaQuery.of(context).size.width * 0.3,
+              height: MediaQuery.of(context).size.height * 0.4,
               child: SingleChildScrollView(
                   child: FormBuilder(
                 key: _formKey,
@@ -191,6 +191,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                     ),
                     FormBuilderTextField(
                       name: "target_dir",
+                      decoration: const InputDecoration(labelText: "存储路径"),
                       validator: FormBuilderValidators.required(),
                     ),
                     const MyRangeSlider(name: "limiter"),
