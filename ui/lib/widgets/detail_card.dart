@@ -67,10 +67,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                               width: 30,
                             ),
                             Text(
-                                "${widget.details.storage!.name} (${widget.details.storage!.implementation})"),
-                            const SizedBox(
-                              width: 30,
-                            ),
+                                "${widget.details.storage!.name}:"),
                             Text(
                                 "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
                                 "${widget.details.targetDir}"),
