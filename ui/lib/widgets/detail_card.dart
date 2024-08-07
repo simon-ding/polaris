@@ -112,17 +112,37 @@ class _DetailCardState extends ConsumerState<DetailCard> {
     return Tooltip(
       message: widget.details.mediaType == "tv" ? "删除剧集" : "删除电影",
       child: IconButton(
-          onPressed: () {
-            var f = ref
-                .read(
-                    mediaDetailsProvider(widget.details.id.toString()).notifier)
-                .delete()
-                .then((v) => context.go(widget.details.mediaType == "tv"
-                    ? WelcomePage.routeTv
-                    : WelcomePage.routeMoivie));
-            showLoadingWithFuture(f);
-          },
-          icon: const Icon(Icons.delete)),
+          onPressed: () => showConfirmDialog(), icon: const Icon(Icons.delete)),
+    );
+  }
+
+  Future<void> showConfirmDialog() {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("确认删除："),
+          content: Text("${widget.details.name}"),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("取消")),
+            TextButton(
+                onPressed: () {
+                  var f = ref
+                      .read(mediaDetailsProvider(widget.details.id.toString())
+                          .notifier)
+                      .delete()
+                      .then((v) => context.go(widget.details.mediaType == "tv"
+                          ? WelcomePage.routeTv
+                          : WelcomePage.routeMoivie));
+                  Navigator.of(context).pop();
+                },
+                child: const Text("确认"))
+          ],
+        );
+      },
     );
   }
 
@@ -183,13 +203,13 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                 onPressed: () {
                   if (_formKey.currentState!.saveAndValidate()) {
                     final values = _formKey.currentState!.value;
-                  var f = ref
-                      .read(mediaDetailsProvider(widget.details.id.toString())
-                          .notifier)
-                      .edit(values["resolution"], values["target_dir"], values["limiter"])
-                      .then((v) => Navigator.of(context).pop());
-                  showLoadingWithFuture(f);
-
+                    var f = ref
+                        .read(mediaDetailsProvider(widget.details.id.toString())
+                            .notifier)
+                        .edit(values["resolution"], values["target_dir"],
+                            values["limiter"])
+                        .then((v) => Navigator.of(context).pop());
+                    showLoadingWithFuture(f);
                   }
                 },
                 child: const Text("确认"))
