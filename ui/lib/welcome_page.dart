@@ -57,6 +57,9 @@ class MediaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+        shape: ContinuousRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
         //margin: const EdgeInsets.all(4),
         clipBehavior: Clip.hardEdge,
         elevation: 10,
@@ -75,9 +78,10 @@ class MediaCard extends StatelessWidget {
                 width: 140,
                 height: 210,
                 child: Ink.image(
+                    fit: BoxFit.cover,
                     image: NetworkImage(
-                  "${APIs.imagesUrl}/${item.id}/poster.jpg",
-                )),
+                      "${APIs.imagesUrl}/${item.id}/poster.jpg",
+                    )),
               ),
               SizedBox(
                   width: 140,
