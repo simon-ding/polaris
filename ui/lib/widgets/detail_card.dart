@@ -66,8 +66,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             const SizedBox(
                               width: 30,
                             ),
-                            Text(
-                                "${widget.details.storage!.name}:"),
+                            Text("${widget.details.storage!.name}:"),
                             Text(
                                 "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
                                 "${widget.details.targetDir}"),
@@ -90,13 +89,15 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                         const Text(""),
                         Expanded(
                             child: Text(
-                          overflow: TextOverflow.ellipsis,
+                          overflow: TextOverflow.visible,
                           maxLines: 9,
                           widget.details.overview ?? "",
                         )),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            editIcon(widget.details),
+                            downloadButton(),
+                            editIcon(),
                             deleteIcon(),
                           ],
                         )
@@ -113,11 +114,10 @@ class _DetailCardState extends ConsumerState<DetailCard> {
   }
 
   Widget deleteIcon() {
-    return Tooltip(
-      message: widget.details.mediaType == "tv" ? "删除剧集" : "删除电影",
-      child: IconButton(
-          onPressed: () => showConfirmDialog(), icon: const Icon(Icons.delete)),
-    );
+    return IconButton(
+        tooltip: widget.details.mediaType == "tv" ? "删除剧集" : "删除电影",
+        onPressed: () => showConfirmDialog(),
+        icon: const Icon(Icons.delete));
   }
 
   Future<void> showConfirmDialog() {
@@ -150,19 +150,21 @@ class _DetailCardState extends ConsumerState<DetailCard> {
     );
   }
 
-  Widget editIcon(SeriesDetails details) {
+  Widget editIcon() {
     return IconButton(
-        onPressed: () => showEditDialog(details), icon: const Icon(Icons.edit));
+        tooltip: "编辑",
+        onPressed: () => showEditDialog(),
+        icon: const Icon(Icons.edit));
   }
 
-  showEditDialog(SeriesDetails details) {
+  showEditDialog() {
     final _formKey = GlobalKey<FormBuilderState>();
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("编辑 ${details.name}"),
+          title: Text("编辑 ${widget.details.name}"),
           content: SelectionArea(
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.3,
@@ -171,11 +173,16 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                   child: FormBuilder(
                 key: _formKey,
                 initialValue: {
-                  "resolution": details.resolution,
-                  "target_dir": details.targetDir,
-                  "limiter": details.limiter != null
-                      ? RangeValues(details.limiter!.sizeMin.toDouble()/1000/1000,
-                          details.limiter!.sizeMax.toDouble()/1000/1000)
+                  "resolution": widget.details.resolution,
+                  "target_dir": widget.details.targetDir,
+                  "limiter": widget.details.limiter != null
+                      ? RangeValues(
+                          widget.details.limiter!.sizeMin.toDouble() /
+                              1000 /
+                              1000,
+                          widget.details.limiter!.sizeMax.toDouble() /
+                              1000 /
+                              1000)
                       : const RangeValues(0, 0)
                 },
                 child: Column(
@@ -204,23 +211,29 @@ class _DetailCardState extends ConsumerState<DetailCard> {
             TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text("取消")),
-            TextButton(
-                onPressed: () {
+            LoadingTextButton(
+                onPressed: () async {
                   if (_formKey.currentState!.saveAndValidate()) {
                     final values = _formKey.currentState!.value;
-                    var f = ref
+                    await ref
                         .read(mediaDetailsProvider(widget.details.id.toString())
                             .notifier)
                         .edit(values["resolution"], values["target_dir"],
                             values["limiter"])
                         .then((v) => Navigator.of(context).pop());
-                    showLoadingWithFuture(f);
                   }
                 },
-                child: const Text("确认"))
+                label: const Text("确认"))
           ],
         );
       },
     );
+  }
+
+  Widget downloadButton() {
+    return IconButton(
+        tooltip: widget.details.mediaType == "tv" ? "查找并下载所有监控剧集" : "查找并下载此电影",
+        onPressed: () {},
+        icon: const Icon(Icons.download_rounded));
   }
 }

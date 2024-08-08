@@ -161,15 +161,15 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
             Navigator.of(context).pop();
           },
         ),
-        TextButton(
-          style: TextButton.styleFrom(
-            textStyle: Theme.of(context).textTheme.labelLarge,
-          ),
-          child: const Text('确定'),
+        LoadingTextButton(
+          // style: TextButton.styleFrom(
+          //   textStyle: Theme.of(context).textTheme.labelLarge,
+          // ),
+          label: const Text('确定'),
           onPressed: () async {
             if (_formKey.currentState!.saveAndValidate()) {
               final values = _formKey.currentState!.value;
-              var f = ref
+              await ref
                   .read(searchPageDataProvider(widget.query).notifier)
                   .submit2Watchlist(
                       widget.item.id!,
@@ -185,7 +185,6 @@ class _SubmitSearchResultState extends ConsumerState<SubmitSearchResult> {
                 Navigator.of(context).pop();
                 showSnakeBar("添加成功：${widget.item.name}");
               });
-              showLoadingWithFuture(f);
             }
           },
         ),

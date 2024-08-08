@@ -59,10 +59,10 @@ class ResourceList extends ConsumerWidget {
                       : "-")));
                 }
 
-                rows.add(DataCell(IconButton(
-                  icon: const Icon(Icons.download),
+                rows.add(DataCell(LoadingIconButton(
+                  icon: Icons.download,
                   onPressed: () async {
-                    var f = ref
+                    await ref
                         .read(mediaTorrentsDataProvider((
                           mediaId: mediaId,
                           seasonNumber: seasonNum,
@@ -70,7 +70,6 @@ class ResourceList extends ConsumerWidget {
                         )).notifier)
                         .download(torrent)
                         .then((v) => showSnakeBar("开始下载：${torrent.name}"));
-                    showLoadingWithFuture(f);
                   },
                 )));
                 return DataRow(cells: rows);

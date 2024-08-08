@@ -48,62 +48,55 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                 Opacity(
                     opacity: 0.7,
                     child: ep.status == "downloading"
-                        ? const Tooltip(
-                            message: "下载中",
-                            child: IconButton(onPressed: null, icon: Icon(Icons.downloading)),
-                          )
+                        ? const IconButton(
+                            tooltip: "下载中",
+                            onPressed: null,
+                            icon: Icon(Icons.downloading))
                         : (ep.status == "downloaded"
-                            ? const Tooltip(
-                                message: "已下载",
-                                child: IconButton(onPressed: null, icon: Icon(Icons.download_done)),
-                              )
+                            ? const IconButton(
+                                tooltip: "已下载",
+                                onPressed: null,
+                                icon: Icon(Icons.download_done))
                             : (ep.monitored == true
-                                ? Tooltip(
-                                    message: "监控中",
+                                ? IconButton(
+                                    tooltip: "监控中",
+                                    onPressed: () {
+                                      ref
+                                          .read(mediaDetailsProvider(
+                                                  widget.seriesId)
+                                              .notifier)
+                                          .changeMonitoringStatus(
+                                              ep.id!, false);
+                                    },
+                                    icon: const Icon(Icons.alarm))
+                                : Opacity(
+                                    opacity: 0.7,
                                     child: IconButton(
+                                        tooltip: "未监控",
                                         onPressed: () {
                                           ref
                                               .read(mediaDetailsProvider(
                                                       widget.seriesId)
                                                   .notifier)
                                               .changeMonitoringStatus(
-                                                  ep.id!, false);
+                                                  ep.id!, true);
                                         },
-                                        icon: const Icon(Icons.alarm)),
-                                  )
-                                : Opacity(
-                                    opacity: 0.7,
-                                    child: Tooltip(
-                                      message: "未监控",
-                                      child: IconButton(
-                                          onPressed: () {
-                                            ref
-                                                .read(mediaDetailsProvider(
-                                                        widget.seriesId)
-                                                    .notifier)
-                                                .changeMonitoringStatus(
-                                                    ep.id!, true);
-                                          },
-                                          icon: const Icon(Icons.alarm_off)),
-                                    ),
+                                        icon: const Icon(Icons.alarm_off)),
                                   )))),
               ),
               DataCell(Row(
                 children: [
-                  Tooltip(
-                    message: "搜索下载对应剧集",
-                    child: IconButton(
-                        onPressed: () {
-                          var f = ref
-                              .read(mediaDetailsProvider(widget.seriesId)
-                                  .notifier)
-                              .searchAndDownload(widget.seriesId,
-                                  ep.seasonNumber!, ep.episodeNumber!)
-                              .then((v) => showSnakeBar("开始下载: $v"));
-                          showLoadingWithFuture(f);
-                        },
-                        icon: const Icon(Icons.download)),
-                  ),
+                  LoadingIconButton(
+                      tooltip: "搜索下载对应剧集",
+                      onPressed: () async {
+                        await ref
+                            .read(
+                                mediaDetailsProvider(widget.seriesId).notifier)
+                            .searchAndDownload(widget.seriesId,
+                                ep.seasonNumber!, ep.episodeNumber!)
+                            .then((v) => showSnakeBar("开始下载: $v"));
+                      },
+                      icon: Icons.download),
                   const SizedBox(
                     width: 10,
                   ),
@@ -142,19 +135,17 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                   DataColumn(
                       label: Row(
                     children: [
-                      Tooltip(
-                        message: "搜索下载全部剧集",
-                        child: IconButton(
-                            onPressed: () {
-                              final f = ref
-                                  .read(mediaDetailsProvider(widget.seriesId)
-                                      .notifier)
-                                  .searchAndDownload(widget.seriesId, k, 0)
-                                  .then((v) => showSnakeBar("开始下载: $v"));
-                              showLoadingWithFuture(f);
-                            },
-                            icon: const Icon(Icons.download)),
-                      ),
+                      LoadingIconButton(
+                          tooltip: "搜索下载全部剧集",
+                          onPressed: () async {
+                            await ref
+                                .read(mediaDetailsProvider(widget.seriesId)
+                                    .notifier)
+                                .searchAndDownload(widget.seriesId, k, 0)
+                                .then((v) => showSnakeBar("开始下载: $v"));
+                            //showLoadingWithFuture(f);
+                          },
+                          icon: Icons.download),
                       const SizedBox(
                         width: 10,
                       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:ui/providers/APIs.dart';
+import 'package:ui/widgets/utils.dart';
 
 class Commons {
   static InputDecoration requiredTextFieldStyle({
@@ -137,5 +138,95 @@ class _MySliderState extends State<MyRangeSlider> {
       return v.replaceAll("K", " GB");
     }
     return "$v MB";
+  }
+}
+
+class LoadingIconButton extends StatefulWidget {
+  LoadingIconButton({required this.onPressed, required this.icon, this.tooltip});
+  final Future<void> Function() onPressed;
+  final IconData icon;
+  final String? tooltip;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _LoadingIconButtonState();
+  }
+}
+
+class _LoadingIconButtonState extends State<LoadingIconButton> {
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: widget.tooltip,
+        onPressed: loading
+            ? null
+            : () async {
+                setState(() => loading = true);
+                try {
+                  await widget.onPressed();
+                } catch (e) {
+                  showSnakeBar("操作失败：$e");
+                } finally {
+                  setState(() => loading = false);
+                }
+              },
+        icon: loading
+            ? Container(
+                width: 24,
+                height: 24,
+                padding: const EdgeInsets.all(2.0),
+                child: const CircularProgressIndicator(
+                  color: Colors.grey,
+                  strokeWidth: 3,
+                ),
+              )
+            : Icon(widget.icon));
+  }
+}
+
+class LoadingTextButton extends StatefulWidget {
+  LoadingTextButton({required this.onPressed, required this.label});
+  final Future<void> Function() onPressed;
+  final Widget label;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _LoadingTextButtonState();
+  }
+}
+
+class _LoadingTextButtonState extends State<LoadingTextButton> {
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: loading
+          ? null
+          : () async {
+              setState(() => loading = true);
+              try {
+                await widget.onPressed();
+              } catch (e) {
+                showSnakeBar("操作失败：$e");
+              } finally {
+                setState(() => loading = false);
+              }
+            },
+      icon: loading
+          ? Container(
+              width: 24,
+              height: 24,
+              padding: const EdgeInsets.all(2.0),
+              child: const CircularProgressIndicator(
+                color: Colors.grey,
+                strokeWidth: 3,
+              ),
+            )
+          : Text(""),
+      label: widget.label,
+    );
   }
 }

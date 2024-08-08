@@ -22,12 +22,11 @@ Future<void> showSettingDialog(
           ),
           actions: <Widget>[
             showDelete
-                ? TextButton(
-                    onPressed: () {
-                      final f = onDelete().then((v) => Navigator.of(context).pop());
-                      showLoadingWithFuture(f);
+                ? LoadingTextButton(
+                    onPressed: () async {
+                      await onDelete().then((v) => Navigator.of(context).pop());
                     },
-                    child: const Text(
+                    label: const Text(
                       '删除',
                       style: TextStyle(color: Colors.red),
                     ))
@@ -35,11 +34,10 @@ Future<void> showSettingDialog(
             TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('取消')),
-            TextButton(
-              child: const Text('确定'),
-              onPressed: () {
-                final f = onSubmit().then((v) => Navigator.of(context).pop());
-                showLoadingWithFuture(f);
+            LoadingTextButton(
+              label: const Text('确定'),
+              onPressed: () async {
+                await onSubmit().then((v) => Navigator.of(context).pop());
               },
             ),
           ],
