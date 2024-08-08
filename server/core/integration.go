@@ -36,9 +36,13 @@ func (c *Client) writePlexmatch(seriesId int, episodeId int, targetDir, name str
 	_, err = st.ReadFile(filepath.Join(series.TargetDir, ".plexmatch"))
 	if err != nil {
 		//create new
+		buff := bytes.Buffer{}
+		if series.ImdbID != "" {
+			buff.WriteString(fmt.Sprintf("imdbid: %d\n", series.ImdbID))
+		}
+		buff.WriteString(fmt.Sprintf("tmdbid: %d\n", series.TmdbID))
 		log.Warnf(".plexmatch file not found, create new one: %s", series.NameEn)
-		if err := st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"),
-			[]byte(fmt.Sprintf("tmdbid: %d\n", series.TmdbID))); err != nil {
+		if err := st.WriteFile(filepath.Join(series.TargetDir, ".plexmatch"), buff.Bytes()); err != nil {
 			return errors.Wrap(err, "series plexmatch")
 		}
 	}

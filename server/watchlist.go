@@ -139,6 +139,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 	}
 	m := &ent.Media{
 		TmdbID:                  int(detail.ID),
+		ImdbID:                  detail.IMDbID,
 		MediaType:               media.MediaTypeTv,
 		NameCn:                  nameCn,
 		NameEn:                  nameEn,
@@ -210,6 +211,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 
 	r, err := s.db.AddMediaWatchlist(&ent.Media{
 		TmdbID:       int(detail.ID),
+		ImdbID:       detail.IMDbID,
 		MediaType:    media.MediaTypeMovie,
 		NameCn:       nameCn,
 		NameEn:       nameEn,

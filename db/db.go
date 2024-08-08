@@ -138,6 +138,7 @@ func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, er
 	}
 	r, err := c.ent.Media.Create().
 		SetTmdbID(m.TmdbID).
+		SetImdbID(m.ImdbID).
 		SetStorageID(m.StorageID).
 		SetOverview(m.Overview).
 		SetNameCn(m.NameCn).
@@ -560,9 +561,9 @@ func (c *Client) SetEpisodeMonitoring(id int, b bool) error {
 }
 
 type EditMediaData struct {
-	ID         int                  `json:"id"`
-	Resolution media.Resolution     `json:"resolution"`
-	TargetDir  string               `json:"target_dir"`
+	ID         int                 `json:"id"`
+	Resolution media.Resolution    `json:"resolution"`
+	TargetDir  string              `json:"target_dir"`
 	Limiter    schema.MediaLimiter `json:"limiter"`
 }
 

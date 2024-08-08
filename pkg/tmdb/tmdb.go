@@ -48,7 +48,7 @@ func NewClient(apiKey, proxyUrl string) (*Client, error) {
 }
 
 func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) {
-	d, err := c.tmdbClient.GetTVDetails(id, withLangOption(language))
+	d, err := c.tmdbClient.GetTVDetails(id, withExternalIDs(withLangOption(language)))
 	if err != nil {
 		return nil, errors.Wrap(err, "get tv detail")
 	}
@@ -58,7 +58,7 @@ func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) 
 		log.Debug("should fetch english version")
 		var detailEN *tmdb.TVDetails
 		if language == "zh-CN" {
-			detailEN, err = c.tmdbClient.GetTVDetails(id, withLangOption("en-US"))
+			detailEN, err = c.tmdbClient.GetTVDetails(id, withExternalIDs(withLangOption("en-US")))
 			if err != nil {
 				return d, nil
 			}
@@ -75,7 +75,7 @@ func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) 
 }
 
 func (c *Client) GetMovieDetails(id int, language string) (*tmdb.MovieDetails, error) {
-	return c.tmdbClient.GetMovieDetails(id, withLangOption(language))
+	return c.tmdbClient.GetMovieDetails(id, withExternalIDs(withLangOption(language)))
 }
 
 func (c *Client) SearchTvShow(query string, lang string) (*tmdb.SearchTVShows, error) {
@@ -209,6 +209,11 @@ func wrapLanguage(lang string) string {
 		lang = "zh-CN"
 	}
 	return lang
+}
+
+func withExternalIDs(m map[string]string) map[string]string {
+	m["append_to_response"] = "external_ids"
+	return m
 }
 
 func withLangOption(language string) map[string]string {
