@@ -4,6 +4,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:ui/providers/activity.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:ui/widgets/widgets.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ActivityPage extends ConsumerStatefulWidget {
   const ActivityPage({super.key});
@@ -60,21 +61,63 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
 
           return activitiesWatcher.when(
               data: (activities) {
-                return SingleChildScrollView(
-                  child: PaginatedDataTable(
-                    rowsPerPage: 10,
-                    columns: const [
-                      DataColumn(label: Text("#"), numeric: true),
-                      DataColumn(label: Text("名称")),
-                      DataColumn(label: Text("开始时间")),
-                      DataColumn(label: Text("状态")),
-                      DataColumn(label: Text("操作"))
-                    ],
-                    source: ActivityDataSource(
-                        activities: activities,
-                        onDelete: selectedTab == 0 ? onDelete() : null),
-                  ),
-                );
+                return Flexible(
+                    child: ListView.builder(
+                  itemCount: activities.length,
+                  itemBuilder: (context, index) {
+                    final ac = activities[index];
+                    return Column(
+                      children: [
+                        ListTile(
+                          dense: true,
+                          leading: () {
+                            if (ac.status == "uploading") {
+                              return const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: Tooltip(
+                                    message: "正在上传到指定存储",
+                                    child: CircularProgressIndicator(),
+                                  ));
+                            } else if (ac.status == "fail") {
+                              return const Tooltip(
+                                  message: "下载失败",
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                  ));
+                            } else if (ac.status == "success") {
+                              return const Tooltip(
+                                message: "下载成功",
+                                child: Icon(
+                                  Icons.check,
+                                  color: Colors.green,
+                                ),
+                              );
+                            }
+
+                            double p = ac.progress == null
+                                ? 0
+                                : ac.progress!.toDouble() / 100;
+                            return Tooltip(message: "${ac.progress}%",child: CircularProgressIndicator(
+                              backgroundColor: Colors.black26,
+                              value: p,
+                            ),);
+                          }(),
+                          title: Text("$index " + (ac.sourceTitle ?? "")),
+                          subtitle: Text("开始时间：${timeago.format(ac.date!)}"),
+                          trailing: selectedTab == 0
+                              ? IconButton(
+                                  tooltip: "删除任务",
+                                  onPressed: () => onDelete()(ac.id!),
+                                  icon: const Icon(Icons.delete))
+                              : const Text("-"),
+                        ),
+                        Divider(),
+                      ],
+                    );
+                  },
+                ));
               },
               error: (err, trace) => Text("$err"),
               loading: () => const MyProgressIndicator());
