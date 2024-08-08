@@ -23,9 +23,7 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 	}
 	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, seasonNum, episodes)
 
-	res := searchWithTorznab(db1, series.NameEn)
-	resCn := searchWithTorznab(db1, series.NameCn)
-	res = append(res, resCn...)
+	res := searchWithTorznab(db1, series.NameEn, series.NameCn)
 
 	var filtered []torznab.Result
 	for _, r := range res {
@@ -97,10 +95,7 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 		return nil, errors.New("no media found of id")
 	}
 
-	res := searchWithTorznab(db1, movieDetail.NameEn)
-
-	res1 := searchWithTorznab(db1, movieDetail.NameCn)
-	res = append(res, res1...)
+	res := searchWithTorznab(db1, movieDetail.NameEn, movieDetail.NameCn)
 
 	if len(res) == 0 {
 		return nil, fmt.Errorf("no resource found")
@@ -144,7 +139,7 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 
 }
 
-func searchWithTorznab(db *db.Client, q string) []torznab.Result {
+func searchWithTorznab(db *db.Client, queries ...string) []torznab.Result {
 
 	var res []torznab.Result
 	allTorznab := db.GetAllTorznabInfo()
@@ -157,14 +152,16 @@ func searchWithTorznab(db *db.Client, q string) []torznab.Result {
 		}
 		wg.Add(1)
 		go func() {
-			log.Debugf("search torznab %v with %v", tor.Name, q)
+			log.Debugf("search torznab %v with %v", tor.Name, queries)
 			defer wg.Done()
-			resp, err := torznab.Search(tor, q)
-			if err != nil {
-				log.Errorf("search %s error: %v", tor.Name, err)
-				return
+			for _, q := range queries {
+				resp, err := torznab.Search(tor, q)
+				if err != nil {
+					log.Errorf("search %s error: %v", tor.Name, err)
+					return
+				}
+				resChan <- resp
 			}
-			resChan <- resp
 
 		}()
 	}
