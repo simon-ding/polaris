@@ -68,7 +68,8 @@ class Activity {
       required this.targetDir,
       required this.status,
       required this.saved,
-      required this.progress});
+      required this.progress,
+      required this.size});
 
   final int? id;
   final int? mediaId;
@@ -79,6 +80,7 @@ class Activity {
   final String? status;
   final String? saved;
   final int? progress;
+  final int? size;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
@@ -90,6 +92,7 @@ class Activity {
         targetDir: json["target_dir"],
         status: json["status"],
         saved: json["saved"],
-        progress: json["progress"]);
+        progress: json["progress"],
+        size: json["size"]);
   }
 }

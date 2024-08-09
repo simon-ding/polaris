@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:ui/providers/activity.dart';
 import 'package:ui/widgets/progress_indicator.dart';
+import 'package:ui/widgets/utils.dart';
 import 'package:ui/widgets/widgets.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -99,13 +99,26 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                             double p = ac.progress == null
                                 ? 0
                                 : ac.progress!.toDouble() / 100;
-                            return Tooltip(message: "${ac.progress}%",child: CircularProgressIndicator(
-                              backgroundColor: Colors.black26,
-                              value: p,
-                            ),);
+                            return Tooltip(
+                              message: "${ac.progress}%",
+                              child: CircularProgressIndicator(
+                                backgroundColor: Colors.black26,
+                                value: p,
+                              ),
+                            );
                           }(),
-                          title: Text("$index " + (ac.sourceTitle ?? "")),
-                          subtitle: Text("开始时间：${timeago.format(ac.date!)}"),
+                          title:
+                              Text( (ac.sourceTitle ?? "")),
+                          subtitle: Opacity(
+                            opacity: 0.7,
+                            child: Wrap(
+                              spacing: 10,
+                              children: [
+                                Text("开始时间：${timeago.format(ac.date!)}"),
+                                Text("大小：${(ac.size ?? 0).readableFileSize()}")
+                              ],
+                            ),
+                          ),
                           trailing: selectedTab == 0
                               ? IconButton(
                                   tooltip: "删除任务",
@@ -134,72 +147,4 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
       showLoadingWithFuture(f);
     };
   }
-}
-
-class ActivityDataSource extends DataTableSource {
-  List<Activity> activities;
-  Function(int)? onDelete;
-  ActivityDataSource({required this.activities, this.onDelete});
-
-  @override
-  int get rowCount => activities.length;
-
-  @override
-  DataRow? getRow(int index) {
-    final activity = activities[index];
-    return DataRow(cells: [
-      DataCell(Text("${activity.id}")),
-      DataCell(Text("${activity.sourceTitle}")),
-      DataCell(Text("${activity.date!.toLocal()}")),
-      DataCell(() {
-        if (activity.status == "uploading") {
-          return const SizedBox(
-              width: 20,
-              height: 20,
-              child: Tooltip(
-                message: "正在上传到指定存储",
-                child: CircularProgressIndicator(),
-              ));
-        } else if (activity.status == "fail") {
-          return const Tooltip(
-              message: "下载失败",
-              child: Icon(
-                Icons.close,
-                color: Colors.red,
-              ));
-        } else if (activity.status == "success") {
-          return const Tooltip(
-            message: "下载成功",
-            child: Icon(
-              Icons.check,
-              color: Colors.green,
-            ),
-          );
-        }
-
-        double p =
-            activity.progress == null ? 0 : activity.progress!.toDouble() / 100;
-        return CircularPercentIndicator(
-          radius: 15.0,
-          lineWidth: 5.0,
-          percent: p,
-          center: Text("${p * 100}"),
-          progressColor: Colors.green,
-        );
-      }()),
-      onDelete != null
-          ? DataCell(Tooltip(
-              message: "删除任务",
-              child: IconButton(
-                  onPressed: () => onDelete!(activity.id!),
-                  icon: const Icon(Icons.delete))))
-          : const DataCell(Text("-"))
-    ]);
-  }
-
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get selectedRowCount => 0;
 }

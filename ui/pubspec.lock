@@ -317,14 +317,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.9.0"
-  percent_indicator:
-    dependency: "direct main"
-    description:
-      name: percent_indicator
-      sha256: c37099ad833a883c9d71782321cb65c3a848c21b6939b6185f0ff6640d05814c
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "4.2.3"
   phone_numbers_parser:
     dependency: transitive
     description:
