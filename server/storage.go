@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"polaris/db"
+	"regexp"
 
 	"polaris/log"
 	"polaris/pkg/storage"
@@ -75,6 +76,10 @@ func (s *Server) SuggestedSeriesFolderName(c *gin.Context) (interface{}, error) 
 			name = fmt.Sprintf("%s %s", d.Name, en.Name)
 		}
 	}
+	//remove extra characters
+	re := regexp.MustCompile(`[^\p{L}\w\s]`)
+	name = re.ReplaceAllString(strings.ToLower(name), " ")
+
 	year := strings.Split(d.FirstAirDate, "-")[0]
 	if year != "" {
 		name = fmt.Sprintf("%s (%s)", name, year)
@@ -104,11 +109,15 @@ func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
 			name = fmt.Sprintf("%s %s", d1.Title, en.Title)
 		}
 	}
+	//remove extra characters
+	re := regexp.MustCompile(`[^\p{L}\w\s]`)
+	name = re.ReplaceAllString(strings.ToLower(name), " ")
 
 	year := strings.Split(d1.ReleaseDate, "-")[0]
 	if year != "" {
 		name = fmt.Sprintf("%s (%s)", name, year)
 	}
+
 	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
 	return gin.H{"name": name}, nil
 }
