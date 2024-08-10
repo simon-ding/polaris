@@ -11,6 +11,7 @@ import 'package:ui/settings/settings.dart';
 import 'package:ui/system_page.dart';
 import 'package:ui/tv_details.dart';
 import 'package:ui/welcome_page.dart';
+import 'package:ui/widgets/utils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,7 +50,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       builder: (BuildContext context, GoRouterState state, Widget child) {
         return SelectionArea(
           child: MainSkeleton(
-            body: Padding(padding: const EdgeInsets.all(20), child: child),
+            body: Padding(
+                padding: EdgeInsets.all(isSmallScreen(context) ? 5 : 20),
+                child: child),
           ),
         );
       },
@@ -128,8 +131,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.blueAccent,
                 brightness: Brightness.dark,
-                surface: Colors.black87
-                ),
+                surface: Colors.black87),
             useMaterial3: true,
             //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
             tooltipTheme: TooltipThemeData(

@@ -58,3 +58,7 @@ bool isDesktop() {
   return Platform.isLinux || Platform.isWindows || Platform.isMacOS;
 }
 
+  bool isSmallScreen(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 600;
+  }
