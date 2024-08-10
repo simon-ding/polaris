@@ -27,8 +27,8 @@ class WelcomePage extends ConsumerWidget {
     return switch (data) {
       AsyncData(:final value) => SingleChildScrollView(
           child: Wrap(
-            spacing: 10,
-            runSpacing: 20,
+            spacing: isSmallScreen(context) ? 5 : 10,
+            runSpacing: isSmallScreen(context) ? 10 : 20,
             children: value.isEmpty
                 ? [
                     Container(
@@ -48,6 +48,11 @@ class WelcomePage extends ConsumerWidget {
       _ => const MyProgressIndicator(),
     };
   }
+
+  bool isSmallScreen(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 600;
+  }
 }
 
 class MediaCard extends StatelessWidget {
@@ -58,7 +63,6 @@ class MediaCard extends StatelessWidget {
   const MediaCard({super.key, required this.item});
   @override
   Widget build(BuildContext context) {
-
     return Card(
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
