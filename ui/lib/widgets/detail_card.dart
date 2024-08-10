@@ -113,29 +113,48 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                                     label: Text(
                                         "${(widget.details.limiter!.sizeMin).readableFileSize()} - ${(widget.details.limiter!.sizeMax).readableFileSize()}"))
                                 : const SizedBox(),
-                            Chip(
-                              clipBehavior: Clip.hardEdge,
-                              shape: ContinuousRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100.0)),
-                              padding: EdgeInsets.all(0),
-                              label: InkWell(
-                                child: Text("TMDB"),
-                                onTap: () => launchUrl(url),
-                              ),
-                            ),
-                            isBlank(widget.details.imdbid)
-                                ? SizedBox()
-                                : Chip(
+                            MenuAnchor(
+                              style: MenuStyle(alignment: Alignment.bottomRight),
+                              menuChildren: [
+                                ActionChip.elevated(
+                                    onPressed: () => launchUrl(url),
+                                    clipBehavior: Clip.hardEdge,
+                                    backgroundColor: Colors.indigo[700],
+                                    shape: ContinuousRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(100.0)),
+                                    padding: EdgeInsets.all(0),
+                                    label: Text("TMDB")),
+                                isBlank(widget.details.imdbid)
+                                    ? SizedBox()
+                                    : ActionChip.elevated(
+                                        onPressed: () => launchUrl(imdbUrl),
+                                        backgroundColor: Colors.indigo[700],
+                                        clipBehavior: Clip.hardEdge,
+                                        shape: ContinuousRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(100.0)),
+                                        padding: EdgeInsets.all(0),
+                                        label: Text("IMDB"),
+                                      )
+                              ],
+                              builder: (context, controller, child) {
+                                return ActionChip.elevated(
+                                    onPressed: () {
+                                      if (controller.isOpen) {
+                                        controller.close();
+                                      } else {
+                                        controller.open();
+                                      }
+                                    },
                                     clipBehavior: Clip.hardEdge,
                                     shape: ContinuousRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(100.0)),
                                     padding: EdgeInsets.all(0),
-                                    label: InkWell(
-                                      child: Text("IMDB"),
-                                      onTap: () => launchUrl(imdbUrl),
-                                    ),
-                                  )
+                                    label: Text("外部链接"));
+                              },
+                            ),
                           ],
                         ),
                         const Text("", style: TextStyle(height: 1)),
