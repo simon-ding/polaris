@@ -27,6 +27,7 @@ class WelcomePage extends ConsumerWidget {
     return switch (data) {
       AsyncData(:final value) => SingleChildScrollView(
           child: Wrap(
+            alignment: WrapAlignment.spaceEvenly,
             spacing: isSmallScreen(context) ? 0 : 10,
             runSpacing: isSmallScreen(context) ? 10 : 20,
             children: value.isEmpty
@@ -57,7 +58,7 @@ class WelcomePage extends ConsumerWidget {
 
 class MediaCard extends StatelessWidget {
   final MediaDetail item;
-  static const double smallWidth = 120;
+  static const double smallWidth = 110;
   static const double largeWidth = 140;
 
   const MediaCard({super.key, required this.item});
