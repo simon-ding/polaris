@@ -24,6 +24,8 @@ class DetailCard extends ConsumerStatefulWidget {
 class _DetailCardState extends ConsumerState<DetailCard> {
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Card(
       margin: const EdgeInsets.all(4),
       clipBehavior: Clip.hardEdge,
@@ -41,7 +43,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(
-            children: <Widget>[
+            children: <Widget>[screenWidth<600? SizedBox():
               Flexible(
                 flex: 2,
                 child: Padding(
@@ -89,7 +91,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                         const Text(""),
                         Expanded(
                             child: Text(
-                          overflow: TextOverflow.visible,
+                          overflow: TextOverflow.ellipsis,
                           maxLines: 9,
                           widget.details.overview ?? "",
                         )),
