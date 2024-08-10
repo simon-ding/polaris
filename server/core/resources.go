@@ -13,54 +13,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) DownloadSeasonPackage(r1 torznab.Result, seriesId, seasonNum int) (*string, error) {
-	trc, dlClient, err := c.getDownloadClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "connect transmission")
-	}
-	downloadDir := c.db.GetDownloadDir()
-	size := utils.AvailableSpace(downloadDir)
-	if size < uint64(r1.Size) {
-		log.Errorf("space available %v, space needed %v", size, r1.Size)
-		return nil, errors.New("no enough space")
-	}
-
-	torrent, err := trc.Download(r1.Link, c.db.GetDownloadDir())
-	if err != nil {
-		return nil, errors.Wrap(err, "downloading")
-	}
-	torrent.Start()
-
-	series := c.db.GetMediaDetails(seriesId)
-	if series == nil {
-		return nil, fmt.Errorf("no tv series of id %v", seriesId)
-	}
-	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
-
-	history, err := c.db.SaveHistoryRecord(ent.History{
-		MediaID:          seriesId,
-		EpisodeID:        0,
-		SourceTitle:      r1.Name,
-		TargetDir:        dir,
-		Status:           history.StatusRunning,
-		Size:             r1.Size,
-		Saved:            torrent.Save(),
-		DownloadClientID: dlClient.ID,
-		IndexerID:        r1.IndexerId,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "save record")
-	}
-	c.db.SetSeasonAllEpisodeStatus(seriesId, seasonNum, episode.StatusDownloading)
-
-	c.tasks[history.ID] = &Task{Torrent: torrent}
-
-	c.sendMsg(fmt.Sprintf(message.BeginDownload, r1.Name))
-	return &r1.Name, nil
-
-}
-
-
 func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, episodeNum int) (*string, error) {
 	trc, dlc, err := c.getDownloadClient()
 	if err != nil {
@@ -70,16 +22,29 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
 	}
+
+	//check space available
+	downloadDir := c.db.GetDownloadDir()
+	size := utils.AvailableSpace(downloadDir)
+	if size < uint64(r1.Size) {
+		log.Errorf("space available %v, space needed %v", size, r1.Size)
+		return nil, errors.New("no enough space")
+	}
+
 	var ep *ent.Episode
-	for _, e := range series.Episodes {
-		if e.SeasonNumber == seasonNum && e.EpisodeNumber == episodeNum {
-			ep = e
+	if episodeNum > 0 {
+		for _, e := range series.Episodes {
+			if e.SeasonNumber == seasonNum && e.EpisodeNumber == episodeNum {
+				ep = e
+			}
 		}
+		if ep == nil {
+			return nil, errors.Errorf("no episode of season %d episode %d", seasonNum, episodeNum)
+		}
+	} else { //season package download
+		ep = &ent.Episode{}
 	}
-	if ep == nil {
-		return nil, errors.Errorf("no episode of season %d episode %d", seasonNum, episodeNum)
-	}
-	torrent, err := trc.Download(r1.Link, c.db.GetDownloadDir())
+	torrent, err := trc.Download(r1.Link, downloadDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "downloading")
 	}
@@ -88,7 +53,7 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
 
 	history, err := c.db.SaveHistoryRecord(ent.History{
-		MediaID:          ep.MediaID,
+		MediaID:          seriesId,
 		EpisodeID:        ep.ID,
 		SourceTitle:      r1.Name,
 		TargetDir:        dir,
@@ -101,7 +66,11 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
 	}
-	c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+	if episodeNum > 0 {
+		c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+	} else {
+		c.db.SetSeasonAllEpisodeStatus(seriesId, seasonNum, episode.StatusDownloading)
+	}
 
 	c.tasks[history.ID] = &Task{Torrent: torrent}
 	c.sendMsg(fmt.Sprintf(message.BeginDownload, r1.Name))
@@ -121,7 +90,7 @@ func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	return c.DownloadEpisodeTorrent(r1, seriesId, seasonNum, episodeNum)
 }
 
-func (c *Client) DownloadMovie(m *ent.Media,link, name string, size int, indexerID int) (*string, error) {
+func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexerID int) (*string, error) {
 	trc, dlc, err := c.getDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
