@@ -27,7 +27,7 @@ class WelcomePage extends ConsumerWidget {
     return switch (data) {
       AsyncData(:final value) => SingleChildScrollView(
           child: Wrap(
-            alignment: WrapAlignment.spaceEvenly,
+            alignment: WrapAlignment.start,
             spacing: isSmallScreen(context) ? 0 : 10,
             runSpacing: isSmallScreen(context) ? 10 : 20,
             children: value.isEmpty

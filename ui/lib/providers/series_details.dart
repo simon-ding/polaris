@@ -70,7 +70,10 @@ class SeriesDetailData
       "id": int.parse(id!),
       "resolution": resolution,
       "target_dir": targetDir,
-      "limiter": {"size_min": limiter.start.toInt()*1000*1000, "size_max": limiter.end.toInt()*1000*1000},
+      "limiter": {
+        "size_min": limiter.start.toInt() * 1000 * 1000,
+        "size_max": limiter.end.toInt() * 1000 * 1000
+      },
     });
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
@@ -83,6 +86,7 @@ class SeriesDetailData
 class SeriesDetails {
   int? id;
   int? tmdbId;
+  String? imdbid;
   String? name;
   String? originalName;
   String? overview;
@@ -101,6 +105,7 @@ class SeriesDetails {
   SeriesDetails(
       {this.id,
       this.tmdbId,
+      this.imdbid,
       this.name,
       this.originalName,
       this.overview,
@@ -119,6 +124,7 @@ class SeriesDetails {
   SeriesDetails.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     tmdbId = json['tmdb_id'];
+    imdbid = json["imdb_id"];
     name = json['name_cn'];
     originalName = json['original_name'];
     overview = json['overview'];

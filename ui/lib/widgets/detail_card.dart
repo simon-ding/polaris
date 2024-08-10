@@ -3,10 +3,12 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quiver/strings.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/series_details.dart';
 import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets.dart';
 
@@ -22,16 +24,22 @@ class DetailCard extends ConsumerStatefulWidget {
 }
 
 class _DetailCardState extends ConsumerState<DetailCard> {
+  final tmdbBase = "https://www.themoviedb.org/";
+  final imdbBase = "https://www.imdb.com/title/";
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final url = Uri.parse(tmdbBase +
+        (widget.details.mediaType == "tv" ? "tv/" : "movie/") +
+        widget.details.tmdbId.toString());
 
+    final imdbUrl = Uri.parse(imdbBase + (widget.details.imdbid ?? ""));
     return Card(
       margin: const EdgeInsets.all(4),
       clipBehavior: Clip.hardEdge,
       child: Container(
         constraints:
-            BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.4),
+            BoxConstraints(maxHeight: 400),
         decoration: BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
@@ -43,16 +51,18 @@ class _DetailCardState extends ConsumerState<DetailCard> {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(
-            children: <Widget>[screenWidth<600? SizedBox():
-              Flexible(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Image.network(
-                      "${APIs.imagesUrl}/${widget.details.id}/poster.jpg",
-                      fit: BoxFit.contain),
-                ),
-              ),
+            children: <Widget>[
+              screenWidth < 600
+                  ? SizedBox()
+                  : Flexible(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Image.network(
+                            "${APIs.imagesUrl}/${widget.details.id}/poster.jpg",
+                            fit: BoxFit.contain),
+                      ),
+                    ),
               Flexible(
                 flex: 4,
                 child: Row(
@@ -61,38 +71,79 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                         child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(""),
-                        Wrap(
-                          children: [
-                            Text("${widget.details.resolution}"),
-                            const SizedBox(
-                              width: 30,
-                            ),
-                            Text("${widget.details.storage!.name}:"),
-                            Text(
-                                "${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
-                                "${widget.details.targetDir}"),
-                            const SizedBox(
-                              width: 30,
-                            ),
-                            widget.details.limiter != null &&
-                                    widget.details.limiter!.sizeMax > 0
-                                ? Text(
-                                    "${(widget.details.limiter!.sizeMin).readableFileSize()} - ${(widget.details.limiter!.sizeMax).readableFileSize()}")
-                                : const SizedBox()
-                          ],
-                        ),
-                        const Divider(thickness: 1, height: 1),
+                        //const Text(""),
                         Text(
                           "${widget.details.name} ${widget.details.name != widget.details.originalName ? widget.details.originalName : ''} (${widget.details.airDate!.split("-")[0]})",
                           style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              height: 2.5),
                         ),
-                        const Text(""),
+                        const Divider(thickness: 1, height: 1),
+                        Text(
+                          "",
+                          style: TextStyle(height: 0.2),
+                        ),
+                        Wrap(
+                          spacing: 10,
+                          children: [
+                            Chip(
+                              clipBehavior: Clip.hardEdge,
+                              shape: ContinuousRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100.0)),
+                              label: Text("${widget.details.resolution}"),
+                              padding: EdgeInsets.all(0),
+                            ),
+                            Chip(
+                              clipBehavior: Clip.hardEdge,
+                              shape: ContinuousRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100.0)),
+                              label: Text(
+                                  "${widget.details.storage!.name}: ${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
+                                  "${widget.details.targetDir}"),
+                              padding: EdgeInsets.all(0),
+                            ),
+                            widget.details.limiter != null &&
+                                    widget.details.limiter!.sizeMax > 0
+                                ? Chip(
+                                    clipBehavior: Clip.hardEdge,
+                                    shape: ContinuousRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(100.0)),
+                                    padding: EdgeInsets.all(0),
+                                    label: Text(
+                                        "${(widget.details.limiter!.sizeMin).readableFileSize()} - ${(widget.details.limiter!.sizeMax).readableFileSize()}"))
+                                : const SizedBox(),
+                            Chip(
+                              clipBehavior: Clip.hardEdge,
+                              shape: ContinuousRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100.0)),
+                              padding: EdgeInsets.all(0),
+                              label: InkWell(
+                                child: Text("TMDB"),
+                                onTap: () => launchUrl(url),
+                              ),
+                            ),
+                            isBlank(widget.details.imdbid)
+                                ? SizedBox()
+                                : Chip(
+                                    clipBehavior: Clip.hardEdge,
+                                    shape: ContinuousRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(100.0)),
+                                    padding: EdgeInsets.all(0),
+                                    label: InkWell(
+                                      child: Text("IMDB"),
+                                      onTap: () => launchUrl(imdbUrl),
+                                    ),
+                                  )
+                          ],
+                        ),
+                        const Text("",style: TextStyle(height: 1)),
                         Expanded(
                             child: Text(
                           overflow: TextOverflow.ellipsis,
-                          maxLines: 9,
+                          maxLines: 7,
                           widget.details.overview ?? "",
                         )),
                         Row(
