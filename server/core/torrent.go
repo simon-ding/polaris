@@ -23,7 +23,7 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 	}
 	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, seasonNum, episodes)
 
-	res := searchWithTorznab(db1, series.NameEn, series.NameCn)
+	res := searchWithTorznab(db1, series.NameEn, series.NameCn, series.OriginalName)
 
 	var filtered []torznab.Result
 	for _, r := range res {
@@ -50,7 +50,8 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 		if checkResolution && meta.Resolution != series.Resolution.String() {
 			continue
 		}
-		if !utils.IsNameAcceptable(meta.NameEn, series.NameEn) && !utils.IsNameAcceptable(meta.NameCn, series.NameCn) {
+		if !utils.IsNameAcceptable(meta.NameEn, series.NameEn) && !utils.IsNameAcceptable(meta.NameCn, series.NameCn) && 
+			!utils.IsNameAcceptable(meta.NameCn, series.OriginalName) {
 			continue
 		}
 
@@ -95,7 +96,7 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 		return nil, errors.New("no media found of id")
 	}
 
-	res := searchWithTorznab(db1, movieDetail.NameEn, movieDetail.NameCn)
+	res := searchWithTorznab(db1, movieDetail.NameEn, movieDetail.NameCn, movieDetail.OriginalName)
 
 	if len(res) == 0 {
 		return nil, fmt.Errorf("no resource found")
@@ -103,7 +104,8 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 	var filtered []torznab.Result
 	for _, r := range res {
 		meta := metadata.ParseMovie(r.Name)
-		if !utils.IsNameAcceptable(meta.NameEn, movieDetail.NameEn) {
+		if !utils.IsNameAcceptable(meta.NameEn, movieDetail.NameEn) && !utils.IsNameAcceptable(meta.NameEn, movieDetail.NameCn) &&
+			!utils.IsNameAcceptable(meta.NameEn, movieDetail.OriginalName) {
 			continue
 		}
 		if checkResolution && meta.Resolution != movieDetail.Resolution.String() {
