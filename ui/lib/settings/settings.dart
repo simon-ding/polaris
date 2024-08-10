@@ -45,14 +45,14 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         ),
         ExpansionTile(
           expandedAlignment: Alignment.centerLeft,
-          childrenPadding: EdgeInsets.fromLTRB(20, 0, 50, 0),
+          childrenPadding: EdgeInsets.fromLTRB(20, 0, 20, 0),
           initiallyExpanded: false,
           title: Text("存储"),
           children: [StorageSettings()],
         ),
         ExpansionTile(
           expandedAlignment: Alignment.centerLeft,
-          childrenPadding: EdgeInsets.fromLTRB(20, 0, 50, 0),
+          childrenPadding: EdgeInsets.fromLTRB(20, 0, 20, 0),
           initiallyExpanded: false,
           title: Text("通知客户端"),
           children: [NotifierSettings()],

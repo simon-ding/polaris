@@ -186,16 +186,13 @@ class _MainSkeletonState extends State<MainSkeleton> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: const Row(
-          children: [
-            Text("Polaris"),
-          ],
-        ),
+        title: Text("Polaris"),
+        
         actions: [
           SearchAnchor(
               builder: (BuildContext context, SearchController controller) {
             return Container(
-              constraints: const BoxConstraints(maxWidth: 300, maxHeight: 40),
+              constraints: const BoxConstraints(maxWidth: 250, maxHeight: 40),
               child: Opacity(
                 opacity: 0.8,
                 child: SearchBar(

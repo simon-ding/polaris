@@ -38,8 +38,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
       margin: const EdgeInsets.all(4),
       clipBehavior: Clip.hardEdge,
       child: Container(
-        constraints:
-            BoxConstraints(maxHeight: 400),
+        constraints: BoxConstraints(maxHeight: 400),
         decoration: BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
@@ -91,16 +90,16 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                               clipBehavior: Clip.hardEdge,
                               shape: ContinuousRectangleBorder(
                                   borderRadius: BorderRadius.circular(100.0)),
-                              label: Text("${widget.details.resolution}"),
+                              label: Text(
+                                  "${widget.details.storage!.name}: ${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
+                                  "${widget.details.targetDir}"),
                               padding: EdgeInsets.all(0),
                             ),
                             Chip(
                               clipBehavior: Clip.hardEdge,
                               shape: ContinuousRectangleBorder(
                                   borderRadius: BorderRadius.circular(100.0)),
-                              label: Text(
-                                  "${widget.details.storage!.name}: ${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
-                                  "${widget.details.targetDir}"),
+                              label: Text("${widget.details.resolution}"),
                               padding: EdgeInsets.all(0),
                             ),
                             widget.details.limiter != null &&
@@ -139,7 +138,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                                   )
                           ],
                         ),
-                        const Text("",style: TextStyle(height: 1)),
+                        const Text("", style: TextStyle(height: 1)),
                         Expanded(
                             child: Text(
                           overflow: TextOverflow.ellipsis,
