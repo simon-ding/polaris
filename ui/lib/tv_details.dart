@@ -32,6 +32,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     var seriesDetails = ref.watch(mediaDetailsProvider(widget.seriesId));
     return seriesDetails.when(
         data: (details) {
@@ -118,6 +119,41 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
           }
           List<ExpansionTile> list = List.empty(growable: true);
           for (final k in m.keys.toList().reversed) {
+            final seasonEpisodes = DataTable(columns: [
+              const DataColumn(label: Text("#")),
+              const DataColumn(
+                label: Text("标题"),
+              ),
+              const DataColumn(label: Text("播出时间")),
+              const DataColumn(label: Text("状态")),
+              DataColumn(
+                  label: Row(
+                children: [
+                  LoadingIconButton(
+                      tooltip: "搜索下载全部剧集",
+                      onPressed: () async {
+                        await ref
+                            .read(
+                                mediaDetailsProvider(widget.seriesId).notifier)
+                            .searchAndDownload(widget.seriesId, k, 0)
+                            .then((v) => showSnakeBar("开始下载: $v"));
+                        //showLoadingWithFuture(f);
+                      },
+                      icon: Icons.download),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Tooltip(
+                    message: "查看可用资源",
+                    child: IconButton(
+                        onPressed: () =>
+                            showAvailableTorrents(widget.seriesId, k, 0),
+                        icon: const Icon(Icons.manage_search)),
+                  )
+                ],
+              ))
+            ], rows: m[k]!);
+
             var seasonList = ExpansionTile(
               tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               //childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
@@ -125,40 +161,12 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
               title: k == 0 ? const Text("特别篇") : Text("第 $k 季"),
               expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DataTable(columns: [
-                  const DataColumn(label: Text("#")),
-                  const DataColumn(
-                    label: Text("标题"),
-                  ),
-                  const DataColumn(label: Text("播出时间")),
-                  const DataColumn(label: Text("状态")),
-                  DataColumn(
-                      label: Row(
-                    children: [
-                      LoadingIconButton(
-                          tooltip: "搜索下载全部剧集",
-                          onPressed: () async {
-                            await ref
-                                .read(mediaDetailsProvider(widget.seriesId)
-                                    .notifier)
-                                .searchAndDownload(widget.seriesId, k, 0)
-                                .then((v) => showSnakeBar("开始下载: $v"));
-                            //showLoadingWithFuture(f);
-                          },
-                          icon: Icons.download),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Tooltip(
-                        message: "查看可用资源",
-                        child: IconButton(
-                            onPressed: () =>
-                                showAvailableTorrents(widget.seriesId, k, 0),
-                            icon: const Icon(Icons.manage_search)),
+                screenWidth < 600
+                    ? SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: seasonEpisodes,
                       )
-                    ],
-                  ))
-                ], rows: m[k]!),
+                    : seasonEpisodes
               ],
             );
             list.add(seasonList);

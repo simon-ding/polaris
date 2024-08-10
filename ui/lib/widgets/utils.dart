@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ui/providers/APIs.dart';
+import 'dart:io' show Platform;
 
 class Utils {
   static Future<void> showAlertDialog(BuildContext context, String msg) async {
@@ -31,18 +32,17 @@ class Utils {
       },
     );
   }
-
 }
 
- showSnakeBar(String msg) {
-    final context = APIs.navigatorKey.currentContext;
-    if (context != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(msg),
-        showCloseIcon: true,
-      ));
-    }
+showSnakeBar(String msg) {
+  final context = APIs.navigatorKey.currentContext;
+  if (context != null) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      showCloseIcon: true,
+    ));
   }
+}
 
 extension FileFormatter on num {
   String readableFileSize({bool base1024 = false}) {
@@ -53,3 +53,8 @@ extension FileFormatter on num {
     return "${NumberFormat("#,##0.#").format(this / pow(base, digitGroups))} ${units[digitGroups]}";
   }
 }
+
+bool isDesktop() {
+  return Platform.isLinux || Platform.isWindows || Platform.isMacOS;
+}
+

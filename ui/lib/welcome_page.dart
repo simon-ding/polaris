@@ -52,10 +52,13 @@ class WelcomePage extends ConsumerWidget {
 
 class MediaCard extends StatelessWidget {
   final MediaDetail item;
+  static const double smallWidth = 110;
+  static const double largeWidth = 140;
 
   const MediaCard({super.key, required this.item});
   @override
   Widget build(BuildContext context) {
+
     return Card(
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
@@ -75,8 +78,8 @@ class MediaCard extends StatelessWidget {
           child: Column(
             children: <Widget>[
               SizedBox(
-                width: 140,
-                height: 210,
+                width: cardWidth(context),
+                height: cardWidth(context) / 2 * 3,
                 child: Ink.image(
                     fit: BoxFit.cover,
                     image: NetworkImage(
@@ -84,7 +87,7 @@ class MediaCard extends StatelessWidget {
                     )),
               ),
               SizedBox(
-                  width: 140,
+                  width: cardWidth(context),
                   child: Column(
                     children: [
                       LinearProgressIndicator(
@@ -106,5 +109,13 @@ class MediaCard extends StatelessWidget {
             ],
           ),
         ));
+  }
+
+  double cardWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 600) {
+      return smallWidth;
+    }
+    return largeWidth;
   }
 }
