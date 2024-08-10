@@ -50,7 +50,7 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 		if checkResolution && meta.Resolution != series.Resolution.String() {
 			continue
 		}
-		if !utils.IsNameAcceptable(meta.NameEn, series.NameEn) && !utils.IsNameAcceptable(meta.NameCn, series.NameCn) && 
+		if !utils.IsNameAcceptable(meta.NameEn, series.NameEn) && !utils.IsNameAcceptable(meta.NameCn, series.NameCn) &&
 			!utils.IsNameAcceptable(meta.NameCn, series.OriginalName) {
 			continue
 		}
@@ -104,8 +104,8 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 	var filtered []torznab.Result
 	for _, r := range res {
 		meta := metadata.ParseMovie(r.Name)
-		if !utils.IsNameAcceptable(meta.NameEn, movieDetail.NameEn) && !utils.IsNameAcceptable(meta.NameEn, movieDetail.NameCn) &&
-			!utils.IsNameAcceptable(meta.NameEn, movieDetail.OriginalName) {
+		if !utils.IsNameAcceptable(meta.Name, movieDetail.NameEn) && !utils.IsNameAcceptable(meta.Name, movieDetail.NameCn) &&
+			!utils.IsNameAcceptable(meta.Name, movieDetail.OriginalName) {
 			continue
 		}
 		if checkResolution && meta.Resolution != movieDetail.Resolution.String() {

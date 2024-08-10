@@ -8,8 +8,7 @@ import (
 )
 
 type MovieMetadata struct {
-	NameEn     string
-	NameCN     string
+	Name       string
 	Year       int
 	Resolution string
 }
@@ -29,11 +28,22 @@ func ParseMovie(name string) *MovieMetadata {
 			panic(fmt.Sprintf("convert %s error: %v", y, err))
 		}
 		meta.Year = n
-	}
-	if yearIndex != -1 {
-		meta.NameEn = name[:yearIndex]
 	} else {
-		meta.NameEn = name
+		yearRe := regexp.MustCompile(`\d{4}`)
+		yearMatches := yearRe.FindAllString(name, -1)
+		if len(yearMatches) > 0 {
+			n, err := strconv.Atoi(yearMatches[0])
+			if err != nil {
+				panic(fmt.Sprintf("convert %s error: %v", yearMatches[0], err))
+			}
+			meta.Year = n
+		}
+	}
+
+	if yearIndex != -1 {
+		meta.Name = name[:yearIndex]
+	} else {
+		meta.Name = name
 	}
 	resRe := regexp.MustCompile(`\d{3,4}p`)
 	resMatches := resRe.FindAllString(name, -1)
