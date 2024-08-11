@@ -80,11 +80,14 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 
 }
 func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string, error) {
-
+	var episodes []int
+	if episodeNum > 0 {
+		episodes = append(episodes, episodeNum)
+	}
 	res, err := SearchTvSeries(c.db, &SearchParam{
 		MediaId:         seriesId,
 		SeasonNum:       seasonNum,
-		Episodes:        []int{episodeNum},
+		Episodes:        episodes,
 		CheckFileSize:   true,
 		CheckResolution: true,
 	})

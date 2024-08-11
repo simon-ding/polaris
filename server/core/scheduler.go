@@ -207,23 +207,46 @@ func (c *Client) downloadTvSeries() {
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
 		tvDetail := c.db.GetMediaDetails(series.ID)
+		m := make(map[int][]*ent.Episode)
 		for _, ep := range tvDetail.Episodes {
-			if !ep.Monitored { //未监控的剧集不去下载
-				continue
-			}
-
-			if ep.Status != episode.StatusMissing { //已经下载的不去下载
-				continue
-			}
-			name, err := c.SearchAndDownload(series.ID, ep.SeasonNumber, ep.EpisodeNumber)
-			if err != nil {
-				log.Infof("cannot find resource to download for %s: %v", ep.Title, err)
-			} else {
-				log.Infof("begin download torrent resource: %v", name)
-			}
-
+			m[ep.SeasonNumber] = append(m[ep.SeasonNumber], ep)
 		}
+		for seasonNum, epsides := range m {
+			wantedSeasonPack := true
+			for _, ep := range epsides {
+				if !ep.Monitored {
+					wantedSeasonPack = false
+				}
+				if ep.Status != episode.StatusMissing {
+					wantedSeasonPack = false
+				}
+			}
+			if wantedSeasonPack {
+				name, err := c.SearchAndDownload(series.ID, seasonNum, -1)
+				if err != nil {
+					log.Infof("cannot find resource to download : %v", err)
+				} else {
+					log.Infof("begin download torrent resource: %v", name)
+				}
 
+			} else {
+				for _, ep := range epsides {
+					if !ep.Monitored {
+						continue
+					}
+					if ep.Status != episode.StatusMissing {
+						continue
+					}
+					name, err := c.SearchAndDownload(series.ID, ep.SeasonNumber, ep.EpisodeNumber)
+					if err != nil {
+						log.Infof("cannot find resource to download for %s: %v", ep.Title, err)
+					} else {
+						log.Infof("begin download torrent resource: %v", name)
+					}
+				}
+
+			}
+		}
 	}
 }
 
