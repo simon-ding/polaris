@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"path/filepath"
+	"polaris/db"
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/history"
@@ -276,11 +277,17 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode) error {
 	if err != nil {
 		return errors.Wrap(err, "connect transmission")
 	}
+	qiangban := c.db.GetSetting(db.SettingAllowQiangban)
+	allowQiangban := false
+	if qiangban == "true" {
+		allowQiangban = false
+	}
 
 	res, err := SearchMovie(c.db, &SearchParam{
 		MediaId:         ep.MediaID,
 		CheckFileSize:   true,
 		CheckResolution: true,
+		FilterQiangban:  !allowQiangban,
 	})
 	if err != nil {
 

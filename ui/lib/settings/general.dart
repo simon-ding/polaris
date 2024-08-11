@@ -34,7 +34,8 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
               "download_dir": v.downloadDIr,
               "log_level": v.logLevel,
               "proxy": v.proxy,
-              "enable_plexmatch": v.enablePlexmatch
+              "enable_plexmatch": v.enablePlexmatch,
+              "allow_qiangban": v.allowQiangban,
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,8 +82,19 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                 ),
                 SizedBox(
                   width: 300,
-                  child: FormBuilderSwitch(decoration: const InputDecoration(icon: Icon(Icons.token)),
-                      name: "enable_plexmatch", title: const Text("Plex 刮削支持")),
+                  child: FormBuilderSwitch(
+                      decoration:
+                          const InputDecoration(icon: Icon(Icons.token)),
+                      name: "enable_plexmatch",
+                      title: const Text("Plex 刮削支持")),
+                ),
+                SizedBox(
+                  width: 300,
+                  child: FormBuilderSwitch(
+                      decoration:
+                          const InputDecoration(icon: Icon(Icons.token)),
+                      name: "allow_qiangban",
+                      title: const Text("是否下载枪版资源")),
                 ),
                 Center(
                   child: Padding(
@@ -102,6 +114,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                                     downloadDIr: values["download_dir"],
                                     logLevel: values["log_level"],
                                     proxy: values["proxy"],
+                                    allowQiangban: values["allow_qiangban"],
                                     enablePlexmatch:
                                         values["enable_plexmatch"]))
                                 .then((v) => showSnakeBar("更新成功"));

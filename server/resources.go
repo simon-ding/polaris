@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"polaris/db"
 	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/torznab"
@@ -77,8 +78,15 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 		}
 	} else {
 		log.Info("search movie %d", in.ID)
+		qiangban := s.db.GetSetting(db.SettingAllowQiangban)
+		allowQiangban := false
+		if qiangban == "true" {
+			allowQiangban = true
+		}
+
 		res, err = core.SearchMovie(s.db, &core.SearchParam{
-			MediaId: in.ID,
+			MediaId:        in.ID,
+			FilterQiangban: !allowQiangban,
 		})
 		if err != nil {
 			if err.Error() == "no resource found" {

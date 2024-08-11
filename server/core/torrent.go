@@ -23,6 +23,7 @@ type SearchParam struct {
 	Episodes        []int //for tv
 	CheckResolution bool
 	CheckFileSize   bool
+	FilterQiangban  bool //for movie, 是否过滤枪版电影
 }
 
 func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
@@ -148,6 +149,9 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 		}
 
 		if !torrentSizeOk(movieDetail, r.Size, param) {
+			continue
+		}
+		if param.FilterQiangban && meta.IsQingban { //过滤枪版电影
 			continue
 		}
 

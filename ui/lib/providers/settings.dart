@@ -52,13 +52,15 @@ class GeneralSetting {
   String? logLevel;
   String? proxy;
   bool? enablePlexmatch;
+  bool? allowQiangban;
 
   GeneralSetting(
       {this.tmdbApiKey,
       this.downloadDIr,
       this.logLevel,
       this.proxy,
-      this.enablePlexmatch});
+      this.enablePlexmatch,
+      this.allowQiangban});
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
     return GeneralSetting(
@@ -66,6 +68,7 @@ class GeneralSetting {
         downloadDIr: json["download_dir"],
         logLevel: json["log_level"],
         proxy: json["proxy"],
+        allowQiangban: json["allow_qiangban"] ?? false,
         enablePlexmatch: json["enable_plexmatch"] ?? false);
   }
 
@@ -76,6 +79,7 @@ class GeneralSetting {
     data["log_level"] = logLevel;
     data["proxy"] = proxy;
     data["enable_plexmatch"] = enablePlexmatch;
+    data["allow_qiangban"] = allowQiangban;
     return data;
   }
 }
@@ -134,7 +138,14 @@ class Indexer {
   double? seedRatio;
   bool? disabled;
 
-  Indexer({this.name, this.url, this.apiKey, this.id, this.priority=50, this.seedRatio=0, this.disabled});
+  Indexer(
+      {this.name,
+      this.url,
+      this.apiKey,
+      this.id,
+      this.priority = 50,
+      this.seedRatio = 0,
+      this.disabled});
 
   Indexer.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -142,7 +153,7 @@ class Indexer {
     apiKey = json['api_key'];
     id = json["id"];
     priority = json["priority"];
-    seedRatio = json["seed_ratio"]??0;
+    seedRatio = json["seed_ratio"] ?? 0;
     disabled = json["disabled"] ?? false;
   }
   Map<String, dynamic> toJson() {

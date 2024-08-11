@@ -11,6 +11,7 @@ type MovieMetadata struct {
 	Name       string
 	Year       int
 	Resolution string
+	IsQingban  bool
 }
 
 func ParseMovie(name string) *MovieMetadata {
@@ -50,5 +51,22 @@ func ParseMovie(name string) *MovieMetadata {
 	if len(resMatches) > 0 {
 		meta.Resolution = resMatches[0]
 	}
+	meta.IsQingban = isQiangban(name)
 	return meta
+}
+
+// https://en.wikipedia.org/wiki/Pirated_movie_release_types
+func isQiangban(name string) bool {
+	qiangbanFilter := []string{"CAM-Rip", "CAM", "HDCAM", "TS", "HDTS", "TELESYNC", "PDVD", "PreDVDRip", "TC", "HDTC", "TELECINE", "WP", "WORKPRINT"}
+	re := regexp.MustCompile(`\W`)
+	name = re.ReplaceAllString(strings.ToLower(name), " ")
+	fields := strings.Fields(name)
+	for _, q := range qiangbanFilter {
+		for _, f := range fields {
+			if strings.ToLower(q) == strings.ToLower(f) {
+				return true
+			}
+		}
+	}
+	return false
 }
