@@ -3,10 +3,11 @@ package core
 import (
 	"fmt"
 	"polaris/db"
+	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/metadata"
 	"polaris/pkg/torznab"
-	"polaris/pkg/utils"
+	"regexp"
 	"slices"
 	"sort"
 	"strconv"
@@ -16,12 +17,20 @@ import (
 	"github.com/pkg/errors"
 )
 
-func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, checkResolution bool, checkFileSize bool) ([]torznab.Result, error) {
-	series := db1.GetMediaDetails(seriesId)
+type SearchParam struct {
+	MediaId         int
+	SeasonNum       int   //for tv
+	Episodes        []int //for tv
+	CheckResolution bool
+	CheckFileSize   bool
+}
+
+func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
+	series := db1.GetMediaDetails(param.MediaId)
 	if series == nil {
-		return nil, fmt.Errorf("no tv series of id %v", seriesId)
+		return nil, fmt.Errorf("no tv series of id %v", param.MediaId)
 	}
-	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, seasonNum, episodes)
+	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, param.SeasonNum, param.Episodes)
 
 	res := searchWithTorznab(db1, series.NameEn, series.NameCn, series.OriginalName)
 
@@ -32,39 +41,32 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 		if meta == nil { //cannot parse name
 			continue
 		}
-		if !isNumberedSeries(series) && meta.Season != seasonNum { //do not check season on series that only rely on episode number
+		if !isNoSeasonSeries(series) && meta.Season != param.SeasonNum { //do not check season on series that only rely on episode number
 			continue
 
 		}
-		if isNumberedSeries(series) && len(episodes) == 0 {
+		if isNoSeasonSeries(series) && len(param.Episodes) == 0 {
 			//should not want season
 			continue
 		}
 
-		if len(episodes) > 0 && !slices.Contains(episodes, meta.Episode) { //not season pack, but episode number not equal
+		if len(param.Episodes) > 0 && !slices.Contains(param.Episodes, meta.Episode) { //not season pack, but episode number not equal
 			continue
 
-		} else if len(episodes) == 0 && !meta.IsSeasonPack { //want season pack, but not season pack
+		} else if len(param.Episodes) == 0 && !meta.IsSeasonPack { //want season pack, but not season pack
 			continue
 		}
-		if checkResolution && meta.Resolution != series.Resolution.String() {
+		if param.CheckResolution && meta.Resolution != series.Resolution.String() {
 			continue
 		}
-		if !utils.IsNameAcceptable(meta.NameEn, series.NameEn) && !utils.IsNameAcceptable(meta.NameCn, series.NameCn) &&
-			!utils.IsNameAcceptable(meta.NameCn, series.OriginalName) {
+		if !torrentNameOk(series, r.Name) {
 			continue
 		}
 
-		if checkFileSize {
-			if series.Limiter.SizeMin > 0 && r.Size < series.Limiter.SizeMin {
-				//min size not satified
-				continue
-			}
-			if series.Limiter.SizeMax > 0 && r.Size > series.Limiter.SizeMax {
-				//max size not satified
-				continue
-			}
+		if !torrentSizeOk(series, r.Size, param) {
+			continue
 		}
+
 		filtered = append(filtered, r)
 	}
 	if len(filtered) == 0 {
@@ -75,7 +77,40 @@ func SearchTvSeries(db1 *db.Client, seriesId, seasonNum int, episodes []int, che
 
 }
 
-func isNumberedSeries(detail *db.MediaDetails) bool {
+func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam) bool {
+	if param.CheckFileSize {
+		multiplier := 1                                                        //大小倍数，正常为1，如果是季包则为季内集数
+		if detail.MediaType == media.MediaTypeTv && len(param.Episodes) == 0 { //tv season pack
+			multiplier = seasonEpisodeCount(detail, param.SeasonNum)
+		}
+
+		if detail.Limiter.SizeMin > 0 { //min size
+			sizeMin := detail.Limiter.SizeMin * multiplier
+			if torrentSize < sizeMin { //比最小要求的大小还要小
+				return false
+			}
+		}
+		if detail.Limiter.SizeMax > 0 { //max size
+			sizeMax := detail.Limiter.SizeMax * multiplier
+			if torrentSize > sizeMax { //larger than max size wanted
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func seasonEpisodeCount(detail *db.MediaDetails, seasonNum int) int {
+	count := 0
+	for _, ep := range detail.Episodes {
+		if ep.SeasonNumber == seasonNum {
+			count++
+		}
+	}
+	return count
+}
+
+func isNoSeasonSeries(detail *db.MediaDetails) bool {
 	hasSeason2 := false
 	season2HasEpisode1 := false
 	for _, ep := range detail.Episodes {
@@ -90,8 +125,8 @@ func isNumberedSeries(detail *db.MediaDetails) bool {
 	return hasSeason2 && !season2HasEpisode1 //only one 1st episode
 }
 
-func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSize bool) ([]torznab.Result, error) {
-	movieDetail := db1.GetMediaDetails(movieId)
+func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
+	movieDetail := db1.GetMediaDetails(param.MediaId)
 	if movieDetail == nil {
 		return nil, errors.New("no media found of id")
 	}
@@ -104,23 +139,16 @@ func SearchMovie(db1 *db.Client, movieId int, checkResolution bool, checkFileSiz
 	var filtered []torznab.Result
 	for _, r := range res {
 		meta := metadata.ParseMovie(r.Name)
-		if !utils.IsNameAcceptable(meta.Name, movieDetail.NameEn) && !utils.IsNameAcceptable(meta.Name, movieDetail.NameCn) &&
-			!utils.IsNameAcceptable(meta.Name, movieDetail.OriginalName) {
-			continue
-		}
-		if checkResolution && meta.Resolution != movieDetail.Resolution.String() {
+		if !torrentNameOk(movieDetail, r.Name) {
 			continue
 		}
 
-		if checkFileSize {
-			if movieDetail.Limiter.SizeMin > 0 && r.Size < movieDetail.Limiter.SizeMin {
-				//min size not satified
-				continue
-			}
-			if movieDetail.Limiter.SizeMax > 0 && r.Size > movieDetail.Limiter.SizeMax {
-				//max size not satified
-				continue
-			}
+		if param.CheckResolution && meta.Resolution != movieDetail.Resolution.String() {
+			continue
+		}
+
+		if !torrentSizeOk(movieDetail, r.Size, param) {
+			continue
 		}
 
 		ss := strings.Split(movieDetail.AirDate, "-")[0]
@@ -176,7 +204,7 @@ func searchWithTorznab(db *db.Client, queries ...string) []torznab.Result {
 		res = append(res, result...)
 	}
 
-	//res = dedup(res)
+	res = dedup(res)
 
 	sort.SliceStable(res, func(i, j int) bool { //先按做种人数排序
 		var s1 = res[i]
@@ -225,4 +253,18 @@ func dedup(list []torznab.Result) []torznab.Result {
 		res = append(res, r)
 	}
 	return res
+}
+
+func torrentNameOk(detail *db.MediaDetails, torrentName string) bool {
+	return isNameAcceptable(torrentName, detail.NameCn) || isNameAcceptable(torrentName, detail.NameEn) ||
+		isNameAcceptable(torrentName, detail.OriginalName)
+}
+
+func isNameAcceptable(torrentName, wantedName string) bool {
+	re := regexp.MustCompile(`[^\p{L}\w\s]`)
+	torrentName = re.ReplaceAllString(strings.ToLower(torrentName), " ")
+	wantedName = re.ReplaceAllString(strings.ToLower(wantedName), " ")
+	torrentName = strings.Join(strings.Fields(torrentName), " ")
+	wantedName = strings.Join(strings.Fields(wantedName), " ")
+	return strings.Contains(torrentName, wantedName)
 }

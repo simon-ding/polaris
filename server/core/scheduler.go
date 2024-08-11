@@ -254,7 +254,11 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode) error {
 		return errors.Wrap(err, "connect transmission")
 	}
 
-	res, err := SearchMovie(c.db, ep.MediaID, true, true)
+	res, err := SearchMovie(c.db, &SearchParam{
+		MediaId:         ep.MediaID,
+		CheckFileSize:   true,
+		CheckResolution: true,
+	})
 	if err != nil {
 
 		return errors.Wrap(err, "search movie")

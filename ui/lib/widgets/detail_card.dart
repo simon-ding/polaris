@@ -114,7 +114,8 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                                         "${(widget.details.limiter!.sizeMin).readableFileSize()} - ${(widget.details.limiter!.sizeMax).readableFileSize()}"))
                                 : const SizedBox(),
                             MenuAnchor(
-                              style: MenuStyle(alignment: Alignment.bottomRight),
+                              style:
+                                  MenuStyle(alignment: Alignment.bottomRight),
                               menuChildren: [
                                 ActionChip.elevated(
                                     onPressed: () => launchUrl(url),
