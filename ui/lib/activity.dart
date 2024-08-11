@@ -91,11 +91,13 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                                   ));
                             } else if (ac.status == "seeding") {
                               //seeding
-                              return const Tooltip(
+                              return Tooltip(
                                 message: "做种中",
                                 child: Icon(
-                                  Icons.upload,
-                                  //color: Colors.blue,
+                                  Icons.keyboard_double_arrow_up,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inversePrimary,
                                 ),
                               );
                             } else if (ac.status == "success") {
