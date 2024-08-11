@@ -92,7 +92,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                   width: 300,
                   child: FormBuilderSwitch(
                       decoration:
-                          const InputDecoration(icon: Icon(Icons.filter_alt)),
+                          const InputDecoration(icon: Icon(Icons.phone_iphone)),
                       name: "allow_qiangban",
                       title: const Text("是否下载枪版资源")),
                 ),

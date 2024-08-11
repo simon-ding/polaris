@@ -184,20 +184,21 @@ func searchWithTorznab(db *db.Client, queries ...string) []torznab.Result {
 		if tor.Disabled {
 			continue
 		}
-		wg.Add(1)
-		go func() {
-			log.Debugf("search torznab %v with %v", tor.Name, queries)
-			defer wg.Done()
-			for _, q := range queries {
+		for _, q := range queries {
+			wg.Add(1)
+
+			go func() {
+				log.Debugf("search torznab %v with %v", tor.Name, queries)
+				defer wg.Done()
+
 				resp, err := torznab.Search(tor, q)
 				if err != nil {
 					log.Warnf("search %s with query %s error: %v", tor.Name, q, err)
-					continue
+					return
 				}
 				resChan <- resp
-			}
-
-		}()
+			}()
+		}
 	}
 	go func() {
 		wg.Wait()

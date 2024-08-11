@@ -36,14 +36,21 @@ func (c *Client) mustAddCron(spec string, cmd func()) {
 func (c *Client) checkTasks() {
 	log.Debug("begin check tasks...")
 	for id, t := range c.tasks {
+		r := c.db.GetHistory(id)
 		if !t.Exists() {
 			log.Infof("task no longer exists: %v", id)
+
+			if r.Status == history.StatusRunning || r.Status == history.StatusUploading {
+				log.Warnf("task is running but no longer available in download client, mark as fail, task name: %s", r.SourceTitle)
+				c.db.SetHistoryStatus(id, history.StatusFail)
+			}
+
 			delete(c.tasks, id)
 			continue
 		}
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
-			r := c.db.GetHistory(id)
+
 			if r.Status == history.StatusSuccess {
 				//task already success, check seed ratio
 				torrent := c.tasks[id]
