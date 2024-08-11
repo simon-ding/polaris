@@ -142,7 +142,7 @@ func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
 		var res Response
 		err = xml.Unmarshal(data, &res)
 		if err != nil {
-			return nil, errors.Wrap(err, "json unmarshal")
+			return nil, errors.Wrapf(err, "xml unmarshal data: %v", string(data))
 		}
 		cacheRes = res
 		cc.Set(key, cacheRes)

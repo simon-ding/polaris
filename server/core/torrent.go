@@ -191,8 +191,8 @@ func searchWithTorznab(db *db.Client, queries ...string) []torznab.Result {
 			for _, q := range queries {
 				resp, err := torznab.Search(tor, q)
 				if err != nil {
-					log.Errorf("search %s error: %v", tor.Name, err)
-					return
+					log.Warnf("search %s with query %s error: %v", tor.Name, q, err)
+					continue
 				}
 				resChan <- resp
 			}
