@@ -262,17 +262,17 @@ func (c *Client) downloadMovie() {
 			continue
 		}
 		ep := detail.Episodes[0]
-		if ep.Status == episode.StatusDownloaded {
+		if ep.Status != episode.StatusMissing {
 			continue
 		}
 
-		if err := c.downloadMovieSingleEpisode(ep); err != nil {
+		if err := c.downloadMovieSingleEpisode(ep, series.TargetDir); err != nil {
 			log.Errorf("download movie error: %v", err)
 		}
 	}
 }
 
-func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode) error {
+func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) error {
 	trc, dlc, err := c.getDownloadClient()
 	if err != nil {
 		return errors.Wrap(err, "connect transmission")
@@ -305,7 +305,7 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode) error {
 		MediaID:          ep.MediaID,
 		EpisodeID:        ep.ID,
 		SourceTitle:      r1.Name,
-		TargetDir:        "./",
+		TargetDir:        targetDir,
 		Status:           history.StatusRunning,
 		Size:             r1.Size,
 		Saved:            torrent.Save(),
