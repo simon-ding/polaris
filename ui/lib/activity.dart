@@ -89,17 +89,16 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                                     Icons.close,
                                     color: Colors.red,
                                   ));
+                            } else if (ac.status == "seeding") {
+                              //seeding
+                              return const Tooltip(
+                                message: "做种中",
+                                child: Icon(
+                                  Icons.upload,
+                                  //color: Colors.blue,
+                                ),
+                              );
                             } else if (ac.status == "success") {
-                              if (ac.progress == 100) {
-                                //seeding
-                                return const Tooltip(
-                                  message: "做种中",
-                                  child: Icon(
-                                    Icons.upload,
-                                    //color: Colors.blue,
-                                  ),
-                                );
-                              }
                               return const Tooltip(
                                 message: "下载成功",
                                 child: Icon(

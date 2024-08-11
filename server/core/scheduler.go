@@ -40,23 +40,18 @@ func (c *Client) checkTasks() {
 		if !t.Exists() {
 			log.Infof("task no longer exists: %v", id)
 
-			if r.Status == history.StatusRunning || r.Status == history.StatusUploading {
-				log.Warnf("task is running but no longer available in download client, mark as fail, task name: %s", r.SourceTitle)
-				c.db.SetHistoryStatus(id, history.StatusFail)
-			}
-
 			delete(c.tasks, id)
 			continue
 		}
 		log.Infof("task (%s) percentage done: %d%%", t.Name(), t.Progress())
 		if t.Progress() == 100 {
 
-			if r.Status == history.StatusSuccess {
+			if r.Status == history.StatusSeeding {
 				//task already success, check seed ratio
 				torrent := c.tasks[id]
 				ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 				if ok {
-					log.Infof("torrent file seed ratio reached, remove: %v, current seed ratio: %v", torrent.Name(), torrent.SeedRatio())
+					log.Infof("torrent file seed ratio reached, remove: %v, current seed ratio: %v", torrent.Name(), *torrent.SeedRatio())
 					torrent.Remove()
 					delete(c.tasks, id)
 				} else {
@@ -104,7 +99,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 			} else {
 				c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
 			}
-			c.sendMsg(fmt.Sprintf(message.ProcessingFailed, err))
+			c.sendMsg(fmt.Sprintf(message.ProcessingFailed, err1))
 			if downloadclient.RemoveFailedDownloads {
 				log.Debugf("task failed, remove failed torrent and files related")
 				delete(c.tasks, r.ID)
@@ -134,7 +129,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 		return errors.Wrap(err, "move file")
 	}
 
-	c.db.SetHistoryStatus(r.ID, history.StatusSuccess)
+	c.db.SetHistoryStatus(r.ID, history.StatusSeeding)
 	if r.EpisodeID != 0 {
 		c.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
 	} else {
@@ -145,7 +140,8 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	//判断是否需要删除本地文件
 	ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 	if downloadclient.RemoveCompletedDownloads && ok {
-		log.Debugf("download complete,remove torrent and files related, torrent: %v, seed ratio: %v", torrentName, torrent.SeedRatio())
+		log.Debugf("download complete,remove torrent and files related, torrent: %v, seed ratio: %v", torrentName, *torrent.SeedRatio())
+		c.db.SetHistoryStatus(r.ID, history.StatusSuccess)
 		delete(c.tasks, r.ID)
 		torrent.Remove()
 	}

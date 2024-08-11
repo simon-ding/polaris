@@ -33,7 +33,7 @@ func (c *Client) Init() {
 }
 
 func (c *Client) reloadTasks() {
-	allTasks := c.db.GetHistories()
+	allTasks := c.db.GetRunningHistories()
 	for _, t := range allTasks {
 		torrent, err := transmission.ReloadTorrent(t.Saved)
 		if err != nil {
@@ -78,8 +78,7 @@ func (c *Client) MustTMDB() *tmdb.Client {
 	return t
 }
 
-
-func (c *Client) RemoveTaskAndTorrent(id int)error {
+func (c *Client) RemoveTaskAndTorrent(id int) error {
 	torrent := c.tasks[id]
 	if torrent != nil {
 		if err := torrent.Remove(); err != nil {

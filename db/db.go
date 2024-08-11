@@ -491,7 +491,7 @@ func (c *Client) GetHistories() ent.Histories {
 
 func (c *Client) GetRunningHistories() ent.Histories {
 	h, err := c.ent.History.Query().Where(history.Or(history.StatusEQ(history.StatusRunning),
-		history.StatusEQ(history.StatusUploading))).All(context.TODO())
+		history.StatusEQ(history.StatusUploading), history.StatusEQ(history.StatusSeeding))).All(context.TODO())
 	if err != nil {
 		return nil
 	}

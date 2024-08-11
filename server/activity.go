@@ -21,30 +21,35 @@ type Activity struct {
 
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 	q := c.Query("status")
-	his := s.db.GetHistories()
-	var activities = make([]Activity, 0, len(his))
-	for _, h := range his {
-		if q == "archive" && (h.Status == history.StatusRunning || h.Status == history.StatusUploading) {
-			continue //archived downloads
-		}
-
-		a := Activity{
-			History: h,
-		}
-		existInDownloadClient := false
-		for id, task := range s.core.GetTasks() {
-			if h.ID == id && task.Exists() {
-				a.Progress = task.Progress()
-				a.SeedRatio = float32(*task.SeedRatio())
-				existInDownloadClient = true
+	var activities = make([]Activity, 0)
+	if q == "active" {
+		his := s.db.GetRunningHistories()
+		for _, h := range his {
+			a := Activity{
+				History: h,
 			}
+			for id, task := range s.core.GetTasks() {
+				if h.ID == id && task.Exists() {
+					a.Progress = task.Progress()
+					a.SeedRatio = float32(*task.SeedRatio())
+				}
+			}
+			activities = append(activities, a)
 		}
-		if q == "active" && !existInDownloadClient {
-			continue
-		}
-		activities = append(activities, a)
-	}
+	} else {
+		his := s.db.GetHistories()
+		for _, h := range his {
+			if h.Status == history.StatusRunning || h.Status == history.StatusUploading || h.Status == history.StatusSeeding {
+				continue //archived downloads
+			}
 
+			a := Activity{
+				History: h,
+			}
+			activities = append(activities, a)
+		}
+
+	}
 	return activities, nil
 }
 
