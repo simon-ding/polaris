@@ -49,7 +49,7 @@ func (c *Client) checkTasks() {
 				torrent := c.tasks[id]
 				ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 				if ok {
-					log.Infof("torrent file seed ratio reached, remove: %v", torrent.Name())
+					log.Infof("torrent file seed ratio reached, remove: %v, current seed ratio: %v", torrent.Name(), torrent.SeedRatio())
 					torrent.Remove()
 					delete(c.tasks, id)
 				} else {
@@ -138,7 +138,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	//判断是否需要删除本地文件
 	ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 	if downloadclient.RemoveCompletedDownloads && ok {
-		log.Debugf("download complete,remove torrent and files related")
+		log.Debugf("download complete,remove torrent and files related, torrent: %v, seed ratio: %v", torrentName, torrent.SeedRatio())
 		delete(c.tasks, r.ID)
 		torrent.Remove()
 	}

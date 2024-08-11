@@ -54,12 +54,15 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
           ],
         ),
         Builder(builder: (context) {
-          var activitiesWatcher = ref.watch(activitiesDataProvider("active"));
+          AsyncValue<List<Activity>>? activitiesWatcher;
+
           if (selectedTab == 1) {
             activitiesWatcher = ref.watch(activitiesDataProvider("archive"));
+          } else if (selectedTab == 0) {
+            activitiesWatcher = ref.watch(activitiesDataProvider("active"));
           }
 
-          return activitiesWatcher.when(
+          return activitiesWatcher!.when(
               data: (activities) {
                 return Flexible(
                     child: ListView.builder(
@@ -107,15 +110,15 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                               ),
                             );
                           }(),
-                          title:
-                              Text( (ac.sourceTitle ?? "")),
+                          title: Text((ac.sourceTitle ?? "")),
                           subtitle: Opacity(
                             opacity: 0.7,
                             child: Wrap(
                               spacing: 10,
                               children: [
                                 Text("开始时间：${timeago.format(ac.date!)}"),
-                                Text("大小：${(ac.size ?? 0).readableFileSize()}")
+                                Text("大小：${(ac.size ?? 0).readableFileSize()}"),
+                                ac.seedRatio > 0 ?Text("分享率：${ac.seedRatio}"): SizedBox()
                               ],
                             ),
                           ),

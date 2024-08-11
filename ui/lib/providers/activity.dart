@@ -69,7 +69,8 @@ class Activity {
       required this.status,
       required this.saved,
       required this.progress,
-      required this.size});
+      required this.size,
+      required this.seedRatio});
 
   final int? id;
   final int? mediaId;
@@ -81,6 +82,7 @@ class Activity {
   final String? saved;
   final int? progress;
   final int? size;
+  final double seedRatio;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
@@ -93,6 +95,7 @@ class Activity {
         status: json["status"],
         saved: json["saved"],
         progress: json["progress"],
+        seedRatio: json["seed_ratio"],
         size: json["size"]);
   }
 }

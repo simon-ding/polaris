@@ -15,7 +15,8 @@ import (
 
 type Activity struct {
 	*ent.History
-	Progress int `json:"progress"`
+	Progress  int     `json:"progress"`
+	SeedRatio float32 `json:"seed_ratio"`
 }
 
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
@@ -35,6 +36,7 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 		for id, task := range s.core.GetTasks() {
 			if h.ID == id && task.Exists() {
 				a.Progress = task.Progress()
+				a.SeedRatio = float32(*task.SeedRatio())
 			}
 		}
 		activities = append(activities, a)
