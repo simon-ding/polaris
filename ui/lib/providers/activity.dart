@@ -5,7 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
 var activitiesDataProvider =
-    AsyncNotifierProvider.family<ActivityData, List<Activity>, String>(
+    AsyncNotifierProvider.autoDispose.family<ActivityData, List<Activity>, String>(
         ActivityData.new);
 
 var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
@@ -24,7 +24,7 @@ var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   },
 );
 
-class ActivityData extends FamilyAsyncNotifier<List<Activity>, String> {
+class ActivityData extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String> {
   @override
   FutureOr<List<Activity>> build(String arg) async {
     if (arg == "active") {
