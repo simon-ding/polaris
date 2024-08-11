@@ -60,7 +60,7 @@ func (c *Client) checkTasks() {
 					torrent.Remove()
 					delete(c.tasks, id)
 				} else {
-					log.Infof("torrent file still sedding: %v", torrent.Name())
+					log.Infof("torrent file still sedding: %v, current seed ratio: %v", torrent.Name(), torrent.SeedRatio())
 				}
 				continue
 			}

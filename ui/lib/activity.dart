@@ -90,6 +90,16 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                                     color: Colors.red,
                                   ));
                             } else if (ac.status == "success") {
+                              if (ac.progress == 100) {
+                                //seeding
+                                return const Tooltip(
+                                  message: "做种中",
+                                  child: Icon(
+                                    Icons.upload,
+                                    //color: Colors.blue,
+                                  ),
+                                );
+                              }
                               return const Tooltip(
                                 message: "下载成功",
                                 child: Icon(
@@ -118,7 +128,9 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                               children: [
                                 Text("开始时间：${timeago.format(ac.date!)}"),
                                 Text("大小：${(ac.size ?? 0).readableFileSize()}"),
-                                ac.seedRatio > 0 ?Text("分享率：${ac.seedRatio}"): SizedBox()
+                                ac.seedRatio > 0
+                                    ? Text("分享率：${ac.seedRatio}")
+                                    : SizedBox()
                               ],
                             ),
                           ),

@@ -24,20 +24,23 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 	his := s.db.GetHistories()
 	var activities = make([]Activity, 0, len(his))
 	for _, h := range his {
-		if q == "active" && (h.Status != history.StatusRunning && h.Status != history.StatusUploading) {
-			continue //active downloads
-		} else if q == "archive" && (h.Status == history.StatusRunning || h.Status == history.StatusUploading) {
+		if q == "archive" && (h.Status == history.StatusRunning || h.Status == history.StatusUploading) {
 			continue //archived downloads
 		}
 
 		a := Activity{
 			History: h,
 		}
+		existInDownloadClient := false
 		for id, task := range s.core.GetTasks() {
 			if h.ID == id && task.Exists() {
 				a.Progress = task.Progress()
 				a.SeedRatio = float32(*task.SeedRatio())
+				existInDownloadClient = true
 			}
+		}
+		if q == "active" && !existInDownloadClient {
+			continue
 		}
 		activities = append(activities, a)
 	}
