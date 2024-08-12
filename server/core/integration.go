@@ -177,7 +177,7 @@ func (c *Client) findEpisodeFilesPreMoving(historyId int) error {
 			}
 		}
 	} else {
-		if fi.IsDir() {
+		if !fi.IsDir() {
 			return fmt.Errorf("not season pack downloaded")
 		}
 		seasonNum, err := utils.SeasonId(his.TargetDir)
