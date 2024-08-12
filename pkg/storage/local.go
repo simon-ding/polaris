@@ -99,5 +99,6 @@ func (l *LocalStorage) ReadFile(name string) ([]byte, error) {
 }
 
 func (l *LocalStorage) WriteFile(name string, data []byte) error {
+	os.MkdirAll(filepath.Dir(name), os.ModePerm)
 	return os.WriteFile(filepath.Join(l.dir, name), data, os.ModePerm)
 }
