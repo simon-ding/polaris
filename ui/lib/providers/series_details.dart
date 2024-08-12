@@ -82,7 +82,7 @@ class SeriesDetailData
     ref.invalidateSelf();
   }
 
-  Future<void> downloadall() async {
+  Future<dynamic> downloadall() async {
     final dio = APIs.getDio();
     var resp = await dio.get(APIs.downloadAllUrl + id!);
     var sp = ServerResponse.fromJson(resp.data);
@@ -90,6 +90,7 @@ class SeriesDetailData
       throw sp.message;
     }
     ref.invalidateSelf();
+    return sp.data;
   }
 }
 

@@ -308,7 +308,9 @@ class _DetailCardState extends ConsumerState<DetailCard> {
         onPressed: () async{
           await ref
               .read(mediaDetailsProvider(widget.details.id.toString()).notifier)
-              .downloadall();
+              .downloadall().then((list) => {
+                showSnakeBar("开始下载：$list")
+              });
         },
         icon: Icons.download_rounded);
   }
