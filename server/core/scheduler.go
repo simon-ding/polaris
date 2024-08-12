@@ -206,7 +206,7 @@ type Task struct {
 	pkg.Torrent
 }
 
-func (c *Client) DownloadSeriesAllEpisodes(id int) ([]string, error) {
+func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 	tvDetail := c.db.GetMediaDetails(id)
 	m := make(map[int][]*ent.Episode)
 	for _, ep := range tvDetail.Episodes {
@@ -214,6 +214,9 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) ([]string, error) {
 	}
 	var allNames []string
 	for seasonNum, epsides := range m {
+		if seasonNum == 0 {
+			continue
+		}
 		wantedSeasonPack := true
 		for _, ep := range epsides {
 			if !ep.Monitored {
@@ -225,14 +228,16 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) ([]string, error) {
 		}
 		if wantedSeasonPack {
 			name, err := c.SearchAndDownload(id, seasonNum, -1)
-			if err != nil {
-				return nil, errors.Wrap(err, "find resource")
-			} else {
+			if err == nil {
 				allNames = append(allNames, *name)
 				log.Infof("begin download torrent resource: %v", name)
+			} else {
+				log.Warnf("finding season pack error: %v", err)
+				wantedSeasonPack = false
 			}
 
-		} else {
+		}
+		if !wantedSeasonPack {
 			for _, ep := range epsides {
 				if !ep.Monitored {
 					continue
@@ -242,7 +247,8 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) ([]string, error) {
 				}
 				name, err := c.SearchAndDownload(id, ep.SeasonNumber, ep.EpisodeNumber)
 				if err != nil {
-					return nil, errors.Wrap(err, "find resource to download")
+					log.Warnf("finding resoruces of season %d episode %d error: %v", ep.SeasonNumber, ep.EpisodeNumber, err)
+					continue
 				} else {
 					allNames = append(allNames, *name)
 					log.Infof("begin download torrent resource: %v", name)
@@ -252,16 +258,14 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) ([]string, error) {
 		}
 
 	}
-	return allNames, nil
+	return allNames
 }
 
 func (c *Client) downloadAllTvSeries() {
 	log.Infof("begin check all tv series resources")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
-		if _, err := c.DownloadSeriesAllEpisodes(series.ID); err != nil {
-			return
-		}
+		c.DownloadSeriesAllEpisodes(series.ID)
 	}
 }
 

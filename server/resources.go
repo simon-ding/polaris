@@ -180,7 +180,7 @@ func (s *Server) DownloadAll(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "get media")
 	}
 	if m.MediaType == media.MediaTypeTv {
-		return s.core.DownloadSeriesAllEpisodes(m.ID)
+		return s.core.DownloadSeriesAllEpisodes(m.ID), nil
 	}
 	name, err := s.core.DownloadMovieByID(m.ID)
 

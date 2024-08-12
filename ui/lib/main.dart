@@ -190,6 +190,7 @@ class _MainSkeletonState extends State<MainSkeleton> {
           onPressed: () => context.go(WelcomePage.routeTv),
           child: Text(
             "Polaris",
+            overflow: TextOverflow.clip,
             style: TextStyle(fontSize: 28),
           ),
         ),
