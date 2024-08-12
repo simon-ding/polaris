@@ -305,12 +305,13 @@ class _DetailCardState extends ConsumerState<DetailCard> {
   Widget downloadButton() {
     return LoadingIconButton(
         tooltip: widget.details.mediaType == "tv" ? "查找并下载所有监控剧集" : "查找并下载此电影",
-        onPressed: () async{
+        onPressed: () async {
           await ref
               .read(mediaDetailsProvider(widget.details.id.toString()).notifier)
-              .downloadall().then((list) => {
-                showSnakeBar("开始下载：$list")
-              });
+              .downloadall()
+              .then((list) => {
+                    if (list != null) {showSnakeBar("开始下载：$list")}
+                  });
         },
         icon: Icons.download_rounded);
   }
