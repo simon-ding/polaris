@@ -42,9 +42,11 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 		if meta == nil { //cannot parse name
 			continue
 		}
-		if isImdbidNotMatch(series.ImdbID, r.ImdbId) { //imdb id not match
+		if isImdbidNotMatch(series.ImdbID, r.ImdbId) { //has imdb id and not match
 			continue
-		} else {
+		}
+
+		if !imdbIDMatchExact(series.ImdbID, r.ImdbId) { //imdb id not exact match, check file name
 			if !torrentNameOk(series, r.Name) {
 				continue
 			}
@@ -83,6 +85,7 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 
 }
 
+// imdbid not exist consider match
 func isImdbidNotMatch(id1, id2 string) bool {
 	if id1 == "" || id2 == "" {
 		return false
@@ -90,6 +93,16 @@ func isImdbidNotMatch(id1, id2 string) bool {
 	id1 = strings.TrimPrefix(id1, "tt")
 	id2 = strings.TrimPrefix(id2, "tt")
 	return id1 != id2
+}
+
+// imdbid not exist consider not match
+func imdbIDMatchExact(id1, id2 string) bool {
+	if id1 == "" || id2 == "" {
+		return false
+	}
+	id1 = strings.TrimPrefix(id1, "tt")
+	id2 = strings.TrimPrefix(id2, "tt")
+	return id1 == id2
 }
 
 func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam) bool {
@@ -154,9 +167,12 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	var filtered []torznab.Result
 	for _, r := range res {
 		meta := metadata.ParseMovie(r.Name)
+
 		if isImdbidNotMatch(movieDetail.ImdbID, r.ImdbId) { //imdb id not match
 			continue
-		} else {
+		}
+
+		if !imdbIDMatchExact(movieDetail.ImdbID, r.ImdbId) {
 			if !torrentNameOk(movieDetail, r.Name) {
 				continue
 			}
