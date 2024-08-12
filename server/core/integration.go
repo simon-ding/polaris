@@ -3,24 +3,30 @@ package core
 import (
 	"bytes"
 	"fmt"
+	"github.com/pkg/errors"
+	"os"
 	"path/filepath"
 	"polaris/db"
 	"polaris/ent/media"
 	storage1 "polaris/ent/storage"
 	"polaris/log"
+	"polaris/pkg/metadata"
 	"polaris/pkg/notifier"
 	"polaris/pkg/storage"
+	"polaris/pkg/utils"
+	"slices"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
-func (c *Client) writePlexmatch(seriesId int, episodeId int, targetDir, name string) error {
+func (c *Client) writePlexmatch(historyId int) error {
 
 	if !c.plexmatchEnabled() {
 		return nil
 	}
-	series, err := c.db.GetMedia(seriesId)
+
+	his := c.db.GetHistory(historyId)
+
+	series, err := c.db.GetMedia(his.MediaID)
 	if err != nil {
 		return err
 	}
@@ -47,24 +53,44 @@ func (c *Client) writePlexmatch(seriesId int, episodeId int, targetDir, name str
 		}
 	}
 
-	//season plexmatch file
-	ep, err := c.db.GetEpisodeByID(episodeId)
-	if err != nil {
-		return errors.Wrap(err, "query episode")
-	}
 	buff := bytes.Buffer{}
-	seasonPlex := filepath.Join(targetDir, ".plexmatch")
+	seasonPlex := filepath.Join(his.TargetDir, ".plexmatch")
 	data, err := st.ReadFile(seasonPlex)
 	if err != nil {
 		log.Infof("read season plexmatch: %v", err)
 	} else {
 		buff.Write(data)
 	}
-	if strings.Contains(buff.String(), name) {
-		log.Debugf("already write plex episode line: %v", name)
-		return nil
+
+	if his.EpisodeID > 0 {
+		//single episode download
+		ep, err := c.db.GetEpisodeByID(his.EpisodeID)
+		if err != nil {
+			return errors.Wrap(err, "query episode")
+		}
+		if strings.Contains(buff.String(), ep.TargetFile) {
+			log.Debugf("already write plex episode line: %v", ep.TargetFile)
+			return nil
+		}
+		buff.WriteString(fmt.Sprintf("\nep: %d: %s\n", ep.EpisodeNumber, ep.TargetFile))
+	} else {
+		seasonNum, err := utils.SeasonId(his.TargetDir)
+		if err != nil {
+			return errors.Wrap(err, "no season id")
+		}
+		allEpisodes, err := c.db.GetSeasonEpisodes(his.MediaID, seasonNum)
+		if err != nil {
+			return errors.Wrap(err, "query season episode")
+		}
+		for _, ep := range allEpisodes {
+			if strings.Contains(buff.String(), ep.TargetFile) {
+				log.Debugf("already write plex episode line: %v", ep.TargetFile)
+				continue
+			}
+			buff.WriteString(fmt.Sprintf("\nep: %d: %s\n", ep.EpisodeNumber, ep.TargetFile))
+		}
+
 	}
-	buff.WriteString(fmt.Sprintf("\nep: %d: %s\n", ep.EpisodeNumber, name))
 	log.Infof("write season plexmatch file content: %s", buff.String())
 	return st.WriteFile(seasonPlex, buff.Bytes())
 }
@@ -127,4 +153,64 @@ func (c *Client) sendMsg(msg string) {
 		}
 		log.Debugf("send message to %s success, msg is %s", cl.Name, msg)
 	}
+}
+
+func (c *Client) findEpisodeFilesPreMoving(historyId int) error {
+	his := c.db.GetHistory(historyId)
+
+	isSingleEpisode := his.EpisodeID > 0
+	downloadDir := c.db.GetDownloadDir()
+	task := c.tasks[historyId]
+	target := filepath.Join(downloadDir, task.Name())
+	fi, err := os.Stat(target)
+	if err != nil {
+		return errors.Wrapf(err, "read dir %v", target)
+	}
+	if isSingleEpisode {
+		if fi.IsDir() {
+			//download single episode in dir
+			//TODO
+		} else {
+			//is file
+			if err := c.db.UpdateEpisodeTargetFile(his.EpisodeID, fi.Name()); err != nil {
+				log.Errorf("writing downloaded file name to db error: %v", err)
+			}
+		}
+	} else {
+		if fi.IsDir() {
+			return fmt.Errorf("not season pack downloaded")
+		}
+		seasonNum, err := utils.SeasonId(his.TargetDir)
+		if err != nil {
+			return errors.Wrap(err, "no season id")
+		}
+
+		files, err := os.ReadDir(target)
+		if err != nil {
+			return err
+		}
+		for _, f := range files {
+			if f.IsDir() { //want media file
+				continue
+			}
+			excludedExt := []string{".txt", ".srt", ".ass", ".sub"}
+			ext := filepath.Ext(f.Name())
+			if slices.Contains(excludedExt, strings.ToLower(ext)) {
+				continue
+			}
+
+			meta := metadata.ParseTv(f.Name())
+			if meta.Episode > 0 {
+				//episode exists
+				ep, err := c.db.GetEpisode(his.MediaID, seasonNum, meta.Episode)
+				if err != nil {
+					return err
+				}
+				if err := c.db.UpdateEpisodeTargetFile(ep.ID, f.Name()); err != nil {
+					return errors.Wrap(err, "update episode file")
+				}
+			}
+		}
+	}
+	return nil
 }

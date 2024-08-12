@@ -571,3 +571,11 @@ func (c *Client) EditMediaMetadata(in EditMediaData) error {
 	return c.ent.Media.Update().Where(media.ID(in.ID)).SetResolution(in.Resolution).SetTargetDir(in.TargetDir).SetLimiter(in.Limiter).
 		Exec(context.Background())
 }
+
+func (c *Client) UpdateEpisodeTargetFile(id int, filename string) error {
+	return c.ent.Episode.Update().Where(episode.ID(id)).SetTargetFile(filename).Exec(context.Background())
+}
+
+func (c *Client) GetSeasonEpisodes(mediaId, seasonNum int) ([]*ent.Episode, error) {
+	return c.ent.Episode.Query().Where(episode.MediaID(mediaId), episode.SeasonNumber(seasonNum)).All(context.Background())
+}

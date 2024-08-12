@@ -39,6 +39,7 @@ var (
 		{Name: "air_date", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"missing", "downloading", "downloaded"}, Default: "missing"},
 		{Name: "monitored", Type: field.TypeBool, Default: false},
+		{Name: "target_file", Type: field.TypeString, Nullable: true},
 		{Name: "media_id", Type: field.TypeInt, Nullable: true},
 	}
 	// EpisodesTable holds the schema information for the "episodes" table.
@@ -49,7 +50,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "episodes_media_episodes",
-				Columns:    []*schema.Column{EpisodesColumns[8]},
+				Columns:    []*schema.Column{EpisodesColumns[9]},
 				RefColumns: []*schema.Column{MediaColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

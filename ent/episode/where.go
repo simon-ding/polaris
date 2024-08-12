@@ -89,6 +89,11 @@ func Monitored(v bool) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldMonitored, v))
 }
 
+// TargetFile applies equality check predicate on the "target_file" field. It's identical to TargetFileEQ.
+func TargetFile(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldTargetFile, v))
+}
+
 // MediaIDEQ applies the EQ predicate on the "media_id" field.
 func MediaIDEQ(v int) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldMediaID, v))
@@ -422,6 +427,81 @@ func MonitoredEQ(v bool) predicate.Episode {
 // MonitoredNEQ applies the NEQ predicate on the "monitored" field.
 func MonitoredNEQ(v bool) predicate.Episode {
 	return predicate.Episode(sql.FieldNEQ(FieldMonitored, v))
+}
+
+// TargetFileEQ applies the EQ predicate on the "target_file" field.
+func TargetFileEQ(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldTargetFile, v))
+}
+
+// TargetFileNEQ applies the NEQ predicate on the "target_file" field.
+func TargetFileNEQ(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldNEQ(FieldTargetFile, v))
+}
+
+// TargetFileIn applies the In predicate on the "target_file" field.
+func TargetFileIn(vs ...string) predicate.Episode {
+	return predicate.Episode(sql.FieldIn(FieldTargetFile, vs...))
+}
+
+// TargetFileNotIn applies the NotIn predicate on the "target_file" field.
+func TargetFileNotIn(vs ...string) predicate.Episode {
+	return predicate.Episode(sql.FieldNotIn(FieldTargetFile, vs...))
+}
+
+// TargetFileGT applies the GT predicate on the "target_file" field.
+func TargetFileGT(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldGT(FieldTargetFile, v))
+}
+
+// TargetFileGTE applies the GTE predicate on the "target_file" field.
+func TargetFileGTE(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldGTE(FieldTargetFile, v))
+}
+
+// TargetFileLT applies the LT predicate on the "target_file" field.
+func TargetFileLT(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldLT(FieldTargetFile, v))
+}
+
+// TargetFileLTE applies the LTE predicate on the "target_file" field.
+func TargetFileLTE(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldLTE(FieldTargetFile, v))
+}
+
+// TargetFileContains applies the Contains predicate on the "target_file" field.
+func TargetFileContains(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldContains(FieldTargetFile, v))
+}
+
+// TargetFileHasPrefix applies the HasPrefix predicate on the "target_file" field.
+func TargetFileHasPrefix(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldHasPrefix(FieldTargetFile, v))
+}
+
+// TargetFileHasSuffix applies the HasSuffix predicate on the "target_file" field.
+func TargetFileHasSuffix(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldHasSuffix(FieldTargetFile, v))
+}
+
+// TargetFileIsNil applies the IsNil predicate on the "target_file" field.
+func TargetFileIsNil() predicate.Episode {
+	return predicate.Episode(sql.FieldIsNull(FieldTargetFile))
+}
+
+// TargetFileNotNil applies the NotNil predicate on the "target_file" field.
+func TargetFileNotNil() predicate.Episode {
+	return predicate.Episode(sql.FieldNotNull(FieldTargetFile))
+}
+
+// TargetFileEqualFold applies the EqualFold predicate on the "target_file" field.
+func TargetFileEqualFold(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldEqualFold(FieldTargetFile, v))
+}
+
+// TargetFileContainsFold applies the ContainsFold predicate on the "target_file" field.
+func TargetFileContainsFold(v string) predicate.Episode {
+	return predicate.Episode(sql.FieldContainsFold(FieldTargetFile, v))
 }
 
 // HasMedia applies the HasEdge predicate on the "media" edge.

@@ -30,6 +30,8 @@ const (
 	FieldStatus = "status"
 	// FieldMonitored holds the string denoting the monitored field in the database.
 	FieldMonitored = "monitored"
+	// FieldTargetFile holds the string denoting the target_file field in the database.
+	FieldTargetFile = "target_file"
 	// EdgeMedia holds the string denoting the media edge name in mutations.
 	EdgeMedia = "media"
 	// Table holds the table name of the episode in the database.
@@ -54,6 +56,7 @@ var Columns = []string{
 	FieldAirDate,
 	FieldStatus,
 	FieldMonitored,
+	FieldTargetFile,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -144,6 +147,11 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByMonitored orders the results by the monitored field.
 func ByMonitored(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMonitored, opts...).ToFunc()
+}
+
+// ByTargetFile orders the results by the target_file field.
+func ByTargetFile(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTargetFile, opts...).ToFunc()
 }
 
 // ByMediaField orders the results by media field.

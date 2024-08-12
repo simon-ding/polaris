@@ -33,6 +33,8 @@ type Episode struct {
 	Status episode.Status `json:"status,omitempty"`
 	// Monitored holds the value of the "monitored" field.
 	Monitored bool `json:"monitored"`
+	// TargetFile holds the value of the "target_file" field.
+	TargetFile string `json:"target_file,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EpisodeQuery when eager-loading is set.
 	Edges        EpisodeEdges `json:"edges"`
@@ -68,7 +70,7 @@ func (*Episode) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case episode.FieldID, episode.FieldMediaID, episode.FieldSeasonNumber, episode.FieldEpisodeNumber:
 			values[i] = new(sql.NullInt64)
-		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldStatus:
+		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldStatus, episode.FieldTargetFile:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -139,6 +141,12 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.Monitored = value.Bool
 			}
+		case episode.FieldTargetFile:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field target_file", values[i])
+			} else if value.Valid {
+				e.TargetFile = value.String
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -203,6 +211,9 @@ func (e *Episode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("monitored=")
 	builder.WriteString(fmt.Sprintf("%v", e.Monitored))
+	builder.WriteString(", ")
+	builder.WriteString("target_file=")
+	builder.WriteString(e.TargetFile)
 	builder.WriteByte(')')
 	return builder.String()
 }

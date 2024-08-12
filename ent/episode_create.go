@@ -92,6 +92,20 @@ func (ec *EpisodeCreate) SetNillableMonitored(b *bool) *EpisodeCreate {
 	return ec
 }
 
+// SetTargetFile sets the "target_file" field.
+func (ec *EpisodeCreate) SetTargetFile(s string) *EpisodeCreate {
+	ec.mutation.SetTargetFile(s)
+	return ec
+}
+
+// SetNillableTargetFile sets the "target_file" field if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableTargetFile(s *string) *EpisodeCreate {
+	if s != nil {
+		ec.SetTargetFile(*s)
+	}
+	return ec
+}
+
 // SetMedia sets the "media" edge to the Media entity.
 func (ec *EpisodeCreate) SetMedia(m *Media) *EpisodeCreate {
 	return ec.SetMediaID(m.ID)
@@ -223,6 +237,10 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.Monitored(); ok {
 		_spec.SetField(episode.FieldMonitored, field.TypeBool, value)
 		_node.Monitored = value
+	}
+	if value, ok := ec.mutation.TargetFile(); ok {
+		_spec.SetField(episode.FieldTargetFile, field.TypeString, value)
+		_node.TargetFile = value
 	}
 	if nodes := ec.mutation.MediaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

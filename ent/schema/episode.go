@@ -22,16 +22,17 @@ func (Episode) Fields() []ent.Field {
 		field.String("air_date"),
 		field.Enum("status").Values("missing", "downloading", "downloaded").Default("missing"),
 		field.Bool("monitored").Default(false).StructTag("json:\"monitored\""), //whether this episode is monitored
+		field.String("target_file").Optional(),
 	}
 }
 
 // Edges of the Episode.
 func (Episode) Edges() []ent.Edge {
 	return []ent.Edge{
-        edge.From("media", Media.Type).
-            Ref("episodes").
-            Unique().
+		edge.From("media", Media.Type).
+			Ref("episodes").
+			Unique().
 			Field("media_id"),
-    }
+	}
 
 }

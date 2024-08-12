@@ -160,6 +160,26 @@ func (eu *EpisodeUpdate) SetNillableMonitored(b *bool) *EpisodeUpdate {
 	return eu
 }
 
+// SetTargetFile sets the "target_file" field.
+func (eu *EpisodeUpdate) SetTargetFile(s string) *EpisodeUpdate {
+	eu.mutation.SetTargetFile(s)
+	return eu
+}
+
+// SetNillableTargetFile sets the "target_file" field if the given value is not nil.
+func (eu *EpisodeUpdate) SetNillableTargetFile(s *string) *EpisodeUpdate {
+	if s != nil {
+		eu.SetTargetFile(*s)
+	}
+	return eu
+}
+
+// ClearTargetFile clears the value of the "target_file" field.
+func (eu *EpisodeUpdate) ClearTargetFile() *EpisodeUpdate {
+	eu.mutation.ClearTargetFile()
+	return eu
+}
+
 // SetMedia sets the "media" edge to the Media entity.
 func (eu *EpisodeUpdate) SetMedia(m *Media) *EpisodeUpdate {
 	return eu.SetMediaID(m.ID)
@@ -251,6 +271,12 @@ func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.Monitored(); ok {
 		_spec.SetField(episode.FieldMonitored, field.TypeBool, value)
+	}
+	if value, ok := eu.mutation.TargetFile(); ok {
+		_spec.SetField(episode.FieldTargetFile, field.TypeString, value)
+	}
+	if eu.mutation.TargetFileCleared() {
+		_spec.ClearField(episode.FieldTargetFile, field.TypeString)
 	}
 	if eu.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -433,6 +459,26 @@ func (euo *EpisodeUpdateOne) SetNillableMonitored(b *bool) *EpisodeUpdateOne {
 	return euo
 }
 
+// SetTargetFile sets the "target_file" field.
+func (euo *EpisodeUpdateOne) SetTargetFile(s string) *EpisodeUpdateOne {
+	euo.mutation.SetTargetFile(s)
+	return euo
+}
+
+// SetNillableTargetFile sets the "target_file" field if the given value is not nil.
+func (euo *EpisodeUpdateOne) SetNillableTargetFile(s *string) *EpisodeUpdateOne {
+	if s != nil {
+		euo.SetTargetFile(*s)
+	}
+	return euo
+}
+
+// ClearTargetFile clears the value of the "target_file" field.
+func (euo *EpisodeUpdateOne) ClearTargetFile() *EpisodeUpdateOne {
+	euo.mutation.ClearTargetFile()
+	return euo
+}
+
 // SetMedia sets the "media" edge to the Media entity.
 func (euo *EpisodeUpdateOne) SetMedia(m *Media) *EpisodeUpdateOne {
 	return euo.SetMediaID(m.ID)
@@ -554,6 +600,12 @@ func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err e
 	}
 	if value, ok := euo.mutation.Monitored(); ok {
 		_spec.SetField(episode.FieldMonitored, field.TypeBool, value)
+	}
+	if value, ok := euo.mutation.TargetFile(); ok {
+		_spec.SetField(episode.FieldTargetFile, field.TypeString, value)
+	}
+	if euo.mutation.TargetFileCleared() {
+		_spec.ClearField(episode.FieldTargetFile, field.TypeString)
 	}
 	if euo.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{

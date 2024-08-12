@@ -61,12 +61,22 @@ func (c *Client) checkTasks() {
 			}
 			log.Infof("task is done: %v", t.Name())
 			c.sendMsg(fmt.Sprintf(message.DownloadComplete, t.Name()))
-			go func() {
-				if err := c.moveCompletedTask(id); err != nil {
-					log.Infof("post tasks for id %v fail: %v", id, err)
-				}
-			}()
+
+			go c.postTaskProcessing(id)
 		}
+	}
+}
+
+func (c *Client) postTaskProcessing(id int) {
+	if err := c.findEpisodeFilesPreMoving(id); err != nil {
+		log.Errorf("finding all episode file error: %v", err)
+	} else {
+		if err := c.writePlexmatch(id); err != nil {
+			log.Errorf("write plexmatch file error: %v", err)
+		}
+	}
+	if err := c.moveCompletedTask(id); err != nil {
+		log.Infof("post tasks for id %v fail: %v", id, err)
 	}
 }
 
@@ -117,11 +127,6 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	stImpl, err := c.getStorage(st.ID, series.MediaType)
 	if err != nil {
 		return err
-	}
-
-	// .plexmatch file
-	if err := c.writePlexmatch(r.MediaID, r.EpisodeID, r.TargetDir, torrentName); err != nil {
-		log.Errorf("create .plexmatch file error: %v", err)
 	}
 
 	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
