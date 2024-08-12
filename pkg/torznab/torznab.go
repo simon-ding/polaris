@@ -87,6 +87,7 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 			Seeders:              mustAtoI(item.GetAttr("seeders")),
 			Peers:                mustAtoI(item.GetAttr("peers")),
 			Category:             mustAtoI(item.GetAttr("category")),
+			ImdbId:               item.GetAttr("imdbid"),
 			DownloadVolumeFactor: tryParseFloat(item.GetAttr("downloadvolumefactor")),
 			UploadVolumeFactor:   tryParseFloat(item.GetAttr("uploadvolumefactor")),
 			Source:               indexer.Name,
@@ -167,4 +168,5 @@ type Result struct {
 	IndexerId            int     `json:"indexer_id"`
 	Priority             int     `json:"priority"`
 	IsPrivate            bool    `json:"is_private"`
+	ImdbId               string  `json:"imdb_id"`
 }

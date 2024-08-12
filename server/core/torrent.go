@@ -67,6 +67,9 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 		if !torrentSizeOk(series, r.Size, param) {
 			continue
 		}
+		if isImdbidNotMatch(series.ImdbID, r.ImdbId) { //imdb id not match
+			continue
+		}
 
 		filtered = append(filtered, r)
 	}
@@ -76,6 +79,15 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 	filtered = dedup(filtered)
 	return filtered, nil
 
+}
+
+func isImdbidNotMatch(id1, id2 string) bool {
+	if id1 == "" || id2 == "" {
+		return false
+	}
+	id1 = strings.TrimPrefix(id1, "tt")
+	id2 = strings.TrimPrefix(id2, "tt")
+	return id1 != id2
 }
 
 func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam) bool {
@@ -152,6 +164,9 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 			continue
 		}
 		if param.FilterQiangban && meta.IsQingban { //过滤枪版电影
+			continue
+		}
+		if isImdbidNotMatch(movieDetail.ImdbID, r.ImdbId) { //imdb id not match
 			continue
 		}
 
