@@ -42,6 +42,14 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 		if meta == nil { //cannot parse name
 			continue
 		}
+		if isImdbidNotMatch(series.ImdbID, r.ImdbId) { //imdb id not match
+			continue
+		} else {
+			if !torrentNameOk(series, r.Name) {
+				continue
+			}
+		}
+
 		if !isNoSeasonSeries(series) && meta.Season != param.SeasonNum { //do not check season on series that only rely on episode number
 			continue
 
@@ -60,14 +68,8 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 		if param.CheckResolution && meta.Resolution != series.Resolution.String() {
 			continue
 		}
-		if !torrentNameOk(series, r.Name) {
-			continue
-		}
 
 		if !torrentSizeOk(series, r.Size, param) {
-			continue
-		}
-		if isImdbidNotMatch(series.ImdbID, r.ImdbId) { //imdb id not match
 			continue
 		}
 
@@ -152,27 +154,28 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	var filtered []torznab.Result
 	for _, r := range res {
 		meta := metadata.ParseMovie(r.Name)
-		if !torrentNameOk(movieDetail, r.Name) {
+		if isImdbidNotMatch(movieDetail.ImdbID, r.ImdbId) { //imdb id not match
 			continue
+		} else {
+			if !torrentNameOk(movieDetail, r.Name) {
+				continue
+			}
+			ss := strings.Split(movieDetail.AirDate, "-")[0]
+			year, _ := strconv.Atoi(ss)
+			if meta.Year != year && meta.Year != year-1 && meta.Year != year+1 { //year not match
+				continue
+			}
 		}
 
 		if param.CheckResolution && meta.Resolution != movieDetail.Resolution.String() {
 			continue
 		}
 
-		if !torrentSizeOk(movieDetail, r.Size, param) {
-			continue
-		}
 		if param.FilterQiangban && meta.IsQingban { //过滤枪版电影
 			continue
 		}
-		if isImdbidNotMatch(movieDetail.ImdbID, r.ImdbId) { //imdb id not match
-			continue
-		}
 
-		ss := strings.Split(movieDetail.AirDate, "-")[0]
-		year, _ := strconv.Atoi(ss)
-		if meta.Year != year && meta.Year != year-1 && meta.Year != year+1 { //year not match
+		if !torrentSizeOk(movieDetail, r.Size, param) {
 			continue
 		}
 
