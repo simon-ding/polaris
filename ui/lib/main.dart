@@ -186,8 +186,14 @@ class _MainSkeletonState extends State<MainSkeleton> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("Polaris"),
-        
+        title: TextButton(
+          onPressed: () => context.go(WelcomePage.routeTv),
+          child: Text(
+            "Polaris",
+            style: TextStyle(fontSize: 28),
+          ),
+        ),
+
         actions: [
           SearchAnchor(
               builder: (BuildContext context, SearchController controller) {
