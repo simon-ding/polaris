@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"polaris/db"
 	"polaris/log"
+	"slices"
 	"strconv"
 	"time"
 
@@ -76,6 +77,9 @@ func (i *Item) GetAttr(key string) string {
 func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 	var res []Result
 	for _, item := range r.Channel.Item {
+		if slices.Contains(item.Category, "3000") { //exclude audio files
+			continue
+		}
 		r := Result{
 			Name:                 item.Title,
 			Link:                 item.Link,
