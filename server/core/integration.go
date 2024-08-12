@@ -83,6 +83,11 @@ func (c *Client) writePlexmatch(historyId int) error {
 			return errors.Wrap(err, "query season episode")
 		}
 		for _, ep := range allEpisodes {
+			if ep.TargetFile == "" {
+				log.Errorf("no episode file of episode %d, season %d", ep.EpisodeNumber, ep.SeasonNumber)
+				//TODO update db
+				continue
+			}
 			if strings.Contains(buff.String(), ep.TargetFile) {
 				log.Debugf("already write plex episode line: %v", ep.TargetFile)
 				continue
