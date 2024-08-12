@@ -19,8 +19,8 @@ import (
 func (c *Client) addSysCron() {
 	c.mustAddCron("@every 1m", c.checkTasks)
 	c.mustAddCron("0 0 * * * *", func() {
-		c.downloadTvSeries()
-		c.downloadMovie()
+		c.downloadAllTvSeries()
+		c.downloadAllMovies()
 	})
 	c.mustAddCron("0 0 */12 * * *", c.checkAllSeriesNewSeason)
 	c.cron.Start()
@@ -206,79 +206,97 @@ type Task struct {
 	pkg.Torrent
 }
 
-func (c *Client) downloadTvSeries() {
+func (c *Client) DownloadSeriesAllEpisodes(id int) ([]string, error) {
+	tvDetail := c.db.GetMediaDetails(id)
+	m := make(map[int][]*ent.Episode)
+	for _, ep := range tvDetail.Episodes {
+		m[ep.SeasonNumber] = append(m[ep.SeasonNumber], ep)
+	}
+	var allNames []string
+	for seasonNum, epsides := range m {
+		wantedSeasonPack := true
+		for _, ep := range epsides {
+			if !ep.Monitored {
+				wantedSeasonPack = false
+			}
+			if ep.Status != episode.StatusMissing {
+				wantedSeasonPack = false
+			}
+		}
+		if wantedSeasonPack {
+			name, err := c.SearchAndDownload(id, seasonNum, -1)
+			if err != nil {
+				return nil, errors.Wrap(err, "find resource")
+			} else {
+				allNames = append(allNames, *name)
+				log.Infof("begin download torrent resource: %v", name)
+			}
+
+		} else {
+			for _, ep := range epsides {
+				if !ep.Monitored {
+					continue
+				}
+				if ep.Status != episode.StatusMissing {
+					continue
+				}
+				name, err := c.SearchAndDownload(id, ep.SeasonNumber, ep.EpisodeNumber)
+				if err != nil {
+					return nil, errors.Wrap(err, "find resource to download")
+				} else {
+					allNames = append(allNames, *name)
+					log.Infof("begin download torrent resource: %v", name)
+				}
+			}
+
+		}
+
+	}
+	return allNames, nil
+}
+
+func (c *Client) downloadAllTvSeries() {
 	log.Infof("begin check all tv series resources")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
-		tvDetail := c.db.GetMediaDetails(series.ID)
-		m := make(map[int][]*ent.Episode)
-		for _, ep := range tvDetail.Episodes {
-			m[ep.SeasonNumber] = append(m[ep.SeasonNumber], ep)
-		}
-		for seasonNum, epsides := range m {
-			wantedSeasonPack := true
-			for _, ep := range epsides {
-				if !ep.Monitored {
-					wantedSeasonPack = false
-				}
-				if ep.Status != episode.StatusMissing {
-					wantedSeasonPack = false
-				}
-			}
-			if wantedSeasonPack {
-				name, err := c.SearchAndDownload(series.ID, seasonNum, -1)
-				if err != nil {
-					log.Infof("cannot find resource to download : %v", err)
-				} else {
-					log.Infof("begin download torrent resource: %v", name)
-				}
-
-			} else {
-				for _, ep := range epsides {
-					if !ep.Monitored {
-						continue
-					}
-					if ep.Status != episode.StatusMissing {
-						continue
-					}
-					name, err := c.SearchAndDownload(series.ID, ep.SeasonNumber, ep.EpisodeNumber)
-					if err != nil {
-						log.Infof("cannot find resource to download for %s: %v", ep.Title, err)
-					} else {
-						log.Infof("begin download torrent resource: %v", name)
-					}
-				}
-
-			}
+		if _, err := c.DownloadSeriesAllEpisodes(series.ID); err != nil {
+			return
 		}
 	}
 }
 
-func (c *Client) downloadMovie() {
+func (c *Client) downloadAllMovies() {
 	log.Infof("begin check all movie resources")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeMovie)
 
 	for _, series := range allSeries {
-		detail := c.db.GetMediaDetails(series.ID)
-		if len(detail.Episodes) == 0 {
-			log.Errorf("no related dummy episode: %v", detail.NameEn)
-			continue
-		}
-		ep := detail.Episodes[0]
-		if ep.Status != episode.StatusMissing {
-			continue
-		}
-
-		if err := c.downloadMovieSingleEpisode(ep, series.TargetDir); err != nil {
+		if _, err := c.DownloadMovieByID(series.ID); err != nil {
 			log.Errorf("download movie error: %v", err)
 		}
 	}
 }
 
-func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) error {
+func (c *Client) DownloadMovieByID(id int) (string, error) {
+	detail := c.db.GetMediaDetails(id)
+	if len(detail.Episodes) == 0 {
+		return "", fmt.Errorf("no related dummy episode: %v", detail.NameEn)
+	}
+	ep := detail.Episodes[0]
+	if ep.Status != episode.StatusMissing {
+		return "", nil
+	}
+
+	if name, err := c.downloadMovieSingleEpisode(ep, detail.TargetDir); err != nil {
+		return "", errors.Wrap(err, "download movie")
+	} else {
+		return name, nil
+	}
+}
+
+func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (string, error) {
 	trc, dlc, err := c.getDownloadClient()
 	if err != nil {
-		return errors.Wrap(err, "connect transmission")
+		return "", errors.Wrap(err, "connect transmission")
 	}
 	qiangban := c.db.GetSetting(db.SettingAllowQiangban)
 	allowQiangban := false
@@ -294,13 +312,13 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) e
 	})
 	if err != nil {
 
-		return errors.Wrap(err, "search movie")
+		return "", errors.Wrap(err, "search movie")
 	}
 	r1 := res[0]
 	log.Infof("begin download torrent resource: %v", r1.Name)
 	torrent, err := trc.Download(r1.Link, c.db.GetDownloadDir())
 	if err != nil {
-		return errors.Wrap(err, "downloading")
+		return "", errors.Wrap(err, "downloading")
 	}
 	torrent.Start()
 
@@ -322,7 +340,7 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) e
 	c.tasks[history.ID] = &Task{Torrent: torrent}
 
 	c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
-	return nil
+	return r1.Name, nil
 }
 
 func (c *Client) checkAllSeriesNewSeason() {

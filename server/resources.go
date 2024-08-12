@@ -7,6 +7,7 @@ import (
 	"polaris/log"
 	"polaris/pkg/torznab"
 	"polaris/server/core"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -166,4 +167,22 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 		return s.core.DownloadMovie(m, in.Link, in.Name, in.Size, in.IndexerId)
 	}
 
+}
+
+func (s *Server) DownloadAll(c *gin.Context) (interface{}, error) {
+	ids := c.Param("id")
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		return nil, errors.Wrap(err, "convert")
+	}
+	m, err := s.db.GetMedia(id)
+	if err != nil {
+		return nil, errors.Wrap(err, "get media")
+	}
+	if m.MediaType == media.MediaTypeTv {
+		return s.core.DownloadSeriesAllEpisodes(m.ID)
+	}
+	name, err := s.core.DownloadMovieByID(m.ID)
+
+	return []string{name}, err
 }

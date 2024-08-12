@@ -8,6 +8,7 @@ class APIs {
   static final _baseUrl = baseUrl();
   static final searchUrl = "$_baseUrl/api/v1/media/search";
   static final editMediaUrl = "$_baseUrl/api/v1/media/edit";
+  static final downloadAllUrl = "$_baseUrl/api/v1/media/downloadall/";
   static final settingsUrl = "$_baseUrl/api/v1/setting/do";
   static final settingsGeneralUrl = "$_baseUrl/api/v1/setting/general";
   static final watchlistTvUrl = "$_baseUrl/api/v1/media/tv/watchlist";

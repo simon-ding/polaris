@@ -57,13 +57,13 @@ func ParseMovie(name string) *MovieMetadata {
 
 // https://en.wikipedia.org/wiki/Pirated_movie_release_types
 func isQiangban(name string) bool {
-	qiangbanFilter := []string{"CAM-Rip", "CAM", "HDCAM", "TS", "HDTS", "TELESYNC", "PDVD", "PreDVDRip", "TC", "HDTC", "TELECINE", "WP", "WORKPRINT"}
+	qiangbanFilter := []string{"CAMRip","CAM-Rip", "CAM", "HDCAM", "TS","TSRip", "HDTS", "TELESYNC", "PDVD", "PreDVDRip", "TC", "HDTC", "TELECINE", "WP", "WORKPRINT"}
 	re := regexp.MustCompile(`\W`)
 	name = re.ReplaceAllString(strings.ToLower(name), " ")
 	fields := strings.Fields(name)
 	for _, q := range qiangbanFilter {
 		for _, f := range fields {
-			if strings.ToLower(q) == strings.ToLower(f) {
+			if strings.EqualFold(q, f) {
 				return true
 			}
 		}

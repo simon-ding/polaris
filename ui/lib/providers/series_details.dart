@@ -81,6 +81,16 @@ class SeriesDetailData
     }
     ref.invalidateSelf();
   }
+
+  Future<void> downloadall() async {
+    final dio = APIs.getDio();
+    var resp = await dio.get(APIs.downloadAllUrl + id!);
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
+  }
 }
 
 class SeriesDetails {
