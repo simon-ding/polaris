@@ -5,4 +5,4 @@ import (
 	"time"
 )
 
-var cc = cache.NewCache[string, Response](time.Minute * 30)
+var cc = cache.NewCache[string, *Response](time.Minute * 30)

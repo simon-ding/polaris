@@ -135,24 +135,33 @@ func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
 
 	cacheRes, ok := cc.Get(key)
 	if !ok {
-		resp, err := http.DefaultClient.Do(req)
+		res, err := doRequest(req)
 		if err != nil {
-			return nil, errors.Wrap(err, "do http")
-		}
-		defer resp.Body.Close()
-		data, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, errors.Wrap(err, "read http body")
-		}
-		var res Response
-		err = xml.Unmarshal(data, &res)
-		if err != nil {
-			return nil, errors.Wrapf(err, "xml unmarshal data: %v", string(data))
+			cc.Set(key, &Response{})
+			return nil, errors.Wrap(err, "do http request")
 		}
 		cacheRes = res
 		cc.Set(key, cacheRes)
 	}
 	return cacheRes.ToResults(indexer), nil
+}
+
+func doRequest(req *http.Request) (*Response, error) {
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "do http")
+	}
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "read http body")
+	}
+	var res Response
+	err = xml.Unmarshal(data, &res)
+	if err != nil {
+		return nil, errors.Wrapf(err, "xml unmarshal data: %v", string(data))
+	}
+	return &res, nil
 }
 
 type Result struct {
