@@ -60,7 +60,7 @@ func (c *Client) writeNfoFile(historyId int) error {
 					},
 				},
 			}
-			data, err := xml.Marshal(&show)
+			data, err := xml.MarshalIndent(&show, " ", "  ")
 			if err != nil {
 				return errors.Wrap(err, "xml marshal")
 			}
@@ -95,7 +95,7 @@ func (c *Client) writeNfoFile(historyId int) error {
 					},
 				},
 			}
-			data, err := xml.Marshal(&nfoData)
+			data, err := xml.MarshalIndent(&nfoData, " ", "  ")
 			if err != nil {
 				return errors.Wrap(err, "xml marshal")
 			}
