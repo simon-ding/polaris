@@ -70,7 +70,9 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	}
 
 	if his.EpisodeID != 0 {
-		s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
+		if his.Status == history.StatusRunning || his.Status == history.StatusUploading {
+			s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
+		}
 
 	} else {
 		seasonNum, err := utils.SeasonId(his.TargetDir)
@@ -78,8 +80,9 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 			log.Errorf("no season id: %v", his.TargetDir)
 			seasonNum = -1
 		}
-		s.db.SetSeasonAllEpisodeStatus(his.MediaID, seasonNum, episode.StatusMissing)
-
+		if his.Status == history.StatusRunning || his.Status == history.StatusUploading {
+			s.db.SetSeasonAllEpisodeStatus(his.MediaID, seasonNum, episode.StatusMissing)
+		}
 	}
 
 	err = s.db.DeleteHistory(id)
