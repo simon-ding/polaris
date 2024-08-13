@@ -74,6 +74,9 @@ func (c *Client) postTaskProcessing(id int) {
 		if err := c.writePlexmatch(id); err != nil {
 			log.Errorf("write plexmatch file error: %v", err)
 		}
+		if err := c.writeNfoFile(id); err != nil {
+			log.Errorf("write nfo file error: %v", err)
+		}
 	}
 	if err := c.moveCompletedTask(id); err != nil {
 		log.Infof("post tasks for id %v fail: %v", id, err)

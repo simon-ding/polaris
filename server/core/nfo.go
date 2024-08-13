@@ -46,24 +46,20 @@ type Tvshow struct {
 			Preview string `xml:"preview,attr"`
 		} `xml:"thumb"`
 	} `xml:"fanart"`
-	Mpaa       string `xml:"mpaa"`
-	Playcount  string `xml:"playcount"`
-	Lastplayed string `xml:"lastplayed"`
-	ID         string `xml:"id"`
-	Uniqueid   []struct {
-		Text    string `xml:",chardata"`
-		Type    string `xml:"type,attr"`
-		Default string `xml:"default,attr"`
-	} `xml:"uniqueid"`
-	Genre     string `xml:"genre"`
-	Premiered string `xml:"premiered"`
-	Year      string `xml:"year"`
-	Status    string `xml:"status"`
-	Code      string `xml:"code"`
-	Aired     string `xml:"aired"`
-	Studio    string `xml:"studio"`
-	Trailer   string `xml:"trailer"`
-	Actor     []struct {
+	Mpaa       string     `xml:"mpaa"`
+	Playcount  string     `xml:"playcount"`
+	Lastplayed string     `xml:"lastplayed"`
+	ID         string     `xml:"id"`
+	Uniqueid   []UniqueId `xml:"uniqueid"`
+	Genre      string     `xml:"genre"`
+	Premiered  string     `xml:"premiered"`
+	Year       string     `xml:"year"`
+	Status     string     `xml:"status"`
+	Code       string     `xml:"code"`
+	Aired      string     `xml:"aired"`
+	Studio     string     `xml:"studio"`
+	Trailer    string     `xml:"trailer"`
+	Actor      []struct {
 		Text  string `xml:",chardata"`
 		Name  string `xml:"name"`
 		Role  string `xml:"role"`
@@ -82,6 +78,11 @@ type Tvshow struct {
 	Dateadded string `xml:"dateadded"`
 }
 
+type UniqueId struct {
+	Text    string `xml:",chardata"`
+	Type    string `xml:"type,attr"`
+	Default string `xml:"default,attr"`
+}
 
 type Episodedetails struct {
 	XMLName   xml.Name `xml:"episodedetails"`
@@ -148,8 +149,7 @@ type Episodedetails struct {
 		Total    string `xml:"total"`
 	} `xml:"resume"`
 	Dateadded string `xml:"dateadded"`
-} 
-
+}
 
 type Movie struct {
 	XMLName       xml.Name `xml:"movie"`
@@ -189,18 +189,14 @@ type Movie struct {
 			Preview string `xml:"preview,attr"`
 		} `xml:"thumb"`
 	} `xml:"fanart"`
-	Mpaa       string `xml:"mpaa"`
-	Playcount  string `xml:"playcount"`
-	Lastplayed string `xml:"lastplayed"`
-	ID         string `xml:"id"`
-	Uniqueid   []struct {
-		Text    string `xml:",chardata"`
-		Type    string `xml:"type,attr"`
-		Default string `xml:"default,attr"`
-	} `xml:"uniqueid"`
-	Genre   string   `xml:"genre"`
-	Country []string `xml:"country"`
-	Set     struct {
+	Mpaa       string     `xml:"mpaa"`
+	Playcount  string     `xml:"playcount"`
+	Lastplayed string     `xml:"lastplayed"`
+	ID         string     `xml:"id"`
+	Uniqueid   []UniqueId `xml:"uniqueid"`
+	Genre      string     `xml:"genre"`
+	Country    []string   `xml:"country"`
+	Set        struct {
 		Text     string `xml:",chardata"`
 		Name     string `xml:"name"`
 		Overview string `xml:"overview"`
@@ -254,4 +250,4 @@ type Movie struct {
 		Order string `xml:"order"`
 		Thumb string `xml:"thumb"`
 	} `xml:"actor"`
-} 
+}

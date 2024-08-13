@@ -2,6 +2,7 @@ package core
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"github.com/pkg/errors"
 	"os"
@@ -15,8 +16,94 @@ import (
 	"polaris/pkg/storage"
 	"polaris/pkg/utils"
 	"slices"
+	"strconv"
 	"strings"
 )
+
+func (c *Client) writeNfoFile(historyId int) error {
+	if !c.nfoSupportEnabled() {
+		return nil
+	}
+
+	his := c.db.GetHistory(historyId)
+
+	md, err := c.db.GetMedia(his.MediaID)
+	if err != nil {
+		return err
+	}
+
+	if md.MediaType == media.MediaTypeTv { //tvshow.nfo
+		st, err := c.getStorage(md.StorageID, media.MediaTypeTv)
+		if err != nil {
+			return errors.Wrap(err, "get storage")
+		}
+
+		nfoPath := filepath.Join(md.TargetDir, "tvshow.nfo")
+		_, err = st.ReadFile(nfoPath)
+		if err != nil {
+			log.Infof("tvshow.nfo file missing, create new one, tv series name: %s", md.NameEn)
+			show := Tvshow{
+				Title:         md.NameCn,
+				Originaltitle: md.OriginalName,
+				Showtitle:     md.NameCn,
+				Plot:          md.Overview,
+				ID:            strconv.Itoa(md.TmdbID),
+				Uniqueid: []UniqueId{
+					{
+						Text:    strconv.Itoa(md.TmdbID),
+						Type:    "tmdb",
+						Default: "true",
+					},
+					{
+						Text: md.ImdbID,
+						Type: "imdb",
+					},
+				},
+			}
+			data, err := xml.Marshal(&show)
+			if err != nil {
+				return errors.Wrap(err, "xml marshal")
+			}
+			return st.WriteFile(nfoPath, data)
+		}
+
+	} else if md.MediaType == media.MediaTypeMovie { //movie.nfo
+		st, err := c.getStorage(md.StorageID, media.MediaTypeMovie)
+		if err != nil {
+			return errors.Wrap(err, "get storage")
+		}
+
+		nfoPath := filepath.Join(md.TargetDir, "movie.nfo")
+		_, err = st.ReadFile(nfoPath)
+		if err != nil {
+			log.Infof("movie.nfo file missing, create new one, tv series name: %s", md.NameEn)
+			nfoData := Movie{
+				Title:         md.NameCn,
+				Originaltitle: md.OriginalName,
+				Sorttitle:     md.NameCn,
+				Plot:          md.Overview,
+				ID:            strconv.Itoa(md.TmdbID),
+				Uniqueid: []UniqueId{
+					{
+						Text:    strconv.Itoa(md.TmdbID),
+						Type:    "tmdb",
+						Default: "true",
+					},
+					{
+						Text: md.ImdbID,
+						Type: "imdb",
+					},
+				},
+			}
+			data, err := xml.Marshal(&nfoData)
+			if err != nil {
+				return errors.Wrap(err, "xml marshal")
+			}
+			return st.WriteFile(nfoPath, data)
+		}
+	}
+	return nil
+}
 
 func (c *Client) writePlexmatch(historyId int) error {
 
@@ -30,7 +117,7 @@ func (c *Client) writePlexmatch(historyId int) error {
 	if err != nil {
 		return err
 	}
-	if series.MediaType != media.MediaTypeTv {
+	if series.MediaType != media.MediaTypeTv { //.plexmatch only support tv series
 		return nil
 	}
 	st, err := c.getStorage(series.StorageID, media.MediaTypeTv)
@@ -102,6 +189,10 @@ func (c *Client) writePlexmatch(historyId int) error {
 
 func (c *Client) plexmatchEnabled() bool {
 	return c.db.GetSetting(db.SettingPlexMatchEnabled) == "true"
+}
+
+func (c *Client) nfoSupportEnabled() bool {
+	return c.db.GetSetting(db.SettingNfoSupportEnabled) == "true"
 }
 
 func (c *Client) getStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {

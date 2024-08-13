@@ -3,15 +3,16 @@ package db
 var Version = "undefined"
 
 const (
-	SettingTmdbApiKey       = "tmdb_api_key"
-	SettingLanguage         = "language"
-	SettingJacketUrl        = "jacket_url"
-	SettingJacketApiKey     = "jacket_api_key"
-	SettingDownloadDir      = "download_dir"
-	SettingLogLevel         = "log_level"
-	SettingProxy            = "proxy"
-	SettingPlexMatchEnabled = "plexmatch_enabled"
-	SettingAllowQiangban    = "filter_qiangban"
+	SettingTmdbApiKey        = "tmdb_api_key"
+	SettingLanguage          = "language"
+	SettingJacketUrl         = "jacket_url"
+	SettingJacketApiKey      = "jacket_api_key"
+	SettingDownloadDir       = "download_dir"
+	SettingLogLevel          = "log_level"
+	SettingProxy             = "proxy"
+	SettingPlexMatchEnabled  = "plexmatch_enabled"
+	SettingNfoSupportEnabled = "nfo_support_enabled"
+	SettingAllowQiangban     = "filter_qiangban"
 )
 
 const (
