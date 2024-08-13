@@ -67,7 +67,9 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 		return nil, errors.Wrap(err, "save record")
 	}
 	if episodeNum > 0 {
-		c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+		if ep.Status == episode.StatusMissing {
+			c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+		}
 	} else {
 		c.db.SetSeasonAllEpisodeStatus(seriesId, seasonNum, episode.StatusDownloading)
 	}
@@ -133,7 +135,10 @@ func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexe
 
 		c.tasks[history.ID] = &Task{Torrent: torrent}
 
-		c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+		if ep.Status == episode.StatusMissing {
+			c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+		}
+
 	}()
 
 	c.sendMsg(fmt.Sprintf(message.BeginDownload, name))
