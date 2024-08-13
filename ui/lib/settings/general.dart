@@ -36,6 +36,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
               "proxy": v.proxy,
               "enable_plexmatch": v.enablePlexmatch,
               "allow_qiangban": v.allowQiangban,
+              "enable_nfo": v.enableNfo,
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +93,15 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                   width: 300,
                   child: FormBuilderSwitch(
                       decoration:
-                          const InputDecoration(icon: Icon(Icons.phone_iphone)),
+                          const InputDecoration(icon: Icon(Icons.library_books), helperText: "emby/kodi等软件刮削需要"),
+                      name: "enable_nfo",
+                      title: const Text("nfo 文件支持")),
+                ),
+                SizedBox(
+                  width: 300,
+                  child: FormBuilderSwitch(
+                      decoration:
+                          const InputDecoration(icon: Icon(Icons.remove_circle)),
                       name: "allow_qiangban",
                       title: const Text("是否下载枪版资源")),
                 ),
@@ -115,6 +124,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                                     logLevel: values["log_level"],
                                     proxy: values["proxy"],
                                     allowQiangban: values["allow_qiangban"],
+                                    enableNfo: values["enable_nfo"],
                                     enablePlexmatch:
                                         values["enable_plexmatch"]))
                                 .then((v) => showSnakeBar("更新成功"));

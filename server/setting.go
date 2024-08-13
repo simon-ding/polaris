@@ -19,6 +19,7 @@ type GeneralSettings struct {
 	LogLevel        string `json:"log_level"`
 	Proxy           string `json:"proxy"`
 	EnablePlexmatch bool   `json:"enable_plexmatch"`
+	EnableNfo       bool   `json:"enable_nfo"`
 	AllowQiangban   bool   `json:"allow_qiangban"`
 }
 
@@ -62,6 +63,12 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		s.db.SetSetting(db.SettingAllowQiangban, "false")
 	}
 
+	if in.EnableNfo {
+		s.db.SetSetting(db.SettingNfoSupportEnabled, "true")
+	} else {
+		s.db.SetSetting(db.SettingNfoSupportEnabled, "false")
+	}
+
 	return nil, nil
 }
 
@@ -71,6 +78,7 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	logLevel := s.db.GetSetting(db.SettingLogLevel)
 	plexmatchEnabled := s.db.GetSetting(db.SettingPlexMatchEnabled)
 	allowQiangban := s.db.GetSetting(db.SettingAllowQiangban)
+	enableNfo := s.db.GetSetting(db.SettingNfoSupportEnabled)
 	return &GeneralSettings{
 		TmdbApiKey:      tmdb,
 		DownloadDir:     downloadDir,
@@ -78,6 +86,7 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 		Proxy:           s.db.GetSetting(db.SettingProxy),
 		EnablePlexmatch: plexmatchEnabled == "true",
 		AllowQiangban:   allowQiangban == "true",
+		EnableNfo:       enableNfo == "true",
 	}, nil
 }
 

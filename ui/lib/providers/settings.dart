@@ -53,6 +53,7 @@ class GeneralSetting {
   String? proxy;
   bool? enablePlexmatch;
   bool? allowQiangban;
+  bool? enableNfo;
 
   GeneralSetting(
       {this.tmdbApiKey,
@@ -60,6 +61,7 @@ class GeneralSetting {
       this.logLevel,
       this.proxy,
       this.enablePlexmatch,
+      this.enableNfo,
       this.allowQiangban});
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,7 @@ class GeneralSetting {
         logLevel: json["log_level"],
         proxy: json["proxy"],
         allowQiangban: json["allow_qiangban"] ?? false,
+        enableNfo: json["enable_nfo"] ?? false,
         enablePlexmatch: json["enable_plexmatch"] ?? false);
   }
 
@@ -80,6 +83,7 @@ class GeneralSetting {
     data["proxy"] = proxy;
     data["enable_plexmatch"] = enablePlexmatch;
     data["allow_qiangban"] = allowQiangban;
+    data["enable_nfo"] = enableNfo;
     return data;
   }
 }
