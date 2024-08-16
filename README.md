@@ -14,7 +14,11 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 
 交流群： https://t.me/+8R2nzrlSs2JhMDgx
 
-## 功能
+## 快速开始
+
+使用此程序参考 [【快速开始】](https://simonding.gitbook.io/polaris/quick_start)
+
+## Features
 
 - [x] 电视剧自动追踪下载
 - [x] 电影自动追踪下载
@@ -23,17 +27,16 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 - [x] 后台代理支持
 - [x] 用户认证
 - [x] plex 刮削支持
+- [x] NFO 刮削文件支持
+- [x] BT/PT 支持
 - [x] and more...
 
 ## Todos
 
-- [] qbittorrent客户端支持
-- [] 更多通知客户端支持
-- [] 第三方watchlist导入支持
+- [ ] qbittorrent客户端支持
+- [ ] 更多通知客户端支持
+- [ ] 第三方watchlist导入支持
 
-## 使用
-
-使用此程序参考 [【快速开始】](./doc/quick_start.md)
 
 ## 原理
 
