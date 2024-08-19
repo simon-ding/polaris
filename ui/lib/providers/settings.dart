@@ -54,6 +54,7 @@ class GeneralSetting {
   bool? enablePlexmatch;
   bool? allowQiangban;
   bool? enableNfo;
+  bool? enableAdult;
 
   GeneralSetting(
       {this.tmdbApiKey,
@@ -62,7 +63,8 @@ class GeneralSetting {
       this.proxy,
       this.enablePlexmatch,
       this.enableNfo,
-      this.allowQiangban});
+      this.allowQiangban,
+      this.enableAdult});
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
     return GeneralSetting(
@@ -70,6 +72,7 @@ class GeneralSetting {
         downloadDIr: json["download_dir"],
         logLevel: json["log_level"],
         proxy: json["proxy"],
+        enableAdult: json["enable_adult_content"]??false,
         allowQiangban: json["allow_qiangban"] ?? false,
         enableNfo: json["enable_nfo"] ?? false,
         enablePlexmatch: json["enable_plexmatch"] ?? false);
@@ -84,6 +87,7 @@ class GeneralSetting {
     data["enable_plexmatch"] = enablePlexmatch;
     data["allow_qiangban"] = allowQiangban;
     data["enable_nfo"] = enableNfo;
+    data["enable_adult_content"] = enableAdult;
     return data;
   }
 }

@@ -67,7 +67,8 @@ func (c *Client) TMDB() (*tmdb.Client, error) {
 		return nil, errors.New("TMDB apiKey not set")
 	}
 	proxy := c.db.GetSetting(db.SettingProxy)
-	return tmdb.NewClient(api, proxy)
+	adult := c.db.GetSetting(db.SettingEnableTmdbAdultContent)
+	return tmdb.NewClient(api, proxy, adult == "true")
 }
 
 func (c *Client) MustTMDB() *tmdb.Client {

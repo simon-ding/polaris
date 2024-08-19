@@ -37,6 +37,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
               "enable_plexmatch": v.enablePlexmatch,
               "allow_qiangban": v.allowQiangban,
               "enable_nfo": v.enableNfo,
+              "enable_adult": v.enableAdult,
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,6 +86,14 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                   width: 300,
                   child: FormBuilderSwitch(
                       decoration:
+                          const InputDecoration(icon: Icon(Icons.back_hand)),
+                      name: "enable_adult",
+                      title: const Text("是否显示成人内容")),
+                ),
+                SizedBox(
+                  width: 300,
+                  child: FormBuilderSwitch(
+                      decoration:
                           const InputDecoration(icon: Icon(Icons.token)),
                       name: "enable_plexmatch",
                       title: const Text("Plex 刮削支持")),
@@ -92,16 +101,17 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                 SizedBox(
                   width: 300,
                   child: FormBuilderSwitch(
-                      decoration:
-                          const InputDecoration(icon: Icon(Icons.library_books), helperText: "emby/kodi等软件刮削需要"),
+                      decoration: const InputDecoration(
+                          icon: Icon(Icons.library_books),
+                          helperText: "emby/kodi等软件刮削需要"),
                       name: "enable_nfo",
                       title: const Text("nfo 文件支持")),
                 ),
                 SizedBox(
                   width: 300,
                   child: FormBuilderSwitch(
-                      decoration:
-                          const InputDecoration(icon: Icon(Icons.remove_circle)),
+                      decoration: const InputDecoration(
+                          icon: Icon(Icons.remove_circle)),
                       name: "allow_qiangban",
                       title: const Text("是否下载枪版资源")),
                 ),
@@ -124,6 +134,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                                     logLevel: values["log_level"],
                                     proxy: values["proxy"],
                                     allowQiangban: values["allow_qiangban"],
+                                    enableAdult: values["enable_adult"],
                                     enableNfo: values["enable_nfo"],
                                     enablePlexmatch:
                                         values["enable_plexmatch"]))

@@ -14,13 +14,14 @@ import (
 )
 
 type GeneralSettings struct {
-	TmdbApiKey      string `json:"tmdb_api_key"`
-	DownloadDir     string `json:"download_dir"`
-	LogLevel        string `json:"log_level"`
-	Proxy           string `json:"proxy"`
-	EnablePlexmatch bool   `json:"enable_plexmatch"`
-	EnableNfo       bool   `json:"enable_nfo"`
-	AllowQiangban   bool   `json:"allow_qiangban"`
+	TmdbApiKey         string `json:"tmdb_api_key"`
+	DownloadDir        string `json:"download_dir"`
+	LogLevel           string `json:"log_level"`
+	Proxy              string `json:"proxy"`
+	EnablePlexmatch    bool   `json:"enable_plexmatch"`
+	EnableNfo          bool   `json:"enable_nfo"`
+	AllowQiangban      bool   `json:"allow_qiangban"`
+	EnableAdultContent bool   `json:"enable_adult_content"`
 }
 
 func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
@@ -68,6 +69,11 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 	} else {
 		s.db.SetSetting(db.SettingNfoSupportEnabled, "false")
 	}
+	if in.EnableAdultContent {
+		s.db.SetSetting(db.SettingEnableTmdbAdultContent, "true")
+	} else {
+		s.db.SetSetting(db.SettingEnableTmdbAdultContent, "false")
+	}
 
 	return nil, nil
 }
@@ -79,6 +85,7 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	plexmatchEnabled := s.db.GetSetting(db.SettingPlexMatchEnabled)
 	allowQiangban := s.db.GetSetting(db.SettingAllowQiangban)
 	enableNfo := s.db.GetSetting(db.SettingNfoSupportEnabled)
+	enableAdult := s.db.GetSetting(db.SettingEnableTmdbAdultContent)
 	return &GeneralSettings{
 		TmdbApiKey:      tmdb,
 		DownloadDir:     downloadDir,
@@ -87,6 +94,7 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 		EnablePlexmatch: plexmatchEnabled == "true",
 		AllowQiangban:   allowQiangban == "true",
 		EnableNfo:       enableNfo == "true",
+		EnableAdultContent: enableAdult == "true",
 	}, nil
 }
 

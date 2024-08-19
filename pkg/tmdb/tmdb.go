@@ -15,9 +15,10 @@ import (
 type Client struct {
 	apiKey     string
 	tmdbClient *tmdb.Client
+	enableAdultContent bool
 }
 
-func NewClient(apiKey, proxyUrl string) (*Client, error) {
+func NewClient(apiKey, proxyUrl string, enableAdultContent bool) (*Client, error) {
 
 	tmdbClient, err := tmdb.Init(apiKey)
 	if err != nil {
@@ -44,6 +45,7 @@ func NewClient(apiKey, proxyUrl string) (*Client, error) {
 	return &Client{
 		apiKey:     apiKey,
 		tmdbClient: tmdbClient,
+		enableAdultContent: enableAdultContent,
 	}, nil
 }
 
@@ -114,6 +116,9 @@ func (c *Client) SearchMedia(query string, lang string, page int) (*SearchResult
 	}
 	options := withLangOption(lang)
 	options["page"] = strconv.Itoa(page)
+	if c.enableAdultContent {
+		options["include_adult"] = "true"
+	}
 	res, err := c.tmdbClient.GetSearchMulti(query, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "query imdb")
