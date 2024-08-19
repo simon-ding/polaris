@@ -101,6 +101,13 @@ func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
 	}
 	name := d1.Title
 
+	if isJav(d1) {
+		javid := s.getJavid(id)
+		if javid != "" {
+			return gin.H{"name": javid}, nil
+		}
+	}
+
 	if s.language == db.LanguageCN {
 		en, err := s.MustTMDB().GetMovieDetails(id, db.LanguageEN)
 		if err != nil {
