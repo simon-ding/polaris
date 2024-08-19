@@ -170,6 +170,20 @@ func (mc *MediaCreate) SetNillableLimiter(sl *schema.MediaLimiter) *MediaCreate 
 	return mc
 }
 
+// SetExtras sets the "extras" field.
+func (mc *MediaCreate) SetExtras(se schema.MediaExtras) *MediaCreate {
+	mc.mutation.SetExtras(se)
+	return mc
+}
+
+// SetNillableExtras sets the "extras" field if the given value is not nil.
+func (mc *MediaCreate) SetNillableExtras(se *schema.MediaExtras) *MediaCreate {
+	if se != nil {
+		mc.SetExtras(*se)
+	}
+	return mc
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mc *MediaCreate) AddEpisodeIDs(ids ...int) *MediaCreate {
 	mc.mutation.AddEpisodeIDs(ids...)
@@ -358,6 +372,10 @@ func (mc *MediaCreate) createSpec() (*Media, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Limiter(); ok {
 		_spec.SetField(media.FieldLimiter, field.TypeJSON, value)
 		_node.Limiter = value
+	}
+	if value, ok := mc.mutation.Extras(); ok {
+		_spec.SetField(media.FieldExtras, field.TypeJSON, value)
+		_node.Extras = value
 	}
 	if nodes := mc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -270,6 +270,26 @@ func (mu *MediaUpdate) ClearLimiter() *MediaUpdate {
 	return mu
 }
 
+// SetExtras sets the "extras" field.
+func (mu *MediaUpdate) SetExtras(se schema.MediaExtras) *MediaUpdate {
+	mu.mutation.SetExtras(se)
+	return mu
+}
+
+// SetNillableExtras sets the "extras" field if the given value is not nil.
+func (mu *MediaUpdate) SetNillableExtras(se *schema.MediaExtras) *MediaUpdate {
+	if se != nil {
+		mu.SetExtras(*se)
+	}
+	return mu
+}
+
+// ClearExtras clears the value of the "extras" field.
+func (mu *MediaUpdate) ClearExtras() *MediaUpdate {
+	mu.mutation.ClearExtras()
+	return mu
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mu *MediaUpdate) AddEpisodeIDs(ids ...int) *MediaUpdate {
 	mu.mutation.AddEpisodeIDs(ids...)
@@ -427,6 +447,12 @@ func (mu *MediaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if mu.mutation.LimiterCleared() {
 		_spec.ClearField(media.FieldLimiter, field.TypeJSON)
+	}
+	if value, ok := mu.mutation.Extras(); ok {
+		_spec.SetField(media.FieldExtras, field.TypeJSON, value)
+	}
+	if mu.mutation.ExtrasCleared() {
+		_spec.ClearField(media.FieldExtras, field.TypeJSON)
 	}
 	if mu.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -733,6 +759,26 @@ func (muo *MediaUpdateOne) ClearLimiter() *MediaUpdateOne {
 	return muo
 }
 
+// SetExtras sets the "extras" field.
+func (muo *MediaUpdateOne) SetExtras(se schema.MediaExtras) *MediaUpdateOne {
+	muo.mutation.SetExtras(se)
+	return muo
+}
+
+// SetNillableExtras sets the "extras" field if the given value is not nil.
+func (muo *MediaUpdateOne) SetNillableExtras(se *schema.MediaExtras) *MediaUpdateOne {
+	if se != nil {
+		muo.SetExtras(*se)
+	}
+	return muo
+}
+
+// ClearExtras clears the value of the "extras" field.
+func (muo *MediaUpdateOne) ClearExtras() *MediaUpdateOne {
+	muo.mutation.ClearExtras()
+	return muo
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (muo *MediaUpdateOne) AddEpisodeIDs(ids ...int) *MediaUpdateOne {
 	muo.mutation.AddEpisodeIDs(ids...)
@@ -920,6 +966,12 @@ func (muo *MediaUpdateOne) sqlSave(ctx context.Context) (_node *Media, err error
 	}
 	if muo.mutation.LimiterCleared() {
 		_spec.ClearField(media.FieldLimiter, field.TypeJSON)
+	}
+	if value, ok := muo.mutation.Extras(); ok {
+		_spec.SetField(media.FieldExtras, field.TypeJSON, value)
+	}
+	if muo.mutation.ExtrasCleared() {
+		_spec.ClearField(media.FieldExtras, field.TypeJSON)
 	}
 	if muo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{

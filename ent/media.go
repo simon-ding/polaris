@@ -47,6 +47,8 @@ type Media struct {
 	DownloadHistoryEpisodes bool `json:"download_history_episodes,omitempty"`
 	// Limiter holds the value of the "limiter" field.
 	Limiter schema.MediaLimiter `json:"limiter,omitempty"`
+	// Extras holds the value of the "extras" field.
+	Extras schema.MediaExtras `json:"extras,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MediaQuery when eager-loading is set.
 	Edges        MediaEdges `json:"edges"`
@@ -76,7 +78,7 @@ func (*Media) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case media.FieldLimiter:
+		case media.FieldLimiter, media.FieldExtras:
 			values[i] = new([]byte)
 		case media.FieldDownloadHistoryEpisodes:
 			values[i] = new(sql.NullBool)
@@ -193,6 +195,14 @@ func (m *Media) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field limiter: %w", err)
 				}
 			}
+		case media.FieldExtras:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field extras", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &m.Extras); err != nil {
+					return fmt.Errorf("unmarshal field extras: %w", err)
+				}
+			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -275,6 +285,9 @@ func (m *Media) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("limiter=")
 	builder.WriteString(fmt.Sprintf("%v", m.Limiter))
+	builder.WriteString(", ")
+	builder.WriteString("extras=")
+	builder.WriteString(fmt.Sprintf("%v", m.Extras))
 	builder.WriteByte(')')
 	return builder.String()
 }

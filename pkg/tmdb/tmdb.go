@@ -209,6 +209,11 @@ func (c *Client) GetTVAlternativeTitles(id int, language string) (*tmdb.TVAltern
 	return c.tmdbClient.GetTVAlternativeTitles(id, withLangOption(language))
 }
 
+func (c *Client) GetMovieAlternativeTitles(id int, language string) (*tmdb.MovieAlternativeTitles, error) {
+	return c.tmdbClient.GetMovieAlternativeTitles(id, withLangOption(language))
+}
+
+
 func wrapLanguage(lang string) string {
 	if lang == "" {
 		lang = "zh-CN"

@@ -13,6 +13,7 @@ import (
 	"polaris/ent/schema"
 	"polaris/log"
 	"strconv"
+	"strings"
 	"time"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
@@ -174,6 +175,26 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 	return nil, nil
 }
 
+func isJav(detail *tmdb.MovieDetails) bool {
+	if detail.Adult && len(detail.ProductionCountries)> 0 && strings.ToUpper(detail.ProductionCountries[0].Iso3166_1)  == "JP" {
+		return true
+	}
+	return false
+}
+
+func (s *Server) getJavid(id int) string {
+	alters, err := s.MustTMDB().GetMovieAlternativeTitles(id, s.language)
+	if err != nil {
+		return ""
+	}
+	for _, t := range alters.Titles {
+		if t.Iso3166_1 == "JP" && t.Type == "" {
+			return t.Title
+		}
+	}
+	return ""
+}
+
 func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 	var in addWatchlistIn
 	if err := c.ShouldBindJSON(&in); err != nil {
@@ -196,6 +217,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 	}
 	log.Infof("find detail for movie id %d: %v", in.TmdbID, detail)
 
+
 	epid, err := s.db.SaveEposideDetail(&ent.Episode{
 		SeasonNumber:  1,
 		EpisodeNumber: 1,
@@ -209,7 +231,7 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 	}
 	log.Infof("added dummy episode for movie: %v", nameEn)
 
-	r, err := s.db.AddMediaWatchlist(&ent.Media{
+	movie := ent.Media{
 		TmdbID:       int(detail.ID),
 		ImdbID:       detail.IMDbID,
 		MediaType:    media.MediaTypeMovie,
@@ -222,7 +244,19 @@ func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
 		StorageID:    in.StorageID,
 		TargetDir:    in.Folder,
 		Limiter:      schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
-	}, []int{epid})
+	}
+	if isJav(detail) {
+		javid := s.getJavid(in.TmdbID)
+		movie.Extras = schema.MediaExtras{
+			IsJav: true,
+			JavId: javid,
+		}
+	}
+	if detail.Adult {
+		movie.Extras.IsAdult = true
+	}
+	
+	r, err := s.db.AddMediaWatchlist(&movie, []int{epid})
 	if err != nil {
 		return nil, errors.Wrap(err, "add to list")
 	}

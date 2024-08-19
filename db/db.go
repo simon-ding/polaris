@@ -150,6 +150,7 @@ func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, er
 		SetTargetDir(m.TargetDir).
 		SetDownloadHistoryEpisodes(m.DownloadHistoryEpisodes).
 		SetLimiter(m.Limiter).
+		SetExtras(m.Extras).
 		AddEpisodeIDs(episodes...).
 		Save(context.TODO())
 	return r, err
