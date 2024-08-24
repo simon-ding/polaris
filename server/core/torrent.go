@@ -160,7 +160,7 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	}
 
 	res := searchWithTorznab(db1, movieDetail.NameEn, movieDetail.NameCn, movieDetail.OriginalName)
-	if movieDetail.Extras.IsJav {
+	if movieDetail.Extras.IsJav(){
 		res1 := searchWithTorznab(db1, movieDetail.Extras.JavId)
 		res = append(res, res1...)
 	}
@@ -180,7 +180,7 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 			if !torrentNameOk(movieDetail, r.Name) {
 				continue
 			}
-			if !movieDetail.Extras.IsJav {
+			if !movieDetail.Extras.IsJav() {
 				ss := strings.Split(movieDetail.AirDate, "-")[0]
 				year, _ := strconv.Atoi(ss)
 				if meta.Year != year && meta.Year != year-1 && meta.Year != year+1 { //year not match
@@ -301,7 +301,7 @@ func dedup(list []torznab.Result) []torznab.Result {
 }
 
 func torrentNameOk(detail *db.MediaDetails, torrentName string) bool {
-	if detail.Extras.IsJav && isNameAcceptable(torrentName, detail.Extras.JavId) {
+	if detail.Extras.IsJav() && isNameAcceptable(torrentName, detail.Extras.JavId) {
 		return true
 	}
 	return isNameAcceptable(torrentName, detail.NameCn) || isNameAcceptable(torrentName, detail.NameEn) ||

@@ -47,7 +47,16 @@ type MediaLimiter struct {
 }
 
 type MediaExtras struct {
-	IsAdult bool   `json:"is_adult"`
-	IsJav   bool   `json:"is_jav"`
-	JavId   string `json:"javid"`
+	IsAdultMovie bool   `json:"is_adult_movie"`
+	JavId        string `json:"javid"`
+	//OriginCountry    []string `json:"origin_country"`
+	OriginalLanguage string `json:"original_language"`
+	Genres []struct {
+		ID   int64  `json:"id"`
+		Name string `json:"name"`
+	} `json:"genres"`
+}
+
+func (m *MediaExtras) IsJav() bool {
+	return m.IsAdultMovie && m.JavId != ""
 }
