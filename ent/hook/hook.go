@@ -44,6 +44,18 @@ func (f HistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.HistoryMutation", m)
 }
 
+// The ImportListFunc type is an adapter to allow the use of ordinary
+// function as ImportList mutator.
+type ImportListFunc func(context.Context, *ent.ImportListMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ImportListFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ImportListMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ImportListMutation", m)
+}
+
 // The IndexersFunc type is an adapter to allow the use of ordinary
 // function as Indexers mutator.
 type IndexersFunc func(context.Context, *ent.IndexersMutation) (ent.Value, error)

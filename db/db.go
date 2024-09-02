@@ -9,6 +9,7 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
 	"polaris/ent/history"
+	"polaris/ent/importlist"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
 	"polaris/ent/schema"
@@ -579,4 +580,26 @@ func (c *Client) UpdateEpisodeTargetFile(id int, filename string) error {
 
 func (c *Client) GetSeasonEpisodes(mediaId, seasonNum int) ([]*ent.Episode, error) {
 	return c.ent.Episode.Query().Where(episode.MediaID(mediaId), episode.SeasonNumber(seasonNum)).All(context.Background())
+}
+
+func (c *Client) GetAllImportLists() ([]*ent.ImportList, error) {
+	return c.ent.ImportList.Query().All(context.Background())
+}
+
+func (c *Client) AddImportlist(il *ent.ImportList) error {
+	count, err := c.ent.ImportList.Query().Where(importlist.Name(il.Name)).Count(context.Background())
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		//edit exist record
+		return c.ent.ImportList.Update().Where(importlist.Name(il.Name)).
+			SetURL(il.URL).SetQulity(il.Qulity).SetType(il.Type).SetStorageID(il.StorageID).Exec(context.Background())
+	}
+	return c.ent.ImportList.Create().SetName(il.Name).SetURL(il.URL).SetQulity(il.Qulity).SetStorageID(il.StorageID).
+		SetType(il.Type).Exec(context.Background())
+}
+
+func (c *Client) DeleteImportlist(id int) error {
+	return c.ent.ImportList.DeleteOneID(id).Exec(context.TODO())
 }

@@ -36,6 +36,9 @@ class APIs {
   static final logFilesUrl = "$_baseUrl/api/v1/setting/logfiles";
   static final aboutUrl = "$_baseUrl/api/v1/setting/about";
   static final changeMonitoringUrl = "$_baseUrl/api/v1/setting/monitoring";
+  static final addImportlistUrl = "$_baseUrl/api/v1/importlist/add";
+  static final deleteImportlistUrl = "$_baseUrl/api/v1/importlist/delete";
+  static final getAllImportlists = "$_baseUrl/api/v1/importlist/";
 
   static final notifierAllUrl = "$_baseUrl/api/v1/notifier/all";
   static final notifierDeleteUrl = "$_baseUrl/api/v1/notifier/id/";

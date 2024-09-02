@@ -1,22 +1,16 @@
 package server
 
 import (
-	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"polaris/db"
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/media"
-	"polaris/ent/schema"
 	"polaris/log"
+	"polaris/server/core"
 	"strconv"
-	"strings"
-	"time"
 
-	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -73,245 +67,19 @@ type addWatchlistIn struct {
 }
 
 func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
-	var in addWatchlistIn
+	var in core.AddWatchlistIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
-	log.Debugf("add tv watchlist input %+v", in)
-	if in.Folder == "" {
-		return nil, errors.New("folder should be provided")
-	}
-	detailCn, err := s.MustTMDB().GetTvDetails(in.TmdbID, db.LanguageCN)
-	if err != nil {
-		return nil, errors.Wrap(err, "get tv detail")
-	}
-	var nameCn = detailCn.Name
-
-	detailEn, _ := s.MustTMDB().GetTvDetails(in.TmdbID, db.LanguageEN)
-	var nameEn = detailEn.Name
-	var detail *tmdb.TVDetails
-	if s.language == "" || s.language == db.LanguageCN {
-		detail = detailCn
-	} else {
-		detail = detailEn
-	}
-	log.Infof("find detail for tv id %d: %v", in.TmdbID, detail)
-
-	var epIds []int
-	for _, season := range detail.Seasons {
-		seasonId := season.SeasonNumber
-		se, err := s.MustTMDB().GetSeasonDetails(int(detail.ID), seasonId, s.language)
-		if err != nil {
-			log.Errorf("get season detail (%s) error: %v", detail.Name, err)
-			continue
-		}
-		for _, ep := range se.Episodes {
-			shouldMonitor := false
-			//如果设置下载往期剧集，则监控所有剧集。如果没有则监控未上映的剧集，考虑时差等问题留24h余量
-			if in.DownloadHistoryEpisodes {
-				shouldMonitor = true
-			} else {
-				t, err := time.Parse("2006-01-02", ep.AirDate)
-				if err != nil {
-					log.Error("air date not known, will monitor: %v", ep.AirDate)
-					shouldMonitor = true
-
-				} else {
-					if time.Since(t) < 24*time.Hour { //monitor episode air 24h before now
-						shouldMonitor = true
-					}
-				}
-			}
-
-			epid, err := s.db.SaveEposideDetail(&ent.Episode{
-				SeasonNumber:  seasonId,
-				EpisodeNumber: ep.EpisodeNumber,
-				Title:         ep.Name,
-				Overview:      ep.Overview,
-				AirDate:       ep.AirDate,
-				Monitored:     shouldMonitor,
-			})
-			if err != nil {
-				log.Errorf("save episode info error: %v", err)
-				continue
-			}
-			epIds = append(epIds, epid)
-		}
-	}
-	m := &ent.Media{
-		TmdbID:                  int(detail.ID),
-		ImdbID:                  detail.IMDbID,
-		MediaType:               media.MediaTypeTv,
-		NameCn:                  nameCn,
-		NameEn:                  nameEn,
-		OriginalName:            detail.OriginalName,
-		Overview:                detail.Overview,
-		AirDate:                 detail.FirstAirDate,
-		Resolution:              media.Resolution(in.Resolution),
-		StorageID:               in.StorageID,
-		TargetDir:               in.Folder,
-		DownloadHistoryEpisodes: in.DownloadHistoryEpisodes,
-		Limiter:                 schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
-		Extras: schema.MediaExtras{
-			OriginalLanguage: detail.OriginalLanguage,
-			Genres:           detail.Genres,
-		},
-	}
-
-	r, err := s.db.AddMediaWatchlist(m, epIds)
-	if err != nil {
-		return nil, errors.Wrap(err, "add to list")
-	}
-	go func() {
-		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
-			log.Errorf("download poster error: %v", err)
-		}
-		if err := s.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
-			log.Errorf("download poster error: %v", err)
-		}
-		if err := s.core.CheckDownloadedSeriesFiles(r); err != nil {
-			log.Errorf("check downloaded files error: %v", err)
-		}
-
-	}()
-
-	log.Infof("add tv %s to watchlist success", detail.Name)
-	return nil, nil
-}
-
-func isJav(detail *tmdb.MovieDetails) bool {
-	if detail.Adult && len(detail.ProductionCountries) > 0 && strings.ToUpper(detail.ProductionCountries[0].Iso3166_1) == "JP" {
-		return true
-	}
-	return false
-}
-
-func (s *Server) getJavid(id int) string {
-	alters, err := s.MustTMDB().GetMovieAlternativeTitles(id, s.language)
-	if err != nil {
-		return ""
-	}
-	for _, t := range alters.Titles {
-		if t.Iso3166_1 == "JP" && t.Type == "" {
-			return t.Title
-		}
-	}
-	return ""
+	return s.core.AddTv2Watchlist(in)
 }
 
 func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
-	var in addWatchlistIn
+	var in core.AddWatchlistIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
-	log.Infof("add movie watchlist input: %+v", in)
-	detailCn, err := s.MustTMDB().GetMovieDetails(in.TmdbID, db.LanguageCN)
-	if err != nil {
-		return nil, errors.Wrap(err, "get movie detail")
-	}
-	var nameCn = detailCn.Title
-
-	detailEn, _ := s.MustTMDB().GetMovieDetails(in.TmdbID, db.LanguageEN)
-	var nameEn = detailEn.Title
-	var detail *tmdb.MovieDetails
-	if s.language == "" || s.language == db.LanguageCN {
-		detail = detailCn
-	} else {
-		detail = detailEn
-	}
-	log.Infof("find detail for movie id %d: %v", in.TmdbID, detail)
-
-	epid, err := s.db.SaveEposideDetail(&ent.Episode{
-		SeasonNumber:  1,
-		EpisodeNumber: 1,
-		Title:         "dummy episode for movies",
-		Overview:      "dummy episode for movies",
-		AirDate:       detail.ReleaseDate,
-		Monitored:     true,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "add dummy episode")
-	}
-	log.Infof("added dummy episode for movie: %v", nameEn)
-
-	movie := ent.Media{
-		TmdbID:       int(detail.ID),
-		ImdbID:       detail.IMDbID,
-		MediaType:    media.MediaTypeMovie,
-		NameCn:       nameCn,
-		NameEn:       nameEn,
-		OriginalName: detail.OriginalTitle,
-		Overview:     detail.Overview,
-		AirDate:      detail.ReleaseDate,
-		Resolution:   media.Resolution(in.Resolution),
-		StorageID:    in.StorageID,
-		TargetDir:    in.Folder,
-		Limiter:      schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
-	}
-
-	extras := schema.MediaExtras{
-		IsAdultMovie:     detail.Adult,
-		OriginalLanguage: detail.OriginalLanguage,
-		Genres:           detail.Genres,
-	}
-	if isJav(detail) {
-		javid := s.getJavid(in.TmdbID)
-		extras.JavId = javid
-	}
-
-	movie.Extras = extras
-	r, err := s.db.AddMediaWatchlist(&movie, []int{epid})
-	if err != nil {
-		return nil, errors.Wrap(err, "add to list")
-	}
-	go func() {
-		if err := s.downloadPoster(detail.PosterPath, r.ID); err != nil {
-			log.Errorf("download poster error: %v", err)
-		}
-		if err := s.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
-			log.Errorf("download backdrop error: %v", err)
-		}
-	}()
-
-	log.Infof("add movie %s to watchlist success", detail.Title)
-	return nil, nil
-
-}
-
-func (s *Server) downloadBackdrop(path string, mediaID int) error {
-	url := "https://image.tmdb.org/t/p/original" + path
-	return s.downloadImage(url, mediaID, "backdrop.jpg")
-}
-
-func (s *Server) downloadPoster(path string, mediaID int) error {
-	var url = "https://image.tmdb.org/t/p/original" + path
-
-	return s.downloadImage(url, mediaID, "poster.jpg")
-}
-
-func (s *Server) downloadImage(url string, mediaID int, name string) error {
-
-	log.Infof("try to download image: %v", url)
-	var resp, err = http.Get(url)
-	if err != nil {
-		return errors.Wrap(err, "http get")
-	}
-	targetDir := fmt.Sprintf("%v/%d", db.ImgPath, mediaID)
-	os.MkdirAll(targetDir, 0777)
-	//ext := filepath.Ext(path)
-	targetFile := filepath.Join(targetDir, name)
-	f, err := os.Create(targetFile)
-	if err != nil {
-		return errors.Wrap(err, "new file")
-	}
-	defer f.Close()
-	_, err = io.Copy(f, resp.Body)
-	if err != nil {
-		return errors.Wrap(err, "copy http response")
-	}
-	log.Infof("image successfully downlaoded: %v", targetFile)
-	return nil
-
+	return s.core.AddMovie2Watchlist(in)
 }
 
 type MediaWithStatus struct {

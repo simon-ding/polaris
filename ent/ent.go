@@ -9,6 +9,7 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
 	"polaris/ent/history"
+	"polaris/ent/importlist"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
 	"polaris/ent/notificationclient"
@@ -83,6 +84,7 @@ func checkColumn(table, column string) error {
 			downloadclients.Table:    downloadclients.ValidColumn,
 			episode.Table:            episode.ValidColumn,
 			history.Table:            history.ValidColumn,
+			importlist.Table:         importlist.ValidColumn,
 			indexers.Table:           indexers.ValidColumn,
 			media.Table:              media.ValidColumn,
 			notificationclient.Table: notificationclient.ValidColumn,

@@ -15,6 +15,9 @@ type Episode func(*sql.Selector)
 // History is the predicate function for history builders.
 type History func(*sql.Selector)
 
+// ImportList is the predicate function for importlist builders.
+type ImportList func(*sql.Selector)
+
 // Indexers is the predicate function for indexers builders.
 type Indexers func(*sql.Selector)
 

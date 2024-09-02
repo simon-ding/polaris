@@ -3,12 +3,10 @@ package server
 import (
 	"fmt"
 	"polaris/db"
-	"regexp"
 
 	"polaris/log"
 	"polaris/pkg/storage"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -61,31 +59,10 @@ func (s *Server) SuggestedSeriesFolderName(c *gin.Context) (interface{}, error) 
 	if err != nil {
 		return nil, fmt.Errorf("id is not int: %v", ids)
 	}
-	d, err := s.MustTMDB().GetTvDetails(id, s.language)
+	name, err := s.core.SuggestedSeriesFolderName(id)
 	if err != nil {
-		return nil, errors.Wrap(err, "get tv details")
+		return nil, err
 	}
-
-	name := d.Name
-
-	if s.language == db.LanguageCN {
-		en, err := s.MustTMDB().GetTvDetails(id, db.LanguageEN)
-		if err != nil {
-			log.Errorf("get en tv detail error: %v", err)
-		} else {
-			name = fmt.Sprintf("%s %s", d.Name, en.Name)
-		}
-	}
-	//remove extra characters
-	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(strings.ToLower(name), " ")
-	name = strings.Join(strings.Fields(name), " ")
-	year := strings.Split(d.FirstAirDate, "-")[0]
-	if year != "" {
-		name = fmt.Sprintf("%s (%s)", name, year)
-	}
-
-	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
 	return gin.H{"name": name}, nil
 }
 
@@ -95,36 +72,9 @@ func (s *Server) SuggestedMovieFolderName(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("id is not int: %v", ids)
 	}
-	d1, err := s.MustTMDB().GetMovieDetails(id, s.language)
+	name, err := s.core.SuggestedMovieFolderName(id)
 	if err != nil {
-		return nil, errors.Wrap(err, "get movie details")
+		return nil, err
 	}
-	name := d1.Title
-
-	if isJav(d1) {
-		javid := s.getJavid(id)
-		if javid != "" {
-			return gin.H{"name": javid}, nil
-		}
-	}
-
-	if s.language == db.LanguageCN {
-		en, err := s.MustTMDB().GetMovieDetails(id, db.LanguageEN)
-		if err != nil {
-			log.Errorf("get en movie detail error: %v", err)
-		} else {
-			name = fmt.Sprintf("%s %s", d1.Title, en.Title)
-		}
-	}
-	//remove extra characters
-	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(strings.ToLower(name), " ")
-	name = strings.Join(strings.Fields(name), " ")
-	year := strings.Split(d1.ReleaseDate, "-")[0]
-	if year != "" {
-		name = fmt.Sprintf("%s (%s)", name, year)
-	}
-
-	log.Infof("tv series of tmdb id %v suggestting name is %v", id, name)
 	return gin.H{"name": name}, nil
 }

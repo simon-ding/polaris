@@ -23,6 +23,9 @@ func (c *Client) addSysCron() {
 		c.downloadAllMovies()
 	})
 	c.mustAddCron("0 0 */12 * * *", c.checkAllSeriesNewSeason)
+	c.mustAddCron("0 0/30 * * * *", func() {
+		c.periodicallyUpdateImportlist()
+	})
 	c.cron.Start()
 }
 

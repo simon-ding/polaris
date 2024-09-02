@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:ui/activity.dart';
+import 'package:ui/calendar.dart';
 import 'package:ui/login_page.dart';
 import 'package:ui/movie_watchlist.dart';
 import 'package:ui/providers/APIs.dart';
@@ -14,7 +16,7 @@ import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/utils.dart';
 
 void main() {
-  runApp(const MyApp());
+  initializeDateFormatting().then((_) => runApp(MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -219,6 +221,9 @@ class _MainSkeletonState extends State<MainSkeleton> {
                   (BuildContext context, SearchController controller) {
             return [Text("dadada")];
           }),
+          IconButton(
+              onPressed: () => showCalendar(context),
+              icon: Icon(Icons.calendar_month)),
           MenuAnchor(
             menuChildren: [
               MenuItemButton(

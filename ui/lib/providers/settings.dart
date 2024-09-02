@@ -21,6 +21,10 @@ var storageSettingProvider =
     AsyncNotifierProvider.autoDispose<StorageSettingData, List<Storage>>(
         StorageSettingData.new);
 
+var importlistProvider =
+    AsyncNotifierProvider.autoDispose<ImportListData, List<ImportList>>(
+        ImportListData.new);
+
 class EditSettingData extends AutoDisposeAsyncNotifier<GeneralSetting> {
   @override
   FutureOr<GeneralSetting> build() async {
@@ -72,7 +76,7 @@ class GeneralSetting {
         downloadDIr: json["download_dir"],
         logLevel: json["log_level"],
         proxy: json["proxy"],
-        enableAdult: json["enable_adult_content"]??false,
+        enableAdult: json["enable_adult_content"] ?? false,
         allowQiangban: json["allow_qiangban"] ?? false,
         enableNfo: json["enable_nfo"] ?? false,
         enablePlexmatch: json["enable_plexmatch"] ?? false);
@@ -411,5 +415,79 @@ class About {
       uptime:
           Duration(microseconds: (json["uptime"] / 1000.0 as double).round()),
     );
+  }
+}
+
+class ImportList {
+  final int? id;
+  final String? name;
+  final String? url;
+  final String? qulity;
+  final int? storageId;
+  final String? type;
+  ImportList({
+    this.id,
+    this.name,
+    this.url,
+    this.qulity,
+    this.storageId,
+    this.type,
+  });
+
+  factory ImportList.fromJson(Map<String, dynamic> json) {
+    return ImportList(
+        id: json["id"],
+        name: json["name"],
+        url: json["url"],
+        qulity: json["qulity"],
+        type: json["type"],
+        storageId: json["storage_id"]);
+  }
+
+  Map<String, dynamic> tojson() => {
+        "name": name,
+        "url": url,
+        "qulity": qulity,
+        "type": type,
+        "storage_id": storageId
+      };
+}
+
+class ImportListData extends AutoDisposeAsyncNotifier<List<ImportList>> {
+  @override
+  FutureOr<List<ImportList>> build() async {
+    final dio = APIs.getDio();
+    var resp = await dio.get(APIs.getAllImportlists);
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    List<ImportList> list = List.empty(growable: true);
+
+    for (var item in sp.data as List) {
+      var il = ImportList.fromJson(item);
+      list.add(il);
+    }
+    return list;
+  }
+
+  addImportlist(ImportList il) async {
+    final dio = APIs.getDio();
+    var resp = await dio.post(APIs.addImportlistUrl, data: il.tojson());
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
+  }
+
+  deleteimportlist(int id) async {
+    final dio = APIs.getDio();
+    var resp = await dio.post(APIs.deleteImportlistUrl, data: {"id": id});
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
   }
 }

@@ -213,6 +213,19 @@ func (c *Client) GetMovieAlternativeTitles(id int, language string) (*tmdb.Movie
 	return c.tmdbClient.GetMovieAlternativeTitles(id, withLangOption(language))
 }
 
+func (c *Client) GetByImdbId(imdbId string, lang string)(*tmdb.FindByID, error) {
+	m := withLangOption(lang)
+	m["external_source"] = "imdb_id"
+	return c.tmdbClient.GetFindByID(imdbId, m)
+}
+
+func (c *Client) GetByTvdbId(imdbId string, lang string)(*tmdb.FindByID, error) {
+	m := withLangOption(lang)
+	m["external_source"] = "tvdb_id"
+	return c.tmdbClient.GetFindByID(imdbId, m)
+}
+
+
 
 func wrapLanguage(lang string) string {
 	if lang == "" {

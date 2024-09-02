@@ -120,6 +120,12 @@ func (s *Server) Serve() error {
 		notifier.DELETE("/id/:id", HttpHandler(s.DeleteNotificationClient))
 		notifier.POST("/add", HttpHandler(s.AddNotificationClient))
 	}
+	importlist := api.Group("/importlist")
+	{
+		importlist.GET("/", HttpHandler(s.getAllImportLists))
+		importlist.POST("/add", HttpHandler(s.addImportlist))
+		importlist.DELETE("/delete", HttpHandler(s.deleteImportList))
+	}
 
 	s.language = s.db.GetLanguage()
 	return s.r.Run(":8080")
@@ -132,7 +138,7 @@ func (s *Server) TMDB() (*tmdb.Client, error) {
 	}
 	proxy := s.db.GetSetting(db.SettingProxy)
 	adult := s.db.GetSetting(db.SettingEnableTmdbAdultContent)
-	return tmdb.NewClient(api, proxy, adult=="true")
+	return tmdb.NewClient(api, proxy, adult == "true")
 }
 
 func (s *Server) MustTMDB() *tmdb.Client {

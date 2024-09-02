@@ -14,6 +14,7 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
 	"polaris/ent/history"
+	"polaris/ent/importlist"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
 	"polaris/ent/notificationclient"
@@ -37,6 +38,8 @@ type Client struct {
 	Episode *EpisodeClient
 	// History is the client for interacting with the History builders.
 	History *HistoryClient
+	// ImportList is the client for interacting with the ImportList builders.
+	ImportList *ImportListClient
 	// Indexers is the client for interacting with the Indexers builders.
 	Indexers *IndexersClient
 	// Media is the client for interacting with the Media builders.
@@ -61,6 +64,7 @@ func (c *Client) init() {
 	c.DownloadClients = NewDownloadClientsClient(c.config)
 	c.Episode = NewEpisodeClient(c.config)
 	c.History = NewHistoryClient(c.config)
+	c.ImportList = NewImportListClient(c.config)
 	c.Indexers = NewIndexersClient(c.config)
 	c.Media = NewMediaClient(c.config)
 	c.NotificationClient = NewNotificationClientClient(c.config)
@@ -161,6 +165,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		DownloadClients:    NewDownloadClientsClient(cfg),
 		Episode:            NewEpisodeClient(cfg),
 		History:            NewHistoryClient(cfg),
+		ImportList:         NewImportListClient(cfg),
 		Indexers:           NewIndexersClient(cfg),
 		Media:              NewMediaClient(cfg),
 		NotificationClient: NewNotificationClientClient(cfg),
@@ -188,6 +193,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		DownloadClients:    NewDownloadClientsClient(cfg),
 		Episode:            NewEpisodeClient(cfg),
 		History:            NewHistoryClient(cfg),
+		ImportList:         NewImportListClient(cfg),
 		Indexers:           NewIndexersClient(cfg),
 		Media:              NewMediaClient(cfg),
 		NotificationClient: NewNotificationClientClient(cfg),
@@ -222,7 +228,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media,
+		c.DownloadClients, c.Episode, c.History, c.ImportList, c.Indexers, c.Media,
 		c.NotificationClient, c.Settings, c.Storage,
 	} {
 		n.Use(hooks...)
@@ -233,7 +239,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.DownloadClients, c.Episode, c.History, c.Indexers, c.Media,
+		c.DownloadClients, c.Episode, c.History, c.ImportList, c.Indexers, c.Media,
 		c.NotificationClient, c.Settings, c.Storage,
 	} {
 		n.Intercept(interceptors...)
@@ -249,6 +255,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Episode.mutate(ctx, m)
 	case *HistoryMutation:
 		return c.History.mutate(ctx, m)
+	case *ImportListMutation:
+		return c.ImportList.mutate(ctx, m)
 	case *IndexersMutation:
 		return c.Indexers.mutate(ctx, m)
 	case *MediaMutation:
@@ -676,6 +684,139 @@ func (c *HistoryClient) mutate(ctx context.Context, m *HistoryMutation) (Value, 
 		return (&HistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown History mutation op: %q", m.Op())
+	}
+}
+
+// ImportListClient is a client for the ImportList schema.
+type ImportListClient struct {
+	config
+}
+
+// NewImportListClient returns a client for the ImportList from the given config.
+func NewImportListClient(c config) *ImportListClient {
+	return &ImportListClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `importlist.Hooks(f(g(h())))`.
+func (c *ImportListClient) Use(hooks ...Hook) {
+	c.hooks.ImportList = append(c.hooks.ImportList, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `importlist.Intercept(f(g(h())))`.
+func (c *ImportListClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ImportList = append(c.inters.ImportList, interceptors...)
+}
+
+// Create returns a builder for creating a ImportList entity.
+func (c *ImportListClient) Create() *ImportListCreate {
+	mutation := newImportListMutation(c.config, OpCreate)
+	return &ImportListCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ImportList entities.
+func (c *ImportListClient) CreateBulk(builders ...*ImportListCreate) *ImportListCreateBulk {
+	return &ImportListCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ImportListClient) MapCreateBulk(slice any, setFunc func(*ImportListCreate, int)) *ImportListCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ImportListCreateBulk{err: fmt.Errorf("calling to ImportListClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ImportListCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ImportListCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ImportList.
+func (c *ImportListClient) Update() *ImportListUpdate {
+	mutation := newImportListMutation(c.config, OpUpdate)
+	return &ImportListUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ImportListClient) UpdateOne(il *ImportList) *ImportListUpdateOne {
+	mutation := newImportListMutation(c.config, OpUpdateOne, withImportList(il))
+	return &ImportListUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ImportListClient) UpdateOneID(id int) *ImportListUpdateOne {
+	mutation := newImportListMutation(c.config, OpUpdateOne, withImportListID(id))
+	return &ImportListUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ImportList.
+func (c *ImportListClient) Delete() *ImportListDelete {
+	mutation := newImportListMutation(c.config, OpDelete)
+	return &ImportListDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ImportListClient) DeleteOne(il *ImportList) *ImportListDeleteOne {
+	return c.DeleteOneID(il.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ImportListClient) DeleteOneID(id int) *ImportListDeleteOne {
+	builder := c.Delete().Where(importlist.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ImportListDeleteOne{builder}
+}
+
+// Query returns a query builder for ImportList.
+func (c *ImportListClient) Query() *ImportListQuery {
+	return &ImportListQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeImportList},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ImportList entity by its id.
+func (c *ImportListClient) Get(ctx context.Context, id int) (*ImportList, error) {
+	return c.Query().Where(importlist.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ImportListClient) GetX(ctx context.Context, id int) *ImportList {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ImportListClient) Hooks() []Hook {
+	return c.hooks.ImportList
+}
+
+// Interceptors returns the client interceptors.
+func (c *ImportListClient) Interceptors() []Interceptor {
+	return c.inters.ImportList
+}
+
+func (c *ImportListClient) mutate(ctx context.Context, m *ImportListMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ImportListCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ImportListUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ImportListUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ImportListDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ImportList mutation op: %q", m.Op())
 	}
 }
 
@@ -1363,11 +1504,11 @@ func (c *StorageClient) mutate(ctx context.Context, m *StorageMutation) (Value, 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		DownloadClients, Episode, History, Indexers, Media, NotificationClient,
-		Settings, Storage []ent.Hook
+		DownloadClients, Episode, History, ImportList, Indexers, Media,
+		NotificationClient, Settings, Storage []ent.Hook
 	}
 	inters struct {
-		DownloadClients, Episode, History, Indexers, Media, NotificationClient,
-		Settings, Storage []ent.Interceptor
+		DownloadClients, Episode, History, ImportList, Indexers, Media,
+		NotificationClient, Settings, Storage []ent.Interceptor
 	}
 )

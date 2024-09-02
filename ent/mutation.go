@@ -9,6 +9,7 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
 	"polaris/ent/history"
+	"polaris/ent/importlist"
 	"polaris/ent/indexers"
 	"polaris/ent/media"
 	"polaris/ent/notificationclient"
@@ -35,6 +36,7 @@ const (
 	TypeDownloadClients    = "DownloadClients"
 	TypeEpisode            = "Episode"
 	TypeHistory            = "History"
+	TypeImportList         = "ImportList"
 	TypeIndexers           = "Indexers"
 	TypeMedia              = "Media"
 	TypeNotificationClient = "NotificationClient"
@@ -2890,6 +2892,679 @@ func (m *HistoryMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *HistoryMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown History edge %s", name)
+}
+
+// ImportListMutation represents an operation that mutates the ImportList nodes in the graph.
+type ImportListMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	_type         *importlist.Type
+	url           *string
+	qulity        *string
+	storage_id    *int
+	addstorage_id *int
+	settings      *schema.ImportListSettings
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ImportList, error)
+	predicates    []predicate.ImportList
+}
+
+var _ ent.Mutation = (*ImportListMutation)(nil)
+
+// importlistOption allows management of the mutation configuration using functional options.
+type importlistOption func(*ImportListMutation)
+
+// newImportListMutation creates new mutation for the ImportList entity.
+func newImportListMutation(c config, op Op, opts ...importlistOption) *ImportListMutation {
+	m := &ImportListMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeImportList,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withImportListID sets the ID field of the mutation.
+func withImportListID(id int) importlistOption {
+	return func(m *ImportListMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ImportList
+		)
+		m.oldValue = func(ctx context.Context) (*ImportList, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ImportList.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withImportList sets the old ImportList of the mutation.
+func withImportList(node *ImportList) importlistOption {
+	return func(m *ImportListMutation) {
+		m.oldValue = func(context.Context) (*ImportList, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ImportListMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ImportListMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ImportListMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ImportListMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ImportList.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *ImportListMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ImportListMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ImportList entity.
+// If the ImportList object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImportListMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ImportListMutation) ResetName() {
+	m.name = nil
+}
+
+// SetType sets the "type" field.
+func (m *ImportListMutation) SetType(i importlist.Type) {
+	m._type = &i
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *ImportListMutation) GetType() (r importlist.Type, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the ImportList entity.
+// If the ImportList object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImportListMutation) OldType(ctx context.Context) (v importlist.Type, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *ImportListMutation) ResetType() {
+	m._type = nil
+}
+
+// SetURL sets the "url" field.
+func (m *ImportListMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *ImportListMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the ImportList entity.
+// If the ImportList object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImportListMutation) OldURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ClearURL clears the value of the "url" field.
+func (m *ImportListMutation) ClearURL() {
+	m.url = nil
+	m.clearedFields[importlist.FieldURL] = struct{}{}
+}
+
+// URLCleared returns if the "url" field was cleared in this mutation.
+func (m *ImportListMutation) URLCleared() bool {
+	_, ok := m.clearedFields[importlist.FieldURL]
+	return ok
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *ImportListMutation) ResetURL() {
+	m.url = nil
+	delete(m.clearedFields, importlist.FieldURL)
+}
+
+// SetQulity sets the "qulity" field.
+func (m *ImportListMutation) SetQulity(s string) {
+	m.qulity = &s
+}
+
+// Qulity returns the value of the "qulity" field in the mutation.
+func (m *ImportListMutation) Qulity() (r string, exists bool) {
+	v := m.qulity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldQulity returns the old "qulity" field's value of the ImportList entity.
+// If the ImportList object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImportListMutation) OldQulity(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldQulity is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldQulity requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldQulity: %w", err)
+	}
+	return oldValue.Qulity, nil
+}
+
+// ResetQulity resets all changes to the "qulity" field.
+func (m *ImportListMutation) ResetQulity() {
+	m.qulity = nil
+}
+
+// SetStorageID sets the "storage_id" field.
+func (m *ImportListMutation) SetStorageID(i int) {
+	m.storage_id = &i
+	m.addstorage_id = nil
+}
+
+// StorageID returns the value of the "storage_id" field in the mutation.
+func (m *ImportListMutation) StorageID() (r int, exists bool) {
+	v := m.storage_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStorageID returns the old "storage_id" field's value of the ImportList entity.
+// If the ImportList object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImportListMutation) OldStorageID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStorageID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStorageID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStorageID: %w", err)
+	}
+	return oldValue.StorageID, nil
+}
+
+// AddStorageID adds i to the "storage_id" field.
+func (m *ImportListMutation) AddStorageID(i int) {
+	if m.addstorage_id != nil {
+		*m.addstorage_id += i
+	} else {
+		m.addstorage_id = &i
+	}
+}
+
+// AddedStorageID returns the value that was added to the "storage_id" field in this mutation.
+func (m *ImportListMutation) AddedStorageID() (r int, exists bool) {
+	v := m.addstorage_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStorageID resets all changes to the "storage_id" field.
+func (m *ImportListMutation) ResetStorageID() {
+	m.storage_id = nil
+	m.addstorage_id = nil
+}
+
+// SetSettings sets the "settings" field.
+func (m *ImportListMutation) SetSettings(sls schema.ImportListSettings) {
+	m.settings = &sls
+}
+
+// Settings returns the value of the "settings" field in the mutation.
+func (m *ImportListMutation) Settings() (r schema.ImportListSettings, exists bool) {
+	v := m.settings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSettings returns the old "settings" field's value of the ImportList entity.
+// If the ImportList object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImportListMutation) OldSettings(ctx context.Context) (v schema.ImportListSettings, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSettings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSettings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSettings: %w", err)
+	}
+	return oldValue.Settings, nil
+}
+
+// ClearSettings clears the value of the "settings" field.
+func (m *ImportListMutation) ClearSettings() {
+	m.settings = nil
+	m.clearedFields[importlist.FieldSettings] = struct{}{}
+}
+
+// SettingsCleared returns if the "settings" field was cleared in this mutation.
+func (m *ImportListMutation) SettingsCleared() bool {
+	_, ok := m.clearedFields[importlist.FieldSettings]
+	return ok
+}
+
+// ResetSettings resets all changes to the "settings" field.
+func (m *ImportListMutation) ResetSettings() {
+	m.settings = nil
+	delete(m.clearedFields, importlist.FieldSettings)
+}
+
+// Where appends a list predicates to the ImportListMutation builder.
+func (m *ImportListMutation) Where(ps ...predicate.ImportList) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ImportListMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ImportListMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ImportList, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ImportListMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ImportListMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ImportList).
+func (m *ImportListMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ImportListMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.name != nil {
+		fields = append(fields, importlist.FieldName)
+	}
+	if m._type != nil {
+		fields = append(fields, importlist.FieldType)
+	}
+	if m.url != nil {
+		fields = append(fields, importlist.FieldURL)
+	}
+	if m.qulity != nil {
+		fields = append(fields, importlist.FieldQulity)
+	}
+	if m.storage_id != nil {
+		fields = append(fields, importlist.FieldStorageID)
+	}
+	if m.settings != nil {
+		fields = append(fields, importlist.FieldSettings)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ImportListMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case importlist.FieldName:
+		return m.Name()
+	case importlist.FieldType:
+		return m.GetType()
+	case importlist.FieldURL:
+		return m.URL()
+	case importlist.FieldQulity:
+		return m.Qulity()
+	case importlist.FieldStorageID:
+		return m.StorageID()
+	case importlist.FieldSettings:
+		return m.Settings()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ImportListMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case importlist.FieldName:
+		return m.OldName(ctx)
+	case importlist.FieldType:
+		return m.OldType(ctx)
+	case importlist.FieldURL:
+		return m.OldURL(ctx)
+	case importlist.FieldQulity:
+		return m.OldQulity(ctx)
+	case importlist.FieldStorageID:
+		return m.OldStorageID(ctx)
+	case importlist.FieldSettings:
+		return m.OldSettings(ctx)
+	}
+	return nil, fmt.Errorf("unknown ImportList field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ImportListMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case importlist.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case importlist.FieldType:
+		v, ok := value.(importlist.Type)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case importlist.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
+		return nil
+	case importlist.FieldQulity:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetQulity(v)
+		return nil
+	case importlist.FieldStorageID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStorageID(v)
+		return nil
+	case importlist.FieldSettings:
+		v, ok := value.(schema.ImportListSettings)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSettings(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ImportList field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ImportListMutation) AddedFields() []string {
+	var fields []string
+	if m.addstorage_id != nil {
+		fields = append(fields, importlist.FieldStorageID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ImportListMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case importlist.FieldStorageID:
+		return m.AddedStorageID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ImportListMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case importlist.FieldStorageID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStorageID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ImportList numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ImportListMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(importlist.FieldURL) {
+		fields = append(fields, importlist.FieldURL)
+	}
+	if m.FieldCleared(importlist.FieldSettings) {
+		fields = append(fields, importlist.FieldSettings)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ImportListMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ImportListMutation) ClearField(name string) error {
+	switch name {
+	case importlist.FieldURL:
+		m.ClearURL()
+		return nil
+	case importlist.FieldSettings:
+		m.ClearSettings()
+		return nil
+	}
+	return fmt.Errorf("unknown ImportList nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ImportListMutation) ResetField(name string) error {
+	switch name {
+	case importlist.FieldName:
+		m.ResetName()
+		return nil
+	case importlist.FieldType:
+		m.ResetType()
+		return nil
+	case importlist.FieldURL:
+		m.ResetURL()
+		return nil
+	case importlist.FieldQulity:
+		m.ResetQulity()
+		return nil
+	case importlist.FieldStorageID:
+		m.ResetStorageID()
+		return nil
+	case importlist.FieldSettings:
+		m.ResetSettings()
+		return nil
+	}
+	return fmt.Errorf("unknown ImportList field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ImportListMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ImportListMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ImportListMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ImportListMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ImportListMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ImportListMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ImportListMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ImportList unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ImportListMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ImportList edge %s", name)
 }
 
 // IndexersMutation represents an operation that mutates the Indexers nodes in the graph.

@@ -76,6 +76,22 @@ var (
 		Columns:    HistoriesColumns,
 		PrimaryKey: []*schema.Column{HistoriesColumns[0]},
 	}
+	// ImportListsColumns holds the columns for the "import_lists" table.
+	ImportListsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"plex", "doulist"}},
+		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "qulity", Type: field.TypeString},
+		{Name: "storage_id", Type: field.TypeInt},
+		{Name: "settings", Type: field.TypeJSON, Nullable: true},
+	}
+	// ImportListsTable holds the schema information for the "import_lists" table.
+	ImportListsTable = &schema.Table{
+		Name:       "import_lists",
+		Columns:    ImportListsColumns,
+		PrimaryKey: []*schema.Column{ImportListsColumns[0]},
+	}
 	// IndexersColumns holds the columns for the "indexers" table.
 	IndexersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -166,6 +182,7 @@ var (
 		DownloadClientsTable,
 		EpisodesTable,
 		HistoriesTable,
+		ImportListsTable,
 		IndexersTable,
 		MediaTable,
 		NotificationClientsTable,
