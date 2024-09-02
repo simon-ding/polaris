@@ -101,7 +101,7 @@ func (s *Server) Logout(c *gin.Context) (interface{}, error) {
 	}
 
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("polaris_token", "", -1, "/", "", true, false)
+	c.SetCookie("polaris_token", "", -1, "/", "", false, false)
 	return nil, nil
 }
 
