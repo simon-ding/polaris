@@ -91,7 +91,7 @@ func (s *Server) Login(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "sign")
 	}
 	c.SetSameSite(http.SameSiteNoneMode)
-	c.SetCookie("token", sig, 0, "/", "", true, false)
+	c.SetCookie("token", sig, 0, "/", "", false, false)
 	return gin.H{
 		"token": sig,
 	}, nil
