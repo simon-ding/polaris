@@ -22,7 +22,7 @@ func (s *Server) authModdleware(c *gin.Context) {
 		c.Next()
 		return
 	}
-	token, err := c.Cookie("token")
+	token, err := c.Cookie("polaris_token")
 	if err != nil {
 		log.Errorf("token error: %v", err)
 		c.AbortWithStatus(http.StatusForbidden)
@@ -90,11 +90,9 @@ func (s *Server) Login(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "sign")
 	}
-	c.SetSameSite(http.SameSiteNoneMode)
-	c.SetCookie("token", sig, 0, "/", "", false, false)
-	return gin.H{
-		"token": sig,
-	}, nil
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("polaris_token", sig, 0, "/", "", false, false)
+	return "success", nil
 }
 
 func (s *Server) Logout(c *gin.Context) (interface{}, error) {
@@ -102,8 +100,8 @@ func (s *Server) Logout(c *gin.Context) (interface{}, error) {
 		return nil, errors.New( "auth is not enabled")
 	}
 
-	c.SetSameSite(http.SameSiteNoneMode)
-	c.SetCookie("token", "", -1, "/", "", true, false)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("polaris_token", "", -1, "/", "", true, false)
 	return nil, nil
 }
 
