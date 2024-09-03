@@ -246,3 +246,20 @@ func (s *Server) EditMediaMetadata(c *gin.Context) (interface{}, error) {
 	}
 	return "success", nil
 }
+
+type triggerCronJobIn struct {
+	JobName string `json:"job_name"`
+}
+
+func (s *Server) TriggerCronJob(c *gin.Context) (interface{}, error) {
+	var in triggerCronJobIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind")
+	}
+
+	err := s.core.TriggerCronJob(in.JobName)
+	if err != nil {
+		return nil, err
+	}
+	return "success", nil
+}

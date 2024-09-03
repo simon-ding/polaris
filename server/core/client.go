@@ -6,6 +6,7 @@ import (
 	"polaris/log"
 	"polaris/pkg/tmdb"
 	"polaris/pkg/transmission"
+	"polaris/pkg/utils"
 
 	"github.com/pkg/errors"
 	"github.com/robfig/cron"
@@ -20,11 +21,23 @@ func NewClient(db *db.Client, language string) *Client {
 	}
 }
 
+type scheduler struct {
+	cron string
+	f func() error 
+}
 type Client struct {
 	db       *db.Client
 	cron     *cron.Cron
 	tasks    map[int]*Task
 	language string
+	schedulers utils.Map[string, scheduler]
+}
+
+func (c *Client) registerCronJob(name string, cron string, f func() error) {
+	c.schedulers.Store(name, scheduler{
+		cron: cron,
+		f: f,
+	})
 }
 
 func (c *Client) Init() {

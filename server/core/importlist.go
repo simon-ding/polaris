@@ -22,11 +22,13 @@ import (
 )
 
 func (c *Client) periodicallyUpdateImportlist() error {
+	log.Infof("begin check import list")
 	lists, err := c.db.GetAllImportLists()
 	if err != nil {
 		return errors.Wrap(err, "get from db")
 	}
 	for _, l := range lists {
+		log.Infof("check import list content for %v", l.Name)
 		if l.Type == importlist.TypePlex {
 			res, err := plexwatchlist.ParsePlexWatchlist(l.URL)
 			if err != nil {
@@ -61,12 +63,17 @@ func (c *Client) periodicallyUpdateImportlist() error {
 						log.Errorf("suggesting name error: %v", err)
 						continue
 					}
-					c.AddMovie2Watchlist(AddWatchlistIn{
+					_, err = c.AddMovie2Watchlist(AddWatchlistIn{
 						TmdbID:     int(d.ID),
 						StorageID:  l.StorageID,
 						Resolution: l.Qulity,
 						Folder:     name,
 					})
+					if err != nil {
+						log.Errorf("[update_import_lists] add movie to watchlist error: %v", err)
+					} else {
+						log.Infof("[update_import_lists] add movie to watchlist success")
+					}
 				} else if len(tmdbRes.TvResults) > 0 {
 					d := tmdbRes.TvResults[0]
 					name, err := c.SuggestedSeriesFolderName(int(d.ID))
@@ -75,12 +82,18 @@ func (c *Client) periodicallyUpdateImportlist() error {
 						continue
 					}
 
-					c.AddTv2Watchlist(AddWatchlistIn{
+					_, err = c.AddTv2Watchlist(AddWatchlistIn{
 						TmdbID:     int(d.ID),
 						StorageID:  l.StorageID,
 						Resolution: l.Qulity,
 						Folder:     name,
 					})
+					if err != nil {
+						log.Errorf("[update_import_lists] add tv to watchlist error: %v", err)
+					} else {
+						log.Infof("[update_import_lists] add tv to watchlist success")
+					}
+
 				}
 
 			}

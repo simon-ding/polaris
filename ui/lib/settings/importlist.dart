@@ -46,6 +46,7 @@ class _ImportlistState extends ConsumerState<Importlist> {
       key: _formKey,
       initialValue: {
         "name": list.name,
+        "url": list.url,
         "qulity": list.qulity,
         "storage_id": list.storageId
       },

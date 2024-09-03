@@ -17,14 +17,22 @@ import (
 )
 
 func (c *Client) addSysCron() {
-	c.mustAddCron("@every 1m", c.checkTasks)
-	c.mustAddCron("0 0 * * * *", func() {
+	c.registerCronJob("check_running_tasks","@every 1m", c.checkTasks)
+	c.registerCronJob("check_available_medias_to_download","0 0 * * * *", func() error{
 		c.downloadAllTvSeries()
 		c.downloadAllMovies()
+		return nil
 	})
-	c.mustAddCron("0 0 */12 * * *", c.checkAllSeriesNewSeason)
-	c.mustAddCron("0 0/30 * * * *", func() {
-		c.periodicallyUpdateImportlist()
+	c.registerCronJob("check_series_new_release", "0 0 */12 * * *", c.checkAllSeriesNewSeason)
+	c.registerCronJob("update_import_lists","0 30 * * * *", c.periodicallyUpdateImportlist)
+
+	c.schedulers.Range(func(key string, value scheduler) bool {
+		c.mustAddCron(value.cron, func() {
+			if err := value.f(); err != nil {
+				log.Errorf("exexuting cron job %s error: %v", key, err)
+			}
+		})
+		return false
 	})
 	c.cron.Start()
 }
@@ -36,7 +44,15 @@ func (c *Client) mustAddCron(spec string, cmd func()) {
 	}
 }
 
-func (c *Client) checkTasks() {
+func (c *Client) TriggerCronJob(name string) error {
+	job, ok := c.schedulers.Load(name)
+	if !ok {
+		return fmt.Errorf("job name not exists: %s", name)
+	}
+	return job.f()
+}
+
+func (c *Client) checkTasks() error{
 	log.Debug("begin check tasks...")
 	for id, t := range c.tasks {
 		r := c.db.GetHistory(id)
@@ -68,6 +84,7 @@ func (c *Client) checkTasks() {
 			go c.postTaskProcessing(id)
 		}
 	}
+	return nil
 }
 
 func (c *Client) postTaskProcessing(id int) {
@@ -358,7 +375,7 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (
 	return r1.Name, nil
 }
 
-func (c *Client) checkAllSeriesNewSeason() {
+func (c *Client) checkAllSeriesNewSeason() error{
 	log.Infof("begin checking series all new season")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
@@ -367,6 +384,7 @@ func (c *Client) checkAllSeriesNewSeason() {
 			log.Errorf("check series new season error: series name %v, error: %v", series.NameEn, err)
 		}
 	}
+	return nil
 }
 
 func (c *Client) checkSeiesNewSeason(media *ent.Media) error {

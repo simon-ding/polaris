@@ -13,8 +13,8 @@ import (
 )
 
 type Client struct {
-	apiKey     string
-	tmdbClient *tmdb.Client
+	apiKey             string
+	tmdbClient         *tmdb.Client
 	enableAdultContent bool
 }
 
@@ -43,8 +43,8 @@ func NewClient(apiKey, proxyUrl string, enableAdultContent bool) (*Client, error
 	}
 
 	return &Client{
-		apiKey:     apiKey,
-		tmdbClient: tmdbClient,
+		apiKey:             apiKey,
+		tmdbClient:         tmdbClient,
 		enableAdultContent: enableAdultContent,
 	}, nil
 }
@@ -59,7 +59,7 @@ func (c *Client) GetTvDetails(id int, language string) (*tmdb.TVDetails, error) 
 	if !episodeNameUseful(d.LastEpisodeToAir.Name) {
 		log.Debug("should fetch english version")
 		var detailEN *tmdb.TVDetails
-		if language == "zh-CN" {
+		if language == "zh-CN" || language == "" {
 			detailEN, err = c.tmdbClient.GetTVDetails(id, withExternalIDs(withLangOption("en-US")))
 			if err != nil {
 				return d, nil
@@ -167,7 +167,7 @@ func (c *Client) GetEposideDetail(id, seasonNumber, eposideNumber int, language 
 	}
 	if !episodeNameUseful(d.Name) {
 		var detailEN *tmdb.TVEpisodeDetails
-		if language == "zh-CN" {
+		if language == "zh-CN" || language == "" {
 			detailEN, err = c.tmdbClient.GetTVEpisodeDetails(id, seasonNumber, eposideNumber, withLangOption("en-US"))
 			if err != nil {
 				return d, nil
@@ -189,7 +189,7 @@ func (c *Client) GetSeasonDetails(id, seasonNumber int, language string) (*tmdb.
 		return nil, err
 	}
 	var detailEN *tmdb.TVSeasonDetails
-	if language == "zh-CN" {
+	if language == "zh-CN" || language == "" {
 		detailEN, err = c.tmdbClient.GetTVSeasonDetails(id, seasonNumber, withLangOption("en-US"))
 		if err != nil {
 			return detailCN, nil
@@ -213,19 +213,17 @@ func (c *Client) GetMovieAlternativeTitles(id int, language string) (*tmdb.Movie
 	return c.tmdbClient.GetMovieAlternativeTitles(id, withLangOption(language))
 }
 
-func (c *Client) GetByImdbId(imdbId string, lang string)(*tmdb.FindByID, error) {
+func (c *Client) GetByImdbId(imdbId string, lang string) (*tmdb.FindByID, error) {
 	m := withLangOption(lang)
 	m["external_source"] = "imdb_id"
 	return c.tmdbClient.GetFindByID(imdbId, m)
 }
 
-func (c *Client) GetByTvdbId(imdbId string, lang string)(*tmdb.FindByID, error) {
+func (c *Client) GetByTvdbId(imdbId string, lang string) (*tmdb.FindByID, error) {
 	m := withLangOption(lang)
 	m["external_source"] = "tvdb_id"
 	return c.tmdbClient.GetFindByID(imdbId, m)
 }
-
-
 
 func wrapLanguage(lang string) string {
 	if lang == "" {
