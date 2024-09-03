@@ -119,7 +119,7 @@ func (c *Client) GetLanguage() string {
 	lang := c.GetSetting(SettingLanguage)
 	log.Infof("get application language: %s", lang)
 	if lang == "" {
-		return "zh-CN"
+		return LanguageCN
 	}
 	return lang
 }

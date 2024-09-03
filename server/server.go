@@ -22,8 +22,9 @@ import (
 func NewServer(db *db.Client) *Server {
 	r := gin.Default()
 	s := &Server{
-		r:  r,
-		db: db,
+		r:        r,
+		db:       db,
+		language: db.GetLanguage(),
 	}
 	s.core = core.NewClient(db, s.language)
 	return s
@@ -128,7 +129,6 @@ func (s *Server) Serve() error {
 		importlist.DELETE("/delete", HttpHandler(s.deleteImportList))
 	}
 
-	s.language = s.db.GetLanguage()
 	return s.r.Run(":8080")
 }
 

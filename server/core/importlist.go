@@ -371,7 +371,7 @@ func (c *Client) SuggestedMovieFolderName(tmdbId int) (string, error) {
 	}
 	//remove extra characters
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(strings.ToLower(name), " ")
+	name = re.ReplaceAllString(name, " ")
 	name = strings.Join(strings.Fields(name), " ")
 	year := strings.Split(d1.ReleaseDate, "-")[0]
 	if year != "" {
