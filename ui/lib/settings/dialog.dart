@@ -17,7 +17,7 @@ Future<void> showSettingDialog(
           content: SingleChildScrollView(
             child: SizedBox(
               width: 400,
-              child: body,
+              child: SelectionArea(child: body),
             ),
           ),
           actions: <Widget>[

@@ -17,6 +17,7 @@ class Importlist extends ConsumerStatefulWidget {
 }
 
 class _ImportlistState extends ConsumerState<Importlist> {
+  String? _selectedType;
   @override
   Widget build(BuildContext context) {
     var importlists = ref.watch(importlistProvider);
@@ -42,16 +43,39 @@ class _ImportlistState extends ConsumerState<Importlist> {
   Future<void> showImportlistDetails(ImportList list) {
     final _formKey = GlobalKey<FormBuilderState>();
 
+    setState(() {
+      _selectedType = list.type;
+    });
     var body = FormBuilder(
       key: _formKey,
       initialValue: {
         "name": list.name,
         "url": list.url,
         "qulity": list.qulity,
+        "type": list.type,
         "storage_id": list.storageId
       },
       child: Column(
         children: [
+          FormBuilderDropdown(
+            name: "type",
+            decoration: const InputDecoration(
+                labelText: "类型",
+                hintText:
+                    "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/"),
+            items: const [
+              DropdownMenuItem(value: "plex", child: Text("Plex Watchlist")),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _selectedType = value;
+              });
+            },
+          ),
+          _selectedType == "plex"
+              ? const Text(
+                  "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/")
+              : const Text(""),
           FormBuilderTextField(
             name: "name",
             decoration: Commons.requiredTextFieldStyle(text: "名称"),
@@ -103,12 +127,12 @@ class _ImportlistState extends ConsumerState<Importlist> {
     onSubmit() async {
       if (_formKey.currentState!.saveAndValidate()) {
         var values = _formKey.currentState!.value;
-        
+
         return ref.read(importlistProvider.notifier).addImportlist(ImportList(
               id: list.id,
               name: values["name"],
               url: values["url"],
-              type: "plex",
+              type: values["type"],
               qulity: values["qulity"],
               storageId: values["storage_id"],
             ));
