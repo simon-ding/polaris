@@ -116,6 +116,7 @@ class _NotifierState extends ConsumerState<NotifierSettings> {
       },
       child: Column(
         children: [
+          const Text("https://bark.day.app/#/"),
           FormBuilderTextField(
             name: "name",
             decoration: Commons.requiredTextFieldStyle(text: "名称"),
@@ -176,6 +177,7 @@ class _NotifierState extends ConsumerState<NotifierSettings> {
       },
       child: Column(
         children: [
+          const Text("https://pushover.net/"),
           FormBuilderTextField(
             name: "name",
             decoration: Commons.requiredTextFieldStyle(text: "名称"),

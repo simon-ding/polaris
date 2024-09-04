@@ -63,6 +63,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                   decoration: const InputDecoration(
                       labelText: "代理地址",
                       icon: Icon(Icons.web),
+                      hintText: "http://10.0.0.1:1080",
                       helperText: "后台联网代理地址，留空表示不启用代理"),
                 ),
                 SizedBox(
