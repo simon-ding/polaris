@@ -118,6 +118,6 @@ class _ImportlistState extends ConsumerState<Importlist> {
     }
 
     return showSettingDialog(
-        context, "导入列表", list.id != null, body, onSubmit, onDelete);
+        context, "监控列表", list.id != null, body, onSubmit, onDelete);
   }
 }

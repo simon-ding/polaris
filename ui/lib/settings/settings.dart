@@ -28,7 +28,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         getExpansionTile("下载器", const DownloaderSettings()),
         getExpansionTile("存储", const StorageSettings()),
         getExpansionTile("通知客户端", const NotifierSettings()),
-        getExpansionTile("导入列表", const Importlist()),
+        getExpansionTile("监控列表", const Importlist()),
         getExpansionTile("认证", const AuthSettings())
       ],
     );

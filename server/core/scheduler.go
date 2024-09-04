@@ -17,22 +17,23 @@ import (
 )
 
 func (c *Client) addSysCron() {
-	c.registerCronJob("check_running_tasks","@every 1m", c.checkTasks)
-	c.registerCronJob("check_available_medias_to_download","0 0 * * * *", func() error{
+	c.registerCronJob("check_running_tasks", "@every 1m", c.checkTasks)
+	c.registerCronJob("check_available_medias_to_download", "0 0 * * * *", func() error {
 		c.downloadAllTvSeries()
 		c.downloadAllMovies()
 		return nil
 	})
 	c.registerCronJob("check_series_new_release", "0 0 */12 * * *", c.checkAllSeriesNewSeason)
-	c.registerCronJob("update_import_lists","0 30 * * * *", c.periodicallyUpdateImportlist)
+	c.registerCronJob("update_import_lists", "0 30 * * * *", c.periodicallyUpdateImportlist)
 
 	c.schedulers.Range(func(key string, value scheduler) bool {
+		log.Debugf("add cron job: %v", key)
 		c.mustAddCron(value.cron, func() {
 			if err := value.f(); err != nil {
 				log.Errorf("exexuting cron job %s error: %v", key, err)
 			}
 		})
-		return false
+		return true
 	})
 	c.cron.Start()
 }
@@ -52,7 +53,7 @@ func (c *Client) TriggerCronJob(name string) error {
 	return job.f()
 }
 
-func (c *Client) checkTasks() error{
+func (c *Client) checkTasks() error {
 	log.Debug("begin check tasks...")
 	for id, t := range c.tasks {
 		r := c.db.GetHistory(id)
@@ -375,7 +376,7 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (
 	return r1.Name, nil
 }
 
-func (c *Client) checkAllSeriesNewSeason() error{
+func (c *Client) checkAllSeriesNewSeason() error {
 	log.Infof("begin checking series all new season")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
