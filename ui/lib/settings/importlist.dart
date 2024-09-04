@@ -17,7 +17,6 @@ class Importlist extends ConsumerStatefulWidget {
 }
 
 class _ImportlistState extends ConsumerState<Importlist> {
-  String? _selectedType;
   @override
   Widget build(BuildContext context) {
     var importlists = ref.watch(importlistProvider);
@@ -42,84 +41,85 @@ class _ImportlistState extends ConsumerState<Importlist> {
 
   Future<void> showImportlistDetails(ImportList list) {
     final _formKey = GlobalKey<FormBuilderState>();
+    String? _selectedType = list.type;
 
-    setState(() {
-      _selectedType = list.type;
+    var body = StatefulBuilder(builder: (context, setState) {
+      return FormBuilder(
+        key: _formKey,
+        initialValue: {
+          "name": list.name,
+          "url": list.url,
+          "qulity": list.qulity,
+          "type": list.type,
+          "storage_id": list.storageId
+        },
+        child: Column(
+          children: [
+            FormBuilderDropdown(
+              name: "type",
+              decoration: const InputDecoration(
+                  labelText: "类型",
+                  hintText:
+                      "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/"),
+              items: const [
+                DropdownMenuItem(value: "plex", child: Text("Plex Watchlist")),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedType = value;
+                });
+              },
+            ),
+            _selectedType == "plex"
+                ? const Text(
+                    "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/")
+                : const Text(""),
+            FormBuilderTextField(
+              name: "name",
+              decoration: Commons.requiredTextFieldStyle(text: "名称"),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: FormBuilderValidators.required(),
+            ),
+            FormBuilderTextField(
+              name: "url",
+              decoration: Commons.requiredTextFieldStyle(text: "地址"),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: FormBuilderValidators.required(),
+            ),
+            FormBuilderDropdown(
+              name: "qulity",
+              decoration: const InputDecoration(labelText: "清晰度"),
+              items: const [
+                DropdownMenuItem(value: "720p", child: Text("720p")),
+                DropdownMenuItem(value: "1080p", child: Text("1080p")),
+                DropdownMenuItem(value: "2160p", child: Text("2160p")),
+              ],
+            ),
+            Consumer(
+              builder: (context, ref, child) {
+                var storage = ref.watch(storageSettingProvider);
+                return storage.when(
+                    data: (v) {
+                      return FormBuilderDropdown(
+                        name: "storage_id",
+                        decoration: const InputDecoration(labelText: "存储"),
+                        items: List.generate(
+                            v.length,
+                            (i) => DropdownMenuItem(
+                                  value: v[i].id,
+                                  child: Text(v[i].name!),
+                                )),
+                      );
+                    },
+                    error: (err, trace) => Text("$err"),
+                    loading: () => const MyProgressIndicator());
+              },
+            ),
+          ],
+        ),
+      );
     });
-    var body = FormBuilder(
-      key: _formKey,
-      initialValue: {
-        "name": list.name,
-        "url": list.url,
-        "qulity": list.qulity,
-        "type": list.type,
-        "storage_id": list.storageId
-      },
-      child: Column(
-        children: [
-          FormBuilderDropdown(
-            name: "type",
-            decoration: const InputDecoration(
-                labelText: "类型",
-                hintText:
-                    "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/"),
-            items: const [
-              DropdownMenuItem(value: "plex", child: Text("Plex Watchlist")),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedType = value;
-              });
-            },
-          ),
-          _selectedType == "plex"
-              ? const Text(
-                  "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/")
-              : const Text(""),
-          FormBuilderTextField(
-            name: "name",
-            decoration: Commons.requiredTextFieldStyle(text: "名称"),
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: FormBuilderValidators.required(),
-          ),
-          FormBuilderTextField(
-            name: "url",
-            decoration: Commons.requiredTextFieldStyle(text: "地址"),
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: FormBuilderValidators.required(),
-          ),
-          FormBuilderDropdown(
-            name: "qulity",
-            decoration: const InputDecoration(labelText: "清晰度"),
-            items: const [
-              DropdownMenuItem(value: "720p", child: Text("720p")),
-              DropdownMenuItem(value: "1080p", child: Text("1080p")),
-              DropdownMenuItem(value: "2160p", child: Text("2160p")),
-            ],
-          ),
-          Consumer(
-            builder: (context, ref, child) {
-              var storage = ref.watch(storageSettingProvider);
-              return storage.when(
-                  data: (v) {
-                    return FormBuilderDropdown(
-                      name: "storage_id",
-                      decoration: const InputDecoration(labelText: "存储"),
-                      items: List.generate(
-                          v.length,
-                          (i) => DropdownMenuItem(
-                                value: v[i].id,
-                                child: Text(v[i].name!),
-                              )),
-                    );
-                  },
-                  error: (err, trace) => Text("$err"),
-                  loading: () => const MyProgressIndicator());
-            },
-          ),
-        ],
-      ),
-    );
+
     onDelete() async {
       return ref.read(importlistProvider.notifier).deleteimportlist(list.id!);
     }
