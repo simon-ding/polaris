@@ -46,6 +46,8 @@ class APIs {
 
   static final tmdbImgBaseUrl = "$_baseUrl/api/v1/posters";
 
+  static final cronJobUrl = "$_baseUrl/api/v1/setting/cron/trigger";
+
   static const tmdbApiKey = "tmdb_api_key";
   static const downloadDirKey = "download_dir";
 
@@ -98,6 +100,16 @@ class APIs {
     final context = navigatorKey.currentContext;
     if (context != null) {
       context.go('/login');
+    }
+  }
+
+  static Future<void> triggerCronJob(String name) async {
+    var resp = await getDio().post(APIs.cronJobUrl, data: {"job_name": name});
+
+    var sp = ServerResponse.fromJson(resp.data);
+
+    if (sp.code != 0) {
+      throw sp.message;
     }
   }
 }

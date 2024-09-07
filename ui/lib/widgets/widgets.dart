@@ -142,7 +142,7 @@ class _MySliderState extends State<MyRangeSlider> {
 }
 
 class LoadingIconButton extends StatefulWidget {
-  LoadingIconButton({required this.onPressed, required this.icon, this.tooltip});
+  const LoadingIconButton({super.key, required this.onPressed, required this.icon, this.tooltip});
   final Future<void> Function() onPressed;
   final IconData icon;
   final String? tooltip;
@@ -187,7 +187,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
 }
 
 class LoadingTextButton extends StatefulWidget {
-  LoadingTextButton({required this.onPressed, required this.label});
+  const LoadingTextButton({super.key, required this.onPressed, required this.label});
   final Future<void> Function() onPressed;
   final Widget label;
 
