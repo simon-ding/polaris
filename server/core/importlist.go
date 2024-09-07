@@ -13,6 +13,7 @@ import (
 	"polaris/ent/schema"
 	"polaris/log"
 	"polaris/pkg/importlist/plexwatchlist"
+	"polaris/pkg/utils"
 	"regexp"
 	"strings"
 	"time"
@@ -361,12 +362,13 @@ func (c *Client) SuggestedMovieFolderName(tmdbId int) (string, error) {
 		}
 	}
 
-	if c.language == db.LanguageCN {
+	//if name is already in english, no need to query again
+	if !utils.IsASCII(name) && c.language == db.LanguageCN {
 		en, err := c.MustTMDB().GetMovieDetails(tmdbId, db.LanguageEN)
 		if err != nil {
 			log.Errorf("get en movie detail error: %v", err)
 		} else {
-			name = fmt.Sprintf("%s %s", d1.Title, en.Title)
+			name = fmt.Sprintf("%s %s", name, en.Title)
 		}
 	}
 	//remove extra characters
@@ -391,12 +393,13 @@ func (c *Client) SuggestedSeriesFolderName(tmdbId int) (string, error) {
 
 	name := d.Name
 
-	if c.language == db.LanguageCN {
+	//if name is already in english, no need to query again
+	if !utils.IsASCII(name) && c.language == db.LanguageCN {
 		en, err := c.MustTMDB().GetTvDetails(tmdbId, db.LanguageEN)
 		if err != nil {
 			log.Errorf("get en tv detail error: %v", err)
 		} else {
-			name = fmt.Sprintf("%s %s", d.Name, en.Name)
+			name = fmt.Sprintf("%s %s", name, en.Name)
 		}
 	}
 	//remove extra characters
