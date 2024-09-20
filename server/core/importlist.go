@@ -409,7 +409,7 @@ func (c *Client) SuggestedSeriesFolderName(tmdbId int) (string, error) {
 	}
 	//remove extra characters
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(strings.ToLower(name), " ")
+	name = re.ReplaceAllString(name, " ")
 	name = strings.Join(strings.Fields(name), " ")
 	year := strings.Split(d.FirstAirDate, "-")[0]
 	if year != "" {
