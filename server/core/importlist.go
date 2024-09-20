@@ -16,7 +16,6 @@ import (
 	"polaris/pkg/utils"
 	"regexp"
 	"strings"
-	"time"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/pkg/errors"
@@ -134,6 +133,12 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	}
 	log.Infof("find detail for tv id %d: %v", in.TmdbID, detail)
 
+	maxSeason := 0
+	for _, season := range detail.Seasons {
+		if season.SeasonNumber > maxSeason {
+			maxSeason = season.SeasonNumber
+		}
+	}
 	var epIds []int
 	for _, season := range detail.Seasons {
 		seasonId := season.SeasonNumber
@@ -143,22 +148,22 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 			continue
 		}
 		for _, ep := range se.Episodes {
-			shouldMonitor := false
-			//如果设置下载往期剧集，则监控所有剧集。如果没有则监控未上映的剧集，考虑时差等问题留24h余量
-			if in.DownloadHistoryEpisodes {
-				shouldMonitor = true
-			} else {
-				t, err := time.Parse("2006-01-02", ep.AirDate)
-				if err != nil {
-					log.Error("air date not known, will monitor: %v", ep.AirDate)
-					shouldMonitor = true
+			shouldMonitor := season.SeasonNumber >= maxSeason //监控最新的一季
+			// //如果设置下载往期剧集，则监控所有剧集。如果没有则监控未上映的剧集，考虑时差等问题留24h余量
+			// if in.DownloadHistoryEpisodes {
+			// 	shouldMonitor = true
+			// } else {
+			// 	t, err := time.Parse("2006-01-02", ep.AirDate)
+			// 	if err != nil {
+			// 		log.Error("air date not known, will monitor: %v", ep.AirDate)
+			// 		shouldMonitor = true
 
-				} else {
-					if time.Since(t) < 24*time.Hour { //monitor episode air 24h before now
-						shouldMonitor = true
-					}
-				}
-			}
+			// 	} else {
+			// 		if time.Since(t) < 24*time.Hour { //monitor episode air 24h before now
+			// 			shouldMonitor = true
+			// 		}
+			// 	}
+			// }
 
 			epid, err := c.db.SaveEposideDetail(&ent.Episode{
 				SeasonNumber:  seasonId,
