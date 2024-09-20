@@ -68,9 +68,14 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	if err := s.core.RemoveTaskAndTorrent(his.ID); err != nil {
 		return nil, errors.Wrap(err, "remove torrent")
 	}
+	err = s.db.DeleteHistory(id)
+	if err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+
 
 	if his.EpisodeID != 0 {
-		if his.Status == history.StatusRunning || his.Status == history.StatusUploading {
+		if !s.db.IsEpisodeDownloadingOrDownloaded(his.EpisodeID) {
 			s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
 		}
 
@@ -85,10 +90,6 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		}
 	}
 
-	err = s.db.DeleteHistory(id)
-	if err != nil {
-		return nil, errors.Wrap(err, "db")
-	}
 	log.Infof("history record successful deleted: %v", his.SourceTitle)
 	return nil, nil
 }

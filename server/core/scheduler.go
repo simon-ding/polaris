@@ -129,7 +129,9 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 		if err1 != nil {
 			c.db.SetHistoryStatus(r.ID, history.StatusFail)
 			if r.EpisodeID != 0 {
-				c.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
+				if !c.db.IsEpisodeDownloadingOrDownloaded(r.EpisodeID) {
+					c.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
+				}
 			} else {
 				c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
 			}
