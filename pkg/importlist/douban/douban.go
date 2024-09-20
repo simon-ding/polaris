@@ -55,7 +55,7 @@ func ParseDoulist(doulistUrl string) (*importlist.Response, error) {
 					continue
 				} else {
 					n := ppp[1]
-					n1, err := strconv.Atoi(n)
+					n1, err := strconv.Atoi(strings.TrimSpace(n))
 					if err != nil {
 						log.Errorf("convert year number %s to int error: %v", n, err)
 						continue

@@ -14,6 +14,7 @@ const (
 	SettingNfoSupportEnabled      = "nfo_support_enabled"
 	SettingAllowQiangban          = "filter_qiangban"
 	SettingEnableTmdbAdultContent = "tmdb_adult_content"
+	SetttingSizeLimiter           = "size_limiter"
 )
 
 const (
@@ -37,3 +38,14 @@ const (
 type ResolutionType string
 
 const JwtSerectKey = "jwt_secrect_key"
+
+type SizeLimiter struct {
+	R720p  Limiter `json:"720p"`
+	R1080p Limiter `json:"1080p"`
+	R2160p Limiter `json:"2160p"`
+}
+
+type Limiter struct {
+	Max int `json:"max"`
+	Min int `json:"min"`
+}

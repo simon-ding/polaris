@@ -530,6 +530,16 @@ func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetStatus(status).Exec(context.TODO())
 }
 
+func (c *Client) IsEpisodeDownloadingOrDownloaded(id int) bool {
+	his := c.ent.History.Query().Where(history.EpisodeID(id)).AllX(context.Background())
+	for _, h := range his {
+		if h.Status != history.StatusFail {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *Client) SetSeasonAllEpisodeStatus(mediaID, seasonNum int, status episode.Status) error {
 	return c.ent.Episode.Update().Where(episode.MediaID(mediaID), episode.SeasonNumber(seasonNum)).SetStatus(status).Exec(context.TODO())
 }
@@ -602,4 +612,19 @@ func (c *Client) AddImportlist(il *ent.ImportList) error {
 
 func (c *Client) DeleteImportlist(id int) error {
 	return c.ent.ImportList.DeleteOneID(id).Exec(context.TODO())
+}
+
+func (c *Client) GetSizeLimiter() (*SizeLimiter, error) {
+	v := c.GetSetting(SetttingSizeLimiter)
+	var limiter SizeLimiter
+	err := json.Unmarshal([]byte(v), &limiter)
+	return &limiter, err
+}
+
+func (c *Client) SetSizeLimiter(limiter *SizeLimiter) error {
+	data, err := json.Marshal(limiter)
+	if err != nil {
+		return err
+	}
+	return c.SetSetting(SetttingSizeLimiter, string(data))
 }
