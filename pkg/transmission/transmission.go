@@ -53,7 +53,7 @@ func (c *Client) GetAll() ([]*Torrent, error) {
 	var torrents []*Torrent
 	for _, t := range all {
 		torrents = append(torrents, &Torrent{
-			ID:     *t.ID,
+			Hash:     *t.HashString,
 			c:      c.c,
 			Config: c.cfg,		
 		})
@@ -86,12 +86,12 @@ func (c *Client) Download(link, dir string) (*Torrent, error) {
 		DownloadDir: &dir,
 	})
 	log.Infof("get torrent info: %+v", t)
-	if t.ID == nil {
+	if t.HashString == nil {
 		return nil, fmt.Errorf("download torrent error: %v", link)
 	}
 
 	return &Torrent{
-		ID:     *t.ID,
+		Hash:     *t.HashString,
 		c:      c.c,
 		Config: c.cfg,
 	}, err
@@ -100,7 +100,7 @@ func (c *Client) Download(link, dir string) (*Torrent, error) {
 type Torrent struct {
 	//t *transmissionrpc.Torrent
 	c  *transmissionrpc.Client
-	ID int64 `json:"id"`
+	Hash string `json:"hash"`
 	Config
 }
 
@@ -114,7 +114,7 @@ func (t *Torrent) reloadClient() error {
 }
 
 func (t *Torrent) getTorrent() transmissionrpc.Torrent {
-	r, err := t.c.TorrentGetAllFor(context.TODO(), []int64{t.ID})
+	r, err := t.c.TorrentGetAllForHashes(context.TODO(), []string{t.Hash})
 	if err != nil {
 		log.Errorf("get torrent info for error: %v", err)
 	}
@@ -122,7 +122,7 @@ func (t *Torrent) getTorrent() transmissionrpc.Torrent {
 }
 
 func (t *Torrent) Exists() bool {
-	r, err := t.c.TorrentGetAllFor(context.TODO(), []int64{t.ID})
+	r, err := t.c.TorrentGetAllForHashes(context.TODO(), []string{t.Hash})
 	if err != nil {
 		log.Errorf("get torrent info for error: %v", err)
 	}
@@ -155,7 +155,7 @@ func (t *Torrent) Progress() int {
 }
 
 func (t *Torrent) Stop() error {
-	return t.c.TorrentStopIDs(context.TODO(), []int64{t.ID})
+	return t.c.TorrentStopHashes(context.TODO(), []string{t.Hash})
 }
 
 func (t *Torrent) SeedRatio() *float64 {
@@ -163,12 +163,13 @@ func (t *Torrent) SeedRatio() *float64 {
 }
 
 func (t *Torrent) Start() error {
-	return t.c.TorrentStartIDs(context.TODO(), []int64{t.ID})
+	return t.c.TorrentStartHashes(context.TODO(), []string{t.Hash})
 }
 
 func (t *Torrent) Remove() error {
+	tt := t.getTorrent()
 	return t.c.TorrentRemove(context.TODO(), transmissionrpc.TorrentRemovePayload{
-		IDs:             []int64{t.ID},
+		IDs:             []int64{*tt.ID},
 		DeleteLocalData: true,
 	})
 }

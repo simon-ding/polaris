@@ -47,7 +47,7 @@ class ActivityData extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String
     return activities;
   }
 
-  Future<void> deleteActivity(int id) async {
+  Future<void> deleteActivity(String id) async {
     final dio = await APIs.getDio();
     var resp = await dio.delete("${APIs.activityUrl}$id");
     final sp = ServerResponse.fromJson(resp.data);
@@ -72,7 +72,7 @@ class Activity {
       required this.size,
       required this.seedRatio});
 
-  final int? id;
+  final String? id;
   final int? mediaId;
   final int? episodeId;
   final String? sourceTitle;

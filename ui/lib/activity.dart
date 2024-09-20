@@ -155,7 +155,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
     );
   }
 
-  Function(int) onDelete() {
+  Function(String) onDelete() {
     return (id) {
       final f = ref
           .read(activitiesDataProvider("active").notifier)

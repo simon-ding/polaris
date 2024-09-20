@@ -107,7 +107,7 @@ func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {
 
 type TorrentInfo struct {
 	Name      string  `json:"name"`
-	ID        int64   `json:"id"`
+	ID        string   `json:"id"`
 	SeedRatio float32 `json:"seed_ratio"`
 	Progress  int     `json:"progress"`
 }
@@ -128,7 +128,7 @@ func (s *Server) GetAllTorrents(c *gin.Context) (interface{}, error) {
 		}
 		infos = append(infos, TorrentInfo{
 			Name:     t.Name(),
-			ID:       t.ID,
+			ID:       t.Hash,
 			Progress: t.Progress(),
 		})
 	}
