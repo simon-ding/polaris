@@ -628,3 +628,19 @@ func (c *Client) SetSizeLimiter(limiter *SizeLimiter) error {
 	}
 	return c.SetSetting(SetttingSizeLimiter, string(data))
 }
+
+func (c *Client) GetTvNamingFormat() string {
+	s := c.GetSetting(SettingTvNamingFormat)
+	if s == "" {
+		return DefaultNamingFormat
+	}
+	return s
+}
+
+func (c *Client) GetMovingNamingFormat() string {
+	s := c.GetSetting(SettingMovieNamingFormat)
+	if s == "" {
+		return DefaultNamingFormat
+	}
+	return s
+}

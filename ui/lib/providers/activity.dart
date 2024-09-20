@@ -72,7 +72,7 @@ class Activity {
       required this.size,
       required this.seedRatio});
 
-  final String? id;
+  final int? id;
   final int? mediaId;
   final int? episodeId;
   final String? sourceTitle;

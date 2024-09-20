@@ -15,6 +15,8 @@ const (
 	SettingAllowQiangban          = "filter_qiangban"
 	SettingEnableTmdbAdultContent = "tmdb_adult_content"
 	SetttingSizeLimiter           = "size_limiter"
+	SettingTvNamingFormat         = "tv_naming_format"
+	SettingMovieNamingFormat      = "movie_naming_format"
 )
 
 const (
@@ -34,6 +36,15 @@ const (
 	LanguageEN = "en-US"
 	LanguageCN = "zh-CN"
 )
+
+const DefaultNamingFormat = "{{.NameCN}} {{.NameEN}} ({{.Year}})"
+
+type NamingInfo struct {
+	NameCN string
+	NameEN string
+	Year   string
+	TmdbID int
+}
 
 type ResolutionType string
 

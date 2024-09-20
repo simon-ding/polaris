@@ -22,6 +22,8 @@ type GeneralSettings struct {
 	EnableNfo          bool   `json:"enable_nfo"`
 	AllowQiangban      bool   `json:"allow_qiangban"`
 	EnableAdultContent bool   `json:"enable_adult_content"`
+	TvNamingFormat     string   `json:"tv_naming_format"`
+	MovieNamingFormat  string   `json:"movie_naming_format"`
 }
 
 func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
@@ -46,7 +48,12 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		if err := s.db.SetSetting(db.SettingLogLevel, in.LogLevel); err != nil {
 			return nil, errors.Wrap(err, "save log level")
 		}
-
+	}
+	if in.TvNamingFormat != "" {
+		s.db.SetSetting(db.SettingTvNamingFormat, in.TvNamingFormat)
+	}
+	if in.MovieNamingFormat != "" {
+		s.db.SetSetting(db.SettingMovieNamingFormat, in.MovieNamingFormat)
 	}
 
 	plexmatchEnabled := s.db.GetSetting(db.SettingPlexMatchEnabled)
@@ -74,7 +81,6 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 	} else {
 		s.db.SetSetting(db.SettingEnableTmdbAdultContent, "false")
 	}
-
 	return nil, nil
 }
 
@@ -86,15 +92,19 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	allowQiangban := s.db.GetSetting(db.SettingAllowQiangban)
 	enableNfo := s.db.GetSetting(db.SettingNfoSupportEnabled)
 	enableAdult := s.db.GetSetting(db.SettingEnableTmdbAdultContent)
+	tvFormat := s.db.GetTvNamingFormat()
+	movieFormat := s.db.GetMovingNamingFormat()
 	return &GeneralSettings{
-		TmdbApiKey:      tmdb,
-		DownloadDir:     downloadDir,
-		LogLevel:        logLevel,
-		Proxy:           s.db.GetSetting(db.SettingProxy),
-		EnablePlexmatch: plexmatchEnabled == "true",
-		AllowQiangban:   allowQiangban == "true",
-		EnableNfo:       enableNfo == "true",
-		EnableAdultContent: enableAdult == "true",
+		TmdbApiKey:           tmdb,
+		DownloadDir:          downloadDir,
+		LogLevel:             logLevel,
+		Proxy:                s.db.GetSetting(db.SettingProxy),
+		EnablePlexmatch:      plexmatchEnabled == "true",
+		AllowQiangban:        allowQiangban == "true",
+		EnableNfo:            enableNfo == "true",
+		EnableAdultContent:   enableAdult == "true",
+		TvNamingFormat: tvFormat,
+		MovieNamingFormat: movieFormat,
 	}, nil
 }
 

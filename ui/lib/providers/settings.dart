@@ -59,6 +59,8 @@ class GeneralSetting {
   bool? allowQiangban;
   bool? enableNfo;
   bool? enableAdult;
+  String? tvNamingFormat;
+  String? movieNamingFormat;
 
   GeneralSetting(
       {this.tmdbApiKey,
@@ -68,6 +70,8 @@ class GeneralSetting {
       this.enablePlexmatch,
       this.enableNfo,
       this.allowQiangban,
+      this.tvNamingFormat,
+      this.movieNamingFormat,
       this.enableAdult});
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
@@ -79,6 +83,8 @@ class GeneralSetting {
         enableAdult: json["enable_adult_content"] ?? false,
         allowQiangban: json["allow_qiangban"] ?? false,
         enableNfo: json["enable_nfo"] ?? false,
+        tvNamingFormat: json["tv_naming_format"],
+        movieNamingFormat: json["movie_naming_format"],
         enablePlexmatch: json["enable_plexmatch"] ?? false);
   }
 
@@ -92,6 +98,8 @@ class GeneralSetting {
     data["allow_qiangban"] = allowQiangban;
     data["enable_nfo"] = enableNfo;
     data["enable_adult_content"] = enableAdult;
+    data["tv_naming_format"] = tvNamingFormat;
+    data["movie_naming_format"] = movieNamingFormat;
     return data;
   }
 }

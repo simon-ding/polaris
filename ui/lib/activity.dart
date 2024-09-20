@@ -138,7 +138,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                           trailing: selectedTab == 0
                               ? IconButton(
                                   tooltip: "删除任务",
-                                  onPressed: () => onDelete()(ac.id!),
+                                  onPressed: () => onDelete()(ac.id!.toString()),
                                   icon: const Icon(Icons.delete))
                               : const Text("-"),
                         ),

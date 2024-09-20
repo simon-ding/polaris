@@ -38,6 +38,8 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
               "allow_qiangban": v.allowQiangban,
               "enable_nfo": v.enableNfo,
               "enable_adult": v.enableAdult,
+              "tv_naming_format": v.tvNamingFormat,
+              "movie_naming_format": v.movieNamingFormat,
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,6 +67,22 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                       icon: Icon(Icons.web),
                       hintText: "http://10.0.0.1:1080",
                       helperText: "后台联网代理地址，留空表示不启用代理"),
+                ),
+                FormBuilderTextField(
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.folder),
+                      labelText: "电视剧路径命名规则",
+                      helperText:
+                          "go template语法，可用的变量为：.NameCN, .NameEN, .Year, .TmdbID"),
+                  name: "tv_naming_format",
+                ),
+                FormBuilderTextField(
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.folder),
+                      labelText: "电影路径命名规则",
+                      helperText:
+                          "go template语法，可用的变量为：.NameCN, .NameEN, .Year, .TmdbID"),
+                  name: "movie_naming_format",
                 ),
                 SizedBox(
                   width: 300,
@@ -137,6 +155,9 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                                     allowQiangban: values["allow_qiangban"],
                                     enableAdult: values["enable_adult"],
                                     enableNfo: values["enable_nfo"],
+                                    tvNamingFormat: values["tv_naming_format"],
+                                    movieNamingFormat:
+                                        values["movie_naming_format"],
                                     enablePlexmatch:
                                         values["enable_plexmatch"]))
                                 .then((v) => showSnakeBar("更新成功"));

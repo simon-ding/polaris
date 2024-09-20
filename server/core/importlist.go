@@ -1,7 +1,9 @@
 package core
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"os"
@@ -366,27 +368,35 @@ func (c *Client) SuggestedMovieFolderName(tmdbId int) (string, error) {
 			return javid, nil
 		}
 	}
-
-	//if name is already in english, no need to query again
-	if !utils.IsASCII(name) && c.language == db.LanguageCN {
+	info := db.NamingInfo{TmdbID: tmdbId}
+	if utils.IsASCII(name) {
+		info.NameEN = stripExtraCharacters(name)
+	} else {
+		info.NameCN = stripExtraCharacters(name)
 		en, err := c.MustTMDB().GetMovieDetails(tmdbId, db.LanguageEN)
 		if err != nil {
-			log.Errorf("get en movie detail error: %v", err)
+			log.Errorf("get en tv detail error: %v", err)
 		} else {
-			name = fmt.Sprintf("%s %s", name, en.Title)
+			info.NameEN = stripExtraCharacters(en.Title)
 		}
 	}
-	//remove extra characters
-	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(name, " ")
-	name = strings.Join(strings.Fields(name), " ")
 	year := strings.Split(d1.ReleaseDate, "-")[0]
-	if year != "" {
-		name = fmt.Sprintf("%s (%s)", name, year)
-	}
+	info.Year = year
+	movieNamingFormat := c.db.GetMovingNamingFormat()
 
-	log.Infof("tv series of tmdb id %v suggestting name is %v", tmdbId, name)
-	return name, nil
+	tmpl, err := template.New("test").Parse(movieNamingFormat)
+	if err != nil {
+		return "", errors.Wrap(err, "naming format")
+	}
+	buff := &bytes.Buffer{}
+	err = tmpl.Execute(buff, info)
+	if err != nil {
+		return "", errors.Wrap(err, "tmpl exec")
+	}
+	res := strings.TrimSpace(buff.String())
+
+	log.Infof("tv series of tmdb id %v suggestting name is %v", tmdbId, res)
+	return res, nil
 }
 
 func (c *Client) SuggestedSeriesFolderName(tmdbId int) (string, error) {
@@ -398,24 +408,40 @@ func (c *Client) SuggestedSeriesFolderName(tmdbId int) (string, error) {
 
 	name := d.Name
 
-	//if name is already in english, no need to query again
-	if !utils.IsASCII(name) && c.language == db.LanguageCN {
+	info := db.NamingInfo{TmdbID: tmdbId}
+	if utils.IsASCII(name) {
+		info.NameEN = stripExtraCharacters(name)
+	} else {
+		info.NameCN = stripExtraCharacters(name)
 		en, err := c.MustTMDB().GetTvDetails(tmdbId, db.LanguageEN)
 		if err != nil {
 			log.Errorf("get en tv detail error: %v", err)
 		} else {
-			name = fmt.Sprintf("%s %s", name, en.Name)
+			info.NameEN = stripExtraCharacters(en.Name)
 		}
 	}
-	//remove extra characters
-	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(name, " ")
-	name = strings.Join(strings.Fields(name), " ")
 	year := strings.Split(d.FirstAirDate, "-")[0]
-	if year != "" {
-		name = fmt.Sprintf("%s (%s)", name, year)
-	}
+	info.Year = year
 
-	log.Infof("tv series of tmdb id %v suggestting name is %v", tmdbId, name)
-	return name, nil
+	tvNamingFormat := c.db.GetTvNamingFormat()
+
+	tmpl, err := template.New("test").Parse(tvNamingFormat)
+	if err != nil {
+		return "", errors.Wrap(err, "naming format")
+	}
+	buff := &bytes.Buffer{}
+	err = tmpl.Execute(buff, info)
+	if err != nil {
+		return "", errors.Wrap(err, "tmpl exec")
+	}
+	res := strings.TrimSpace(buff.String())
+
+	log.Infof("tv series of tmdb id %v suggestting name is %v", tmdbId, res)
+	return res, nil
+}
+
+func stripExtraCharacters(s string) string {
+	re := regexp.MustCompile(`[^\p{L}\w\s]`)
+	s = re.ReplaceAllString(s, " ")
+	return strings.Join(strings.Fields(s), " ")
 }
