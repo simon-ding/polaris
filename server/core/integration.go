@@ -257,7 +257,11 @@ func (c *Client) findEpisodeFilesPreMoving(historyId int) error {
 	isSingleEpisode := his.EpisodeID > 0
 	downloadDir := c.db.GetDownloadDir()
 	task := c.tasks[historyId]
-	target := filepath.Join(downloadDir, task.Name())
+	name, err := task.Name()
+	if err != nil {
+		return err
+	}
+	target := filepath.Join(downloadDir, name)
 	fi, err := os.Stat(target)
 	if err != nil {
 		return errors.Wrapf(err, "read dir %v", target)

@@ -16,7 +16,7 @@ import (
 type Activity struct {
 	*ent.History
 	Progress  int     `json:"progress"`
-	SeedRatio float32 `json:"seed_ratio"`
+	SeedRatio float64 `json:"seed_ratio"`
 }
 
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
@@ -30,8 +30,18 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 			}
 			for id, task := range s.core.GetTasks() {
 				if h.ID == id && task.Exists() {
-					a.Progress = task.Progress()
-					a.SeedRatio = float32(*task.SeedRatio())
+					p, err := task.Progress()
+					if err != nil {
+						log.Warnf("get task progress error: %v", err)
+					} else {
+						a.Progress = p
+					}
+					r, err := task.SeedRatio()
+					if err != nil {
+						log.Warnf("get task seed ratio error: %v", err)
+					} else {
+						a.SeedRatio = r
+					}
 				}
 			}
 			activities = append(activities, a)
@@ -73,7 +83,6 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "db")
 	}
 
-
 	if his.EpisodeID != 0 {
 		if !s.db.IsEpisodeDownloadingOrDownloaded(his.EpisodeID) {
 			s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
@@ -108,7 +117,7 @@ func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {
 
 type TorrentInfo struct {
 	Name      string  `json:"name"`
-	ID        string   `json:"id"`
+	ID        string  `json:"id"`
 	SeedRatio float32 `json:"seed_ratio"`
 	Progress  int     `json:"progress"`
 }
@@ -127,10 +136,12 @@ func (s *Server) GetAllTorrents(c *gin.Context) (interface{}, error) {
 		if !t.Exists() {
 			continue
 		}
+		name, _ := t.Name()
+		p, _ := t.Progress()
 		infos = append(infos, TorrentInfo{
-			Name:     t.Name(),
+			Name:     name,
 			ID:       t.Hash,
-			Progress: t.Progress(),
+			Progress: p,
 		})
 	}
 	return infos, nil

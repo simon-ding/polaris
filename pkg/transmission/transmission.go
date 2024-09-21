@@ -113,12 +113,15 @@ func (t *Torrent) reloadClient() error {
 	return nil
 }
 
-func (t *Torrent) getTorrent() transmissionrpc.Torrent {
+func (t *Torrent) getTorrent() (transmissionrpc.Torrent, error) {
 	r, err := t.c.TorrentGetAllForHashes(context.TODO(), []string{t.Hash})
 	if err != nil {
 		log.Errorf("get torrent info for error: %v", err)
 	}
-	return r[0]
+	if len(r) == 0 {
+		return transmissionrpc.Torrent{}, fmt.Errorf("no torrent")
+	}
+	return r[0], nil
 }
 
 func (t *Torrent) Exists() bool {
@@ -129,37 +132,50 @@ func (t *Torrent) Exists() bool {
 	return len(r) > 0
 }
 
-func (t *Torrent) Name() string {
-	if !t.Exists() {
-		return ""
+
+func (t *Torrent) Name() (string, error) {
+	tt, err := t.getTorrent()
+	if err != nil {
+		return "", err
 	}
-	return *t.getTorrent().Name
+	return *tt.Name, nil
 }
 
-func (t *Torrent) Progress() int {
-	if t.getTorrent().IsFinished != nil && *t.getTorrent().IsFinished {
-		return 100
+func (t *Torrent) Progress() (int, error) {
+	tt, err := t.getTorrent()
+	if err != nil {
+		return 0, err
 	}
-	if t.getTorrent().PercentComplete != nil && *t.getTorrent().PercentComplete >= 1 {
-		return 100
+	if tt.IsFinished != nil && *tt.IsFinished {
+		return 100, nil
+	}
+	if tt.PercentComplete != nil && *tt.PercentComplete >= 1 {
+		return 100, nil
 	}
 
-	if t.getTorrent().PercentComplete != nil {
-		p := int(*t.getTorrent().PercentComplete * 100)
+	if tt.PercentComplete != nil {
+		p := int(*tt.PercentComplete * 100)
 		if p == 100 {
 			p = 99
 		}
-		return p
+		return p, nil
 	}
-	return 0
+	return 0, nil
 }
 
 func (t *Torrent) Stop() error {
 	return t.c.TorrentStopHashes(context.TODO(), []string{t.Hash})
 }
 
-func (t *Torrent) SeedRatio() *float64 {
-	return t.getTorrent().UploadRatio
+func (t *Torrent) SeedRatio() (float64, error) {
+	tt, err := t.getTorrent()
+	if err != nil {
+		return 0, err
+	}
+	if tt.UploadRatio == nil {
+		return 0, nil
+	}
+	return *tt.UploadRatio, nil
 }
 
 func (t *Torrent) Start() error {
@@ -167,15 +183,22 @@ func (t *Torrent) Start() error {
 }
 
 func (t *Torrent) Remove() error {
-	tt := t.getTorrent()
+	tt, err := t.getTorrent()
+	if err != nil {
+		return errors.Wrap(err, "get torrent")
+	}
 	return t.c.TorrentRemove(context.TODO(), transmissionrpc.TorrentRemovePayload{
 		IDs:             []int64{*tt.ID},
 		DeleteLocalData: true,
 	})
 }
 
-func (t *Torrent) Size() int {
-	return int(t.getTorrent().TotalSize.Byte())
+func (t *Torrent) Size() (int, error) {
+	tt, err := t.getTorrent()
+	if err != nil {
+		return 0, errors.Wrap(err, "get torrent")
+	}
+	return int(tt.TotalSize.Byte()), nil
 }
 
 func (t *Torrent) Save() string {
