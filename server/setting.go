@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"polaris/db"
 	"polaris/ent"
 	"polaris/log"
@@ -22,8 +23,8 @@ type GeneralSettings struct {
 	EnableNfo          bool   `json:"enable_nfo"`
 	AllowQiangban      bool   `json:"allow_qiangban"`
 	EnableAdultContent bool   `json:"enable_adult_content"`
-	TvNamingFormat     string   `json:"tv_naming_format"`
-	MovieNamingFormat  string   `json:"movie_naming_format"`
+	TvNamingFormat     string `json:"tv_naming_format"`
+	MovieNamingFormat  string `json:"movie_naming_format"`
 }
 
 func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
@@ -50,9 +51,17 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		}
 	}
 	if in.TvNamingFormat != "" {
+		if _, err := template.New("test").Parse(in.TvNamingFormat);err != nil {
+			return nil, errors.Wrap(err, "tv format")
+		}
+
 		s.db.SetSetting(db.SettingTvNamingFormat, in.TvNamingFormat)
 	}
 	if in.MovieNamingFormat != "" {
+		if _, err := template.New("test").Parse(in.MovieNamingFormat);err != nil {
+			return nil, errors.Wrap(err, "movie format")
+		}
+
 		s.db.SetSetting(db.SettingMovieNamingFormat, in.MovieNamingFormat)
 	}
 
@@ -95,16 +104,16 @@ func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	tvFormat := s.db.GetTvNamingFormat()
 	movieFormat := s.db.GetMovingNamingFormat()
 	return &GeneralSettings{
-		TmdbApiKey:           tmdb,
-		DownloadDir:          downloadDir,
-		LogLevel:             logLevel,
-		Proxy:                s.db.GetSetting(db.SettingProxy),
-		EnablePlexmatch:      plexmatchEnabled == "true",
-		AllowQiangban:        allowQiangban == "true",
-		EnableNfo:            enableNfo == "true",
-		EnableAdultContent:   enableAdult == "true",
-		TvNamingFormat: tvFormat,
-		MovieNamingFormat: movieFormat,
+		TmdbApiKey:         tmdb,
+		DownloadDir:        downloadDir,
+		LogLevel:           logLevel,
+		Proxy:              s.db.GetSetting(db.SettingProxy),
+		EnablePlexmatch:    plexmatchEnabled == "true",
+		AllowQiangban:      allowQiangban == "true",
+		EnableNfo:          enableNfo == "true",
+		EnableAdultContent: enableAdult == "true",
+		TvNamingFormat:     tvFormat,
+		MovieNamingFormat:  movieFormat,
 	}, nil
 }
 
