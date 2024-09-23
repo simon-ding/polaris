@@ -8,6 +8,7 @@ import (
 	"polaris/ent"
 	"polaris/log"
 	"polaris/pkg/transmission"
+	"polaris/pkg/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -32,6 +33,8 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
+	utils.TrimFields(&in)
+	
 	log.Infof("set setting input: %+v", in)
 	if in.TmdbApiKey != "" {
 		if err := s.db.SetSetting(db.SettingTmdbApiKey, in.TmdbApiKey); err != nil {
@@ -132,6 +135,7 @@ func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
+	utils.TrimFields(&in)
 
 	log.Infof("add indexer settings: %+v", in)
 	setting := db.TorznabSetting{
@@ -207,6 +211,7 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
+	utils.TrimFields(&in)
 	//test connection
 	_, err := transmission.NewClient(transmission.Config{
 		URL:      in.URL,

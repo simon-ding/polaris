@@ -6,6 +6,7 @@ import (
 
 	"polaris/log"
 	"polaris/pkg/storage"
+	"polaris/pkg/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind json")
 	}
+	utils.TrimFields(&in)
 
 	if in.Implementation == "webdav" {
 		//test webdav

@@ -2,6 +2,7 @@ package server
 
 import (
 	"polaris/ent"
+	"polaris/pkg/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,7 @@ func (s *Server) AddNotificationClient(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "json")
 	}
+	utils.TrimFields(&in)
 
 	err := s.db.AddNotificationClient(in.Name, in.Service, in.Settings, in.Enabled)
 	if err != nil {

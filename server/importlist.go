@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"polaris/ent"
 	"polaris/ent/importlist"
+	"polaris/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -28,6 +29,8 @@ func (s *Server) addImportlist(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "json")
 	}
+	utils.TrimFields(&in)
+	
 	st := s.db.GetStorage(in.StorageId)
 	if st == nil {
 		return nil, fmt.Errorf("storage id not exist: %v", in.StorageId)
