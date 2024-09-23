@@ -133,14 +133,17 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	} else {
 		detail = detailEn
 	}
-	log.Infof("find detail for tv id %d: %v", in.TmdbID, detail)
+	log.Infof("find detail for tv id %d: %+v", in.TmdbID, detail)
 
-	maxSeason := 0
+	 lastSeason := 0
 	for _, season := range detail.Seasons {
-		if season.SeasonNumber > maxSeason {
-			maxSeason = season.SeasonNumber
+		if season.SeasonNumber > lastSeason && season.EpisodeCount > 0 { //如果最新一季已经有剧集信息，则以最新一季为准
+			lastSeason = season.SeasonNumber
 		}
 	}
+
+	log.Debugf("latest season is %v", lastSeason)
+
 	var epIds []int
 	for _, season := range detail.Seasons {
 		seasonId := season.SeasonNumber
@@ -149,8 +152,11 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 			log.Errorf("get season detail (%s) error: %v", detail.Name, err)
 			continue
 		}
+
+		shouldMonitor := seasonId >= lastSeason //监控最新的一季
+
 		for _, ep := range se.Episodes {
-			shouldMonitor := season.SeasonNumber >= maxSeason //监控最新的一季
+
 			// //如果设置下载往期剧集，则监控所有剧集。如果没有则监控未上映的剧集，考虑时差等问题留24h余量
 			// if in.DownloadHistoryEpisodes {
 			// 	shouldMonitor = true
@@ -167,18 +173,20 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 			// 	}
 			// }
 
-			epid, err := c.db.SaveEposideDetail(&ent.Episode{
+			ep := ent.Episode{
 				SeasonNumber:  seasonId,
 				EpisodeNumber: ep.EpisodeNumber,
 				Title:         ep.Name,
 				Overview:      ep.Overview,
 				AirDate:       ep.AirDate,
 				Monitored:     shouldMonitor,
-			})
+			}
+			epid, err := c.db.SaveEposideDetail(&ep)
 			if err != nil {
 				log.Errorf("save episode info error: %v", err)
 				continue
 			}
+			log.Debugf("success save episode %+v", ep)
 			epIds = append(epIds, epid)
 		}
 	}
