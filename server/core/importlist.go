@@ -425,7 +425,9 @@ func (c *Client) SuggestedSeriesFolderName(tmdbId int) (string, error) {
 		if err != nil {
 			log.Errorf("get en tv detail error: %v", err)
 		} else {
-			info.NameEN = stripExtraCharacters(en.Name)
+			if en.Name != name { //sometimes en name is in chinese
+				info.NameEN = stripExtraCharacters(en.Name)
+			}
 		}
 	}
 	year := strings.Split(d.FirstAirDate, "-")[0]

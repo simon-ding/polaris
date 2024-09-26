@@ -72,7 +72,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                       children: [
                         //const Text(""),
                         Text(
-                          "${widget.details.name} ${widget.details.name != widget.details.originalName ? widget.details.originalName : ''} (${widget.details.airDate!.split("-")[0]})",
+                          "${widget.details.name} ${widget.details.name != widget.details.originalName ? widget.details.originalName : ''} ${widget.details.airDate == null? "": (widget.details.airDate!.split("-")[0])}",
                           style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,

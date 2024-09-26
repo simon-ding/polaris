@@ -37,7 +37,7 @@ const (
 	LanguageCN = "zh-CN"
 )
 
-const DefaultNamingFormat = "{{.NameCN}} {{.NameEN}} ({{.Year}})"
+const DefaultNamingFormat = "{{.NameCN}} {{.NameEN}} {{if .Year}} ({{.Year}}) {{end}}"
 
 type NamingInfo struct {
 	NameCN string

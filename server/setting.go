@@ -34,7 +34,7 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "bind json")
 	}
 	utils.TrimFields(&in)
-	
+
 	log.Infof("set setting input: %+v", in)
 	if in.TmdbApiKey != "" {
 		if err := s.db.SetSetting(db.SettingTmdbApiKey, in.TmdbApiKey); err != nil {
@@ -54,18 +54,23 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		}
 	}
 	if in.TvNamingFormat != "" {
-		if _, err := template.New("test").Parse(in.TvNamingFormat);err != nil {
+		if _, err := template.New("test").Parse(in.TvNamingFormat); err != nil {
 			return nil, errors.Wrap(err, "tv format")
 		}
 
 		s.db.SetSetting(db.SettingTvNamingFormat, in.TvNamingFormat)
+	} else {
+		s.db.SetSetting(db.SettingTvNamingFormat, "")
 	}
+
 	if in.MovieNamingFormat != "" {
-		if _, err := template.New("test").Parse(in.MovieNamingFormat);err != nil {
+		if _, err := template.New("test").Parse(in.MovieNamingFormat); err != nil {
 			return nil, errors.Wrap(err, "movie format")
 		}
 
 		s.db.SetSetting(db.SettingMovieNamingFormat, in.MovieNamingFormat)
+	} else {
+		s.db.SetSetting(db.SettingMovieNamingFormat, "")
 	}
 
 	plexmatchEnabled := s.db.GetSetting(db.SettingPlexMatchEnabled)
