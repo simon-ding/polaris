@@ -98,8 +98,8 @@ class MediaCard extends StatelessWidget {
                       LinearProgressIndicator(
                         value: 1,
                         color: item.downloadedNum! >= item.monitoredNum!
-                            ? Colors.green
-                            : Colors.blue,
+                            ? Colors.teal
+                            : Colors.lightGreen,
                       ),
                       Text(
                         item.name!,
