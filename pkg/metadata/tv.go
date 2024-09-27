@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+	"polaris/log"
 	"polaris/pkg/utils"
 	"regexp"
 	"strconv"
@@ -170,7 +171,7 @@ func parseChineseName(name string) *Metadata {
 	}
 
 	//episode number
-	re1 := regexp.MustCompile(`\[\d{1,2}\]`)
+	re1 := regexp.MustCompile(`\[\d{1,3}\]`)
 	episodeMatches1 := re1.FindAllString(name, -1)
 	if len(episodeMatches1) > 0 { //[11] [1080p]
 		epNum := strings.TrimRight(strings.TrimLeft(episodeMatches1[0], "["), "]")
@@ -228,12 +229,17 @@ func parseChineseName(name string) *Metadata {
 			}
 			meta.Season = n
 		} else {
-			seasonRe1 := regexp.MustCompile(`第.{1}季`)
+			seasonRe1 := regexp.MustCompile(`第.{1,2}季`)
 			seasonMatches := seasonRe1.FindAllString(name, -1)
 			if len(seasonMatches) > 0 {
-				se := []rune(seasonMatches[0])
-				seNum := se[1]
-				meta.Season = chinese2Num[string(seNum)]
+				m1 := []rune(seasonMatches[0])
+				seNum := m1[1 : len(m1)-1]
+				n, err := strconv.Atoi(string(seNum))
+				if err != nil {
+					log.Warnf("parse season number %v error: %v, try to parse using chinese", seNum, err)
+					n = chinese2Num[string(seNum)]
+				}
+				meta.Season = n
 
 			}
 		}
@@ -245,24 +251,29 @@ func parseChineseName(name string) *Metadata {
 	}
 
 	//tv name
-	title := name
 
-	fields := strings.FieldsFunc(title, func(r rune) bool {
+	fields := strings.FieldsFunc(name, func(r rune) bool {
 		return r == '[' || r == ']' || r == '【' || r == '】'
 	})
-	title = ""
+	titleCn := ""
+	title := ""
 	for _, p := range fields { //寻找匹配的最长的字符串，最有可能是名字
-		if len([]rune(p)) > len([]rune(title)) {
+		if utils.ContainsChineseChar(p) && len([]rune(p)) > len([]rune(titleCn)) { //最长含中文字符串
+			titleCn = p
+		}
+		if len([]rune(p)) > len([]rune(title)) { //最长字符串
 			title = p
 		}
 	}
 	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	title = re.ReplaceAllString(strings.TrimSpace(strings.ToLower(title)), "")
+	title = re.ReplaceAllString(strings.TrimSpace(strings.ToLower(title)), "") //去除标点符号
+	titleCn = re.ReplaceAllString(strings.TrimSpace(strings.ToLower(titleCn)), "")
 
-	meta.NameCn = title
+	meta.NameCn = titleCn
 	cnRe := regexp.MustCompile(`\p{Han}.*\p{Han}`)
-	cnmatches := cnRe.FindAllString(title, -1)
+	cnmatches := cnRe.FindAllString(titleCn, -1)
 
+	//titleCn中最长的中文字符
 	if len(cnmatches) > 0 {
 		for _, t := range cnmatches {
 			if len([]rune(t)) > len([]rune(meta.NameCn)) {
@@ -271,12 +282,13 @@ func parseChineseName(name string) *Metadata {
 		}
 	}
 
+	//匹配title中最长拉丁字符串
 	enRe := regexp.MustCompile(`[[:ascii:]]*`)
 	enM := enRe.FindAllString(title, -1)
 	if len(enM) > 0 {
 		for _, t := range enM {
 			if len(t) > len(meta.NameEn) {
-				meta.NameEn = strings.ToLower(t)
+				meta.NameEn = strings.TrimSpace(strings.ToLower(t))
 			}
 		}
 	}

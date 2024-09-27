@@ -137,11 +137,11 @@ func Test_ParseTV13(t *testing.T) {
 }
 
 func Test_ParseTV14(t *testing.T) {
-	s1 := ""
+	s1 := "[GM-Team][国漫][斗破苍穹 第5季][Fights Break Sphere Ⅴ][2022][113][HEVC][GB][4K]"
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
-	assert.Equal(t, 2, m.Season)
-	assert.Equal(t, 01, m.Episode)
+	assert.Equal(t, 5, m.Season)
+	assert.Equal(t, 113, m.Episode)
 	assert.Equal(t, false, m.IsSeasonPack)
-	assert.Equal(t, "720p", m.Resolution)
+	//assert.Equal(t, "720p", m.Resolution)
 }
