@@ -38,7 +38,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
       margin: const EdgeInsets.all(4),
       clipBehavior: Clip.hardEdge,
       child: Container(
-        constraints: BoxConstraints(maxHeight: 400),
+        constraints: const BoxConstraints(maxHeight: 400),
         decoration: BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
@@ -52,7 +52,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
           child: Row(
             children: <Widget>[
               screenWidth < 600
-                  ? SizedBox()
+                  ? const SizedBox()
                   : Flexible(
                       flex: 2,
                       child: Padding(
@@ -72,14 +72,14 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                       children: [
                         //const Text(""),
                         Text(
-                          "${widget.details.name} ${widget.details.name != widget.details.originalName ? widget.details.originalName : ''} ${widget.details.airDate == null? "": (widget.details.airDate!.split("-")[0])}",
+                          "${widget.details.name} ${widget.details.name != widget.details.originalName ? widget.details.originalName : ''} ${widget.details.airDate == null ? "" : (widget.details.airDate!.split("-")[0])}",
                           style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               height: 2.5),
                         ),
                         const Divider(thickness: 1, height: 1),
-                        Text(
+                        const Text(
                           "",
                           style: TextStyle(height: 0.2),
                         ),
@@ -93,14 +93,14 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                               label: Text(
                                   "${widget.details.storage!.name}: ${widget.details.mediaType == "tv" ? widget.details.storage!.tvPath : widget.details.storage!.moviePath}"
                                   "${widget.details.targetDir}"),
-                              padding: EdgeInsets.all(0),
+                              padding: const EdgeInsets.all(0),
                             ),
                             Chip(
                               clipBehavior: Clip.hardEdge,
                               shape: ContinuousRectangleBorder(
                                   borderRadius: BorderRadius.circular(100.0)),
                               label: Text("${widget.details.resolution}"),
-                              padding: EdgeInsets.all(0),
+                              padding: const EdgeInsets.all(0),
                             ),
                             widget.details.limiter != null &&
                                     widget.details.limiter!.sizeMax > 0
@@ -109,13 +109,13 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                                     shape: ContinuousRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(100.0)),
-                                    padding: EdgeInsets.all(0),
+                                    padding: const EdgeInsets.all(0),
                                     label: Text(
                                         "${(widget.details.limiter!.sizeMin).readableFileSize()} - ${(widget.details.limiter!.sizeMax).readableFileSize()}"))
                                 : const SizedBox(),
                             MenuAnchor(
-                              style:
-                                  MenuStyle(alignment: Alignment.bottomRight),
+                              style: const MenuStyle(
+                                  alignment: Alignment.bottomRight),
                               menuChildren: [
                                 ActionChip.elevated(
                                     onPressed: () => launchUrl(url),
@@ -124,10 +124,10 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                                     shape: ContinuousRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(100.0)),
-                                    padding: EdgeInsets.all(0),
-                                    label: Text("TMDB")),
+                                    padding: const EdgeInsets.all(0),
+                                    label: const Text("TMDB")),
                                 isBlank(widget.details.imdbid)
-                                    ? SizedBox()
+                                    ? const SizedBox()
                                     : ActionChip.elevated(
                                         onPressed: () => launchUrl(imdbUrl),
                                         backgroundColor: Colors.indigo[700],
@@ -135,8 +135,8 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                                         shape: ContinuousRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(100.0)),
-                                        padding: EdgeInsets.all(0),
-                                        label: Text("IMDB"),
+                                        padding: const EdgeInsets.all(0),
+                                        label: const Text("IMDB"),
                                       )
                               ],
                               builder: (context, controller, child) {
@@ -152,8 +152,8 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                                     shape: ContinuousRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(100.0)),
-                                    padding: EdgeInsets.all(0),
-                                    label: Text("外部链接"));
+                                    padding: const EdgeInsets.all(0),
+                                    label: const Text("外部链接"));
                               },
                             ),
                           ],
@@ -170,7 +170,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                           children: [
                             downloadButton(),
                             editIcon(),
-                            deleteIcon(),
+                            deleteIcon(context),
                           ],
                         )
                       ],
@@ -185,14 +185,14 @@ class _DetailCardState extends ConsumerState<DetailCard> {
     );
   }
 
-  Widget deleteIcon() {
+  Widget deleteIcon(BuildContext oriContext) {
     return IconButton(
         tooltip: widget.details.mediaType == "tv" ? "删除剧集" : "删除电影",
-        onPressed: () => showConfirmDialog(),
+        onPressed: () => showConfirmDialog(oriContext),
         icon: const Icon(Icons.delete));
   }
 
-  Future<void> showConfirmDialog() {
+  Future<void> showConfirmDialog(BuildContext oriContext) {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -210,9 +210,13 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                       .read(mediaDetailsProvider(widget.details.id.toString())
                           .notifier)
                       .delete()
-                      .then((v) => context.go(widget.details.mediaType == "tv"
+                      .then((v) {
+                    if (oriContext.mounted) {
+                      oriContext.go(widget.details.mediaType == "tv"
                           ? WelcomePage.routeTv
-                          : WelcomePage.routeMoivie));
+                          : WelcomePage.routeMoivie);
+                    }
+                  });
                   Navigator.of(context).pop();
                 },
                 child: const Text("确认"))
@@ -292,7 +296,11 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                             .notifier)
                         .edit(values["resolution"], values["target_dir"],
                             values["limiter"])
-                        .then((v) => Navigator.of(context).pop());
+                        .then((v) {
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    });
                   }
                 },
                 label: const Text("确认"))
