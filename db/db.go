@@ -219,7 +219,10 @@ func (c *Client) DeleteMedia(id int) error {
 		return err
 	}
 	_, err = c.ent.Media.Delete().Where(media.ID(id)).Exec(context.TODO())
-	return err
+	if err != nil {
+		return err
+	}
+	return c.CleanAllDanglingEpisodes()
 }
 
 func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
@@ -644,4 +647,10 @@ func (c *Client) GetMovingNamingFormat() string {
 		return DefaultNamingFormat
 	}
 	return s
+}
+
+
+func (c *Client) CleanAllDanglingEpisodes() error {
+	_, err := c.ent.Episode.Delete().Where(episode.MediaID(0)).Exec(context.Background())
+	return err
 }
