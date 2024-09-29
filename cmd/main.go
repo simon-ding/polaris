@@ -5,14 +5,13 @@ import (
 	"polaris/log"
 	"polaris/pkg/utils"
 	"polaris/server"
-	"syscall"
 	"time"
 )
 
 func main() {
 	log.Infof("------------------- Starting Polaris ---------------------")
 
-	syscall.Umask(0) //max permission 0777
+	utils.MaxPermission()
 
 	dbClient, err := db.Open()
 	if err != nil {

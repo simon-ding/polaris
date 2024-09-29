@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Blocklist is the predicate function for blocklist builders.
+type Blocklist func(*sql.Selector)
+
 // DownloadClients is the predicate function for downloadclients builders.
 type DownloadClients func(*sql.Selector)
 

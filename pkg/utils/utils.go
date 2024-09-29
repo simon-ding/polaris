@@ -13,7 +13,6 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
-	"golang.org/x/sys/unix"
 )
 
 func IsASCII(s string) bool {
@@ -129,13 +128,6 @@ func SeasonId(seasonName string) (int, error) {
 		return 0, errors.Wrap(err, "convert")
 	}
 	return num, nil
-}
-
-func AvailableSpace(dir string) uint64 {
-	var stat unix.Statfs_t
-
-	unix.Statfs(dir, &stat)
-	return stat.Bavail * uint64(stat.Bsize)
 }
 
 func ChangeFileHash(name string) error {

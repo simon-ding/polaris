@@ -5,30 +5,35 @@ go 1.22.4
 require (
 	entgo.io/ent v0.13.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/robfig/cron v1.2.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.27.0
 )
 
 require (
+	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/gin-contrib/zap v1.1.3
+	github.com/ncruces/go-sqlite3 v0.18.4
 	github.com/nikoksr/notify v1.0.0
 	github.com/stretchr/testify v1.9.0
 )
 
 require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/PuerkitoBio/goquery v1.9.2 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/blinkbean/dingtalk v1.1.3 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible // indirect
+	github.com/go-test/deep v1.0.4 // indirect
 	github.com/gregdel/pushover v1.3.1 // indirect
+	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	golang.org/x/sync v0.7.0 // indirect
+	github.com/tetratelabs/wazero v1.8.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -75,11 +80,11 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.25.0
+	golang.org/x/crypto v0.27.0
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/mod v0.19.0 // indirect
-	golang.org/x/sys v0.22.0
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/sys v0.25.0
+	golang.org/x/text v0.18.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -8,6 +8,18 @@ import (
 )
 
 var (
+	// BlocklistsColumns holds the columns for the "blocklists" table.
+	BlocklistsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"media", "torrent"}},
+		{Name: "value", Type: field.TypeString},
+	}
+	// BlocklistsTable holds the schema information for the "blocklists" table.
+	BlocklistsTable = &schema.Table{
+		Name:       "blocklists",
+		Columns:    BlocklistsColumns,
+		PrimaryKey: []*schema.Column{BlocklistsColumns[0]},
+	}
 	// DownloadClientsColumns holds the columns for the "download_clients" table.
 	DownloadClientsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -179,6 +191,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		BlocklistsTable,
 		DownloadClientsTable,
 		EpisodesTable,
 		HistoriesTable,

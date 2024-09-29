@@ -8,6 +8,18 @@ import (
 	"polaris/ent"
 )
 
+// The BlocklistFunc type is an adapter to allow the use of ordinary
+// function as Blocklist mutator.
+type BlocklistFunc func(context.Context, *ent.BlocklistMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BlocklistFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BlocklistMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BlocklistMutation", m)
+}
+
 // The DownloadClientsFunc type is an adapter to allow the use of ordinary
 // function as DownloadClients mutator.
 type DownloadClientsFunc func(context.Context, *ent.DownloadClientsMutation) (ent.Value, error)

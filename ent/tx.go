@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Blocklist is the client for interacting with the Blocklist builders.
+	Blocklist *BlocklistClient
 	// DownloadClients is the client for interacting with the DownloadClients builders.
 	DownloadClients *DownloadClientsClient
 	// Episode is the client for interacting with the Episode builders.
@@ -161,6 +163,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Blocklist = NewBlocklistClient(tx.config)
 	tx.DownloadClients = NewDownloadClientsClient(tx.config)
 	tx.Episode = NewEpisodeClient(tx.config)
 	tx.History = NewHistoryClient(tx.config)
@@ -179,7 +182,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: DownloadClients.QueryXXX(), the query will be executed
+// applies a query, for example: Blocklist.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
