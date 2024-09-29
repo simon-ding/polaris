@@ -649,8 +649,7 @@ func (c *Client) GetMovingNamingFormat() string {
 	return s
 }
 
-
 func (c *Client) CleanAllDanglingEpisodes() error {
-	_, err := c.ent.Episode.Delete().Where(episode.MediaID(0)).Exec(context.Background())
+	_, err := c.ent.Episode.Delete().Where(episode.Not(episode.HasMedia())).Exec(context.Background())
 	return err
 }
