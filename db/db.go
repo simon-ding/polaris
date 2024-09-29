@@ -160,7 +160,7 @@ func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, er
 }
 
 func (c *Client) GetMediaWatchlist(mediaType media.MediaType) []*ent.Media {
-	list, err := c.ent.Media.Query().Where(media.MediaTypeEQ(mediaType)).All(context.TODO())
+	list, err := c.ent.Media.Query().Where(media.MediaTypeEQ(mediaType)).Order(ent.Desc(media.FieldID)).All(context.TODO())
 	if err != nil {
 		log.Infof("query wtach list error: %v", err)
 		return nil
