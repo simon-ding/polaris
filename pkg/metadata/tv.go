@@ -18,6 +18,18 @@ type Metadata struct {
 	IsSeasonPack bool
 }
 
+func (m *Metadata) IsAcceptable(name string) bool {
+	re := regexp.MustCompile(`[^\p{L}\w\s]`)
+	name = re.ReplaceAllString(strings.ToLower(name), " ")
+	nameCN := re.ReplaceAllString(strings.ToLower(m.NameCn), " ")
+	nameEN := re.ReplaceAllString(strings.ToLower(m.NameEn), " ")
+	name = strings.Join(strings.Fields(name), " ")
+	nameCN = strings.Join(strings.Fields(nameCN), " ")
+	nameEN = strings.Join(strings.Fields(nameEN), " ")
+	return strings.Contains(nameCN, name) || strings.Contains(nameEN, name)
+}
+
+
 func ParseTv(name string) *Metadata {
 	name = strings.ToLower(name)
 	name = strings.ReplaceAll(name, "\u200b", "") //remove unicode hidden character

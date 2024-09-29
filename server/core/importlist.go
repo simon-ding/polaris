@@ -10,11 +10,13 @@ import (
 	"path/filepath"
 	"polaris/db"
 	"polaris/ent"
+	"polaris/ent/episode"
 	"polaris/ent/importlist"
 	"polaris/ent/media"
 	"polaris/ent/schema"
 	"polaris/log"
 	"polaris/pkg/importlist/plexwatchlist"
+	"polaris/pkg/metadata"
 	"polaris/pkg/utils"
 	"regexp"
 	"strings"
@@ -299,11 +301,41 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 		if err := c.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
 			log.Errorf("download backdrop error: %v", err)
 		}
+		if err := c.checkMovieFolder(r); err != nil {
+			log.Warnf("check movie folder error: %v", err)
+		}
 	}()
 
 	log.Infof("add movie %s to watchlist success", detail.Title)
 	return nil, nil
 
+}
+
+func (c *Client) checkMovieFolder(m *ent.Media) error {
+	var storageImpl, err = c.getStorage(m.StorageID, media.MediaTypeMovie)
+	if err != nil {
+		return err
+	}
+	files, err := storageImpl.ReadDir(m.TargetDir)
+	if err != nil {
+		return err
+	}
+	ep, err := c.db.GetMovieDummyEpisode(m.ID)
+	if err != nil {
+		return err
+	}
+
+	for _,f := range files {
+		if f.IsDir() || f.Size() < 100 * 1000 * 1000 /* 100M */{ //忽略路径和小于100M的文件
+			continue
+		}
+		meta := metadata.ParseMovie(f.Name())
+		if meta.IsAcceptable(m.NameCn) || meta.IsAcceptable(m.NameEn) {
+			log.Infof("found already downloaded movie: %v", f.Name())
+			c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloaded)
+		}
+	}
+	return nil
 }
 
 func IsJav(detail *tmdb.MovieDetails) bool {
