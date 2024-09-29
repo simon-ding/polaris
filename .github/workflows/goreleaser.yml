@@ -19,6 +19,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3
+      - name: Build Web
+        run: |
+          cd ui
+          flutter pub get
+          flutter build web --no-web-resources-cdn --web-renderer html
       -
         name: Set up Go
         uses: actions/setup-go@v5
