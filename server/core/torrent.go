@@ -7,7 +7,6 @@ import (
 	"polaris/log"
 	"polaris/pkg/metadata"
 	"polaris/pkg/torznab"
-	"regexp"
 	"slices"
 	"sort"
 	"strconv"
@@ -47,7 +46,7 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 		}
 
 		if !imdbIDMatchExact(series.ImdbID, r.ImdbId) { //imdb id not exact match, check file name
-			if !torrentNameOk(series, r.Name) {
+			if !torrentNameOk(series, meta) {
 				continue
 			}
 		}
@@ -160,7 +159,7 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	}
 
 	res := searchWithTorznab(db1, movieDetail.NameEn, movieDetail.NameCn, movieDetail.OriginalName)
-	if movieDetail.Extras.IsJav(){
+	if movieDetail.Extras.IsJav() {
 		res1 := searchWithTorznab(db1, movieDetail.Extras.JavId)
 		res = append(res, res1...)
 	}
@@ -177,7 +176,7 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 		}
 
 		if !imdbIDMatchExact(movieDetail.ImdbID, r.ImdbId) {
-			if !torrentNameOk(movieDetail, r.Name) {
+			if !torrentNameOk(movieDetail, meta) {
 				continue
 			}
 			if !movieDetail.Extras.IsJav() {
@@ -300,19 +299,13 @@ func dedup(list []torznab.Result) []torznab.Result {
 	return res
 }
 
-func torrentNameOk(detail *db.MediaDetails, torrentName string) bool {
-	if detail.Extras.IsJav() && isNameAcceptable(torrentName, detail.Extras.JavId) {
-		return true
-	}
-	return isNameAcceptable(torrentName, detail.NameCn) || isNameAcceptable(torrentName, detail.NameEn) ||
-		isNameAcceptable(torrentName, detail.OriginalName)
+type NameTester interface {
+	IsAcceptable(names ...string) bool
 }
 
-func isNameAcceptable(torrentName, wantedName string) bool {
-	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	torrentName = re.ReplaceAllString(strings.ToLower(torrentName), " ")
-	wantedName = re.ReplaceAllString(strings.ToLower(wantedName), " ")
-	torrentName = strings.Join(strings.Fields(torrentName), " ")
-	wantedName = strings.Join(strings.Fields(wantedName), " ")
-	return strings.Contains(torrentName, wantedName)
+func torrentNameOk(detail *db.MediaDetails, tester NameTester) bool {
+	if detail.Extras.IsJav() && tester.IsAcceptable(detail.Extras.JavId) {
+		return true
+	}
+	return tester.IsAcceptable(detail.NameCn, detail.NameEn, detail.OriginalName)
 }

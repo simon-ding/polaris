@@ -14,13 +14,18 @@ type MovieMetadata struct {
 	IsQingban  bool
 }
 
-func (m *MovieMetadata) IsAcceptable(name string) bool {
-	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(strings.ToLower(name), " ")
-	name2 := re.ReplaceAllString(strings.ToLower(m.Name), " ")
-	name = strings.Join(strings.Fields(name), " ")
-	name2 = strings.Join(strings.Fields(name2), " ")
-	return strings.Contains(name2, name)
+func (m *MovieMetadata) IsAcceptable(names... string) bool {
+	for _, name := range names {
+		re := regexp.MustCompile(`[^\p{L}\w\s]`)
+		name = re.ReplaceAllString(strings.ToLower(name), " ")
+		name2 := re.ReplaceAllString(strings.ToLower(m.Name), " ")
+		name = strings.Join(strings.Fields(name), " ")
+		name2 = strings.Join(strings.Fields(name2), " ")
+		if  strings.Contains(name2, name) {
+			return true
+		}
+	}
+	return false
 }
 
 

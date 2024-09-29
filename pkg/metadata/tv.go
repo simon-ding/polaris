@@ -18,15 +18,21 @@ type Metadata struct {
 	IsSeasonPack bool
 }
 
-func (m *Metadata) IsAcceptable(name string) bool {
-	re := regexp.MustCompile(`[^\p{L}\w\s]`)
-	name = re.ReplaceAllString(strings.ToLower(name), " ")
-	nameCN := re.ReplaceAllString(strings.ToLower(m.NameCn), " ")
-	nameEN := re.ReplaceAllString(strings.ToLower(m.NameEn), " ")
-	name = strings.Join(strings.Fields(name), " ")
-	nameCN = strings.Join(strings.Fields(nameCN), " ")
-	nameEN = strings.Join(strings.Fields(nameEN), " ")
-	return strings.Contains(nameCN, name) || strings.Contains(nameEN, name)
+func (m *Metadata) IsAcceptable(names... string) bool {
+	for _, name := range names {
+		re := regexp.MustCompile(`[^\p{L}\w\s]`)
+		name = re.ReplaceAllString(strings.ToLower(name), " ")
+		nameCN := re.ReplaceAllString(strings.ToLower(m.NameCn), " ")
+		nameEN := re.ReplaceAllString(strings.ToLower(m.NameEn), " ")
+		name = strings.Join(strings.Fields(name), " ")
+		nameCN = strings.Join(strings.Fields(nameCN), " ")
+		nameEN = strings.Join(strings.Fields(nameEN), " ")
+		if  strings.Contains(nameCN, name) || strings.Contains(nameEN, name) {
+			return true
+		}
+	
+	}
+	return false
 }
 
 
