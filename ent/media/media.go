@@ -131,6 +131,7 @@ const (
 	Resolution720p  Resolution = "720p"
 	Resolution1080p Resolution = "1080p"
 	Resolution2160p Resolution = "2160p"
+	ResolutionAny   Resolution = "any"
 )
 
 func (r Resolution) String() string {
@@ -140,7 +141,7 @@ func (r Resolution) String() string {
 // ResolutionValidator is a validator for the "resolution" field enum values. It is called by the builders before save.
 func ResolutionValidator(r Resolution) error {
 	switch r {
-	case Resolution720p, Resolution1080p, Resolution2160p:
+	case Resolution720p, Resolution1080p, Resolution2160p, ResolutionAny:
 		return nil
 	default:
 		return fmt.Errorf("media: invalid enum value for resolution field: %q", r)

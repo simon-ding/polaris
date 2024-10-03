@@ -66,7 +66,10 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 		} else if len(param.Episodes) == 0 && !meta.IsSeasonPack { //want season pack, but not season pack
 			continue
 		}
-		if param.CheckResolution && meta.Resolution != series.Resolution.String() {
+
+		if param.CheckResolution && 
+			series.Resolution != media.ResolutionAny && 
+			meta.Resolution != series.Resolution.String() {
 			continue
 		}
 
@@ -188,7 +191,9 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 			}
 		}
 
-		if param.CheckResolution && meta.Resolution != movieDetail.Resolution.String() {
+		if param.CheckResolution && 
+			movieDetail.Resolution != media.ResolutionAny && 
+			meta.Resolution != movieDetail.Resolution.String() {
 			continue
 		}
 

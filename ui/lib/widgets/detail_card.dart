@@ -267,6 +267,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                       name: "resolution",
                       decoration: const InputDecoration(labelText: "清晰度"),
                       items: const [
+                        DropdownMenuItem(value: "any", child: Text("不限")),
                         DropdownMenuItem(value: "720p", child: Text("720p")),
                         DropdownMenuItem(value: "1080p", child: Text("1080p")),
                         DropdownMenuItem(value: "2160p", child: Text("2160p")),
