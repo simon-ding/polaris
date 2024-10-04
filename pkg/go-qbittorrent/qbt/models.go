@@ -1,6 +1,6 @@
 package qbt
 
-//BasicTorrent holds a basic torrent object from qbittorrent
+// BasicTorrent holds a basic torrent object from qbittorrent
 type BasicTorrent struct {
 	Category               string `json:"category"`
 	CompletionOn           int64  `json:"completion_on"`
@@ -25,8 +25,8 @@ type BasicTorrent struct {
 	FirstLastPiecePriority bool   `json:"f_l_piece_prio"`
 }
 
-//Torrent holds a torrent object from qbittorrent
-//with more information than BasicTorrent
+// Torrent holds a torrent object from qbittorrent
+// with more information than BasicTorrent
 type Torrent struct {
 	AdditionDate       int     `json:"addition_date"`
 	Comment            string  `json:"comment"`
@@ -90,7 +90,7 @@ type TorrentInfo struct {
 	NumLeechs         int64   `json:"num_leechs"`
 	NumSeeds          int64   `json:"num_seeds"`
 	Priority          int64   `json:"priority"`
-	Progress          int64   `json:"progress"`
+	Progress          float64 `json:"progress"`
 	Ratio             float64 `json:"ratio"`
 	RatioLimit        int64   `json:"ratio_limit"`
 	SavePath          string  `json:"save_path"`
@@ -111,7 +111,7 @@ type TorrentInfo struct {
 	Upspeed           int64   `json:"upspeed"`
 }
 
-//Tracker holds a tracker object from qbittorrent
+// Tracker holds a tracker object from qbittorrent
 type Tracker struct {
 	Msg           string `json:"msg"`
 	NumPeers      int    `json:"num_peers"`
@@ -123,12 +123,12 @@ type Tracker struct {
 	URL           string `json:"url"`
 }
 
-//WebSeed holds a webseed object from qbittorrent
+// WebSeed holds a webseed object from qbittorrent
 type WebSeed struct {
 	URL string `json:"url"`
 }
 
-//TorrentFile holds a torrent file object from qbittorrent
+// TorrentFile holds a torrent file object from qbittorrent
 type TorrentFile struct {
 	Index        int     `json:"index"`
 	IsSeed       bool    `json:"is_seed"`
@@ -140,8 +140,8 @@ type TorrentFile struct {
 	PieceRange   []int   `json:"piece_range"`
 }
 
-//Sync holds the sync response struct which contains
-//the server state and a map of infohashes to Torrents
+// Sync holds the sync response struct which contains
+// the server state and a map of infohashes to Torrents
 type Sync struct {
 	Categories  []string `json:"categories"`
 	FullUpdate  bool     `json:"full_update"`
@@ -274,7 +274,7 @@ type Preferences struct {
 	RSSAutoDlEnabled                   bool                   `json:"rss_auto_downloading_enabled"`
 }
 
-//Log
+// Log
 type Log struct {
 	ID        int    `json:"id"`
 	Message   string `json:"message"`
@@ -282,7 +282,7 @@ type Log struct {
 	Type      int    `json:"type"`
 }
 
-//PeerLog
+// PeerLog
 type PeerLog struct {
 	ID        int    `json:"id"`
 	IP        string `json:"ip"`
@@ -291,7 +291,7 @@ type PeerLog struct {
 	Reason    string `json:"reason"`
 }
 
-//Info
+// Info
 type Info struct {
 	ConnectionStatus  string `json:"connection_status"`
 	DHTNodes          int    `json:"dht_nodes"`
@@ -316,37 +316,37 @@ type TorrentsOptions struct {
 	Hashes   []string // separated by | => optional
 }
 
-//Category of torrent
+// Category of torrent
 type Category struct {
 	Name     string `json:"name"`
 	SavePath string `json:"savePath"`
 }
 
-//Categories mapping
+// Categories mapping
 type Categories struct {
 	Category map[string]Category
 }
 
-//LoginOptions contains all options for /login endpoint
+// LoginOptions contains all options for /login endpoint
 type LoginOptions struct {
 	Username string
 	Password string
 }
 
-//AddTrackersOptions contains all options for /addTrackers endpoint
+// AddTrackersOptions contains all options for /addTrackers endpoint
 type AddTrackersOptions struct {
 	Hash     string
 	Trackers []string
 }
 
-//EditTrackerOptions contains all options for /editTracker endpoint
+// EditTrackerOptions contains all options for /editTracker endpoint
 type EditTrackerOptions struct {
 	Hash    string
 	OrigURL string
 	NewURL  string
 }
 
-//RemoveTrackersOptions contains all options for /removeTrackers endpoint
+// RemoveTrackersOptions contains all options for /removeTrackers endpoint
 type RemoveTrackersOptions struct {
 	Hash     string
 	Trackers []string

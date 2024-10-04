@@ -128,7 +128,15 @@ func (t *Torrent) Progress() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return int(qb.Progress), nil
+	p := qb.Progress * 100
+	if p >= 100 {
+		return 100, nil
+	}
+	if int(p) == 100 {
+		return 99, nil
+	}
+
+	return int(p), nil
 }
 
 func (t *Torrent) Stop() error {
