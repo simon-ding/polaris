@@ -27,8 +27,8 @@ const (
 	FieldPassword = "password"
 	// FieldSettings holds the string denoting the settings field in the database.
 	FieldSettings = "settings"
-	// FieldOrdering holds the string denoting the ordering field in the database.
-	FieldOrdering = "ordering"
+	// FieldPriority1 holds the string denoting the priority1 field in the database.
+	FieldPriority1 = "priority1"
 	// FieldRemoveCompletedDownloads holds the string denoting the remove_completed_downloads field in the database.
 	FieldRemoveCompletedDownloads = "remove_completed_downloads"
 	// FieldRemoveFailedDownloads holds the string denoting the remove_failed_downloads field in the database.
@@ -49,7 +49,7 @@ var Columns = []string{
 	FieldUser,
 	FieldPassword,
 	FieldSettings,
-	FieldOrdering,
+	FieldPriority1,
 	FieldRemoveCompletedDownloads,
 	FieldRemoveFailedDownloads,
 	FieldTags,
@@ -72,10 +72,10 @@ var (
 	DefaultPassword string
 	// DefaultSettings holds the default value on creation for the "settings" field.
 	DefaultSettings string
-	// DefaultOrdering holds the default value on creation for the "ordering" field.
-	DefaultOrdering int
-	// OrderingValidator is a validator for the "ordering" field. It is called by the builders before save.
-	OrderingValidator func(int) error
+	// DefaultPriority1 holds the default value on creation for the "priority1" field.
+	DefaultPriority1 int
+	// Priority1Validator is a validator for the "priority1" field. It is called by the builders before save.
+	Priority1Validator func(int) error
 	// DefaultRemoveCompletedDownloads holds the default value on creation for the "remove_completed_downloads" field.
 	DefaultRemoveCompletedDownloads bool
 	// DefaultRemoveFailedDownloads holds the default value on creation for the "remove_failed_downloads" field.
@@ -150,9 +150,9 @@ func BySettings(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSettings, opts...).ToFunc()
 }
 
-// ByOrdering orders the results by the ordering field.
-func ByOrdering(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldOrdering, opts...).ToFunc()
+// ByPriority1 orders the results by the priority1 field.
+func ByPriority1(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPriority1, opts...).ToFunc()
 }
 
 // ByRemoveCompletedDownloads orders the results by the remove_completed_downloads field.

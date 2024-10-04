@@ -32,12 +32,12 @@ func init() {
 	downloadclientsDescSettings := downloadclientsFields[6].Descriptor()
 	// downloadclients.DefaultSettings holds the default value on creation for the settings field.
 	downloadclients.DefaultSettings = downloadclientsDescSettings.Default.(string)
-	// downloadclientsDescOrdering is the schema descriptor for ordering field.
-	downloadclientsDescOrdering := downloadclientsFields[7].Descriptor()
-	// downloadclients.DefaultOrdering holds the default value on creation for the ordering field.
-	downloadclients.DefaultOrdering = downloadclientsDescOrdering.Default.(int)
-	// downloadclients.OrderingValidator is a validator for the "ordering" field. It is called by the builders before save.
-	downloadclients.OrderingValidator = downloadclientsDescOrdering.Validators[0].(func(int) error)
+	// downloadclientsDescPriority1 is the schema descriptor for priority1 field.
+	downloadclientsDescPriority1 := downloadclientsFields[7].Descriptor()
+	// downloadclients.DefaultPriority1 holds the default value on creation for the priority1 field.
+	downloadclients.DefaultPriority1 = downloadclientsDescPriority1.Default.(int)
+	// downloadclients.Priority1Validator is a validator for the "priority1" field. It is called by the builders before save.
+	downloadclients.Priority1Validator = downloadclientsDescPriority1.Validators[0].(func(int) error)
 	// downloadclientsDescRemoveCompletedDownloads is the schema descriptor for remove_completed_downloads field.
 	downloadclientsDescRemoveCompletedDownloads := downloadclientsFields[8].Descriptor()
 	// downloadclients.DefaultRemoveCompletedDownloads holds the default value on creation for the remove_completed_downloads field.

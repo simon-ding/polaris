@@ -56,6 +56,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
             "impl": client.implementation,
             "remove_completed_downloads": client.removeCompletedDownloads,
             "remove_failed_downloads": client.removeFailedDownloads,
+            "priority": client.priority.toString(),
           },
           child: Column(
             children: [
@@ -86,6 +87,11 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: FormBuilderValidators.required(),
               ),
+              FormBuilderTextField(
+                  name: "priority",
+                  decoration: const InputDecoration(labelText: "优先级", helperText: "1-50, 1最高优先级，50最低优先级"),
+                  validator: FormBuilderValidators.integer(),
+                  autovalidateMode: AutovalidateMode.onUserInteraction),
               FormBuilderSwitch(
                   name: "remove_completed_downloads",
                   title: const Text("任务完成后删除")),
@@ -148,6 +154,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                 url: values["url"],
                 user: _enableAuth ? values["user"] : null,
                 password: _enableAuth ? values["password"] : null,
+                priority: int.parse(values["priority"]),
                 removeCompletedDownloads: values["remove_completed_downloads"],
                 removeFailedDownloads: values["remove_failed_downloads"]));
       } else {

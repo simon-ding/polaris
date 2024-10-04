@@ -330,18 +330,18 @@ func (c *Client) SaveDownloader(downloader *ent.DownloadClients) error {
 	count := c.ent.DownloadClients.Query().Where(downloadclients.Name(downloader.Name)).CountX(context.TODO())
 	if count != 0 {
 		err := c.ent.DownloadClients.Update().Where(downloadclients.Name(downloader.Name)).SetImplementation(downloader.Implementation).
-			SetURL(downloader.URL).SetUser(downloader.User).SetPassword(downloader.Password).Exec(context.TODO())
+			SetURL(downloader.URL).SetUser(downloader.User).SetPassword(downloader.Password).SetPriority1(downloader.Priority1).Exec(context.TODO())
 		return err
 	}
 
 	_, err := c.ent.DownloadClients.Create().SetEnable(true).SetImplementation(downloader.Implementation).
-		SetName(downloader.Name).SetURL(downloader.URL).SetUser(downloader.User).SetPassword(downloader.Password).Save(context.TODO())
+		SetName(downloader.Name).SetURL(downloader.URL).SetUser(downloader.User).SetPriority1(downloader.Priority1).SetPassword(downloader.Password).Save(context.TODO())
 	return err
 }
 
 
 func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
-	cc, err := c.ent.DownloadClients.Query().Order(ent.Asc(downloadclients.FieldOrdering)).All(context.TODO())
+	cc, err := c.ent.DownloadClients.Query().Order(ent.Asc(downloadclients.FieldPriority1)).All(context.TODO())
 	if err != nil {
 		log.Errorf("no download client")
 		return nil

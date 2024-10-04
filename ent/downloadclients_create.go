@@ -85,16 +85,16 @@ func (dcc *DownloadClientsCreate) SetNillableSettings(s *string) *DownloadClient
 	return dcc
 }
 
-// SetOrdering sets the "ordering" field.
-func (dcc *DownloadClientsCreate) SetOrdering(i int) *DownloadClientsCreate {
-	dcc.mutation.SetOrdering(i)
+// SetPriority1 sets the "priority1" field.
+func (dcc *DownloadClientsCreate) SetPriority1(i int) *DownloadClientsCreate {
+	dcc.mutation.SetPriority1(i)
 	return dcc
 }
 
-// SetNillableOrdering sets the "ordering" field if the given value is not nil.
-func (dcc *DownloadClientsCreate) SetNillableOrdering(i *int) *DownloadClientsCreate {
+// SetNillablePriority1 sets the "priority1" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillablePriority1(i *int) *DownloadClientsCreate {
 	if i != nil {
-		dcc.SetOrdering(*i)
+		dcc.SetPriority1(*i)
 	}
 	return dcc
 }
@@ -188,9 +188,9 @@ func (dcc *DownloadClientsCreate) defaults() {
 		v := downloadclients.DefaultSettings
 		dcc.mutation.SetSettings(v)
 	}
-	if _, ok := dcc.mutation.Ordering(); !ok {
-		v := downloadclients.DefaultOrdering
-		dcc.mutation.SetOrdering(v)
+	if _, ok := dcc.mutation.Priority1(); !ok {
+		v := downloadclients.DefaultPriority1
+		dcc.mutation.SetPriority1(v)
 	}
 	if _, ok := dcc.mutation.RemoveCompletedDownloads(); !ok {
 		v := downloadclients.DefaultRemoveCompletedDownloads
@@ -234,12 +234,12 @@ func (dcc *DownloadClientsCreate) check() error {
 	if _, ok := dcc.mutation.Settings(); !ok {
 		return &ValidationError{Name: "settings", err: errors.New(`ent: missing required field "DownloadClients.settings"`)}
 	}
-	if _, ok := dcc.mutation.Ordering(); !ok {
-		return &ValidationError{Name: "ordering", err: errors.New(`ent: missing required field "DownloadClients.ordering"`)}
+	if _, ok := dcc.mutation.Priority1(); !ok {
+		return &ValidationError{Name: "priority1", err: errors.New(`ent: missing required field "DownloadClients.priority1"`)}
 	}
-	if v, ok := dcc.mutation.Ordering(); ok {
-		if err := downloadclients.OrderingValidator(v); err != nil {
-			return &ValidationError{Name: "ordering", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.ordering": %w`, err)}
+	if v, ok := dcc.mutation.Priority1(); ok {
+		if err := downloadclients.Priority1Validator(v); err != nil {
+			return &ValidationError{Name: "priority1", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.priority1": %w`, err)}
 		}
 	}
 	if _, ok := dcc.mutation.RemoveCompletedDownloads(); !ok {
@@ -305,9 +305,9 @@ func (dcc *DownloadClientsCreate) createSpec() (*DownloadClients, *sqlgraph.Crea
 		_spec.SetField(downloadclients.FieldSettings, field.TypeString, value)
 		_node.Settings = value
 	}
-	if value, ok := dcc.mutation.Ordering(); ok {
-		_spec.SetField(downloadclients.FieldOrdering, field.TypeInt, value)
-		_node.Ordering = value
+	if value, ok := dcc.mutation.Priority1(); ok {
+		_spec.SetField(downloadclients.FieldPriority1, field.TypeInt, value)
+		_node.Priority1 = value
 	}
 	if value, ok := dcc.mutation.RemoveCompletedDownloads(); ok {
 		_spec.SetField(downloadclients.FieldRemoveCompletedDownloads, field.TypeBool, value)

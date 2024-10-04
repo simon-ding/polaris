@@ -125,24 +125,24 @@ func (dcu *DownloadClientsUpdate) SetNillableSettings(s *string) *DownloadClient
 	return dcu
 }
 
-// SetOrdering sets the "ordering" field.
-func (dcu *DownloadClientsUpdate) SetOrdering(i int) *DownloadClientsUpdate {
-	dcu.mutation.ResetOrdering()
-	dcu.mutation.SetOrdering(i)
+// SetPriority1 sets the "priority1" field.
+func (dcu *DownloadClientsUpdate) SetPriority1(i int) *DownloadClientsUpdate {
+	dcu.mutation.ResetPriority1()
+	dcu.mutation.SetPriority1(i)
 	return dcu
 }
 
-// SetNillableOrdering sets the "ordering" field if the given value is not nil.
-func (dcu *DownloadClientsUpdate) SetNillableOrdering(i *int) *DownloadClientsUpdate {
+// SetNillablePriority1 sets the "priority1" field if the given value is not nil.
+func (dcu *DownloadClientsUpdate) SetNillablePriority1(i *int) *DownloadClientsUpdate {
 	if i != nil {
-		dcu.SetOrdering(*i)
+		dcu.SetPriority1(*i)
 	}
 	return dcu
 }
 
-// AddOrdering adds i to the "ordering" field.
-func (dcu *DownloadClientsUpdate) AddOrdering(i int) *DownloadClientsUpdate {
-	dcu.mutation.AddOrdering(i)
+// AddPriority1 adds i to the "priority1" field.
+func (dcu *DownloadClientsUpdate) AddPriority1(i int) *DownloadClientsUpdate {
+	dcu.mutation.AddPriority1(i)
 	return dcu
 }
 
@@ -227,9 +227,9 @@ func (dcu *DownloadClientsUpdate) check() error {
 			return &ValidationError{Name: "implementation", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.implementation": %w`, err)}
 		}
 	}
-	if v, ok := dcu.mutation.Ordering(); ok {
-		if err := downloadclients.OrderingValidator(v); err != nil {
-			return &ValidationError{Name: "ordering", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.ordering": %w`, err)}
+	if v, ok := dcu.mutation.Priority1(); ok {
+		if err := downloadclients.Priority1Validator(v); err != nil {
+			return &ValidationError{Name: "priority1", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.priority1": %w`, err)}
 		}
 	}
 	return nil
@@ -268,11 +268,11 @@ func (dcu *DownloadClientsUpdate) sqlSave(ctx context.Context) (n int, err error
 	if value, ok := dcu.mutation.Settings(); ok {
 		_spec.SetField(downloadclients.FieldSettings, field.TypeString, value)
 	}
-	if value, ok := dcu.mutation.Ordering(); ok {
-		_spec.SetField(downloadclients.FieldOrdering, field.TypeInt, value)
+	if value, ok := dcu.mutation.Priority1(); ok {
+		_spec.SetField(downloadclients.FieldPriority1, field.TypeInt, value)
 	}
-	if value, ok := dcu.mutation.AddedOrdering(); ok {
-		_spec.AddField(downloadclients.FieldOrdering, field.TypeInt, value)
+	if value, ok := dcu.mutation.AddedPriority1(); ok {
+		_spec.AddField(downloadclients.FieldPriority1, field.TypeInt, value)
 	}
 	if value, ok := dcu.mutation.RemoveCompletedDownloads(); ok {
 		_spec.SetField(downloadclients.FieldRemoveCompletedDownloads, field.TypeBool, value)
@@ -401,24 +401,24 @@ func (dcuo *DownloadClientsUpdateOne) SetNillableSettings(s *string) *DownloadCl
 	return dcuo
 }
 
-// SetOrdering sets the "ordering" field.
-func (dcuo *DownloadClientsUpdateOne) SetOrdering(i int) *DownloadClientsUpdateOne {
-	dcuo.mutation.ResetOrdering()
-	dcuo.mutation.SetOrdering(i)
+// SetPriority1 sets the "priority1" field.
+func (dcuo *DownloadClientsUpdateOne) SetPriority1(i int) *DownloadClientsUpdateOne {
+	dcuo.mutation.ResetPriority1()
+	dcuo.mutation.SetPriority1(i)
 	return dcuo
 }
 
-// SetNillableOrdering sets the "ordering" field if the given value is not nil.
-func (dcuo *DownloadClientsUpdateOne) SetNillableOrdering(i *int) *DownloadClientsUpdateOne {
+// SetNillablePriority1 sets the "priority1" field if the given value is not nil.
+func (dcuo *DownloadClientsUpdateOne) SetNillablePriority1(i *int) *DownloadClientsUpdateOne {
 	if i != nil {
-		dcuo.SetOrdering(*i)
+		dcuo.SetPriority1(*i)
 	}
 	return dcuo
 }
 
-// AddOrdering adds i to the "ordering" field.
-func (dcuo *DownloadClientsUpdateOne) AddOrdering(i int) *DownloadClientsUpdateOne {
-	dcuo.mutation.AddOrdering(i)
+// AddPriority1 adds i to the "priority1" field.
+func (dcuo *DownloadClientsUpdateOne) AddPriority1(i int) *DownloadClientsUpdateOne {
+	dcuo.mutation.AddPriority1(i)
 	return dcuo
 }
 
@@ -516,9 +516,9 @@ func (dcuo *DownloadClientsUpdateOne) check() error {
 			return &ValidationError{Name: "implementation", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.implementation": %w`, err)}
 		}
 	}
-	if v, ok := dcuo.mutation.Ordering(); ok {
-		if err := downloadclients.OrderingValidator(v); err != nil {
-			return &ValidationError{Name: "ordering", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.ordering": %w`, err)}
+	if v, ok := dcuo.mutation.Priority1(); ok {
+		if err := downloadclients.Priority1Validator(v); err != nil {
+			return &ValidationError{Name: "priority1", err: fmt.Errorf(`ent: validator failed for field "DownloadClients.priority1": %w`, err)}
 		}
 	}
 	return nil
@@ -574,11 +574,11 @@ func (dcuo *DownloadClientsUpdateOne) sqlSave(ctx context.Context) (_node *Downl
 	if value, ok := dcuo.mutation.Settings(); ok {
 		_spec.SetField(downloadclients.FieldSettings, field.TypeString, value)
 	}
-	if value, ok := dcuo.mutation.Ordering(); ok {
-		_spec.SetField(downloadclients.FieldOrdering, field.TypeInt, value)
+	if value, ok := dcuo.mutation.Priority1(); ok {
+		_spec.SetField(downloadclients.FieldPriority1, field.TypeInt, value)
 	}
-	if value, ok := dcuo.mutation.AddedOrdering(); ok {
-		_spec.AddField(downloadclients.FieldOrdering, field.TypeInt, value)
+	if value, ok := dcuo.mutation.AddedPriority1(); ok {
+		_spec.AddField(downloadclients.FieldPriority1, field.TypeInt, value)
 	}
 	if value, ok := dcuo.mutation.RemoveCompletedDownloads(); ok {
 		_spec.SetField(downloadclients.FieldRemoveCompletedDownloads, field.TypeBool, value)

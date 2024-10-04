@@ -243,6 +243,7 @@ class DownloadClient {
   String? password;
   bool? removeCompletedDownloads;
   bool? removeFailedDownloads;
+  int? priority;
   DownloadClient(
       {this.id,
       this.enable,
@@ -252,6 +253,7 @@ class DownloadClient {
       this.user,
       this.password,
       this.removeCompletedDownloads = true,
+      this.priority = 1,
       this.removeFailedDownloads = true});
 
   DownloadClient.fromJson(Map<String, dynamic> json) {
@@ -262,6 +264,7 @@ class DownloadClient {
     url = json['url'];
     user = json['user'];
     password = json['password'];
+    priority = json["priority1"];
     removeCompletedDownloads = json["remove_completed_downloads"] ?? false;
     removeFailedDownloads = json["remove_failed_downloads"] ?? false;
   }
@@ -275,6 +278,7 @@ class DownloadClient {
     data['url'] = url;
     data['user'] = user;
     data['password'] = password;
+    data["priority"] = priority;
     data["remove_completed_downloads"] = removeCompletedDownloads;
     data["remove_failed_downloads"] = removeFailedDownloads;
     return data;

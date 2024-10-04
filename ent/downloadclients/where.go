@@ -83,9 +83,9 @@ func Settings(v string) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldEQ(FieldSettings, v))
 }
 
-// Ordering applies equality check predicate on the "ordering" field. It's identical to OrderingEQ.
-func Ordering(v int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldEQ(FieldOrdering, v))
+// Priority1 applies equality check predicate on the "priority1" field. It's identical to Priority1EQ.
+func Priority1(v int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldPriority1, v))
 }
 
 // RemoveCompletedDownloads applies equality check predicate on the "remove_completed_downloads" field. It's identical to RemoveCompletedDownloadsEQ.
@@ -458,44 +458,44 @@ func SettingsContainsFold(v string) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldContainsFold(FieldSettings, v))
 }
 
-// OrderingEQ applies the EQ predicate on the "ordering" field.
-func OrderingEQ(v int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldEQ(FieldOrdering, v))
+// Priority1EQ applies the EQ predicate on the "priority1" field.
+func Priority1EQ(v int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldPriority1, v))
 }
 
-// OrderingNEQ applies the NEQ predicate on the "ordering" field.
-func OrderingNEQ(v int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldNEQ(FieldOrdering, v))
+// Priority1NEQ applies the NEQ predicate on the "priority1" field.
+func Priority1NEQ(v int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNEQ(FieldPriority1, v))
 }
 
-// OrderingIn applies the In predicate on the "ordering" field.
-func OrderingIn(vs ...int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldIn(FieldOrdering, vs...))
+// Priority1In applies the In predicate on the "priority1" field.
+func Priority1In(vs ...int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldIn(FieldPriority1, vs...))
 }
 
-// OrderingNotIn applies the NotIn predicate on the "ordering" field.
-func OrderingNotIn(vs ...int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldNotIn(FieldOrdering, vs...))
+// Priority1NotIn applies the NotIn predicate on the "priority1" field.
+func Priority1NotIn(vs ...int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNotIn(FieldPriority1, vs...))
 }
 
-// OrderingGT applies the GT predicate on the "ordering" field.
-func OrderingGT(v int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldGT(FieldOrdering, v))
+// Priority1GT applies the GT predicate on the "priority1" field.
+func Priority1GT(v int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGT(FieldPriority1, v))
 }
 
-// OrderingGTE applies the GTE predicate on the "ordering" field.
-func OrderingGTE(v int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldGTE(FieldOrdering, v))
+// Priority1GTE applies the GTE predicate on the "priority1" field.
+func Priority1GTE(v int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGTE(FieldPriority1, v))
 }
 
-// OrderingLT applies the LT predicate on the "ordering" field.
-func OrderingLT(v int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldLT(FieldOrdering, v))
+// Priority1LT applies the LT predicate on the "priority1" field.
+func Priority1LT(v int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLT(FieldPriority1, v))
 }
 
-// OrderingLTE applies the LTE predicate on the "ordering" field.
-func OrderingLTE(v int) predicate.DownloadClients {
-	return predicate.DownloadClients(sql.FieldLTE(FieldOrdering, v))
+// Priority1LTE applies the LTE predicate on the "priority1" field.
+func Priority1LTE(v int) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLTE(FieldPriority1, v))
 }
 
 // RemoveCompletedDownloadsEQ applies the EQ predicate on the "remove_completed_downloads" field.

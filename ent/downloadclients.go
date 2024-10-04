@@ -30,8 +30,8 @@ type DownloadClients struct {
 	Password string `json:"password,omitempty"`
 	// Settings holds the value of the "settings" field.
 	Settings string `json:"settings,omitempty"`
-	// Ordering holds the value of the "ordering" field.
-	Ordering int `json:"ordering,omitempty"`
+	// Priority1 holds the value of the "priority1" field.
+	Priority1 int `json:"priority1,omitempty"`
 	// RemoveCompletedDownloads holds the value of the "remove_completed_downloads" field.
 	RemoveCompletedDownloads bool `json:"remove_completed_downloads,omitempty"`
 	// RemoveFailedDownloads holds the value of the "remove_failed_downloads" field.
@@ -48,7 +48,7 @@ func (*DownloadClients) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case downloadclients.FieldEnable, downloadclients.FieldRemoveCompletedDownloads, downloadclients.FieldRemoveFailedDownloads:
 			values[i] = new(sql.NullBool)
-		case downloadclients.FieldID, downloadclients.FieldOrdering:
+		case downloadclients.FieldID, downloadclients.FieldPriority1:
 			values[i] = new(sql.NullInt64)
 		case downloadclients.FieldName, downloadclients.FieldImplementation, downloadclients.FieldURL, downloadclients.FieldUser, downloadclients.FieldPassword, downloadclients.FieldSettings, downloadclients.FieldTags:
 			values[i] = new(sql.NullString)
@@ -115,11 +115,11 @@ func (dc *DownloadClients) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				dc.Settings = value.String
 			}
-		case downloadclients.FieldOrdering:
+		case downloadclients.FieldPriority1:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ordering", values[i])
+				return fmt.Errorf("unexpected type %T for field priority1", values[i])
 			} else if value.Valid {
-				dc.Ordering = int(value.Int64)
+				dc.Priority1 = int(value.Int64)
 			}
 		case downloadclients.FieldRemoveCompletedDownloads:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -196,8 +196,8 @@ func (dc *DownloadClients) String() string {
 	builder.WriteString("settings=")
 	builder.WriteString(dc.Settings)
 	builder.WriteString(", ")
-	builder.WriteString("ordering=")
-	builder.WriteString(fmt.Sprintf("%v", dc.Ordering))
+	builder.WriteString("priority1=")
+	builder.WriteString(fmt.Sprintf("%v", dc.Priority1))
 	builder.WriteString(", ")
 	builder.WriteString("remove_completed_downloads=")
 	builder.WriteString(fmt.Sprintf("%v", dc.RemoveCompletedDownloads))

@@ -22,7 +22,7 @@ func (DownloadClients) Fields() []ent.Field {
 		field.String("user").Default(""),
 		field.String("password").Default(""),
 		field.String("settings").Default(""),
-		field.Int("ordering").Default(1).Validate(func(i int) error {
+		field.Int("priority1").Default(1).Validate(func(i int) error {
 			if i > 50 {
 				return errors.ErrUnsupported
 			}

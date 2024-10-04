@@ -30,7 +30,7 @@ var (
 		{Name: "user", Type: field.TypeString, Default: ""},
 		{Name: "password", Type: field.TypeString, Default: ""},
 		{Name: "settings", Type: field.TypeString, Default: ""},
-		{Name: "ordering", Type: field.TypeInt, Default: 1},
+		{Name: "priority1", Type: field.TypeInt, Default: 1},
 		{Name: "remove_completed_downloads", Type: field.TypeBool, Default: true},
 		{Name: "remove_failed_downloads", Type: field.TypeBool, Default: true},
 		{Name: "tags", Type: field.TypeString, Default: ""},

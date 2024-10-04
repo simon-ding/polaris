@@ -191,12 +191,14 @@ func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
 	}
 	return indexers, nil
 }
+
 type downloadClientIn struct {
 	Name           string `json:"name" binding:"required"`
 	URL            string `json:"url" binding:"required"`
 	User           string `json:"user"`
 	Password       string `json:"password"`
 	Implementation string `json:"implementation" binding:"required"`
+	Priority       int    `json:"priority"`
 }
 
 func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
@@ -205,6 +207,9 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "bind json")
 	}
 	utils.TrimFields(&in)
+	if in.Priority == 0 {
+		in.Priority = 1 //make default
+	}
 	//test connection
 	if in.Implementation == downloadclients.ImplementationTransmission.String() {
 		_, err := transmission.NewClient(transmission.Config{
@@ -215,7 +220,7 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "tranmission setting")
 		}
-	
+
 	} else if in.Implementation == downloadclients.ImplementationQbittorrent.String() {
 		_, err := qbittorrent.NewClient(in.URL, in.User, in.Password)
 		if err != nil {
@@ -223,11 +228,12 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 		}
 	}
 	if err := s.db.SaveDownloader(&ent.DownloadClients{
-		Name: in.Name,
+		Name:           in.Name,
 		Implementation: downloadclients.Implementation(in.Implementation),
-		URL: in.URL,
-		User: in.User,
-		Password: in.Password,
+		Priority1:      in.Priority,
+		URL:            in.URL,
+		User:           in.User,
+		Password:       in.Password,
 	}); err != nil {
 		return nil, errors.Wrap(err, "save downloader")
 	}
