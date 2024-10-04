@@ -74,6 +74,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                   DropdownMenuItem(
                       value: "qbittorrent", child: Text("qBittorrent")),
                 ],
+                validator: FormBuilderValidators.required(),
               ),
               FormBuilderTextField(
                   name: "name",
