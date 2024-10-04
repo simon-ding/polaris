@@ -105,12 +105,15 @@ type Torrent struct {
 	Config
 }
 
-func (t *Torrent) reloadClient() error {
+func (t *Torrent) Reload() error {
 	c, err := NewClient(t.Config)
 	if err != nil {
 		return err
 	}
 	t.c = c.c
+	if !t.Exists() {
+		return errors.Errorf("torrent not exists: %v", t.Hash)
+	}
 	return nil
 }
 
@@ -210,19 +213,4 @@ func (t *Torrent) Save() string {
 
 func (t *Torrent) GetHash() string {
 	return t.Hash
-}
-
-
-func ReloadTorrent(s string) (*Torrent, error) {
-	var torrent = Torrent{}
-	err := json.Unmarshal([]byte(s), &torrent)
-	if err != nil {
-		return nil, err
-	}
-
-	err = torrent.reloadClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "reload client")
-	}
-	return &torrent, nil
 }

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"polaris/db"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
@@ -51,18 +52,43 @@ func (c *Client) Init() {
 func (c *Client) reloadTasks() {
 	allTasks := c.db.GetRunningHistories()
 	for _, t := range allTasks {
-		torrent, err := transmission.ReloadTorrent(t.Saved)
-		if err != nil {
-			log.Errorf("relaod task %s failed: %v", t.SourceTitle, err)
+		var torrent pkg.Torrent
+		if tt, err := c.reloadTransmiision(t.Saved); err == nil {
+			torrent = tt
+			log.Infof("load transmission task: %v", t.Saved)
+		} else if tt, err := c.reloadQbit(t.Saved); err == nil {
+			torrent = tt
+			log.Infof("load qbit task: %v", t.Saved)
+		} else {
+			log.Warnf("load task fail: %v", t.Saved)
 			continue
 		}
-		if !torrent.Exists() { //只要种子还存在于客户端中，就重新加载，有可能是还在做种中
-			continue
-		}
-		log.Infof("reloading task: %d %s", t.ID, t.SourceTitle)
 		c.tasks[t.ID] = &Task{Torrent: torrent}
 	}
 }
+
+func (c *Client) reloadTransmiision(s string) (pkg.Torrent, error) {
+	var t transmission.Torrent
+	if err := json.Unmarshal([]byte(s), &t); err != nil {
+		return nil, err
+	}
+	if err := t.Reload(); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+func (c *Client) reloadQbit(s string) (pkg.Torrent, error) {
+	var t qbittorrent.Torrent
+	if err := json.Unmarshal([]byte(s), &t); err != nil {
+		return nil, err
+	}
+	if err := t.Reload(); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
 
 func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {
 	downloaders := c.db.GetAllDonloadClients()

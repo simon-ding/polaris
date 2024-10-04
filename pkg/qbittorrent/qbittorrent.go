@@ -174,3 +174,15 @@ func (t *Torrent) SeedRatio() (float64, error) {
 	}
 	return qb.Ratio, nil
 }
+
+func (t *Torrent) Reload() error {
+	c, err := NewClient(t.URL, t.User, t.Password)
+	if err != nil {
+		return err
+	}
+	t.c = c.c
+	if !t.Exists() {
+		return errors.Errorf("torrent not exists: %v", t.Hash)
+	}
+	return nil
+}

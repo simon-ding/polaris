@@ -10,6 +10,7 @@ type Torrent interface {
 	Exists() bool
 	SeedRatio() (float64, error)
 	GetHash() string
+	Reload() error
 }
 
 type Downloader interface {
@@ -17,5 +18,3 @@ type Downloader interface {
 	Download(link, dir string) (Torrent, error)
 }
 
-type Storage interface {
-}
