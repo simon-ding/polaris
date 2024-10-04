@@ -469,7 +469,6 @@ func (client *Client) Torrents(opts TorrentsOptions) (torrentList []TorrentInfo,
 	return torrentList, nil
 }
 
-// deprecated
 // Torrent returns a specific torrent matching the hash
 func (client *Client) Torrent(hash string) (torrent Torrent, err error) {
 	var opts = map[string]string{"hash": strings.ToLower(hash)}

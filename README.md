@@ -29,11 +29,12 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 - [x] plex 刮削支持
 - [x] NFO 刮削文件支持
 - [x] BT/PT 支持
+- [x] qbittorrent/transmission客户端支持
 - [x] and more...
 
 ## Todos
 
-- [ ] qbittorrent客户端支持
+
 - [ ] 更多通知客户端支持
 - [ ] 第三方watchlist导入支持
 - [ ] 手机客户端
