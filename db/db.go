@@ -66,9 +66,13 @@ func (c *Client) init() {
 		log.Infof("set default log level")
 		c.SetSetting(SettingLogLevel, "info")
 	}
-	if tr := c.GetTransmission(); tr == nil {
+	if tr := c.GetAllDonloadClients(); len(tr) == 0 {
 		log.Warnf("no download client, set default download client")
-		c.SaveTransmission("transmission", "http://transmission:9091", "", "")
+		c.SaveDownloader(&ent.DownloadClients{
+			Name: "transmission",
+			Implementation: downloadclients.ImplementationTransmission,
+			URL: "http://transmission:9091",
+		})
 	}
 }
 
@@ -322,30 +326,22 @@ func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
 	return l
 }
 
-func (c *Client) SaveTransmission(name, url, user, password string) error {
-	count := c.ent.DownloadClients.Query().Where(downloadclients.Name(name)).CountX(context.TODO())
+func (c *Client) SaveDownloader(downloader *ent.DownloadClients) error {
+	count := c.ent.DownloadClients.Query().Where(downloadclients.Name(downloader.Name)).CountX(context.TODO())
 	if count != 0 {
-		err := c.ent.DownloadClients.Update().Where(downloadclients.Name(name)).
-			SetURL(url).SetUser(user).SetPassword(password).Exec(context.TODO())
+		err := c.ent.DownloadClients.Update().Where(downloadclients.Name(downloader.Name)).SetImplementation(downloader.Implementation).
+			SetURL(downloader.URL).SetUser(downloader.User).SetPassword(downloader.Password).Exec(context.TODO())
 		return err
 	}
 
-	_, err := c.ent.DownloadClients.Create().SetEnable(true).SetImplementation("transmission").
-		SetName(name).SetURL(url).SetUser(user).SetPassword(password).Save(context.TODO())
+	_, err := c.ent.DownloadClients.Create().SetEnable(true).SetImplementation(downloader.Implementation).
+		SetName(downloader.Name).SetURL(downloader.URL).SetUser(downloader.User).SetPassword(downloader.Password).Save(context.TODO())
 	return err
 }
 
-func (c *Client) GetTransmission() *ent.DownloadClients {
-	dc, err := c.ent.DownloadClients.Query().Where(downloadclients.Implementation("transmission")).First(context.TODO())
-	if err != nil {
-		log.Errorf("no transmission client found: %v", err)
-		return nil
-	}
-	return dc
-}
 
 func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
-	cc, err := c.ent.DownloadClients.Query().All(context.TODO())
+	cc, err := c.ent.DownloadClients.Query().Order(ent.Asc(downloadclients.FieldOrdering)).All(context.TODO())
 	if err != nil {
 		log.Errorf("no download client")
 		return nil

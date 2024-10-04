@@ -14,7 +14,7 @@ import (
 )
 
 func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, episodeNum int) (*string, error) {
-	trc, dlc, err := c.getDownloadClient()
+	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
@@ -102,7 +102,7 @@ func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 }
 
 func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexerID int) (*string, error) {
-	trc, dlc, err := c.getDownloadClient()
+	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}

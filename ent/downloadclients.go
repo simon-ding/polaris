@@ -21,7 +21,7 @@ type DownloadClients struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Implementation holds the value of the "implementation" field.
-	Implementation string `json:"implementation,omitempty"`
+	Implementation downloadclients.Implementation `json:"implementation,omitempty"`
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
 	// User holds the value of the "user" field.
@@ -30,8 +30,8 @@ type DownloadClients struct {
 	Password string `json:"password,omitempty"`
 	// Settings holds the value of the "settings" field.
 	Settings string `json:"settings,omitempty"`
-	// Priority holds the value of the "priority" field.
-	Priority string `json:"priority,omitempty"`
+	// Ordering holds the value of the "ordering" field.
+	Ordering int `json:"ordering,omitempty"`
 	// RemoveCompletedDownloads holds the value of the "remove_completed_downloads" field.
 	RemoveCompletedDownloads bool `json:"remove_completed_downloads,omitempty"`
 	// RemoveFailedDownloads holds the value of the "remove_failed_downloads" field.
@@ -48,9 +48,9 @@ func (*DownloadClients) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case downloadclients.FieldEnable, downloadclients.FieldRemoveCompletedDownloads, downloadclients.FieldRemoveFailedDownloads:
 			values[i] = new(sql.NullBool)
-		case downloadclients.FieldID:
+		case downloadclients.FieldID, downloadclients.FieldOrdering:
 			values[i] = new(sql.NullInt64)
-		case downloadclients.FieldName, downloadclients.FieldImplementation, downloadclients.FieldURL, downloadclients.FieldUser, downloadclients.FieldPassword, downloadclients.FieldSettings, downloadclients.FieldPriority, downloadclients.FieldTags:
+		case downloadclients.FieldName, downloadclients.FieldImplementation, downloadclients.FieldURL, downloadclients.FieldUser, downloadclients.FieldPassword, downloadclients.FieldSettings, downloadclients.FieldTags:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -89,7 +89,7 @@ func (dc *DownloadClients) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field implementation", values[i])
 			} else if value.Valid {
-				dc.Implementation = value.String
+				dc.Implementation = downloadclients.Implementation(value.String)
 			}
 		case downloadclients.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -115,11 +115,11 @@ func (dc *DownloadClients) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				dc.Settings = value.String
 			}
-		case downloadclients.FieldPriority:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field priority", values[i])
+		case downloadclients.FieldOrdering:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field ordering", values[i])
 			} else if value.Valid {
-				dc.Priority = value.String
+				dc.Ordering = int(value.Int64)
 			}
 		case downloadclients.FieldRemoveCompletedDownloads:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -182,7 +182,7 @@ func (dc *DownloadClients) String() string {
 	builder.WriteString(dc.Name)
 	builder.WriteString(", ")
 	builder.WriteString("implementation=")
-	builder.WriteString(dc.Implementation)
+	builder.WriteString(fmt.Sprintf("%v", dc.Implementation))
 	builder.WriteString(", ")
 	builder.WriteString("url=")
 	builder.WriteString(dc.URL)
@@ -196,8 +196,8 @@ func (dc *DownloadClients) String() string {
 	builder.WriteString("settings=")
 	builder.WriteString(dc.Settings)
 	builder.WriteString(", ")
-	builder.WriteString("priority=")
-	builder.WriteString(dc.Priority)
+	builder.WriteString("ordering=")
+	builder.WriteString(fmt.Sprintf("%v", dc.Ordering))
 	builder.WriteString(", ")
 	builder.WriteString("remove_completed_downloads=")
 	builder.WriteString(fmt.Sprintf("%v", dc.RemoveCompletedDownloads))

@@ -9,9 +9,13 @@ type Torrent interface {
 	Save() string
 	Exists() bool
 	SeedRatio() (float64, error)
+	GetHash() string
 }
 
+type Downloader interface {
+	GetAll() ([]Torrent, error)
+	Download(link, dir string) (Torrent, error)
+}
 
 type Storage interface {
-
 }

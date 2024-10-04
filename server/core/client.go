@@ -3,7 +3,10 @@ package core
 import (
 	"polaris/db"
 	"polaris/ent"
+	"polaris/ent/downloadclients"
 	"polaris/log"
+	"polaris/pkg"
+	"polaris/pkg/qbittorrent"
 	"polaris/pkg/tmdb"
 	"polaris/pkg/transmission"
 	"polaris/pkg/utils"
@@ -61,17 +64,34 @@ func (c *Client) reloadTasks() {
 	}
 }
 
-func (c *Client) getDownloadClient() (*transmission.Client, *ent.DownloadClients, error) {
-	tr := c.db.GetTransmission()
-	trc, err := transmission.NewClient(transmission.Config{
-		URL:      tr.URL,
-		User:     tr.User,
-		Password: tr.Password,
-	})
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "connect transmission")
+func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {
+	downloaders := c.db.GetAllDonloadClients()
+	for _, d := range downloaders {
+		if !d.Enable {
+			continue
+		}
+		if d.Implementation == downloadclients.ImplementationTransmission {
+			trc, err := transmission.NewClient(transmission.Config{
+				URL:      d.URL,
+				User:     d.User,
+				Password: d.Password,
+			})
+			if err != nil {
+				log.Warnf("connect to download client error: %v", d.URL)
+				continue
+			}
+			return trc, d, nil
+		
+		} else if d.Implementation == downloadclients.ImplementationQbittorrent {
+			qbt, err := qbittorrent.NewClient(d.URL, d.User, d.Password)
+			if err != nil {
+				log.Warnf("connect to download client error: %v", d.URL)
+				continue
+			}
+			return qbt, d, nil
+		}
 	}
-	return trc, tr, nil
+	return nil, nil, errors.Errorf("no available download client")
 }
 
 func (c *Client) TMDB() (*tmdb.Client, error) {

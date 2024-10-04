@@ -53,7 +53,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
             "url": client.url,
             "user": client.user,
             "password": client.password,
-            "impl": "transmission",
+            "impl": client.implementation,
             "remove_completed_downloads": client.removeCompletedDownloads,
             "remove_failed_downloads": client.removeFailedDownloads,
           },
@@ -70,6 +70,8 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                 items: const [
                   DropdownMenuItem(
                       value: "transmission", child: Text("Transmission")),
+                  DropdownMenuItem(
+                      value: "qbittorrent", child: Text("qBittorrent")),
                 ],
               ),
               FormBuilderTextField(

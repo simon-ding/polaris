@@ -434,12 +434,13 @@ type DownloadClientsMutation struct {
 	id                         *int
 	enable                     *bool
 	name                       *string
-	implementation             *string
+	implementation             *downloadclients.Implementation
 	url                        *string
 	user                       *string
 	password                   *string
 	settings                   *string
-	priority                   *string
+	ordering                   *int
+	addordering                *int
 	remove_completed_downloads *bool
 	remove_failed_downloads    *bool
 	tags                       *string
@@ -620,12 +621,12 @@ func (m *DownloadClientsMutation) ResetName() {
 }
 
 // SetImplementation sets the "implementation" field.
-func (m *DownloadClientsMutation) SetImplementation(s string) {
-	m.implementation = &s
+func (m *DownloadClientsMutation) SetImplementation(d downloadclients.Implementation) {
+	m.implementation = &d
 }
 
 // Implementation returns the value of the "implementation" field in the mutation.
-func (m *DownloadClientsMutation) Implementation() (r string, exists bool) {
+func (m *DownloadClientsMutation) Implementation() (r downloadclients.Implementation, exists bool) {
 	v := m.implementation
 	if v == nil {
 		return
@@ -636,7 +637,7 @@ func (m *DownloadClientsMutation) Implementation() (r string, exists bool) {
 // OldImplementation returns the old "implementation" field's value of the DownloadClients entity.
 // If the DownloadClients object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DownloadClientsMutation) OldImplementation(ctx context.Context) (v string, err error) {
+func (m *DownloadClientsMutation) OldImplementation(ctx context.Context) (v downloadclients.Implementation, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldImplementation is only allowed on UpdateOne operations")
 	}
@@ -799,40 +800,60 @@ func (m *DownloadClientsMutation) ResetSettings() {
 	m.settings = nil
 }
 
-// SetPriority sets the "priority" field.
-func (m *DownloadClientsMutation) SetPriority(s string) {
-	m.priority = &s
+// SetOrdering sets the "ordering" field.
+func (m *DownloadClientsMutation) SetOrdering(i int) {
+	m.ordering = &i
+	m.addordering = nil
 }
 
-// Priority returns the value of the "priority" field in the mutation.
-func (m *DownloadClientsMutation) Priority() (r string, exists bool) {
-	v := m.priority
+// Ordering returns the value of the "ordering" field in the mutation.
+func (m *DownloadClientsMutation) Ordering() (r int, exists bool) {
+	v := m.ordering
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPriority returns the old "priority" field's value of the DownloadClients entity.
+// OldOrdering returns the old "ordering" field's value of the DownloadClients entity.
 // If the DownloadClients object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DownloadClientsMutation) OldPriority(ctx context.Context) (v string, err error) {
+func (m *DownloadClientsMutation) OldOrdering(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPriority is only allowed on UpdateOne operations")
+		return v, errors.New("OldOrdering is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPriority requires an ID field in the mutation")
+		return v, errors.New("OldOrdering requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPriority: %w", err)
+		return v, fmt.Errorf("querying old value for OldOrdering: %w", err)
 	}
-	return oldValue.Priority, nil
+	return oldValue.Ordering, nil
 }
 
-// ResetPriority resets all changes to the "priority" field.
-func (m *DownloadClientsMutation) ResetPriority() {
-	m.priority = nil
+// AddOrdering adds i to the "ordering" field.
+func (m *DownloadClientsMutation) AddOrdering(i int) {
+	if m.addordering != nil {
+		*m.addordering += i
+	} else {
+		m.addordering = &i
+	}
+}
+
+// AddedOrdering returns the value that was added to the "ordering" field in this mutation.
+func (m *DownloadClientsMutation) AddedOrdering() (r int, exists bool) {
+	v := m.addordering
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOrdering resets all changes to the "ordering" field.
+func (m *DownloadClientsMutation) ResetOrdering() {
+	m.ordering = nil
+	m.addordering = nil
 }
 
 // SetRemoveCompletedDownloads sets the "remove_completed_downloads" field.
@@ -999,8 +1020,8 @@ func (m *DownloadClientsMutation) Fields() []string {
 	if m.settings != nil {
 		fields = append(fields, downloadclients.FieldSettings)
 	}
-	if m.priority != nil {
-		fields = append(fields, downloadclients.FieldPriority)
+	if m.ordering != nil {
+		fields = append(fields, downloadclients.FieldOrdering)
 	}
 	if m.remove_completed_downloads != nil {
 		fields = append(fields, downloadclients.FieldRemoveCompletedDownloads)
@@ -1033,8 +1054,8 @@ func (m *DownloadClientsMutation) Field(name string) (ent.Value, bool) {
 		return m.Password()
 	case downloadclients.FieldSettings:
 		return m.Settings()
-	case downloadclients.FieldPriority:
-		return m.Priority()
+	case downloadclients.FieldOrdering:
+		return m.Ordering()
 	case downloadclients.FieldRemoveCompletedDownloads:
 		return m.RemoveCompletedDownloads()
 	case downloadclients.FieldRemoveFailedDownloads:
@@ -1064,8 +1085,8 @@ func (m *DownloadClientsMutation) OldField(ctx context.Context, name string) (en
 		return m.OldPassword(ctx)
 	case downloadclients.FieldSettings:
 		return m.OldSettings(ctx)
-	case downloadclients.FieldPriority:
-		return m.OldPriority(ctx)
+	case downloadclients.FieldOrdering:
+		return m.OldOrdering(ctx)
 	case downloadclients.FieldRemoveCompletedDownloads:
 		return m.OldRemoveCompletedDownloads(ctx)
 	case downloadclients.FieldRemoveFailedDownloads:
@@ -1096,7 +1117,7 @@ func (m *DownloadClientsMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case downloadclients.FieldImplementation:
-		v, ok := value.(string)
+		v, ok := value.(downloadclients.Implementation)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1130,12 +1151,12 @@ func (m *DownloadClientsMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSettings(v)
 		return nil
-	case downloadclients.FieldPriority:
-		v, ok := value.(string)
+	case downloadclients.FieldOrdering:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPriority(v)
+		m.SetOrdering(v)
 		return nil
 	case downloadclients.FieldRemoveCompletedDownloads:
 		v, ok := value.(bool)
@@ -1165,13 +1186,21 @@ func (m *DownloadClientsMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *DownloadClientsMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addordering != nil {
+		fields = append(fields, downloadclients.FieldOrdering)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *DownloadClientsMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case downloadclients.FieldOrdering:
+		return m.AddedOrdering()
+	}
 	return nil, false
 }
 
@@ -1180,6 +1209,13 @@ func (m *DownloadClientsMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *DownloadClientsMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case downloadclients.FieldOrdering:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOrdering(v)
+		return nil
 	}
 	return fmt.Errorf("unknown DownloadClients numeric field %s", name)
 }
@@ -1228,8 +1264,8 @@ func (m *DownloadClientsMutation) ResetField(name string) error {
 	case downloadclients.FieldSettings:
 		m.ResetSettings()
 		return nil
-	case downloadclients.FieldPriority:
-		m.ResetPriority()
+	case downloadclients.FieldOrdering:
+		m.ResetOrdering()
 		return nil
 	case downloadclients.FieldRemoveCompletedDownloads:
 		m.ResetRemoveCompletedDownloads()

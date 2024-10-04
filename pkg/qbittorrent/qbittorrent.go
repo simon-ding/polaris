@@ -10,8 +10,49 @@ import (
 	"github.com/pkg/errors"
 )
 
+type Info struct {
+	URL      string
+	User     string
+	Password string
+}
+
 type Client struct {
 	c *qbt.Client
+	Info
+}
+
+func NewClient(url, user, pass string) (*Client, error) {
+	// connect to qbittorrent client
+	qb := qbt.NewClient(url)
+
+	// login to the client
+	loginOpts := qbt.LoginOptions{
+		Username: user,
+		Password: pass,
+	}
+	err := qb.Login(loginOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{c: qb, Info: Info{URL: url, User: user, Password: pass}}, nil
+}
+
+func (c *Client) GetAll() ([]pkg.Torrent, error) {
+	tt, err :=c.c.Torrents(qbt.TorrentsOptions{})
+	if err != nil {
+		return nil, errors.Wrap(err, "get torrents")
+	}
+	var res []pkg.Torrent
+	for _, t := range tt {
+		t1 := &Torrent{
+			c: c.c,
+			Hash: t.Hash,
+			Info: c.Info,
+		}
+		res = append(res, t1)
+	}
+	return res, nil
 }
 
 func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
@@ -48,16 +89,18 @@ loop:
 	if newHash == "" {
 		return nil, fmt.Errorf("download torrent fail: timeout")
 	}
-	return &Torrent{Hash: newHash, c: c.c}, nil
+	return &Torrent{Hash: newHash, c: c.c, Info: c.Info}, nil
 
 }
 
 type Torrent struct {
-	c        *qbt.Client
-	Hash     string
-	URL      string
-	User     string
-	Password string
+	c    *qbt.Client
+	Hash string
+	Info
+}
+
+func (t *Torrent) GetHash() string {
+	return t.Hash
 }
 
 func (t *Torrent) getTorrent() (*qbt.TorrentInfo, error) {

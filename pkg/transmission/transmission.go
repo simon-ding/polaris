@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"polaris/log"
+	"polaris/pkg"
 	"strings"
 
 	"github.com/hekmon/transmissionrpc/v3"
@@ -45,12 +46,12 @@ type Client struct {
 	cfg Config
 }
 
-func (c *Client) GetAll() ([]*Torrent, error) {
+func (c *Client) GetAll() ([]pkg.Torrent, error) {
 	all, err := c.c.TorrentGetAll(context.TODO())
 	if err != nil {
 		return nil, errors.Wrap(err, "get all")
 	}
-	var torrents []*Torrent
+	var torrents []pkg.Torrent
 	for _, t := range all {
 		torrents = append(torrents, &Torrent{
 			Hash:     *t.HashString,
@@ -61,7 +62,7 @@ func (c *Client) GetAll() ([]*Torrent, error) {
 	return torrents, nil
 }
 
-func (c *Client) Download(link, dir string) (*Torrent, error) {
+func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	if strings.HasPrefix(link, "http") {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -206,6 +207,11 @@ func (t *Torrent) Save() string {
 	d, _ := json.Marshal(*t)
 	return string(d)
 }
+
+func (t *Torrent) GetHash() string {
+	return t.Hash
+}
+
 
 func ReloadTorrent(s string) (*Torrent, error) {
 	var torrent = Torrent{}

@@ -341,7 +341,7 @@ func (c *Client) DownloadMovieByID(id int) (string, error) {
 }
 
 func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (string, error) {
-	trc, dlc, err := c.getDownloadClient()
+	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
 		return "", errors.Wrap(err, "connect transmission")
 	}

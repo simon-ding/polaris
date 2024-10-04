@@ -123,7 +123,7 @@ type TorrentInfo struct {
 }
 
 func (s *Server) GetAllTorrents(c *gin.Context) (interface{}, error) {
-	trc, _, err := s.getDownloadClient()
+	trc, _, err := s.core.GetDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
@@ -140,7 +140,7 @@ func (s *Server) GetAllTorrents(c *gin.Context) (interface{}, error) {
 		p, _ := t.Progress()
 		infos = append(infos, TorrentInfo{
 			Name:     name,
-			ID:       t.Hash,
+			ID:       t.GetHash(),
 			Progress: p,
 		})
 	}

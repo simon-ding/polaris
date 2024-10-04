@@ -6,7 +6,9 @@ import (
 	"html/template"
 	"polaris/db"
 	"polaris/ent"
+	"polaris/ent/downloadclients"
 	"polaris/log"
+	"polaris/pkg/qbittorrent"
 	"polaris/pkg/transmission"
 	"polaris/pkg/utils"
 	"strconv"
@@ -189,20 +191,6 @@ func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
 	}
 	return indexers, nil
 }
-
-func (s *Server) getDownloadClient() (*transmission.Client, *ent.DownloadClients, error) {
-	tr := s.db.GetTransmission()
-	trc, err := transmission.NewClient(transmission.Config{
-		URL:      tr.URL,
-		User:     tr.User,
-		Password: tr.Password,
-	})
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "connect transmission")
-	}
-	return trc, tr, nil
-}
-
 type downloadClientIn struct {
 	Name           string `json:"name" binding:"required"`
 	URL            string `json:"url" binding:"required"`
@@ -218,16 +206,30 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 	}
 	utils.TrimFields(&in)
 	//test connection
-	_, err := transmission.NewClient(transmission.Config{
-		URL:      in.URL,
-		User:     in.User,
-		Password: in.Password,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "tranmission setting")
+	if in.Implementation == downloadclients.ImplementationTransmission.String() {
+		_, err := transmission.NewClient(transmission.Config{
+			URL:      in.URL,
+			User:     in.User,
+			Password: in.Password,
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "tranmission setting")
+		}
+	
+	} else if in.Implementation == downloadclients.ImplementationQbittorrent.String() {
+		_, err := qbittorrent.NewClient(in.URL, in.User, in.Password)
+		if err != nil {
+			return nil, errors.Wrap(err, "qbittorrent")
+		}
 	}
-	if err := s.db.SaveTransmission(in.Name, in.URL, in.User, in.Password); err != nil {
-		return nil, errors.Wrap(err, "save transmission")
+	if err := s.db.SaveDownloader(&ent.DownloadClients{
+		Name: in.Name,
+		Implementation: downloadclients.Implementation(in.Implementation),
+		URL: in.URL,
+		User: in.User,
+		Password: in.Password,
+	}); err != nil {
+		return nil, errors.Wrap(err, "save downloader")
 	}
 	return nil, nil
 }
