@@ -13,6 +13,7 @@ require (
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/gin-contrib/zap v1.1.3
 	github.com/ncruces/go-sqlite3 v0.18.4
 	github.com/nikoksr/notify v1.0.0
@@ -24,7 +25,6 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/blinkbean/dingtalk v1.1.3 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible // indirect
 	github.com/go-test/deep v1.0.4 // indirect
 	github.com/gregdel/pushover v1.3.1 // indirect
