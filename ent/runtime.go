@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"polaris/ent/blacklist"
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
 	"polaris/ent/history"
@@ -18,6 +19,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	blacklistFields := schema.Blacklist{}.Fields()
+	_ = blacklistFields
+	// blacklistDescValue is the schema descriptor for value field.
+	blacklistDescValue := blacklistFields[1].Descriptor()
+	// blacklist.DefaultValue holds the default value on creation for the value field.
+	blacklist.DefaultValue = blacklistDescValue.Default.(schema.BlacklistValue)
 	downloadclientsFields := schema.DownloadClients{}.Fields()
 	_ = downloadclientsFields
 	// downloadclientsDescUser is the schema descriptor for user field.

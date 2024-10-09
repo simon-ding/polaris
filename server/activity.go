@@ -3,12 +3,15 @@ package server
 import (
 	"fmt"
 	"polaris/ent"
+	"polaris/ent/blacklist"
 	"polaris/ent/episode"
 	"polaris/ent/history"
+	"polaris/ent/schema"
 	"polaris/log"
 	"polaris/pkg/utils"
 	"strconv"
 
+	"github.com/anacrolix/torrent/metainfo"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -63,22 +66,35 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 	return activities, nil
 }
 
+type removeActivityIn struct {
+	ID            int  `json:"id"`
+	Add2Blacklist bool `json:"add_2_blacklist"`
+}
+
 func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
-	ids := c.Param("id")
-	id, err := strconv.Atoi(ids)
-	if err != nil {
-		return nil, errors.Wrap(err, "convert")
+	var in removeActivityIn
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, errors.Wrap(err, "bind json")
 	}
-	his := s.db.GetHistory(id)
+
+	his := s.db.GetHistory(in.ID)
 	if his == nil {
-		log.Errorf("no record of id: %d", id)
+		log.Errorf("no record of id: %d", in.ID)
 		return nil, nil
+	}
+	if in.Add2Blacklist && his.Link != "" {
+		//should add to blacklist
+		if err := s.addTorrent2Blacklist(his.Link); err != nil {
+			return nil, errors.Errorf("add to blacklist: %v", err)
+		} else {
+			log.Infof("success add magnet link to blacklist: %v", his.Link)
+		}
 	}
 
 	if err := s.core.RemoveTaskAndTorrent(his.ID); err != nil {
 		return nil, errors.Wrap(err, "remove torrent")
 	}
-	err = s.db.DeleteHistory(id)
+	err := s.db.DeleteHistory(in.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "db")
 	}
@@ -102,6 +118,40 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	log.Infof("history record successful deleted: %v", his.SourceTitle)
 	return nil, nil
 }
+
+func (s *Server) addTorrent2Blacklist(link string) error {
+	if link == "" {
+		return nil
+	}
+	if mi, err := metainfo.ParseMagnetV2Uri(link); err != nil {
+		return errors.Errorf("magnet link is not valid: %v", err)
+	} else {
+		hash := ""
+		if mi.InfoHash.Unwrap().HexString() != "" {
+			hash = mi.InfoHash.Unwrap().HexString()
+		} else {
+			btmh := mi.V2InfoHash.Unwrap()
+			if btmh.HexString() != "" {
+				hash = btmh.HexString()
+			}
+		}
+		if hash == "" {
+			return errors.Errorf("magnet has no info hash: %v", link)
+		}
+		item := ent.Blacklist{
+			Type: blacklist.TypeTorrent,
+			Value: schema.BlacklistValue{
+				TorrentHash: hash,
+			},
+		}
+		err := s.db.AddBlacklistItem(&item)
+		if err != nil {
+			return errors.Wrap(err, "add to db")
+		}
+	}
+	return nil
+}
+
 func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {
 	var ids = c.Param("id")
 	id, err := strconv.Atoi(ids)

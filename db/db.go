@@ -69,9 +69,9 @@ func (c *Client) init() {
 	if tr := c.GetAllDonloadClients(); len(tr) == 0 {
 		log.Warnf("no download client, set default download client")
 		c.SaveDownloader(&ent.DownloadClients{
-			Name: "transmission",
+			Name:           "transmission",
 			Implementation: downloadclients.ImplementationTransmission,
-			URL: "http://transmission:9091",
+			URL:            "http://transmission:9091",
 		})
 	}
 }
@@ -338,7 +338,6 @@ func (c *Client) SaveDownloader(downloader *ent.DownloadClients) error {
 		SetName(downloader.Name).SetURL(downloader.URL).SetUser(downloader.User).SetPriority1(downloader.Priority1).SetPassword(downloader.Password).Save(context.TODO())
 	return err
 }
-
 
 func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
 	cc, err := c.ent.DownloadClients.Query().Order(ent.Asc(downloadclients.FieldPriority1)).All(context.TODO())
@@ -656,4 +655,8 @@ func (c *Client) GetMovingNamingFormat() string {
 func (c *Client) CleanAllDanglingEpisodes() error {
 	_, err := c.ent.Episode.Delete().Where(episode.Not(episode.HasMedia())).Exec(context.Background())
 	return err
+}
+
+func (c *Client) AddBlacklistItem(item *ent.Blacklist) error {
+	return c.ent.Blacklist.Create().SetType(item.Type).SetValue(item.Value).SetNotes(item.Notes).Exec(context.Background())
 }

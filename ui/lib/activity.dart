@@ -138,7 +138,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                           trailing: selectedTab == 0
                               ? IconButton(
                                   tooltip: "删除任务",
-                                  onPressed: () => onDelete()(ac.id!.toString()),
+                                  onPressed: () => onDelete()(ac.id!),
                                   icon: const Icon(Icons.delete))
                               : const Text("-"),
                         ),
@@ -155,7 +155,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
     );
   }
 
-  Function(String) onDelete() {
+  Function(int) onDelete() {
     return (id) {
       final f = ref
           .read(activitiesDataProvider("active").notifier)

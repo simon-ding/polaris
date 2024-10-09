@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"polaris/ent/blocklist"
+	"polaris/ent/blacklist"
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
 	"polaris/ent/history"
@@ -82,7 +82,7 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			blocklist.Table:          blocklist.ValidColumn,
+			blacklist.Table:          blacklist.ValidColumn,
 			downloadclients.Table:    downloadclients.ValidColumn,
 			episode.Table:            episode.ValidColumn,
 			history.Table:            history.ValidColumn,

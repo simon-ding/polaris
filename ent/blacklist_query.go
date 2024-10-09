@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"polaris/ent/blocklist"
+	"polaris/ent/blacklist"
 	"polaris/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
@@ -14,64 +14,64 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// BlocklistQuery is the builder for querying Blocklist entities.
-type BlocklistQuery struct {
+// BlacklistQuery is the builder for querying Blacklist entities.
+type BlacklistQuery struct {
 	config
 	ctx        *QueryContext
-	order      []blocklist.OrderOption
+	order      []blacklist.OrderOption
 	inters     []Interceptor
-	predicates []predicate.Blocklist
+	predicates []predicate.Blacklist
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the BlocklistQuery builder.
-func (bq *BlocklistQuery) Where(ps ...predicate.Blocklist) *BlocklistQuery {
+// Where adds a new predicate for the BlacklistQuery builder.
+func (bq *BlacklistQuery) Where(ps ...predicate.Blacklist) *BlacklistQuery {
 	bq.predicates = append(bq.predicates, ps...)
 	return bq
 }
 
 // Limit the number of records to be returned by this query.
-func (bq *BlocklistQuery) Limit(limit int) *BlocklistQuery {
+func (bq *BlacklistQuery) Limit(limit int) *BlacklistQuery {
 	bq.ctx.Limit = &limit
 	return bq
 }
 
 // Offset to start from.
-func (bq *BlocklistQuery) Offset(offset int) *BlocklistQuery {
+func (bq *BlacklistQuery) Offset(offset int) *BlacklistQuery {
 	bq.ctx.Offset = &offset
 	return bq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (bq *BlocklistQuery) Unique(unique bool) *BlocklistQuery {
+func (bq *BlacklistQuery) Unique(unique bool) *BlacklistQuery {
 	bq.ctx.Unique = &unique
 	return bq
 }
 
 // Order specifies how the records should be ordered.
-func (bq *BlocklistQuery) Order(o ...blocklist.OrderOption) *BlocklistQuery {
+func (bq *BlacklistQuery) Order(o ...blacklist.OrderOption) *BlacklistQuery {
 	bq.order = append(bq.order, o...)
 	return bq
 }
 
-// First returns the first Blocklist entity from the query.
-// Returns a *NotFoundError when no Blocklist was found.
-func (bq *BlocklistQuery) First(ctx context.Context) (*Blocklist, error) {
+// First returns the first Blacklist entity from the query.
+// Returns a *NotFoundError when no Blacklist was found.
+func (bq *BlacklistQuery) First(ctx context.Context) (*Blacklist, error) {
 	nodes, err := bq.Limit(1).All(setContextOp(ctx, bq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{blocklist.Label}
+		return nil, &NotFoundError{blacklist.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (bq *BlocklistQuery) FirstX(ctx context.Context) *Blocklist {
+func (bq *BlacklistQuery) FirstX(ctx context.Context) *Blacklist {
 	node, err := bq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -79,22 +79,22 @@ func (bq *BlocklistQuery) FirstX(ctx context.Context) *Blocklist {
 	return node
 }
 
-// FirstID returns the first Blocklist ID from the query.
-// Returns a *NotFoundError when no Blocklist ID was found.
-func (bq *BlocklistQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first Blacklist ID from the query.
+// Returns a *NotFoundError when no Blacklist ID was found.
+func (bq *BlacklistQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = bq.Limit(1).IDs(setContextOp(ctx, bq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{blocklist.Label}
+		err = &NotFoundError{blacklist.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (bq *BlocklistQuery) FirstIDX(ctx context.Context) int {
+func (bq *BlacklistQuery) FirstIDX(ctx context.Context) int {
 	id, err := bq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -102,10 +102,10 @@ func (bq *BlocklistQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Blocklist entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Blocklist entity is found.
-// Returns a *NotFoundError when no Blocklist entities are found.
-func (bq *BlocklistQuery) Only(ctx context.Context) (*Blocklist, error) {
+// Only returns a single Blacklist entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Blacklist entity is found.
+// Returns a *NotFoundError when no Blacklist entities are found.
+func (bq *BlacklistQuery) Only(ctx context.Context) (*Blacklist, error) {
 	nodes, err := bq.Limit(2).All(setContextOp(ctx, bq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -114,14 +114,14 @@ func (bq *BlocklistQuery) Only(ctx context.Context) (*Blocklist, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{blocklist.Label}
+		return nil, &NotFoundError{blacklist.Label}
 	default:
-		return nil, &NotSingularError{blocklist.Label}
+		return nil, &NotSingularError{blacklist.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (bq *BlocklistQuery) OnlyX(ctx context.Context) *Blocklist {
+func (bq *BlacklistQuery) OnlyX(ctx context.Context) *Blacklist {
 	node, err := bq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -129,10 +129,10 @@ func (bq *BlocklistQuery) OnlyX(ctx context.Context) *Blocklist {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Blocklist ID in the query.
-// Returns a *NotSingularError when more than one Blocklist ID is found.
+// OnlyID is like Only, but returns the only Blacklist ID in the query.
+// Returns a *NotSingularError when more than one Blacklist ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (bq *BlocklistQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (bq *BlacklistQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = bq.Limit(2).IDs(setContextOp(ctx, bq.ctx, "OnlyID")); err != nil {
 		return
@@ -141,15 +141,15 @@ func (bq *BlocklistQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{blocklist.Label}
+		err = &NotFoundError{blacklist.Label}
 	default:
-		err = &NotSingularError{blocklist.Label}
+		err = &NotSingularError{blacklist.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (bq *BlocklistQuery) OnlyIDX(ctx context.Context) int {
+func (bq *BlacklistQuery) OnlyIDX(ctx context.Context) int {
 	id, err := bq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -157,18 +157,18 @@ func (bq *BlocklistQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of Blocklists.
-func (bq *BlocklistQuery) All(ctx context.Context) ([]*Blocklist, error) {
+// All executes the query and returns a list of Blacklists.
+func (bq *BlacklistQuery) All(ctx context.Context) ([]*Blacklist, error) {
 	ctx = setContextOp(ctx, bq.ctx, "All")
 	if err := bq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*Blocklist, *BlocklistQuery]()
-	return withInterceptors[[]*Blocklist](ctx, bq, qr, bq.inters)
+	qr := querierAll[[]*Blacklist, *BlacklistQuery]()
+	return withInterceptors[[]*Blacklist](ctx, bq, qr, bq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (bq *BlocklistQuery) AllX(ctx context.Context) []*Blocklist {
+func (bq *BlacklistQuery) AllX(ctx context.Context) []*Blacklist {
 	nodes, err := bq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -176,20 +176,20 @@ func (bq *BlocklistQuery) AllX(ctx context.Context) []*Blocklist {
 	return nodes
 }
 
-// IDs executes the query and returns a list of Blocklist IDs.
-func (bq *BlocklistQuery) IDs(ctx context.Context) (ids []int, err error) {
+// IDs executes the query and returns a list of Blacklist IDs.
+func (bq *BlacklistQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if bq.ctx.Unique == nil && bq.path != nil {
 		bq.Unique(true)
 	}
 	ctx = setContextOp(ctx, bq.ctx, "IDs")
-	if err = bq.Select(blocklist.FieldID).Scan(ctx, &ids); err != nil {
+	if err = bq.Select(blacklist.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (bq *BlocklistQuery) IDsX(ctx context.Context) []int {
+func (bq *BlacklistQuery) IDsX(ctx context.Context) []int {
 	ids, err := bq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -198,16 +198,16 @@ func (bq *BlocklistQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (bq *BlocklistQuery) Count(ctx context.Context) (int, error) {
+func (bq *BlacklistQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, bq.ctx, "Count")
 	if err := bq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, bq, querierCount[*BlocklistQuery](), bq.inters)
+	return withInterceptors[int](ctx, bq, querierCount[*BlacklistQuery](), bq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (bq *BlocklistQuery) CountX(ctx context.Context) int {
+func (bq *BlacklistQuery) CountX(ctx context.Context) int {
 	count, err := bq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -216,7 +216,7 @@ func (bq *BlocklistQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (bq *BlocklistQuery) Exist(ctx context.Context) (bool, error) {
+func (bq *BlacklistQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, bq.ctx, "Exist")
 	switch _, err := bq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -229,7 +229,7 @@ func (bq *BlocklistQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (bq *BlocklistQuery) ExistX(ctx context.Context) bool {
+func (bq *BlacklistQuery) ExistX(ctx context.Context) bool {
 	exist, err := bq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -237,18 +237,18 @@ func (bq *BlocklistQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the BlocklistQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the BlacklistQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (bq *BlocklistQuery) Clone() *BlocklistQuery {
+func (bq *BlacklistQuery) Clone() *BlacklistQuery {
 	if bq == nil {
 		return nil
 	}
-	return &BlocklistQuery{
+	return &BlacklistQuery{
 		config:     bq.config,
 		ctx:        bq.ctx.Clone(),
-		order:      append([]blocklist.OrderOption{}, bq.order...),
+		order:      append([]blacklist.OrderOption{}, bq.order...),
 		inters:     append([]Interceptor{}, bq.inters...),
-		predicates: append([]predicate.Blocklist{}, bq.predicates...),
+		predicates: append([]predicate.Blacklist{}, bq.predicates...),
 		// clone intermediate query.
 		sql:  bq.sql.Clone(),
 		path: bq.path,
@@ -261,19 +261,19 @@ func (bq *BlocklistQuery) Clone() *BlocklistQuery {
 // Example:
 //
 //	var v []struct {
-//		Type blocklist.Type `json:"type,omitempty"`
+//		Type blacklist.Type `json:"type,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Blocklist.Query().
-//		GroupBy(blocklist.FieldType).
+//	client.Blacklist.Query().
+//		GroupBy(blacklist.FieldType).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (bq *BlocklistQuery) GroupBy(field string, fields ...string) *BlocklistGroupBy {
+func (bq *BlacklistQuery) GroupBy(field string, fields ...string) *BlacklistGroupBy {
 	bq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &BlocklistGroupBy{build: bq}
+	grbuild := &BlacklistGroupBy{build: bq}
 	grbuild.flds = &bq.ctx.Fields
-	grbuild.label = blocklist.Label
+	grbuild.label = blacklist.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -284,26 +284,26 @@ func (bq *BlocklistQuery) GroupBy(field string, fields ...string) *BlocklistGrou
 // Example:
 //
 //	var v []struct {
-//		Type blocklist.Type `json:"type,omitempty"`
+//		Type blacklist.Type `json:"type,omitempty"`
 //	}
 //
-//	client.Blocklist.Query().
-//		Select(blocklist.FieldType).
+//	client.Blacklist.Query().
+//		Select(blacklist.FieldType).
 //		Scan(ctx, &v)
-func (bq *BlocklistQuery) Select(fields ...string) *BlocklistSelect {
+func (bq *BlacklistQuery) Select(fields ...string) *BlacklistSelect {
 	bq.ctx.Fields = append(bq.ctx.Fields, fields...)
-	sbuild := &BlocklistSelect{BlocklistQuery: bq}
-	sbuild.label = blocklist.Label
+	sbuild := &BlacklistSelect{BlacklistQuery: bq}
+	sbuild.label = blacklist.Label
 	sbuild.flds, sbuild.scan = &bq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a BlocklistSelect configured with the given aggregations.
-func (bq *BlocklistQuery) Aggregate(fns ...AggregateFunc) *BlocklistSelect {
+// Aggregate returns a BlacklistSelect configured with the given aggregations.
+func (bq *BlacklistQuery) Aggregate(fns ...AggregateFunc) *BlacklistSelect {
 	return bq.Select().Aggregate(fns...)
 }
 
-func (bq *BlocklistQuery) prepareQuery(ctx context.Context) error {
+func (bq *BlacklistQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range bq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -315,7 +315,7 @@ func (bq *BlocklistQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range bq.ctx.Fields {
-		if !blocklist.ValidColumn(f) {
+		if !blacklist.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -329,16 +329,16 @@ func (bq *BlocklistQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (bq *BlocklistQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Blocklist, error) {
+func (bq *BlacklistQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Blacklist, error) {
 	var (
-		nodes = []*Blocklist{}
+		nodes = []*Blacklist{}
 		_spec = bq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*Blocklist).scanValues(nil, columns)
+		return (*Blacklist).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Blocklist{config: bq.config}
+		node := &Blacklist{config: bq.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
@@ -354,7 +354,7 @@ func (bq *BlocklistQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Bl
 	return nodes, nil
 }
 
-func (bq *BlocklistQuery) sqlCount(ctx context.Context) (int, error) {
+func (bq *BlacklistQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := bq.querySpec()
 	_spec.Node.Columns = bq.ctx.Fields
 	if len(bq.ctx.Fields) > 0 {
@@ -363,8 +363,8 @@ func (bq *BlocklistQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, bq.driver, _spec)
 }
 
-func (bq *BlocklistQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(blocklist.Table, blocklist.Columns, sqlgraph.NewFieldSpec(blocklist.FieldID, field.TypeInt))
+func (bq *BlacklistQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(blacklist.Table, blacklist.Columns, sqlgraph.NewFieldSpec(blacklist.FieldID, field.TypeInt))
 	_spec.From = bq.sql
 	if unique := bq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -373,9 +373,9 @@ func (bq *BlocklistQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := bq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, blocklist.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, blacklist.FieldID)
 		for i := range fields {
-			if fields[i] != blocklist.FieldID {
+			if fields[i] != blacklist.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -403,12 +403,12 @@ func (bq *BlocklistQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (bq *BlocklistQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (bq *BlacklistQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(bq.driver.Dialect())
-	t1 := builder.Table(blocklist.Table)
+	t1 := builder.Table(blacklist.Table)
 	columns := bq.ctx.Fields
 	if len(columns) == 0 {
-		columns = blocklist.Columns
+		columns = blacklist.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if bq.sql != nil {
@@ -435,28 +435,28 @@ func (bq *BlocklistQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// BlocklistGroupBy is the group-by builder for Blocklist entities.
-type BlocklistGroupBy struct {
+// BlacklistGroupBy is the group-by builder for Blacklist entities.
+type BlacklistGroupBy struct {
 	selector
-	build *BlocklistQuery
+	build *BlacklistQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (bgb *BlocklistGroupBy) Aggregate(fns ...AggregateFunc) *BlocklistGroupBy {
+func (bgb *BlacklistGroupBy) Aggregate(fns ...AggregateFunc) *BlacklistGroupBy {
 	bgb.fns = append(bgb.fns, fns...)
 	return bgb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (bgb *BlocklistGroupBy) Scan(ctx context.Context, v any) error {
+func (bgb *BlacklistGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, bgb.build.ctx, "GroupBy")
 	if err := bgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BlocklistQuery, *BlocklistGroupBy](ctx, bgb.build, bgb, bgb.build.inters, v)
+	return scanWithInterceptors[*BlacklistQuery, *BlacklistGroupBy](ctx, bgb.build, bgb, bgb.build.inters, v)
 }
 
-func (bgb *BlocklistGroupBy) sqlScan(ctx context.Context, root *BlocklistQuery, v any) error {
+func (bgb *BlacklistGroupBy) sqlScan(ctx context.Context, root *BlacklistQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(bgb.fns))
 	for _, fn := range bgb.fns {
@@ -483,28 +483,28 @@ func (bgb *BlocklistGroupBy) sqlScan(ctx context.Context, root *BlocklistQuery, 
 	return sql.ScanSlice(rows, v)
 }
 
-// BlocklistSelect is the builder for selecting fields of Blocklist entities.
-type BlocklistSelect struct {
-	*BlocklistQuery
+// BlacklistSelect is the builder for selecting fields of Blacklist entities.
+type BlacklistSelect struct {
+	*BlacklistQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (bs *BlocklistSelect) Aggregate(fns ...AggregateFunc) *BlocklistSelect {
+func (bs *BlacklistSelect) Aggregate(fns ...AggregateFunc) *BlacklistSelect {
 	bs.fns = append(bs.fns, fns...)
 	return bs
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (bs *BlocklistSelect) Scan(ctx context.Context, v any) error {
+func (bs *BlacklistSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, bs.ctx, "Select")
 	if err := bs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BlocklistQuery, *BlocklistSelect](ctx, bs.BlocklistQuery, bs, bs.inters, v)
+	return scanWithInterceptors[*BlacklistQuery, *BlacklistSelect](ctx, bs.BlacklistQuery, bs, bs.inters, v)
 }
 
-func (bs *BlocklistSelect) sqlScan(ctx context.Context, root *BlocklistQuery, v any) error {
+func (bs *BlacklistSelect) sqlScan(ctx context.Context, root *BlacklistQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(bs.fns))
 	for _, fn := range bs.fns {

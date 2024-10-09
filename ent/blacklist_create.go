@@ -6,43 +6,67 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"polaris/ent/blocklist"
+	"polaris/ent/blacklist"
+	"polaris/ent/schema"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
 
-// BlocklistCreate is the builder for creating a Blocklist entity.
-type BlocklistCreate struct {
+// BlacklistCreate is the builder for creating a Blacklist entity.
+type BlacklistCreate struct {
 	config
-	mutation *BlocklistMutation
+	mutation *BlacklistMutation
 	hooks    []Hook
 }
 
 // SetType sets the "type" field.
-func (bc *BlocklistCreate) SetType(b blocklist.Type) *BlocklistCreate {
+func (bc *BlacklistCreate) SetType(b blacklist.Type) *BlacklistCreate {
 	bc.mutation.SetType(b)
 	return bc
 }
 
 // SetValue sets the "value" field.
-func (bc *BlocklistCreate) SetValue(s string) *BlocklistCreate {
-	bc.mutation.SetValue(s)
+func (bc *BlacklistCreate) SetValue(sv schema.BlacklistValue) *BlacklistCreate {
+	bc.mutation.SetValue(sv)
 	return bc
 }
 
-// Mutation returns the BlocklistMutation object of the builder.
-func (bc *BlocklistCreate) Mutation() *BlocklistMutation {
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (bc *BlacklistCreate) SetNillableValue(sv *schema.BlacklistValue) *BlacklistCreate {
+	if sv != nil {
+		bc.SetValue(*sv)
+	}
+	return bc
+}
+
+// SetNotes sets the "notes" field.
+func (bc *BlacklistCreate) SetNotes(s string) *BlacklistCreate {
+	bc.mutation.SetNotes(s)
+	return bc
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (bc *BlacklistCreate) SetNillableNotes(s *string) *BlacklistCreate {
+	if s != nil {
+		bc.SetNotes(*s)
+	}
+	return bc
+}
+
+// Mutation returns the BlacklistMutation object of the builder.
+func (bc *BlacklistCreate) Mutation() *BlacklistMutation {
 	return bc.mutation
 }
 
-// Save creates the Blocklist in the database.
-func (bc *BlocklistCreate) Save(ctx context.Context) (*Blocklist, error) {
+// Save creates the Blacklist in the database.
+func (bc *BlacklistCreate) Save(ctx context.Context) (*Blacklist, error) {
+	bc.defaults()
 	return withHooks(ctx, bc.sqlSave, bc.mutation, bc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (bc *BlocklistCreate) SaveX(ctx context.Context) *Blocklist {
+func (bc *BlacklistCreate) SaveX(ctx context.Context) *Blacklist {
 	v, err := bc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -51,35 +75,43 @@ func (bc *BlocklistCreate) SaveX(ctx context.Context) *Blocklist {
 }
 
 // Exec executes the query.
-func (bc *BlocklistCreate) Exec(ctx context.Context) error {
+func (bc *BlacklistCreate) Exec(ctx context.Context) error {
 	_, err := bc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (bc *BlocklistCreate) ExecX(ctx context.Context) {
+func (bc *BlacklistCreate) ExecX(ctx context.Context) {
 	if err := bc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (bc *BlacklistCreate) defaults() {
+	if _, ok := bc.mutation.Value(); !ok {
+		v := blacklist.DefaultValue
+		bc.mutation.SetValue(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
-func (bc *BlocklistCreate) check() error {
+func (bc *BlacklistCreate) check() error {
 	if _, ok := bc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Blocklist.type"`)}
+		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Blacklist.type"`)}
 	}
 	if v, ok := bc.mutation.GetType(); ok {
-		if err := blocklist.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Blocklist.type": %w`, err)}
+		if err := blacklist.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Blacklist.type": %w`, err)}
 		}
 	}
 	if _, ok := bc.mutation.Value(); !ok {
-		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "Blocklist.value"`)}
+		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "Blacklist.value"`)}
 	}
 	return nil
 }
 
-func (bc *BlocklistCreate) sqlSave(ctx context.Context) (*Blocklist, error) {
+func (bc *BlacklistCreate) sqlSave(ctx context.Context) (*Blacklist, error) {
 	if err := bc.check(); err != nil {
 		return nil, err
 	}
@@ -97,42 +129,47 @@ func (bc *BlocklistCreate) sqlSave(ctx context.Context) (*Blocklist, error) {
 	return _node, nil
 }
 
-func (bc *BlocklistCreate) createSpec() (*Blocklist, *sqlgraph.CreateSpec) {
+func (bc *BlacklistCreate) createSpec() (*Blacklist, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Blocklist{config: bc.config}
-		_spec = sqlgraph.NewCreateSpec(blocklist.Table, sqlgraph.NewFieldSpec(blocklist.FieldID, field.TypeInt))
+		_node = &Blacklist{config: bc.config}
+		_spec = sqlgraph.NewCreateSpec(blacklist.Table, sqlgraph.NewFieldSpec(blacklist.FieldID, field.TypeInt))
 	)
 	if value, ok := bc.mutation.GetType(); ok {
-		_spec.SetField(blocklist.FieldType, field.TypeEnum, value)
+		_spec.SetField(blacklist.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
 	if value, ok := bc.mutation.Value(); ok {
-		_spec.SetField(blocklist.FieldValue, field.TypeString, value)
+		_spec.SetField(blacklist.FieldValue, field.TypeJSON, value)
 		_node.Value = value
+	}
+	if value, ok := bc.mutation.Notes(); ok {
+		_spec.SetField(blacklist.FieldNotes, field.TypeString, value)
+		_node.Notes = value
 	}
 	return _node, _spec
 }
 
-// BlocklistCreateBulk is the builder for creating many Blocklist entities in bulk.
-type BlocklistCreateBulk struct {
+// BlacklistCreateBulk is the builder for creating many Blacklist entities in bulk.
+type BlacklistCreateBulk struct {
 	config
 	err      error
-	builders []*BlocklistCreate
+	builders []*BlacklistCreate
 }
 
-// Save creates the Blocklist entities in the database.
-func (bcb *BlocklistCreateBulk) Save(ctx context.Context) ([]*Blocklist, error) {
+// Save creates the Blacklist entities in the database.
+func (bcb *BlacklistCreateBulk) Save(ctx context.Context) ([]*Blacklist, error) {
 	if bcb.err != nil {
 		return nil, bcb.err
 	}
 	specs := make([]*sqlgraph.CreateSpec, len(bcb.builders))
-	nodes := make([]*Blocklist, len(bcb.builders))
+	nodes := make([]*Blacklist, len(bcb.builders))
 	mutators := make([]Mutator, len(bcb.builders))
 	for i := range bcb.builders {
 		func(i int, root context.Context) {
 			builder := bcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*BlocklistMutation)
+				mutation, ok := m.(*BlacklistMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -179,7 +216,7 @@ func (bcb *BlocklistCreateBulk) Save(ctx context.Context) ([]*Blocklist, error) 
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (bcb *BlocklistCreateBulk) SaveX(ctx context.Context) []*Blocklist {
+func (bcb *BlacklistCreateBulk) SaveX(ctx context.Context) []*Blacklist {
 	v, err := bcb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -188,13 +225,13 @@ func (bcb *BlocklistCreateBulk) SaveX(ctx context.Context) []*Blocklist {
 }
 
 // Exec executes the query.
-func (bcb *BlocklistCreateBulk) Exec(ctx context.Context) error {
+func (bcb *BlacklistCreateBulk) Exec(ctx context.Context) error {
 	_, err := bcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (bcb *BlocklistCreateBulk) ExecX(ctx context.Context) {
+func (bcb *BlacklistCreateBulk) ExecX(ctx context.Context) {
 	if err := bcb.Exec(ctx); err != nil {
 		panic(err)
 	}

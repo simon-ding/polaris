@@ -4,9 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
-var activitiesDataProvider =
-    AsyncNotifierProvider.autoDispose.family<ActivityData, List<Activity>, String>(
-        ActivityData.new);
+var activitiesDataProvider = AsyncNotifierProvider.autoDispose
+    .family<ActivityData, List<Activity>, String>(ActivityData.new);
 
 var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   (ref, arg) async {
@@ -24,7 +23,8 @@ var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   },
 );
 
-class ActivityData extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String> {
+class ActivityData
+    extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String> {
   @override
   FutureOr<List<Activity>> build(String arg) async {
     if (arg == "active") {
@@ -47,9 +47,12 @@ class ActivityData extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String
     return activities;
   }
 
-  Future<void> deleteActivity(String id) async {
-    final dio = await APIs.getDio();
-    var resp = await dio.delete("${APIs.activityUrl}$id");
+  Future<void> deleteActivity(int id) async {
+    final dio = APIs.getDio();
+    var resp = await dio.post(APIs.activityDeleteUrl, data: {
+      "id": id,
+      "add_2_blacklist": false,
+    });
     final sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;

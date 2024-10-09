@@ -30,6 +30,7 @@ class APIs {
   static final logoutUrl = "$_baseUrl/api/v1/setting/logout";
   static final loginSettingUrl = "$_baseUrl/api/v1/setting/auth";
   static final activityUrl = "$_baseUrl/api/v1/activity/";
+  static final activityDeleteUrl = "$_baseUrl/api/v1/activity/delete";
   static final activityMediaUrl = "$_baseUrl/api/v1/activity/media/";
   static final imagesUrl = "$_baseUrl/api/v1/img";
   static final logsBaseUrl = "$_baseUrl/api/v1/logs/";

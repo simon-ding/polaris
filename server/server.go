@@ -74,7 +74,7 @@ func (s *Server) Serve() error {
 	activity := api.Group("/activity")
 	{
 		activity.GET("/", HttpHandler(s.GetAllActivities))
-		activity.DELETE("/:id", HttpHandler(s.RemoveActivity))
+		activity.POST("/delete", HttpHandler(s.RemoveActivity))
 		activity.GET("/media/:id", HttpHandler(s.GetMediaDownloadHistory))
 		activity.GET("/torrents", HttpHandler(s.GetAllTorrents))
 	}
