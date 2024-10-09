@@ -474,6 +474,14 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 }
 
 func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
+	if h.Link != "" {
+		r, err := utils.Link2Magnet(h.Link)
+		if err != nil {
+			log.Warnf("convert link to magnet error, link %v, error: %v", h.Link, err)
+		} else {
+			h.Link = r
+		}
+	}
 	return c.ent.History.Create().SetMediaID(h.MediaID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
 		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID).
 		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSaved(h.Saved).Save(context.TODO())

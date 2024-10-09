@@ -94,6 +94,11 @@ func IndexerID(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldIndexerID, v))
 }
 
+// Link applies equality check predicate on the "link" field. It's identical to LinkEQ.
+func Link(v string) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldLink, v))
+}
+
 // Saved applies equality check predicate on the "saved" field. It's identical to SavedEQ.
 func Saved(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSaved, v))
@@ -497,6 +502,81 @@ func IndexerIDIsNil() predicate.History {
 // IndexerIDNotNil applies the NotNil predicate on the "indexer_id" field.
 func IndexerIDNotNil() predicate.History {
 	return predicate.History(sql.FieldNotNull(FieldIndexerID))
+}
+
+// LinkEQ applies the EQ predicate on the "link" field.
+func LinkEQ(v string) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldLink, v))
+}
+
+// LinkNEQ applies the NEQ predicate on the "link" field.
+func LinkNEQ(v string) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldLink, v))
+}
+
+// LinkIn applies the In predicate on the "link" field.
+func LinkIn(vs ...string) predicate.History {
+	return predicate.History(sql.FieldIn(FieldLink, vs...))
+}
+
+// LinkNotIn applies the NotIn predicate on the "link" field.
+func LinkNotIn(vs ...string) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldLink, vs...))
+}
+
+// LinkGT applies the GT predicate on the "link" field.
+func LinkGT(v string) predicate.History {
+	return predicate.History(sql.FieldGT(FieldLink, v))
+}
+
+// LinkGTE applies the GTE predicate on the "link" field.
+func LinkGTE(v string) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldLink, v))
+}
+
+// LinkLT applies the LT predicate on the "link" field.
+func LinkLT(v string) predicate.History {
+	return predicate.History(sql.FieldLT(FieldLink, v))
+}
+
+// LinkLTE applies the LTE predicate on the "link" field.
+func LinkLTE(v string) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldLink, v))
+}
+
+// LinkContains applies the Contains predicate on the "link" field.
+func LinkContains(v string) predicate.History {
+	return predicate.History(sql.FieldContains(FieldLink, v))
+}
+
+// LinkHasPrefix applies the HasPrefix predicate on the "link" field.
+func LinkHasPrefix(v string) predicate.History {
+	return predicate.History(sql.FieldHasPrefix(FieldLink, v))
+}
+
+// LinkHasSuffix applies the HasSuffix predicate on the "link" field.
+func LinkHasSuffix(v string) predicate.History {
+	return predicate.History(sql.FieldHasSuffix(FieldLink, v))
+}
+
+// LinkIsNil applies the IsNil predicate on the "link" field.
+func LinkIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldLink))
+}
+
+// LinkNotNil applies the NotNil predicate on the "link" field.
+func LinkNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldLink))
+}
+
+// LinkEqualFold applies the EqualFold predicate on the "link" field.
+func LinkEqualFold(v string) predicate.History {
+	return predicate.History(sql.FieldEqualFold(FieldLink, v))
+}
+
+// LinkContainsFold applies the ContainsFold predicate on the "link" field.
+func LinkContainsFold(v string) predicate.History {
+	return predicate.History(sql.FieldContainsFold(FieldLink, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

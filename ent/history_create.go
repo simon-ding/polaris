@@ -100,6 +100,20 @@ func (hc *HistoryCreate) SetNillableIndexerID(i *int) *HistoryCreate {
 	return hc
 }
 
+// SetLink sets the "link" field.
+func (hc *HistoryCreate) SetLink(s string) *HistoryCreate {
+	hc.mutation.SetLink(s)
+	return hc
+}
+
+// SetNillableLink sets the "link" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableLink(s *string) *HistoryCreate {
+	if s != nil {
+		hc.SetLink(*s)
+	}
+	return hc
+}
+
 // SetStatus sets the "status" field.
 func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
 	hc.mutation.SetStatus(h)
@@ -243,6 +257,10 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 	if value, ok := hc.mutation.IndexerID(); ok {
 		_spec.SetField(history.FieldIndexerID, field.TypeInt, value)
 		_node.IndexerID = value
+	}
+	if value, ok := hc.mutation.Link(); ok {
+		_spec.SetField(history.FieldLink, field.TypeString, value)
+		_node.Link = value
 	}
 	if value, ok := hc.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)

@@ -21,6 +21,7 @@ func (History) Fields() []ent.Field {
 		field.Int("size").Default(0),
 		field.Int("download_client_id").Optional(),
 		field.Int("indexer_id").Optional(),
+		field.String("link").Optional(),
 		field.Enum("status").Values("running", "success", "fail", "uploading", "seeding"),
 		field.String("saved").Optional(),
 	}

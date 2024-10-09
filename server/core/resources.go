@@ -60,6 +60,7 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 		Status:           history.StatusRunning,
 		Size:             r1.Size,
 		Saved:            torrent.Save(),
+		Link:             r1.Link,
 		DownloadClientID: dlc.ID,
 		IndexerID:        r1.IndexerId,
 	})
@@ -126,6 +127,7 @@ func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexe
 			Status:           history.StatusRunning,
 			Size:             size,
 			Saved:            torrent.Save(),
+			Link:             link,
 			DownloadClientID: dlc.ID,
 			IndexerID:        indexerID,
 		})

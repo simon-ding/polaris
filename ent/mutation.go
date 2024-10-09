@@ -2269,6 +2269,7 @@ type HistoryMutation struct {
 	adddownload_client_id *int
 	indexer_id            *int
 	addindexer_id         *int
+	link                  *string
 	status                *history.Status
 	saved                 *string
 	clearedFields         map[string]struct{}
@@ -2805,6 +2806,55 @@ func (m *HistoryMutation) ResetIndexerID() {
 	delete(m.clearedFields, history.FieldIndexerID)
 }
 
+// SetLink sets the "link" field.
+func (m *HistoryMutation) SetLink(s string) {
+	m.link = &s
+}
+
+// Link returns the value of the "link" field in the mutation.
+func (m *HistoryMutation) Link() (r string, exists bool) {
+	v := m.link
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLink returns the old "link" field's value of the History entity.
+// If the History object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *HistoryMutation) OldLink(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLink is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLink requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLink: %w", err)
+	}
+	return oldValue.Link, nil
+}
+
+// ClearLink clears the value of the "link" field.
+func (m *HistoryMutation) ClearLink() {
+	m.link = nil
+	m.clearedFields[history.FieldLink] = struct{}{}
+}
+
+// LinkCleared returns if the "link" field was cleared in this mutation.
+func (m *HistoryMutation) LinkCleared() bool {
+	_, ok := m.clearedFields[history.FieldLink]
+	return ok
+}
+
+// ResetLink resets all changes to the "link" field.
+func (m *HistoryMutation) ResetLink() {
+	m.link = nil
+	delete(m.clearedFields, history.FieldLink)
+}
+
 // SetStatus sets the "status" field.
 func (m *HistoryMutation) SetStatus(h history.Status) {
 	m.status = &h
@@ -2924,7 +2974,7 @@ func (m *HistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.media_id != nil {
 		fields = append(fields, history.FieldMediaID)
 	}
@@ -2948,6 +2998,9 @@ func (m *HistoryMutation) Fields() []string {
 	}
 	if m.indexer_id != nil {
 		fields = append(fields, history.FieldIndexerID)
+	}
+	if m.link != nil {
+		fields = append(fields, history.FieldLink)
 	}
 	if m.status != nil {
 		fields = append(fields, history.FieldStatus)
@@ -2979,6 +3032,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.DownloadClientID()
 	case history.FieldIndexerID:
 		return m.IndexerID()
+	case history.FieldLink:
+		return m.Link()
 	case history.FieldStatus:
 		return m.Status()
 	case history.FieldSaved:
@@ -3008,6 +3063,8 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDownloadClientID(ctx)
 	case history.FieldIndexerID:
 		return m.OldIndexerID(ctx)
+	case history.FieldLink:
+		return m.OldLink(ctx)
 	case history.FieldStatus:
 		return m.OldStatus(ctx)
 	case history.FieldSaved:
@@ -3076,6 +3133,13 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIndexerID(v)
+		return nil
+	case history.FieldLink:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLink(v)
 		return nil
 	case history.FieldStatus:
 		v, ok := value.(history.Status)
@@ -3193,6 +3257,9 @@ func (m *HistoryMutation) ClearedFields() []string {
 	if m.FieldCleared(history.FieldIndexerID) {
 		fields = append(fields, history.FieldIndexerID)
 	}
+	if m.FieldCleared(history.FieldLink) {
+		fields = append(fields, history.FieldLink)
+	}
 	if m.FieldCleared(history.FieldSaved) {
 		fields = append(fields, history.FieldSaved)
 	}
@@ -3218,6 +3285,9 @@ func (m *HistoryMutation) ClearField(name string) error {
 		return nil
 	case history.FieldIndexerID:
 		m.ClearIndexerID()
+		return nil
+	case history.FieldLink:
+		m.ClearLink()
 		return nil
 	case history.FieldSaved:
 		m.ClearSaved()
@@ -3253,6 +3323,9 @@ func (m *HistoryMutation) ResetField(name string) error {
 		return nil
 	case history.FieldIndexerID:
 		m.ResetIndexerID()
+		return nil
+	case history.FieldLink:
+		m.ResetLink()
 		return nil
 	case history.FieldStatus:
 		m.ResetStatus()

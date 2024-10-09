@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"net/http"
 	"os"
 	"os/exec"
 	"regexp"
@@ -10,6 +11,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/anacrolix/torrent/metainfo"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
@@ -217,4 +219,35 @@ func isWSL() bool {
 		return false
 	}
 	return strings.Contains(strings.ToLower(string(releaseData)), "microsoft")
+}
+
+func Link2Magnet(link string) (string, error) {
+	if strings.HasPrefix(strings.ToLower(link), "magnet:") {
+		return link, nil
+	}
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse //do not follow redirects
+		},
+	}
+	
+	resp, err := client.Get(link)
+	if err != nil {
+		return "", errors.Wrap(err, "get link")
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+		//redirects
+		tourl := resp.Header.Get("Location")
+		return Link2Magnet(tourl)
+	}
+	info, err := metainfo.Load(resp.Body)
+	if err != nil {
+		return "", errors.Wrap(err, "parse response")
+	}
+	mg, err := info.MagnetV2()
+	if err != nil {
+		return "", errors.Wrap(err, "convert magnet")
+	}
+	return mg.String(), nil
 }

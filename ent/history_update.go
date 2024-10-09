@@ -193,6 +193,26 @@ func (hu *HistoryUpdate) ClearIndexerID() *HistoryUpdate {
 	return hu
 }
 
+// SetLink sets the "link" field.
+func (hu *HistoryUpdate) SetLink(s string) *HistoryUpdate {
+	hu.mutation.SetLink(s)
+	return hu
+}
+
+// SetNillableLink sets the "link" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableLink(s *string) *HistoryUpdate {
+	if s != nil {
+		hu.SetLink(*s)
+	}
+	return hu
+}
+
+// ClearLink clears the value of the "link" field.
+func (hu *HistoryUpdate) ClearLink() *HistoryUpdate {
+	hu.mutation.ClearLink()
+	return hu
+}
+
 // SetStatus sets the "status" field.
 func (hu *HistoryUpdate) SetStatus(h history.Status) *HistoryUpdate {
 	hu.mutation.SetStatus(h)
@@ -328,6 +348,12 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if hu.mutation.IndexerIDCleared() {
 		_spec.ClearField(history.FieldIndexerID, field.TypeInt)
+	}
+	if value, ok := hu.mutation.Link(); ok {
+		_spec.SetField(history.FieldLink, field.TypeString, value)
+	}
+	if hu.mutation.LinkCleared() {
+		_spec.ClearField(history.FieldLink, field.TypeString)
 	}
 	if value, ok := hu.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
@@ -523,6 +549,26 @@ func (huo *HistoryUpdateOne) ClearIndexerID() *HistoryUpdateOne {
 	return huo
 }
 
+// SetLink sets the "link" field.
+func (huo *HistoryUpdateOne) SetLink(s string) *HistoryUpdateOne {
+	huo.mutation.SetLink(s)
+	return huo
+}
+
+// SetNillableLink sets the "link" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableLink(s *string) *HistoryUpdateOne {
+	if s != nil {
+		huo.SetLink(*s)
+	}
+	return huo
+}
+
+// ClearLink clears the value of the "link" field.
+func (huo *HistoryUpdateOne) ClearLink() *HistoryUpdateOne {
+	huo.mutation.ClearLink()
+	return huo
+}
+
 // SetStatus sets the "status" field.
 func (huo *HistoryUpdateOne) SetStatus(h history.Status) *HistoryUpdateOne {
 	huo.mutation.SetStatus(h)
@@ -688,6 +734,12 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if huo.mutation.IndexerIDCleared() {
 		_spec.ClearField(history.FieldIndexerID, field.TypeInt)
+	}
+	if value, ok := huo.mutation.Link(); ok {
+		_spec.SetField(history.FieldLink, field.TypeString, value)
+	}
+	if huo.mutation.LinkCleared() {
+		_spec.ClearField(history.FieldLink, field.TypeString)
 	}
 	if value, ok := huo.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
