@@ -1,12 +1,12 @@
 #!/bin/bash
 
-groupadd -g ${PGID} abc
-useradd abc -u ${PUID} -g ${PGID} -m -s /bin/bash
+groupadd -g ${PGID} abc1
+useradd abc1 -u ${PUID} -g ${PGID} -m -s /bin/bash
 
 ## 重设权限
-chown -R abc:abc /app/data
+chown -R "${PUID}:${PGID}" /app/data
 
 umask ${UMASK:-022}
 
 cd /app
-exec gosu chown -R abc:abc /app/polaris
+exec gosu "${PUID}:${PGID}" /app/polaris
