@@ -6,7 +6,7 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/simon-ding/polaris)
 
 
-Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧集或者电影播出后，会第一时间下载对应的资源。支持本地存储或者webdav。
+Polaris 是一个电视剧和电影的追踪下载软件。对动漫日剧美剧都有良好的匹配，支持webdav或者本地存储。
 
 ![main_page](./doc/assets/main_page.png)
 ![detail_page](./doc/assets/detail_page.png)
@@ -16,7 +16,7 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 
 ## 快速开始
 
-使用此程序参考 [【快速开始】](https://simonding.gitbook.io/polaris/quick_start)
+使用此程序参考 [【快速开始】](./doc/quick_start.md)
 
 ## Features
 
@@ -40,13 +40,13 @@ Polaris 是一个电视剧和电影的追踪软件。配置好了之后，当剧
 - [ ] 手机客户端
 
 
-## 原理
+## 运行原理
 
-本程序不提供任何视频相关资源，所有的资源都通过 jackett/prowlarr 所对接的BT/PT站点提供。
-    
-1. 此程序通过调用 jackett/prowlarr API搜索相关资源，然后匹配上对应的剧集
-2. 把搜索到的资源送到下载器下载
-3. 下载完成后归入对应的路径
+Polaris本身不提供任何资源，要使其能正常工作，需要同时安装一个下载客户端（transmission）和一个索引客户端（jackett）。
+
+Polaris通过索引客户端查询相关的BT/PT站点，然后把查到的资源送到下载器，等待下载器下载完成对应资源。下载完成后，根据下载的对应资源，整理到对应的文件夹里去
+
+![](./doc/assets/yuanli.png)
 
 ## 对比 sonarr/radarr
 * 更好的中文支持

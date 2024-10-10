@@ -3,9 +3,12 @@
 要正确使用此程序，需要配置好以下设置：
 
 ### TMDB设置
+
 1. 因为此程序需要使用到 TMDB 的数据，使用此程序首先要申请一个 TMDB 的 Api Key. 申请教程请 google [tmdb api key申请](https://www.google.com/search?q=tmdb+api+key%E7%94%B3%E8%AF%B7)
 
 2. 拿到 TMDB Api Key之后，请填到 *设置 -> 常规设置 -> TMDB Api Key里*
+
+**注意：** TMDB可能需要翻墙才能使用，参考 [TMDB 访问问题](./tmdb.md)
 
 ### 索引器
 
@@ -39,7 +42,7 @@
 
 ### 下载器
 
-资源下载器，目前可支持 tansmission，请配置好对应配置
+资源下载器，目前可支持 tansmission/qbittorrent，请配置好对应配置
 
 ![transmission](./assets/downloader.png)
 
