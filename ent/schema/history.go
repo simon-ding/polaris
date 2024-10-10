@@ -23,7 +23,7 @@ func (History) Fields() []ent.Field {
 		field.Int("indexer_id").Optional(),
 		field.String("link").Optional(), //should be magnet link
 		field.Enum("status").Values("running", "success", "fail", "uploading", "seeding"),
-		field.String("saved").Optional(),
+		field.String("saved").Optional().Comment("deprecated"), //deprecated
 	}
 }
 

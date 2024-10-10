@@ -47,8 +47,8 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 	for _, t := range tt {
 		t1 := &Torrent{
 			c:    c.c,
-			Hash: t.Hash,
-			Info: c.Info,
+			hash: t.Hash,
+			//Info: c.Info,
 		}
 		res = append(res, t1)
 	}
@@ -64,27 +64,46 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "qbt download")
 	}
-	return &Torrent{Hash: hash, c: c.c, Info: c.Info}, nil
+	return &Torrent{hash: hash, c: c.c, }, nil
 
 }
 
+
+func NewTorrent(info Info, magnet string) (*Torrent, error) {
+	c, err := NewClient(info.URL, info.User, info.Password)
+	if err != nil {
+		return nil,  err
+	}
+	hash, err := utils.MagnetHash(magnet)
+	if err != nil {
+		return nil, err
+	}
+	t := &Torrent{
+		c: c.c,
+		hash: hash,
+	}
+	if !t.Exists() {
+		return nil, errors.Errorf("torrent not exist: %v", magnet)
+	}
+	return t, nil
+}
 type Torrent struct {
 	c    *qbt.Client
-	Hash string
-	Info
+	hash string
+	//info Info
 }
 
 func (t *Torrent) GetHash() string {
-	return t.Hash
+	return t.hash
 }
 
 func (t *Torrent) getTorrent() (*qbt.TorrentInfo, error) {
-	all, err := t.c.Torrents(qbt.TorrentsOptions{Hashes: []string{t.Hash}})
+	all, err := t.c.Torrents(qbt.TorrentsOptions{Hashes: []string{t.hash}})
 	if err != nil {
 		return nil, err
 	}
 	if len(all) == 0 {
-		return nil, fmt.Errorf("no such torrent: %v", t.Hash)
+		return nil, fmt.Errorf("no such torrent: %v", t.hash)
 	}
 	return &all[0], nil
 }
@@ -115,11 +134,11 @@ func (t *Torrent) Progress() (int, error) {
 }
 
 func (t *Torrent) Stop() error {
-	return t.c.Pause([]string{t.Hash})
+	return t.c.Pause([]string{t.hash})
 }
 
 func (t *Torrent) Start() error {
-	ok, err := t.c.Resume([]string{t.Hash})
+	ok, err := t.c.Resume([]string{t.hash})
 	if err != nil {
 		return err
 	}
@@ -130,7 +149,7 @@ func (t *Torrent) Start() error {
 }
 
 func (t *Torrent) Remove() error {
-	ok, err := t.c.Delete([]string{t.Hash}, true)
+	ok, err := t.c.Delete([]string{t.hash}, true)
 	if err != nil {
 		return err
 	}
@@ -156,16 +175,4 @@ func (t *Torrent) SeedRatio() (float64, error) {
 		return 0, err
 	}
 	return qb.Ratio, nil
-}
-
-func (t *Torrent) Reload() error {
-	c, err := NewClient(t.URL, t.User, t.Password)
-	if err != nil {
-		return err
-	}
-	t.c = c.c
-	if !t.Exists() {
-		return errors.Errorf("torrent not exists: %v", t.Hash)
-	}
-	return nil
 }

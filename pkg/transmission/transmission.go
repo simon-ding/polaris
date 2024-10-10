@@ -2,7 +2,6 @@ package transmission
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"polaris/log"
@@ -53,9 +52,9 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 	var torrents []pkg.Torrent
 	for _, t := range all {
 		torrents = append(torrents, &Torrent{
-			Hash:   *t.HashString,
-			c:      c.c,
-			Config: c.cfg,
+			hash: *t.HashString,
+			c:    c.c,
+			//cfg: c.cfg,
 		})
 	}
 	return torrents, nil
@@ -74,33 +73,42 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	log.Debugf("get torrent info: %+v", t)
 
 	return &Torrent{
-		Hash:   hash,
-		c:      c.c,
-		Config: c.cfg,
+		hash: hash,
+		c:    c.c,
+		//cfg: c.cfg,
 	}, err
+}
+
+func NewTorrent(cfg Config, magnet string) (*Torrent, error) {
+	c, err := NewClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+	hash, err := utils.MagnetHash(magnet)
+	if err != nil {
+		return nil, err
+	}
+
+	t :=  &Torrent{
+		c:    c.c,
+		hash: hash,
+		//cfg: cfg,
+	}
+	if !t.Exists() {
+		return nil, errors.Errorf("torrent not exist: %v", magnet)
+	}
+	return t, nil
 }
 
 type Torrent struct {
 	//t *transmissionrpc.Torrent
 	c    *transmissionrpc.Client
-	Hash string `json:"hash"`
-	Config
-}
-
-func (t *Torrent) Reload() error {
-	c, err := NewClient(t.Config)
-	if err != nil {
-		return err
-	}
-	t.c = c.c
-	if !t.Exists() {
-		return errors.Errorf("torrent not exists: %v", t.Hash)
-	}
-	return nil
+	hash string `json:"hash"`
+	//cfg Config
 }
 
 func (t *Torrent) getTorrent() (transmissionrpc.Torrent, error) {
-	r, err := t.c.TorrentGetAllForHashes(context.TODO(), []string{t.Hash})
+	r, err := t.c.TorrentGetAllForHashes(context.TODO(), []string{t.hash})
 	if err != nil {
 		log.Errorf("get torrent info for error: %v", err)
 	}
@@ -111,7 +119,7 @@ func (t *Torrent) getTorrent() (transmissionrpc.Torrent, error) {
 }
 
 func (t *Torrent) Exists() bool {
-	r, err := t.c.TorrentGetAllForHashes(context.TODO(), []string{t.Hash})
+	r, err := t.c.TorrentGetAllForHashes(context.TODO(), []string{t.hash})
 	if err != nil {
 		log.Errorf("get torrent info for error: %v", err)
 	}
@@ -149,7 +157,7 @@ func (t *Torrent) Progress() (int, error) {
 }
 
 func (t *Torrent) Stop() error {
-	return t.c.TorrentStopHashes(context.TODO(), []string{t.Hash})
+	return t.c.TorrentStopHashes(context.TODO(), []string{t.hash})
 }
 
 func (t *Torrent) SeedRatio() (float64, error) {
@@ -164,7 +172,7 @@ func (t *Torrent) SeedRatio() (float64, error) {
 }
 
 func (t *Torrent) Start() error {
-	return t.c.TorrentStartHashes(context.TODO(), []string{t.Hash})
+	return t.c.TorrentStartHashes(context.TODO(), []string{t.hash})
 }
 
 func (t *Torrent) Remove() error {
@@ -186,12 +194,6 @@ func (t *Torrent) Size() (int, error) {
 	return int(tt.TotalSize.Byte()), nil
 }
 
-func (t *Torrent) Save() string {
-
-	d, _ := json.Marshal(*t)
-	return string(d)
-}
-
 func (t *Torrent) GetHash() string {
-	return t.Hash
+	return t.hash
 }

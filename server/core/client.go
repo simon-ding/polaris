@@ -1,7 +1,6 @@
 package core
 
 import (
-	"encoding/json"
 	"polaris/db"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
@@ -27,20 +26,20 @@ func NewClient(db *db.Client, language string) *Client {
 
 type scheduler struct {
 	cron string
-	f func() error 
+	f    func() error
 }
 type Client struct {
-	db       *db.Client
-	cron     *cron.Cron
-	tasks    map[int]*Task
-	language string
+	db         *db.Client
+	cron       *cron.Cron
+	tasks      map[int]*Task
+	language   string
 	schedulers utils.Map[string, scheduler]
 }
 
 func (c *Client) registerCronJob(name string, cron string, f func() error) {
 	c.schedulers.Store(name, scheduler{
 		cron: cron,
-		f: f,
+		f:    f,
 	})
 }
 
@@ -52,43 +51,38 @@ func (c *Client) Init() {
 func (c *Client) reloadTasks() {
 	allTasks := c.db.GetRunningHistories()
 	for _, t := range allTasks {
-		var torrent pkg.Torrent
-		if tt, err := c.reloadTransmiision(t.Saved); err == nil {
-			torrent = tt
-			log.Infof("load transmission task: %v", t.Saved)
-		} else if tt, err := c.reloadQbit(t.Saved); err == nil {
-			torrent = tt
-			log.Infof("load qbit task: %v", t.Saved)
-		} else {
-			log.Warnf("load task fail: %v", t.Saved)
+		dl, err := c.db.GetDownloadClient(t.DownloadClientID)
+		if err != nil {
+			log.Warnf("no download client related: %v", t.SourceTitle)
 			continue
 		}
-		c.tasks[t.ID] = &Task{Torrent: torrent}
+
+		if dl.Implementation == downloadclients.ImplementationTransmission {
+			to, err := transmission.NewTorrent(transmission.Config{
+				URL:      dl.URL,
+				User:     dl.User,
+				Password: dl.Password,
+			}, t.Link)
+			if err != nil {
+				log.Warnf("get task error: %v", err)
+				continue
+			}
+			c.tasks[t.ID] = &Task{Torrent: to}
+		} else if dl.Implementation == downloadclients.ImplementationQbittorrent {
+			to, err := qbittorrent.NewTorrent(qbittorrent.Info{
+				URL:      dl.URL,
+				User:     dl.User,
+				Password: dl.Password,
+			}, t.Link)
+			if err != nil {
+				log.Warnf("get task error: %v", err)
+				continue
+			}
+			c.tasks[t.ID] = &Task{Torrent: to}
+		}
+
 	}
 }
-
-func (c *Client) reloadTransmiision(s string) (pkg.Torrent, error) {
-	var t transmission.Torrent
-	if err := json.Unmarshal([]byte(s), &t); err != nil {
-		return nil, err
-	}
-	if err := t.Reload(); err != nil {
-		return nil, err
-	}
-	return &t, nil
-}
-
-func (c *Client) reloadQbit(s string) (pkg.Torrent, error) {
-	var t qbittorrent.Torrent
-	if err := json.Unmarshal([]byte(s), &t); err != nil {
-		return nil, err
-	}
-	if err := t.Reload(); err != nil {
-		return nil, err
-	}
-	return &t, nil
-}
-
 
 func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {
 	downloaders := c.db.GetAllDonloadClients()
@@ -107,7 +101,7 @@ func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, erro
 				continue
 			}
 			return trc, d, nil
-		
+
 		} else if d.Implementation == downloadclients.ImplementationQbittorrent {
 			qbt, err := qbittorrent.NewClient(d.URL, d.User, d.Password)
 			if err != nil {

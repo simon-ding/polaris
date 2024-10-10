@@ -37,7 +37,7 @@ type History struct {
 	Link string `json:"link,omitempty"`
 	// Status holds the value of the "status" field.
 	Status history.Status `json:"status,omitempty"`
-	// Saved holds the value of the "saved" field.
+	// deprecated
 	Saved        string `json:"saved,omitempty"`
 	selectValues sql.SelectValues
 }

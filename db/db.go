@@ -483,7 +483,7 @@ func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
 	}
 	return c.ent.History.Create().SetMediaID(h.MediaID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
 		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID).
-		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSaved(h.Saved).Save(context.TODO())
+		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSaved(h.Saved).SetLink(h.Link).Save(context.TODO())
 }
 
 func (c *Client) SetHistoryStatus(id int, status history.Status) error {
