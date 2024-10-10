@@ -251,3 +251,24 @@ func Link2Magnet(link string) (string, error) {
 	}
 	return mg.String(), nil
 }
+
+
+func MagnetHash(link string) (string, error) {
+	if mi, err := metainfo.ParseMagnetV2Uri(link); err != nil {
+		return "", errors.Errorf("magnet link is not valid: %v", err)
+	} else {
+		hash := ""
+		if mi.InfoHash.Unwrap().HexString() != "" {
+			hash = mi.InfoHash.Unwrap().HexString()
+		} else {
+			btmh := mi.V2InfoHash.Unwrap()
+			if btmh.HexString() != "" {
+				hash = btmh.HexString()
+			}
+		}
+		if hash == "" {
+			return "", errors.Errorf("magnet has no info hash: %v", link)
+		}
+		return hash, nil
+	}
+}

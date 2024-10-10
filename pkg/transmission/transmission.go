@@ -4,11 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"polaris/log"
 	"polaris/pkg"
-	"strings"
+	"polaris/pkg/utils"
 
 	"github.com/hekmon/transmissionrpc/v3"
 	"github.com/pkg/errors"
@@ -54,45 +53,28 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 	var torrents []pkg.Torrent
 	for _, t := range all {
 		torrents = append(torrents, &Torrent{
-			Hash:     *t.HashString,
+			Hash:   *t.HashString,
 			c:      c.c,
-			Config: c.cfg,		
+			Config: c.cfg,
 		})
 	}
 	return torrents, nil
 }
 
 func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
-	if strings.HasPrefix(link, "http") {
-		client := &http.Client{
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-		}
-		resp, err:=client.Get(link)
-		if err == nil {
-			if resp.StatusCode == http.StatusFound {
-				loc, err := resp.Location()
-				if err == nil {
-					link = loc.String()
-					log.Warnf("transimision redirect to url: %v", link)
-				}
-			}
-	
-		}
-	
-	} 
+	hash, err := utils.MagnetHash(link)
+	if err != nil {
+		return nil, errors.Wrap(err, "get hash")
+	}
+
 	t, err := c.c.TorrentAdd(context.TODO(), transmissionrpc.TorrentAddPayload{
 		Filename:    &link,
 		DownloadDir: &dir,
 	})
-	log.Infof("get torrent info: %+v", t)
-	if t.HashString == nil {
-		return nil, fmt.Errorf("download torrent error: %v", link)
-	}
+	log.Debugf("get torrent info: %+v", t)
 
 	return &Torrent{
-		Hash:     *t.HashString,
+		Hash:   hash,
 		c:      c.c,
 		Config: c.cfg,
 	}, err
@@ -100,7 +82,7 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 
 type Torrent struct {
 	//t *transmissionrpc.Torrent
-	c  *transmissionrpc.Client
+	c    *transmissionrpc.Client
 	Hash string `json:"hash"`
 	Config
 }
@@ -135,7 +117,6 @@ func (t *Torrent) Exists() bool {
 	}
 	return len(r) > 0
 }
-
 
 func (t *Torrent) Name() (string, error) {
 	tt, err := t.getTorrent()

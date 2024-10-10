@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"polaris/pkg"
 	"polaris/pkg/go-qbittorrent/qbt"
-	"time"
+	"polaris/pkg/utils"
 
 	"github.com/pkg/errors"
 )
@@ -39,14 +39,14 @@ func NewClient(url, user, pass string) (*Client, error) {
 }
 
 func (c *Client) GetAll() ([]pkg.Torrent, error) {
-	tt, err :=c.c.Torrents(qbt.TorrentsOptions{})
+	tt, err := c.c.Torrents(qbt.TorrentsOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "get torrents")
 	}
 	var res []pkg.Torrent
 	for _, t := range tt {
 		t1 := &Torrent{
-			c: c.c,
+			c:    c.c,
 			Hash: t.Hash,
 			Info: c.Info,
 		}
@@ -56,40 +56,15 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 }
 
 func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
-	all, err := c.c.Torrents(qbt.TorrentsOptions{})
+	hash, err := utils.MagnetHash(link)
 	if err != nil {
-		return nil, errors.Wrap(err, "get old torrents")
-	}
-	allHash := make(map[string]bool, len(all))
-	for _, t := range all {
-		allHash[t.Hash] = true
+		return nil, errors.Wrap(err, "get hash")
 	}
 	err = c.c.DownloadLinks([]string{link}, qbt.DownloadOptions{Savepath: &dir})
 	if err != nil {
 		return nil, errors.Wrap(err, "qbt download")
 	}
-	var newHash string
-
-loop:
-	for i := 0; i < 10; i++ {
-		time.Sleep(1 * time.Second)
-		all, err = c.c.Torrents(qbt.TorrentsOptions{})
-		if err != nil {
-			return nil, errors.Wrap(err, "get new torrents")
-		}
-
-		for _, t := range all {
-			if !allHash[t.Hash] {
-				newHash = t.Hash
-				break loop
-			}
-		}
-	}
-
-	if newHash == "" {
-		return nil, fmt.Errorf("download torrent fail: timeout")
-	}
-	return &Torrent{Hash: newHash, c: c.c, Info: c.Info}, nil
+	return &Torrent{Hash: hash, c: c.c, Info: c.Info}, nil
 
 }
 

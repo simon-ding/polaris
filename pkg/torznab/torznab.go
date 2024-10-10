@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"polaris/db"
 	"polaris/log"
+	"polaris/pkg/utils"
 	"slices"
 	"strconv"
 	"time"
@@ -80,9 +81,14 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 		if slices.Contains(item.Category, "3000") { //exclude audio files
 			continue
 		}
+		link, err := utils.Link2Magnet(item.Link)
+		if err != nil {
+			log.Warnf("converting link to magnet error, error: %v, link: %v", err, item.Link)
+			continue
+		}
 		r := Result{
 			Name:                 item.Title,
-			Link:                 item.Link,
+			Link:                 link,
 			Size:                 mustAtoI(item.Size),
 			Seeders:              mustAtoI(item.GetAttr("seeders")),
 			Peers:                mustAtoI(item.GetAttr("peers")),

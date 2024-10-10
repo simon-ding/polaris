@@ -11,7 +11,6 @@ import (
 	"polaris/pkg/utils"
 	"strconv"
 
-	"github.com/anacrolix/torrent/metainfo"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -123,21 +122,9 @@ func (s *Server) addTorrent2Blacklist(link string) error {
 	if link == "" {
 		return nil
 	}
-	if mi, err := metainfo.ParseMagnetV2Uri(link); err != nil {
-		return errors.Errorf("magnet link is not valid: %v", err)
+	if hash, err := utils.MagnetHash(link); err != nil {
+		return err
 	} else {
-		hash := ""
-		if mi.InfoHash.Unwrap().HexString() != "" {
-			hash = mi.InfoHash.Unwrap().HexString()
-		} else {
-			btmh := mi.V2InfoHash.Unwrap()
-			if btmh.HexString() != "" {
-				hash = btmh.HexString()
-			}
-		}
-		if hash == "" {
-			return errors.Errorf("magnet has no info hash: %v", link)
-		}
 		item := ent.Blacklist{
 			Type: blacklist.TypeTorrent,
 			Value: schema.BlacklistValue{
