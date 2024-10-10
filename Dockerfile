@@ -6,7 +6,7 @@ COPY ./ui/ ./
 RUN flutter build web --no-web-resources-cdn --web-renderer html
 
 # 打包依赖阶段使用golang作为基础镜像
-FROM golang:1.22 as builder
+FROM golang:1.23 as builder
 
 # 启用go module
 ENV GO111MODULE=on \
