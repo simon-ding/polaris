@@ -40,9 +40,17 @@ docker run -d \
     ghcr.io/simon-ding/polaris:latest
 ```
 
+### Unraid 安装
+
+参考下图进行配置
+
+![](./assets/unraid.png)
+
+### 访问
 拉起之后访问 http://< ip >:8080 即可访问 Polaris 的主页：
 
 ![](./assets/main_page.png)
+
 
 ## 安装下载客户端
 
