@@ -9,6 +9,7 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/log"
 	"polaris/pkg/qbittorrent"
+	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
 	"polaris/pkg/utils"
 	"strconv"
@@ -171,6 +172,8 @@ func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "add ")
 	}
+
+	torznab.CleanCache() //need to clean exist cache, so next request will do actaul query
 	return nil, nil
 }
 

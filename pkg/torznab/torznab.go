@@ -81,7 +81,7 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 		if slices.Contains(item.Category, "3000") { //exclude audio files
 			continue
 		}
-		link, err := utils.Link2Magnet(item.Link)
+		link, err := utils.Link2Magnet(item.Link) //TODO time consuming operation
 		if err != nil {
 			log.Warnf("converting link to magnet error, error: %v, link: %v", err, item.Link)
 			continue
@@ -141,15 +141,18 @@ func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
 
 	cacheRes, ok := cc.Get(key)
 	if !ok {
+		log.Debugf("not found in cache, need query again: %v", key)
 		res, err := doRequest(req)
 		if err != nil {
-			cc.Set(key, &Response{})
+			cc.Set(key, nil)
 			return nil, errors.Wrap(err, "do http request")
 		}
-		cacheRes = res
+		cacheRes = res.ToResults(indexer)
 		cc.Set(key, cacheRes)
+	} else {
+		log.Debugf("found cache match for key: %v", key)
 	}
-	return cacheRes.ToResults(indexer), nil
+	return cacheRes, nil
 }
 
 func doRequest(req *http.Request) (*Response, error) {
