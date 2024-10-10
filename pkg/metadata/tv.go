@@ -27,6 +27,11 @@ func (m *Metadata) IsAcceptable(names... string) bool {
 		name = strings.Join(strings.Fields(name), " ")
 		nameCN = strings.Join(strings.Fields(nameCN), " ")
 		nameEN = strings.Join(strings.Fields(nameEN), " ")
+		if utils.IsASCII(name) { //ascii name should match words
+			re := regexp.MustCompile(`\b` + name + `\b`)
+			return re.MatchString(nameCN) ||  re.MatchString(nameEN) 
+		}
+
 		if  strings.Contains(nameCN, name) || strings.Contains(nameEN, name) {
 			return true
 		}

@@ -145,3 +145,16 @@ func Test_ParseTV14(t *testing.T) {
 	assert.Equal(t, false, m.IsSeasonPack)
 	//assert.Equal(t, "720p", m.Resolution)
 }
+//
+
+func Test_ParseTV15(t *testing.T) {
+	s1 := "[7³ACG] 剧场版 回转企鹅罐 [前篇] 你的列车是生存战略/RE:cycle of the PENGUINDRUM  Zenpen [简繁字幕] BDrip 1080p x265 FLAC"
+	m := ParseTv(s1)
+	log.Infof("results: %+v", m)
+	b := m.IsAcceptable("The Penguin")
+	assert.False(t, b)
+	//assert.Equal(t, 1, m.Season)
+	//assert.Equal(t, 113, m.Episode)
+	//assert.Equal(t, false, m.IsSeasonPack)
+	//assert.Equal(t, "720p", m.Resolution)
+}

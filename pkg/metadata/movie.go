@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+	"polaris/pkg/utils"
 	"regexp"
 	"strconv"
 	"strings"
@@ -21,6 +22,11 @@ func (m *MovieMetadata) IsAcceptable(names... string) bool {
 		name2 := re.ReplaceAllString(strings.ToLower(m.Name), " ")
 		name = strings.Join(strings.Fields(name), " ")
 		name2 = strings.Join(strings.Fields(name2), " ")
+		if utils.IsASCII(name) { //ascii name should match words
+			re := regexp.MustCompile(`\b` + name + `\b`)
+			return re.MatchString(name2)
+		}
+		
 		if  strings.Contains(name2, name) {
 			return true
 		}
