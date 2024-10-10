@@ -44,7 +44,12 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 	} else { //season package download
 		ep = &ent.Episode{}
 	}
-	torrent, err := trc.Download(r1.Link, downloadDir)
+	magnet, err := utils.Link2Magnet(r1.Link)
+	if err != nil {
+		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", r1.Link, err)
+	}
+
+	torrent, err := trc.Download(magnet, downloadDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "downloading")
 	}
@@ -60,7 +65,7 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 		Status:           history.StatusRunning,
 		Size:             r1.Size,
 		//Saved:            torrent.Save(),
-		Link:             r1.Link,
+		Link:             magnet,
 		DownloadClientID: dlc.ID,
 		IndexerID:        r1.IndexerId,
 	})
@@ -107,8 +112,12 @@ func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexe
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
+	magnet, err := utils.Link2Magnet(link)
+	if err != nil {
+		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", link, err)
+	}
 
-	torrent, err := trc.Download(link, c.db.GetDownloadDir())
+	torrent, err := trc.Download(magnet, c.db.GetDownloadDir())
 	if err != nil {
 		return nil, errors.Wrap(err, "downloading")
 	}
@@ -127,7 +136,7 @@ func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexe
 			Status:           history.StatusRunning,
 			Size:             size,
 			//Saved:            torrent.Save(),
-			Link:             link,
+			Link:             magnet,
 			DownloadClientID: dlc.ID,
 			IndexerID:        indexerID,
 		})

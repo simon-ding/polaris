@@ -363,7 +363,13 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (
 	}
 	r1 := res[0]
 	log.Infof("begin download torrent resource: %v", r1.Name)
-	torrent, err := trc.Download(r1.Link, c.db.GetDownloadDir())
+
+	magnet, err := utils.Link2Magnet(r1.Link)
+	if err != nil {
+		return "", errors.Errorf("converting link to magnet error, link: %v, error: %v", r1.Link, err)
+	}
+
+	torrent, err := trc.Download(magnet, c.db.GetDownloadDir())
 	if err != nil {
 		return "", errors.Wrap(err, "downloading")
 	}
@@ -377,7 +383,7 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (
 		Status:           history.StatusRunning,
 		Size:             r1.Size,
 		//Saved:            torrent.Save(),
-		Link:             r1.Link,
+		Link:             magnet,
 		DownloadClientID: dlc.ID,
 		IndexerID:        r1.IndexerId,
 	})
