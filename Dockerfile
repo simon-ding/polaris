@@ -25,16 +25,17 @@ COPY --from=flutter /app/build/web ./ui/build/web/
 RUN CGO_ENABLED=1 go build -o polaris -ldflags="-X polaris/db.Version=$(git describe --tags --long)"  ./cmd/ 
 
 FROM debian:stable-slim
-ENV TZ="Asia/Shanghai" GIN_MODE=release
+ENV TZ="Asia/Shanghai" GIN_MODE=release PUID=0 PGID=0 UMASK=0 PERMS=true
 
 WORKDIR /app
-RUN apt-get update && apt-get -y install ca-certificates
+RUN apt-get update && apt-get -y install ca-certificates tzdata gosu tini && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \ 
+    && echo "${TZ}" > /etc/timezone && apt-get clean
 
 # 将上一个阶段publish文件夹下的所有文件复制进来
 COPY --from=builder /app/polaris .
+COPY --from=builder /app/entrypoint.sh .
 
+VOLUME /app/data
 EXPOSE 8080
 
-#USER 1000:1000
-
-ENTRYPOINT ["./polaris"]
+ENTRYPOINT ["tini","./entrypoint.sh"]
