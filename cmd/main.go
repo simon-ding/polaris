@@ -11,7 +11,7 @@ import (
 func main() {
 	log.Infof("------------------- Starting Polaris ---------------------")
 
-	utils.MaxPermission()
+	//utils.MaxPermission()
 
 	dbClient, err := db.Open()
 	if err != nil {
