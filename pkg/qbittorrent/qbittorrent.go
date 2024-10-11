@@ -1,11 +1,12 @@
 package qbittorrent
 
 import (
-	"encoding/json"
 	"fmt"
+	"os"
 	"polaris/pkg"
 	"polaris/pkg/go-qbittorrent/qbt"
 	"polaris/pkg/utils"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -69,15 +70,14 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "qbt download")
 	}
-	return &Torrent{hash: hash, c: c.c, }, nil
+	return &Torrent{hash: hash, c: c.c}, nil
 
 }
-
 
 func NewTorrent(info Info, link string) (*Torrent, error) {
 	c, err := NewClient(info.URL, info.User, info.Password)
 	if err != nil {
-		return nil,  err
+		return nil, err
 	}
 	magnet, err := utils.Link2Magnet(link)
 	if err != nil {
@@ -89,7 +89,7 @@ func NewTorrent(info Info, link string) (*Torrent, error) {
 		return nil, err
 	}
 	t := &Torrent{
-		c: c.c,
+		c:    c.c,
 		hash: hash,
 	}
 	if !t.Exists() {
@@ -97,6 +97,7 @@ func NewTorrent(info Info, link string) (*Torrent, error) {
 	}
 	return t, nil
 }
+
 type Torrent struct {
 	c    *qbt.Client
 	hash string
@@ -119,12 +120,29 @@ func (t *Torrent) getTorrent() (*qbt.TorrentInfo, error) {
 }
 
 func (t *Torrent) Name() (string, error) {
-	qb, err := t.getTorrent()
+	dir, err := t.getTorrentBaseNameOrDir()
+	if err != nil { //use torrent name
+		qb, err := t.getTorrent()
+		if err != nil {
+			return "", err
+		}
+		return qb.Name, nil
+	}
+	return dir, nil
+}
+
+// https://github.com/qbittorrent/qBittorrent/issues/13572
+func (t *Torrent) getTorrentBaseNameOrDir() (string, error) {
+	files, err := t.c.TorrentFiles(t.hash)
 	if err != nil {
 		return "", err
 	}
-
-	return qb.Name, nil
+	if len(files) == 0 {
+		return "", errors.Wrap(err, "no file")
+	}
+	name := files[0].Name
+	dir := strings.Split(name, string(os.PathSeparator))[0]
+	return dir, nil
 }
 
 func (t *Torrent) Progress() (int, error) {
@@ -167,11 +185,6 @@ func (t *Torrent) Remove() error {
 		return fmt.Errorf("status not 200")
 	}
 	return nil
-}
-
-func (t *Torrent) Save() string {
-	data, _ := json.Marshal(t)
-	return string(data)
 }
 
 func (t *Torrent) Exists() bool {
