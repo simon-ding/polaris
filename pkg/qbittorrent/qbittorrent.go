@@ -11,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const btCategory = "polaris"
+
 type Info struct {
 	URL      string
 	User     string
@@ -18,7 +20,8 @@ type Info struct {
 }
 
 type Client struct {
-	c *qbt.Client
+	c        *qbt.Client
+	category string
 	Info
 }
 
@@ -36,11 +39,11 @@ func NewClient(url, user, pass string) (*Client, error) {
 		return nil, err
 	}
 
-	return &Client{c: qb, Info: Info{URL: url, User: user, Password: pass}}, nil
+	return &Client{c: qb, category: btCategory, Info: Info{URL: url, User: user, Password: pass}}, nil
 }
 
 func (c *Client) GetAll() ([]pkg.Torrent, error) {
-	tt, err := c.c.Torrents(qbt.TorrentsOptions{})
+	tt, err := c.c.Torrents(qbt.TorrentsOptions{Category: &c.category})
 	if err != nil {
 		return nil, errors.Wrap(err, "get torrents")
 	}
@@ -66,7 +69,7 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "get hash")
 	}
-	err = c.c.DownloadLinks([]string{magnet}, qbt.DownloadOptions{Savepath: &dir})
+	err = c.c.DownloadLinks([]string{magnet}, qbt.DownloadOptions{Savepath: &dir, Category: &c.category})
 	if err != nil {
 		return nil, errors.Wrap(err, "qbt download")
 	}

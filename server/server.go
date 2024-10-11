@@ -76,7 +76,7 @@ func (s *Server) Serve() error {
 		activity.GET("/", HttpHandler(s.GetAllActivities))
 		activity.POST("/delete", HttpHandler(s.RemoveActivity))
 		activity.GET("/media/:id", HttpHandler(s.GetMediaDownloadHistory))
-		activity.GET("/torrents", HttpHandler(s.GetAllTorrents))
+		//activity.GET("/torrents", HttpHandler(s.GetAllTorrents))
 	}
 
 	tv := api.Group("/media")
