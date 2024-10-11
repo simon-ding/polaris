@@ -16,7 +16,8 @@ import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/utils.dart';
 
 void main() {
-  initializeDateFormatting().then((_) => runApp(MyApp()));
+  initializeDateFormatting()
+      .then((_) => runApp(const ProviderScope(child: MyApp())));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -45,15 +46,17 @@ CustomTransitionPage buildPageWithDefaultTransition<T>({
 
 class _MyAppState extends ConsumerState<MyApp> {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
+    var padding = isSmallScreen(context) ? 5.0 : 20.0;
     // GoRouter configuration
     final shellRoute = ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
         return SelectionArea(
           child: MainSkeleton(
             body: Padding(
-                padding: EdgeInsets.all(isSmallScreen(context) ? 5 : 20),
+                padding: EdgeInsets.only(left: padding, right: padding, top: 5, bottom: 5),
                 child: child),
           ),
         );
@@ -125,28 +128,26 @@ class _MyAppState extends ConsumerState<MyApp> {
       ],
     );
 
-    return ProviderScope(
-      child: MaterialApp.router(
-        title: 'Polaris 影视追踪下载',
-        theme: ThemeData(
-            fontFamily: "NotoSansSC",
-            colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.blueAccent,
-                brightness: Brightness.dark,
-                surface: Colors.black87),
-            useMaterial3: true,
-            //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
-            tooltipTheme: TooltipThemeData(
-              textStyle: const TextStyle(
-                color: Colors.grey,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(20),
-              ),
-            )),
-        routerConfig: router,
-      ),
+    return MaterialApp.router(
+      title: 'Polaris 影视追踪下载',
+      theme: ThemeData(
+          fontFamily: "NotoSansSC",
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.blueAccent,
+              brightness: Brightness.dark,
+              surface: Colors.black87),
+          useMaterial3: true,
+          //scaffoldBackgroundColor: Color.fromARGB(255, 26, 24, 24)
+          tooltipTheme: TooltipThemeData(
+            textStyle: const TextStyle(
+              color: Colors.grey,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(20),
+            ),
+          )),
+      routerConfig: router,
     );
   }
 }
@@ -190,7 +191,7 @@ class _MainSkeletonState extends State<MainSkeleton> {
         // the App.build method, and use it to set our appbar title.
         title: TextButton(
           onPressed: () => context.go(WelcomePage.routeTv),
-          child: Text(
+          child: const Text(
             "Polaris",
             overflow: TextOverflow.clip,
             style: TextStyle(fontSize: 28),
