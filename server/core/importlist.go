@@ -76,6 +76,7 @@ func (c *Client) periodicallyUpdateImportlist() error {
 					if err != nil {
 						log.Errorf("[update_import_lists] add movie to watchlist error: %v", err)
 					} else {
+						c.sendMsg(fmt.Sprintf("成功监控电影：%v", d.Title))
 						log.Infof("[update_import_lists] add movie to watchlist success")
 					}
 				} else if len(tmdbRes.TvResults) > 0 {
@@ -95,6 +96,7 @@ func (c *Client) periodicallyUpdateImportlist() error {
 					if err != nil {
 						log.Errorf("[update_import_lists] add tv to watchlist error: %v", err)
 					} else {
+						c.sendMsg(fmt.Sprintf("成功监控电视剧：%v", d.Name))
 						log.Infof("[update_import_lists] add tv to watchlist success")
 					}
 
