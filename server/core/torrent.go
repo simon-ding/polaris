@@ -67,8 +67,8 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 			continue
 		}
 
-		if param.CheckResolution && 
-			series.Resolution != media.ResolutionAny && 
+		if param.CheckResolution &&
+			series.Resolution != media.ResolutionAny &&
 			meta.Resolution != series.Resolution.String() {
 			continue
 		}
@@ -108,6 +108,11 @@ func imdbIDMatchExact(id1, id2 string) bool {
 }
 
 func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam) bool {
+	defaultMinSize := 80 * 1000 * 1000 //tv, 80M min
+	if detail.MediaType == media.MediaTypeMovie {
+		defaultMinSize = 200 * 1000 * 1000 // movie, 200M min
+	}
+
 	if param.CheckFileSize {
 		multiplier := 1                                                        //大小倍数，正常为1，如果是季包则为季内集数
 		if detail.MediaType == media.MediaTypeTv && len(param.Episodes) == 0 { //tv season pack
@@ -119,7 +124,13 @@ func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam)
 			if torrentSize < sizeMin { //比最小要求的大小还要小
 				return false
 			}
+		} else {
+			sizeMin := defaultMinSize * multiplier
+			if torrentSize < sizeMin { //比最小要求的大小还要小
+				return false
+			}
 		}
+
 		if detail.Limiter.SizeMax > 0 { //max size
 			sizeMax := detail.Limiter.SizeMax * multiplier
 			if torrentSize > sizeMax { //larger than max size wanted
@@ -191,8 +202,8 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 			}
 		}
 
-		if param.CheckResolution && 
-			movieDetail.Resolution != media.ResolutionAny && 
+		if param.CheckResolution &&
+			movieDetail.Resolution != media.ResolutionAny &&
 			meta.Resolution != movieDetail.Resolution.String() {
 			continue
 		}
