@@ -112,33 +112,31 @@ func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam)
 	if detail.MediaType == media.MediaTypeMovie {
 		defaultMinSize = 200 * 1000 * 1000 // movie, 200M min
 	}
+	if detail.Limiter.SizeMin > 0 { //if size limiter set, use configured min size
+		defaultMinSize = detail.Limiter.SizeMin
+	}
 
-	if param.CheckFileSize {
-		multiplier := 1                                                        //大小倍数，正常为1，如果是季包则为季内集数
-		if detail.MediaType == media.MediaTypeTv && len(param.Episodes) == 0 { //tv season pack
-			multiplier = seasonEpisodeCount(detail, param.SeasonNum)
-		}
+	multiplier := 1                                                        //大小倍数，正常为1，如果是季包则为季内集数
+	if detail.MediaType == media.MediaTypeTv && len(param.Episodes) == 0 { //tv season pack
+		multiplier = seasonEpisodeCount(detail, param.SeasonNum)
+	}
 
+	if param.CheckFileSize { //check file size when trigger automatic download
 		if detail.Limiter.SizeMin > 0 { //min size
 			sizeMin := detail.Limiter.SizeMin * multiplier
-			if torrentSize < sizeMin { //比最小要求的大小还要小
-				return false
-			}
-		} else {
-			sizeMin := defaultMinSize * multiplier
-			if torrentSize < sizeMin { //比最小要求的大小还要小
+			if torrentSize < sizeMin { //比最小要求的大小还要小, min size not qualify
 				return false
 			}
 		}
 
 		if detail.Limiter.SizeMax > 0 { //max size
 			sizeMax := detail.Limiter.SizeMax * multiplier
-			if torrentSize > sizeMax { //larger than max size wanted
+			if torrentSize > sizeMax { //larger than max size wanted, max size not qualify
 				return false
 			}
 		}
 	}
-	return true
+	return torrentSize > defaultMinSize * multiplier
 }
 
 func seasonEpisodeCount(detail *db.MediaDetails, seasonNum int) int {
