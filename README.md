@@ -56,6 +56,10 @@ Polaris通过索引客户端查询相关的BT/PT站点，然后把查到的资�
 * 一个程序同时实现了电影、电视剧功能，不需要装两个程序
 * 当然 sonarr/radarr 也是非常优秀的开源项目，目前 Polaris 功能还没有 sonarr/radarr 丰富
 
+
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/simon-ding/polaris.svg?variant=adaptive)](https://starchart.cc/simon-ding/polaris)
+
 -------------
 
 ## 请我喝杯咖啡
