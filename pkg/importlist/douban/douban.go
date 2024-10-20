@@ -37,6 +37,7 @@ func ParseDoulist(doulistUrl string) (*importlist.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	var items []importlist.Item
 	doc.Find("div[class=doulist-item]").Each(func(i int, selection *goquery.Selection) {
 		titleDiv := selection.Find("div[class=title]")
 		link := titleDiv.Find("div>a")
@@ -64,18 +65,26 @@ func ParseDoulist(doulistUrl string) (*importlist.Response, error) {
 				}
 			}
 		}
+		_, err := parseDetailPage(strings.TrimSpace(href))
+		if err != nil {
+			log.Errorf("get detail page: %v", err)
+			return
+		}
 
 		item := importlist.Item{
 			Title: strings.TrimSpace(link.Text()),
 			Year:  year,
 		}
+		items = append(items, item)
 		_ = item
-		println(link.Text(), href)
+		//println(link.Text(), href)
 	})
-	return nil, nil
+
+	return &importlist.Response{Items: items}, nil
 }
 
 func parseDetailPage(url string) (string, error) {
+	println(url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", err
@@ -95,6 +104,14 @@ func parseDetailPage(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	doc.Find("div[class='subject clearfix']").Each(func(i int, se *goquery.Selection) {
+		println(se.Text())
+		se.Children().Get(1)
+		imdb := se.Find("div[class='info']").First().Children().Last()
+		println(imdb.Text())
+	})
+
 	_ = doc
 	return "", nil
 }

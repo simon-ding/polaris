@@ -17,6 +17,7 @@ const (
 	SetttingSizeLimiter           = "size_limiter"
 	SettingTvNamingFormat         = "tv_naming_format"
 	SettingMovieNamingFormat      = "movie_naming_format"
+	SettingProwlarrInfo           = "prowlarr_info"
 )
 
 const (
@@ -59,4 +60,9 @@ type SizeLimiter struct {
 type Limiter struct {
 	Max int `json:"max"`
 	Min int `json:"min"`
+}
+
+type ProwlarrSetting struct {
+	ApiKey string `json:"api_key"`
+	URL    string `json:"url"`
 }

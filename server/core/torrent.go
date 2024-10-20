@@ -6,6 +6,7 @@ import (
 	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/metadata"
+	"polaris/pkg/prowlarr"
 	"polaris/pkg/torznab"
 	"slices"
 	"sort"
@@ -136,7 +137,7 @@ func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam)
 			}
 		}
 	}
-	return torrentSize > defaultMinSize * multiplier
+	return torrentSize > defaultMinSize*multiplier
 }
 
 func seasonEpisodeCount(detail *db.MediaDetails, seasonNum int) int {
@@ -230,6 +231,17 @@ func searchWithTorznab(db *db.Client, queries ...string) []torznab.Result {
 
 	var res []torznab.Result
 	allTorznab := db.GetAllTorznabInfo()
+
+	p, err := db.GetProwlarrSetting()
+	if err == nil { //prowlarr exists
+		c := prowlarr.New(p.ApiKey, p.URL)
+		all, err := c.GetIndexers()
+		if err != nil {
+			log.Warnf("get prowlarr all indexer error: %v", err)
+		} else {
+			allTorznab = append(allTorznab, all...)
+		}
+	}
 	resChan := make(chan []torznab.Result)
 	var wg sync.WaitGroup
 

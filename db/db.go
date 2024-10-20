@@ -660,3 +660,24 @@ func (c *Client) CleanAllDanglingEpisodes() error {
 func (c *Client) AddBlacklistItem(item *ent.Blacklist) error {
 	return c.ent.Blacklist.Create().SetType(item.Type).SetValue(item.Value).SetNotes(item.Notes).Exec(context.Background())
 }
+
+
+func (c *Client) GetProwlarrSetting() (*ProwlarrSetting, error) {
+	s := c.GetSetting(SettingProwlarrInfo)
+	if s == "" {
+		return nil, errors.New("prowlarr setting not set")
+	}
+	var se ProwlarrSetting
+	if err := json.Unmarshal([]byte(s), &se); err != nil {
+		return nil, err
+	}
+	return &se, nil
+}
+
+func (c *Client) SaveProwlarrSetting(se *ProwlarrSetting) error {
+	data, err := json.Marshal(se)
+	if err != nil {
+		return err
+	}
+	return c.SetSetting(SettingProwlarrInfo, string(data))
+}

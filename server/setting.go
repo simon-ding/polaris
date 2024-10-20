@@ -8,6 +8,7 @@ import (
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/log"
+	"polaris/pkg/prowlarr"
 	"polaris/pkg/qbittorrent"
 	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
@@ -298,6 +299,29 @@ func (s *Server) TriggerCronJob(c *gin.Context) (interface{}, error) {
 	}
 
 	err := s.core.TriggerCronJob(in.JobName)
+	if err != nil {
+		return nil, err
+	}
+	return "success", nil
+}
+
+func (s *Server) GetProwlarrSetting(c *gin.Context) (interface{}, error) {
+	se, err :=s.db.GetProwlarrSetting()
+	if err != nil {
+		return &db.ProwlarrSetting{}, nil
+	}
+	return se, nil
+}
+func (s *Server) SaveProwlarrSetting(c *gin.Context) (interface{}, error) {
+	var in db.ProwlarrSetting
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, err
+	}
+	client := prowlarr.New(in.ApiKey, in.URL)
+	if _, err := client.GetIndexers(); err != nil {
+		return nil, errors.Wrap(err, "connect to prowlarr error")
+	}
+	err := s.db.SaveProwlarrSetting(&in)
 	if err != nil {
 		return nil, err
 	}

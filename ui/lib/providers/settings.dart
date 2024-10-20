@@ -25,6 +25,10 @@ var importlistProvider =
     AsyncNotifierProvider.autoDispose<ImportListData, List<ImportList>>(
         ImportListData.new);
 
+var prowlarrSettingDataProvider =
+    AsyncNotifierProvider.autoDispose<ProwlarrSettingData, ProwlarrSetting>(
+        ProwlarrSettingData.new);
+
 class EditSettingData extends AutoDisposeAsyncNotifier<GeneralSetting> {
   @override
   FutureOr<GeneralSetting> build() async {
@@ -496,6 +500,41 @@ class ImportListData extends AutoDisposeAsyncNotifier<List<ImportList>> {
   deleteimportlist(int id) async {
     final dio = APIs.getDio();
     var resp = await dio.post(APIs.deleteImportlistUrl, data: {"id": id});
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
+  }
+}
+
+class ProwlarrSetting {
+  final String apiKey;
+  final String url;
+  ProwlarrSetting({required this.apiKey, required this.url});
+  factory ProwlarrSetting.fromJson(Map<String, dynamic> json) {
+    return ProwlarrSetting(apiKey: json["api_key"], url: json["url"]);
+  }
+
+  Map<String, dynamic> tojson() => {"api_key": apiKey, "url": url};
+}
+
+class ProwlarrSettingData extends AutoDisposeAsyncNotifier<ProwlarrSetting> {
+  @override
+  FutureOr<ProwlarrSetting> build() async {
+    final dio = APIs.getDio();
+    var resp = await dio.get(APIs.prowlarrUrl);
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    var se = ProwlarrSetting.fromJson(sp.data);
+    return se;
+  }
+
+  Future<void> save(ProwlarrSetting ps) async {
+    final dio = APIs.getDio();
+    var resp = await dio.post(APIs.prowlarrUrl, data: ps.tojson());
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;

@@ -70,6 +70,8 @@ func (s *Server) Serve() error {
 		setting.POST("/parse/movie", HttpHandler(s.ParseMovie))
 		setting.POST("/monitoring", HttpHandler(s.ChangeEpisodeMonitoring))
 		setting.POST("/cron/trigger", HttpHandler(s.TriggerCronJob))
+		setting.GET("/prowlarr", HttpHandler(s.GetProwlarrSetting))
+		setting.POST("/prowlarr", HttpHandler(s.SaveProwlarrSetting))
 	}
 	activity := api.Group("/activity")
 	{

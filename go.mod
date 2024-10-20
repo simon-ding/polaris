@@ -21,6 +21,7 @@ require (
 	github.com/ncruces/go-sqlite3 v0.18.4
 	github.com/nikoksr/notify v1.0.0
 	github.com/stretchr/testify v1.9.0
+	golift.io/starr v1.0.0
 )
 
 require (

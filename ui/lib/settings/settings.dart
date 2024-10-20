@@ -6,6 +6,7 @@ import 'package:ui/settings/general.dart';
 import 'package:ui/settings/importlist.dart';
 import 'package:ui/settings/indexer.dart';
 import 'package:ui/settings/notifier.dart';
+import 'package:ui/settings/prowlarr.dart';
 import 'package:ui/settings/storage.dart';
 
 class SystemSettingsPage extends ConsumerStatefulWidget {
@@ -25,6 +26,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
       children: [
         getExpansionTile("常规", const GeneralSettings()),
         getExpansionTile("索引器", const IndexerSettings()),
+        getExpansionTile("Prowlarr 设置", const ProwlarrSettingPage()),
         getExpansionTile("下载器", const DownloaderSettings()),
         getExpansionTile("存储", const StorageSettings()),
         getExpansionTile("通知客户端", const NotifierSettings()),
