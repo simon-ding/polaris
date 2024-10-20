@@ -51,7 +51,7 @@ func (c *Client) GetIndexers() ([]*db.TorznabInfo, error) {
 		entIndexer := ent.Indexers{
 			Name:           in.Name,
 			Implementation: "torznab",
-			Priority:       int(in.Priority),
+			Priority:       128 - int(in.Priority),
 			SeedRatio:      float32(seedRatio),
 			Settings:       string(data),
 		}
