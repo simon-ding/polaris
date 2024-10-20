@@ -41,7 +41,7 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
                     decoration: const InputDecoration(
                         labelText: "API Key",
                         icon: Icon(Icons.key),
-                        helperText: "Prowlarr 设置 -> 通用设置 -> 接口密钥"),
+                        helperText: "Prowlarr 设置 -> 通用 -> API 密钥"),
                     validator: FormBuilderValidators.required(),
                   ),
                   Center(
