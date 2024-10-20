@@ -1,4 +1,10 @@
-# Polaris
+
+![main_page](./doc/assets/main_page.png)
+
+
+<h1 align="center">Polaris</h1>
+
+<div align="center">
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/simon-ding/polaris/go.yml)
 ![GitHub Release](https://img.shields.io/github/v/release/simon-ding/polaris)
@@ -6,11 +12,10 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/simon-ding/polaris)
 
 
-Polaris 是一个电视剧和电影的追踪下载软件。对动漫日剧美剧都有良好的匹配，支持webdav或者本地存储。
+**Polaris 是一个电视剧和电影的追踪下载软件。对动漫日剧美剧都有良好的匹配，支持webdav或者本地存储。**
 
-![main_page](./doc/assets/main_page.png)
-![detail_page](./doc/assets/detail_page.png)
-![anime](./doc/assets/anime_match.png)
+</div>
+
 
 交流群： https://t.me/+8R2nzrlSs2JhMDgx
 
@@ -40,6 +45,13 @@ Polaris 是一个电视剧和电影的追踪下载软件。对动漫日剧美剧
 - [ ] 手机客户端
 
 
+## 截图
+
+![main_page](./doc/assets/main_page.png)
+![detail_page](./doc/assets/detail_page.png)
+![anime](./doc/assets/anime_match.png)
+
+
 ## 运行原理
 
 Polaris本身不提供任何资源，要使其能正常工作，需要同时安装一个下载客户端（transmission）和一个索引客户端（jackett）。
@@ -48,13 +60,13 @@ Polaris通过索引客户端查询相关的BT/PT站点，然后把查到的资�
 
 ![](./doc/assets/yuanli.png)
 
-## 对比 sonarr/radarr
+<!-- ## 对比 sonarr/radarr
 * 更好的中文支持
 * 对于动漫、日剧的良好支持，配合国内站点基本能匹配上对应资源
 * 支持 webdav 后端存储，可以配合 alist 或者阿里云来实现下载后实时传到云上的功能。这样外出就可以不依靠家里的宽带来看电影了，或者实现个轻 NAS 功能，下载功能放在本地，数据放在云盘
 * golang 实现后端，相比于 .NET 更节省资源
 * 一个程序同时实现了电影、电视剧功能，不需要装两个程序
-* 当然 sonarr/radarr 也是非常优秀的开源项目，目前 Polaris 功能还没有 sonarr/radarr 丰富
+* 当然 sonarr/radarr 也是非常优秀的开源项目，目前 Polaris 功能还没有 sonarr/radarr 丰富 -->
 
 
 ## Stargazers over time
