@@ -1,8 +1,8 @@
 # 快速开始
 
-## 安装 Polaris
+## 1. 安装 Polaris
 
-### Docker Compose 方式安装
+### 1.1 Docker Compose 方式安装
 
 最简单使用本程序的方式是通过docker compose，下面内容保存成 docker-compose.yml，然后执行 docker compose up -d, 即可拉起程序。
 
@@ -23,7 +23,7 @@ services:
       - 8080:8080
 ```
 
-### Docker 方式安装
+### 1.2 Docker 方式安装
 
 也可以通过原始 docker 命令的方式安装 Polaris：
 
@@ -40,19 +40,19 @@ docker run -d \
     ghcr.io/simon-ding/polaris:latest
 ```
 
-### Unraid 安装
+### 1.3 Unraid 安装
 
 参考下图进行配置
 
 ![](./assets/unraid.png)
 
-### 访问
+### 1.4 访问
 拉起之后访问 http://< ip >:8080 即可访问 Polaris 的主页：
 
 ![](./assets/main_page.png)
 
 
-## 安装下载客户端
+## 2. 安装下载客户端
 
 Polaris 需要下载客户端的配合使用，目前支持 Transmission 和 Qbittorrent。推荐使用linuxserver镜像进行安装
 
@@ -62,7 +62,7 @@ Polaris 需要下载客户端的配合使用，目前支持 Transmission 和 Qbi
 
 需要注意的是下载客户端内 /downloads 路径的映射地址要和 Polaris的/downloads路径映射保持一致。也就是说他俩都要映射到同一路径。
 
-## 安装 Jackett/Prowlarr
+## 3. 安装 Jackett/Prowlarr
 
 Polaris 如果要正常工作，还需要一个索引客户端的支持，目前支持jackett/prowlarr索引客户端。推荐使用prowlarr，设置更简单
 
@@ -73,7 +73,7 @@ Polaris 如果要正常工作，还需要一个索引客户端的支持，目前
 
 
 
-## 联合安装
+## 4. 联合安装
 
 如果觉得一个个安装麻烦，也可以使用下面docker compose文件，一键拉起所有组件
 
@@ -127,7 +127,7 @@ docker compose up -d
 ```
 
 
-## 配置
+## 5. 配置
 
 详细配置请看 [配置篇](./configuration.md)
 
