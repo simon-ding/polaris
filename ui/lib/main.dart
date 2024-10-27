@@ -56,7 +56,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         return SelectionArea(
           child: MainSkeleton(
             body: Padding(
-                padding: EdgeInsets.only(left: padding, right: padding, top: 5, bottom: 5),
+                padding: EdgeInsets.only(
+                    left: padding, right: padding, top: 5, bottom: 5),
                 child: child),
           ),
         );
@@ -222,9 +223,9 @@ class _MainSkeletonState extends State<MainSkeleton> {
                   (BuildContext context, SearchController controller) {
             return [Text("dadada")];
           }),
-          IconButton(
-              onPressed: () => showCalendar(context),
-              icon: Icon(Icons.calendar_month)),
+          // IconButton(
+          //     onPressed: () => showCalendar(context),
+          //     icon: Icon(Icons.calendar_month)),
           MenuAnchor(
             menuChildren: [
               MenuItemButton(
@@ -247,7 +248,13 @@ class _MainSkeletonState extends State<MainSkeleton> {
                 child: const Icon(Icons.account_circle),
               );
             },
-          )
+          ),
+          IconButton(
+              onPressed: () => showDonate(context),
+              icon: Icon(
+                Icons.heart_broken_rounded,
+                color: Colors.red,
+              )),
         ],
       ),
       useDrawer: false,
@@ -300,6 +307,26 @@ class _MainSkeletonState extends State<MainSkeleton> {
       // Override the default secondaryBody during the smallBreakpoint to be
       // empty. Must use AdaptiveScaffold.emptyBuilder to ensure it is properly
       // overridden.
+    );
+  }
+
+  showDonate(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("项目开发不易，给开发者加个鸡腿："),
+          content: SizedBox(
+            width: 350,
+            height: 400,
+            child: 
+              Ink.image(
+                  fit: BoxFit.fitWidth, image: AssetImage("assets/wechat.jpg"))
+            
+          ),
+        );
+      },
     );
   }
 }
