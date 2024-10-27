@@ -62,12 +62,14 @@ Polaris 需要下载客户端的配合使用，目前支持 Transmission 和 Qbi
 
 需要注意的是下载客户端内 /downloads 路径的映射地址要和 Polaris的/downloads路径映射保持一致。也就是说他俩都要映射到同一路径。
 
-## 安装 Jackett
-Polaris 如果要正常工作，还需要一个索引客户端的支持，目前支持jackett索引客户端。
+## 安装 Jackett/Prowlarr
+
+Polaris 如果要正常工作，还需要一个索引客户端的支持，目前支持jackett/prowlarr索引客户端。推荐使用prowlarr，设置更简单
 
 安装方式见：
 
  * [linuxserver/jackett](https://docs.linuxserver.io/images/docker-jackett/)
+ * [linuxserver/prowlarr](https://docs.linuxserver.io/images/docker-prowlarr/)
 
 
 
