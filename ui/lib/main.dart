@@ -252,7 +252,7 @@ class _MainSkeletonState extends State<MainSkeleton> {
           IconButton(
               onPressed: () => showDonate(context),
               icon: Icon(
-                Icons.heart_broken_rounded,
+                Icons.favorite_rounded,
                 color: Colors.red,
               )),
         ],
