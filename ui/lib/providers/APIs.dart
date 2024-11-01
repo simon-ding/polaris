@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +10,12 @@ class APIs {
   static final _baseUrl = baseUrl();
   static final searchUrl = "$_baseUrl/api/v1/media/search";
   static final editMediaUrl = "$_baseUrl/api/v1/media/edit";
-  static final downloadAllUrl = "$_baseUrl/api/v1/media/downloadall/";
+  static final downloadAllEpisodesUrl = "$_baseUrl/api/v1/media/downloadall/";
+  static final downloadAllTvUrl = "$_baseUrl/api/v1/media/download/tv";
+  static final downloadAllMovieUrl = "$_baseUrl/api/v1/media/download/movie";
   static final settingsUrl = "$_baseUrl/api/v1/setting/do";
   static final settingsGeneralUrl = "$_baseUrl/api/v1/setting/general";
+  //static final singleSettingUrl = "$_baseUrl/api/v1/setting/";
   static final watchlistTvUrl = "$_baseUrl/api/v1/media/tv/watchlist";
   static final watchlistMovieUrl = "$_baseUrl/api/v1/media/movie/watchlist";
   static final availableTorrentsUrl = "$_baseUrl/api/v1/media/torrents/";
@@ -49,6 +54,9 @@ class APIs {
   static final tmdbImgBaseUrl = "$_baseUrl/api/v1/posters";
 
   static final cronJobUrl = "$_baseUrl/api/v1/setting/cron/trigger";
+
+  static final tvParseUrl = "$_baseUrl/api/v1/setting/parse/tv";
+  static final movieParseUrl = "$_baseUrl/api/v1/setting/parse/movie";
 
   static const tmdbApiKey = "tmdb_api_key";
   static const downloadDirKey = "download_dir";
@@ -113,5 +121,51 @@ class APIs {
     if (sp.code != 0) {
       throw sp.message;
     }
+  }
+
+  static Future<List<String>> downloadAllTv() async {
+    var resp = await getDio().get(APIs.downloadAllTvUrl);
+
+    var sp = ServerResponse.fromJson(resp.data);
+
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    return sp.data as List<String>;
+  }
+
+  static Future<List<String>> downloadAllMovies() async {
+    var resp = await getDio().get(APIs.downloadAllMovieUrl);
+
+    var sp = ServerResponse.fromJson(resp.data);
+
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    return sp.data as List<String>;
+  }
+
+  static Future<String> parseTvName(String s) async {
+    var resp = await getDio().post(APIs.tvParseUrl, data: {"s": s});
+
+    var sp = ServerResponse.fromJson(resp.data);
+
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    return encoder.convert(sp.data);
+  }
+
+  static Future<String> parseMovieName(String s) async {
+    var resp = await getDio().post(APIs.movieParseUrl, data: {"s": s});
+
+    var sp = ServerResponse.fromJson(resp.data);
+
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    return encoder.convert(sp.data);
   }
 }

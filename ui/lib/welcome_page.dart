@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/movie_watchlist.dart';
@@ -6,6 +7,8 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/tv_details.dart';
 import 'package:ui/widgets/progress_indicator.dart';
+import 'package:ui/widgets/utils.dart';
+import 'package:ui/widgets/widgets.dart';
 
 class WelcomePage extends ConsumerStatefulWidget {
   const WelcomePage({super.key});
@@ -20,7 +23,7 @@ class WelcomePage extends ConsumerStatefulWidget {
 
 class WelcomePageState extends ConsumerState<WelcomePage> {
   //WelcomePageState({super.key});
-
+  final _formKey = GlobalKey<FormBuilderState>();
   bool onlyShowUnfinished = false;
 
   @override
@@ -50,63 +53,91 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
             _ => const MyProgressIndicator(),
           };
         }(),
-        Row(
+        getMoreButtonAndActions(uri)
+      ],
+    );
+  }
+
+  Widget getMoreButtonAndActions(String uri) {
+    return Row(
+      children: [
+        Expanded(child: Container()),
+        Column(
           children: [
             Expanded(child: Container()),
-            Column(
-              children: [
-                Expanded(child: Container()),
-                Padding(
-                  padding: EdgeInsets.all(20),
-                  child: MenuAnchor(
-                    style: MenuStyle(
-                      //minimumSize: WidgetStatePropertyAll(Size(400, 300)),
-
-                      backgroundColor: WidgetStatePropertyAll(Theme.of(context)
-                          .colorScheme
-                          .inversePrimary
-                          .withOpacity(0.9)),
-                    ),
-                    menuChildren: [
-                      MenuItemButton(
-                        onPressed: null,
-                        child: CheckboxListTile(
-                          value: onlyShowUnfinished,
-                          onChanged: (b) {
-                            setState(() {
-                              onlyShowUnfinished = b!;
-                            });
-                          },
-                          title: const Text(
-                            "未完成",
-                            style: TextStyle(fontSize: 16),
-                            softWrap: false,
-                          ),
-                          controlAffinity: ListTileControlAffinity.leading,
-                        ),
-                      ),
-                    ],
-                    builder: (context, controller, child) {
-                      return Opacity(
-                          opacity: 0.7,
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              if (controller.isOpen) {
-                                controller.close();
-                              } else {
-                                controller.open();
-                              }
-                            },
-                            child: const Icon(Icons.more_horiz),
-                          ));
-                    },
-                  ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: MenuAnchor(
+                style: MenuStyle(
+                  alignment: Alignment.topLeft,
+                  backgroundColor: WidgetStatePropertyAll(Theme.of(context)
+                      .colorScheme
+                      .inversePrimary
+                      .withOpacity(0.7)),
                 ),
-              ],
-            )
+                menuChildren: [parseName(), onlyUnfinished(), refreshAll(uri)],
+                builder: (context, controller, child) {
+                  return Opacity(
+                      opacity: 0.7,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
+                          }
+                        },
+                        child: const Icon(Icons.more_horiz),
+                      ));
+                },
+              ),
+            ),
           ],
-        ),
+        )
       ],
+    );
+  }
+
+  Widget onlyUnfinished() {
+    return CheckboxListTile(
+      value: onlyShowUnfinished,
+      onChanged: (b) {
+        setState(() {
+          onlyShowUnfinished = b!;
+        });
+      },
+      title: const Text(
+        "未完成",
+        style: TextStyle(fontSize: 16),
+        softWrap: false,
+      ),
+      controlAffinity: ListTileControlAffinity.leading,
+    );
+  }
+
+  Widget refreshAll(String uri) {
+    return LoadingListTile(
+      icon: Icons.refresh,
+      text: "全部更新",
+      onPressed: () async {
+        if (uri == WelcomePage.routeMoivie) {
+          await APIs.downloadAllMovies().then((v) {
+            showSnakeBar("开始下载电影：$v");
+          });
+        } else {
+          await APIs.downloadAllTv().then((v) {
+            showSnakeBar("开始下载剧集：$v");
+          });
+        }
+      },
+    );
+  }
+
+  Widget parseName() {
+    return ListTile(
+      leading: Icon(Icons.calculate),
+      title: Text("测试解析"),
+      onTap: () => _showNameParsingDialog(),
     );
   }
 
@@ -134,6 +165,71 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
       final item = list[i];
       return MediaCard(item: item);
     });
+  }
+
+  Future<void> _showNameParsingDialog() async {
+    final resultController = TextEditingController();
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('测试名称解析'),
+          content: SizedBox(
+            width: 500,
+            height: 400,
+            child: FormBuilder(
+              key: _formKey,
+              initialValue: {"name": "", "type": "tv"},
+              child: Column(
+                children: [
+                  FormBuilderTextField(
+                    name: "name",
+                    decoration: InputDecoration(labelText: "要解析的名字"),
+                  ),
+                  FormBuilderDropdown(
+                    name: "type",
+                    items: [
+                      DropdownMenuItem(
+                        value: "tv",
+                        child: const Text("电视剧"),
+                      ),
+                      DropdownMenuItem(value: "movie", child: const Text("电影"))
+                    ],
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: LoadingTextButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.saveAndValidate()) {
+                              final values = _formKey.currentState!.value;
+                              //print(values);
+                              if (values["type"] == "tv") {
+                                var s = await APIs.parseTvName(values["name"]);
+                                resultController.text = s;
+                              } else {
+                                var s =
+                                    await APIs.parseMovieName(values["name"]);
+                                resultController.text = s;
+                              }
+                            }
+                            return;
+                          },
+                          label: Text("解析")),
+                    ),
+                  ),
+                  TextField(
+                    maxLines: 8,
+                    controller: resultController,
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

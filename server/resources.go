@@ -175,6 +175,10 @@ func (s *Server) DownloadAll(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "convert")
 	}
+	return s.downloadAllEpisodes(id)
+}
+
+func (s *Server) downloadAllEpisodes(id int) (interface{}, error) {
 	m, err := s.db.GetMedia(id)
 	if err != nil {
 		return nil, errors.Wrap(err, "get media")
@@ -185,4 +189,28 @@ func (s *Server) DownloadAll(c *gin.Context) (interface{}, error) {
 	name, err := s.core.DownloadMovieByID(m.ID)
 
 	return []string{name}, err
+}
+
+func (s *Server) DownloadAllTv(c *gin.Context) (interface{}, error) {
+	tvs := s.db.GetMediaWatchlist(media.MediaTypeTv)
+	var allNames []string
+	for _, tv := range tvs {
+		names, err := s.downloadAllEpisodes(tv.ID)
+		if err == nil {
+			allNames = append(allNames, names.([]string)...)
+		}
+	}
+	return allNames, nil
+}
+
+func (s *Server) DownloadAllMovies(c *gin.Context) (interface{}, error) {
+	movies := s.db.GetMediaWatchlist(media.MediaTypeMovie)
+	var allNames []string
+	for _, mv := range movies {
+		names, err := s.downloadAllEpisodes(mv.ID)
+		if err == nil {
+			allNames = append(allNames, names.([]string)...)
+		}
+	}
+	return allNames, nil
 }

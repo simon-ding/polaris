@@ -84,7 +84,7 @@ class SeriesDetailData
 
   Future<dynamic> downloadall() async {
     final dio = APIs.getDio();
-    var resp = await dio.get(APIs.downloadAllUrl + id!);
+    var resp = await dio.get(APIs.downloadAllEpisodesUrl + id!);
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;

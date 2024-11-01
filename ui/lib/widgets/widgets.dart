@@ -141,8 +141,58 @@ class _MySliderState extends State<MyRangeSlider> {
   }
 }
 
+class LoadingListTile extends StatefulWidget {
+  const LoadingListTile(
+      {super.key,
+      required this.onPressed,
+      required this.icon,
+      required this.text});
+  final Future<void> Function() onPressed;
+  final IconData icon;
+  final String text;
+
+  @override
+  State<StatefulWidget> createState() {
+    return LoadingListTileState();
+  }
+}
+
+class LoadingListTileState extends State<LoadingListTile> {
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+        onTap: loading
+            ? null
+            : () async {
+                setState(() => loading = true);
+                try {
+                  await widget.onPressed();
+                } catch (e) {
+                  showSnakeBar("操作失败：$e");
+                } finally {
+                  setState(() => loading = false);
+                }
+              },
+        title: Text(widget.text),
+        leading: loading
+            ? Container(
+                width: 24,
+                height: 24,
+                padding: const EdgeInsets.all(2.0),
+                child: const CircularProgressIndicator(
+                  color: Colors.grey,
+                  strokeWidth: 3,
+                ),
+              )
+            : Icon(widget.icon));
+  }
+}
+
 class LoadingIconButton extends StatefulWidget {
-  const LoadingIconButton({super.key, required this.onPressed, required this.icon, this.tooltip});
+  const LoadingIconButton(
+      {super.key, required this.onPressed, required this.icon, this.tooltip});
   final Future<void> Function() onPressed;
   final IconData icon;
   final String? tooltip;
@@ -159,7 +209,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: widget.tooltip,
+        tooltip: widget.tooltip,
         onPressed: loading
             ? null
             : () async {
@@ -187,7 +237,8 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
 }
 
 class LoadingTextButton extends StatefulWidget {
-  const LoadingTextButton({super.key, required this.onPressed, required this.label});
+  const LoadingTextButton(
+      {super.key, required this.onPressed, required this.label});
   final Future<void> Function() onPressed;
   final Widget label;
 

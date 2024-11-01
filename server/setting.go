@@ -105,6 +105,7 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 	return nil, nil
 }
 
+
 func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	tmdb := s.db.GetSetting(db.SettingTmdbApiKey)
 	downloadDir := s.db.GetSetting(db.SettingDownloadDir)

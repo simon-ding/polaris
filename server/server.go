@@ -96,6 +96,8 @@ func (s *Server) Serve() error {
 		tv.GET("/suggest/tv/:tmdb_id", HttpHandler(s.SuggestedSeriesFolderName))
 		tv.GET("/suggest/movie/:tmdb_id", HttpHandler(s.SuggestedMovieFolderName))
 		tv.GET("/downloadall/:id", HttpHandler(s.DownloadAll))
+		tv.GET("/download/tv", HttpHandler(s.DownloadAllTv))
+		tv.GET("/download/movie", HttpHandler(s.DownloadAllMovies))
 	}
 	indexer := api.Group("/indexer")
 	{

@@ -32,7 +32,7 @@ var prowlarrSettingDataProvider =
 class EditSettingData extends AutoDisposeAsyncNotifier<GeneralSetting> {
   @override
   FutureOr<GeneralSetting> build() async {
-    final dio = await APIs.getDio();
+    final dio =  APIs.getDio();
 
     var resp = await dio.get(APIs.settingsGeneralUrl);
     var rrr = ServerResponse.fromJson(resp.data);
