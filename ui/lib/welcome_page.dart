@@ -123,11 +123,15 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
       onPressed: () async {
         if (uri == WelcomePage.routeMoivie) {
           await APIs.downloadAllMovies().then((v) {
-            showSnakeBar("开始下载电影：$v");
+            if (v.isNotEmpty) {
+              showSnakeBar("开始下载电影：$v");
+            }
           });
         } else {
           await APIs.downloadAllTv().then((v) {
-            showSnakeBar("开始下载剧集：$v");
+            if (v.isNotEmpty) {
+              showSnakeBar("开始下载剧集：$v");
+            }
           });
         }
       },

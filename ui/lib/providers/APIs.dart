@@ -131,7 +131,7 @@ class APIs {
     if (sp.code != 0) {
       throw sp.message;
     }
-    return sp.data as List<String>;
+    return sp.data==null? []:sp.data as List<String>;
   }
 
   static Future<List<String>> downloadAllMovies() async {
@@ -142,7 +142,7 @@ class APIs {
     if (sp.code != 0) {
       throw sp.message;
     }
-    return sp.data as List<String>;
+    return sp.data==null? []:sp.data as List<String>;
   }
 
   static Future<String> parseTvName(String s) async {
