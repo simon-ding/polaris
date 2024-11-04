@@ -60,7 +60,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         );
       },
       branches: [
-        StatefulShellBranch(routes: [
+        StatefulShellBranch(initialLocation: WelcomePage.routeTv, routes: [
           GoRoute(
             path: WelcomePage.routeTv,
             pageBuilder: (context, state) => buildPageWithDefaultTransition(
@@ -81,7 +81,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 child: SearchPage(query: state.uri.queryParameters["query"])),
           ),
         ]),
-        StatefulShellBranch(routes: [
+        StatefulShellBranch(initialLocation: WelcomePage.routeMoivie, routes: [
           GoRoute(
             path: WelcomePage.routeMoivie,
             pageBuilder: (context, state) => buildPageWithDefaultTransition(
@@ -249,7 +249,9 @@ class _MainSkeletonState extends State<MainSkeleton> {
       ),
       useDrawer: false,
       selectedIndex: widget.body.currentIndex,
-      onSelectedIndexChange: (p0) => widget.body.goBranch(p0),
+      onSelectedIndexChange: (p0) => widget.body
+          .goBranch(p0, initialLocation: p0 == widget.body.currentIndex),
+
       destinations: const <NavigationDestination>[
         NavigationDestination(
           icon: Icon(Icons.live_tv_outlined),
