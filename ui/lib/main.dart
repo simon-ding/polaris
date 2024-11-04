@@ -49,77 +49,81 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    var padding = isSmallScreen(context) ? 5.0 : 20.0;
     // GoRouter configuration
-    final shellRoute = ShellRoute(
-      builder: (BuildContext context, GoRouterState state, Widget child) {
+    final shellRoute = StatefulShellRoute.indexedStack(
+      builder: (BuildContext context, GoRouterState state,
+          StatefulNavigationShell navigationShell) {
         return SelectionArea(
           child: MainSkeleton(
-            body: Padding(
-                padding: EdgeInsets.only(
-                    left: padding, right: padding, top: 5, bottom: 5),
-                child: child),
+            body: navigationShell,
           ),
         );
       },
-      routes: [
-        GoRoute(
-          path: "/",
-          redirect: (context, state) => WelcomePage.routeTv,
-        ),
-        GoRoute(
-          path: WelcomePage.routeTv,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context, state: state, child: const WelcomePage()),
-        ),
-        GoRoute(
-          path: WelcomePage.routeMoivie,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context, state: state, child: const WelcomePage()),
-        ),
-        GoRoute(
-          path: TvDetailsPage.route,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context,
-              state: state,
-              child: TvDetailsPage(seriesId: state.pathParameters['id']!)),
-        ),
-        GoRoute(
-          path: MovieDetailsPage.route,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context,
-              state: state,
-              child: MovieDetailsPage(id: state.pathParameters['id']!)),
-        ),
-        GoRoute(
-          path: SearchPage.route,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context,
-              state: state,
-              child: SearchPage(query: state.uri.queryParameters["query"])),
-        ),
-        GoRoute(
-          path: SystemSettingsPage.route,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context,
-              state: state,
-              child: const SystemSettingsPage()),
-        ),
-        GoRoute(
-          path: ActivityPage.route,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context, state: state, child: const ActivityPage()),
-        ),
-        GoRoute(
-          path: SystemPage.route,
-          pageBuilder: (context, state) => buildPageWithDefaultTransition(
-              context: context, state: state, child: const SystemPage()),
-        )
+      branches: [
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: WelcomePage.routeTv,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context, state: state, child: const WelcomePage()),
+          ),
+          GoRoute(
+            path: TvDetailsPage.route,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: TvDetailsPage(seriesId: state.pathParameters['id']!)),
+          ),
+          GoRoute(
+            path: SearchPage.route,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: SearchPage(query: state.uri.queryParameters["query"])),
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: WelcomePage.routeMoivie,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context, state: state, child: const WelcomePage()),
+          ),
+          GoRoute(
+            path: MovieDetailsPage.route,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: MovieDetailsPage(id: state.pathParameters['id']!)),
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: ActivityPage.route,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context, state: state, child: const ActivityPage()),
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: SystemPage.route,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context, state: state, child: const SystemPage()),
+          )
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: SystemSettingsPage.route,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: const SystemSettingsPage()),
+          ),
+        ]),
       ],
     );
 
     final router = GoRouter(
       navigatorKey: APIs.navigatorKey,
+      initialLocation: WelcomePage.routeTv,
       routes: [
         shellRoute,
         GoRoute(
@@ -154,7 +158,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 }
 
 class MainSkeleton extends StatefulWidget {
-  final Widget body;
+  final StatefulNavigationShell body;
   const MainSkeleton({super.key, required this.body});
 
   @override
@@ -164,23 +168,11 @@ class MainSkeleton extends StatefulWidget {
 }
 
 class _MainSkeletonState extends State<MainSkeleton> {
-  var _selectedTab;
 
   @override
   Widget build(BuildContext context) {
-    var uri = GoRouterState.of(context).uri.toString();
-    if (uri.contains(WelcomePage.routeTv)) {
-      _selectedTab = 0;
-    } else if (uri.contains(WelcomePage.routeMoivie)) {
-      _selectedTab = 1;
-    } else if (uri.contains(ActivityPage.route)) {
-      _selectedTab = 2;
-    } else if (uri.contains(SystemSettingsPage.route)) {
-      _selectedTab = 3;
-    } else if (uri.contains(SystemPage.route)) {
-      _selectedTab = 4;
-    }
 
+    var padding = isSmallScreen(context) ? 5.0 : 20.0;
     return AdaptiveScaffold(
       appBarBreakpoint: Breakpoints.standard,
       appBar: AppBar(
@@ -258,23 +250,8 @@ class _MainSkeletonState extends State<MainSkeleton> {
         ],
       ),
       useDrawer: false,
-      selectedIndex: _selectedTab,
-      onSelectedIndexChange: (int index) {
-        setState(() {
-          _selectedTab = index;
-        });
-        if (index == 0) {
-          context.go(WelcomePage.routeTv);
-        } else if (index == 1) {
-          context.go(WelcomePage.routeMoivie);
-        } else if (index == 2) {
-          context.go(ActivityPage.route);
-        } else if (index == 3) {
-          context.go(SystemSettingsPage.route);
-        } else if (index == 4) {
-          context.go(SystemPage.route);
-        }
-      },
+      selectedIndex: widget.body.currentIndex,
+      onSelectedIndexChange: (p0) => widget.body.goBranch(p0),
       destinations: const <NavigationDestination>[
         NavigationDestination(
           icon: Icon(Icons.live_tv_outlined),
@@ -302,7 +279,11 @@ class _MainSkeletonState extends State<MainSkeleton> {
           label: '系统',
         ),
       ],
-      body: (context) => SafeArea(child: widget.body),
+      body: (context) => SafeArea(
+          child: Padding(
+              padding: EdgeInsets.only(
+                  left: padding, right: padding, top: 5, bottom: 5),
+              child: widget.body)),
       // Define a default secondaryBody.
       // Override the default secondaryBody during the smallBreakpoint to be
       // empty. Must use AdaptiveScaffold.emptyBuilder to ensure it is properly
@@ -318,13 +299,11 @@ class _MainSkeletonState extends State<MainSkeleton> {
         return AlertDialog(
           title: Text("项目开发不易，给开发者加个鸡腿："),
           content: SizedBox(
-            width: 350,
-            height: 400,
-            child: 
-              Ink.image(
-                  fit: BoxFit.fitWidth, image: AssetImage("assets/wechat.jpg"))
-            
-          ),
+              width: 350,
+              height: 400,
+              child: Ink.image(
+                  fit: BoxFit.fitWidth,
+                  image: AssetImage("assets/wechat.jpg"))),
         );
       },
     );
