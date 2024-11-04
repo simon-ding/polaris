@@ -104,19 +104,19 @@ class _MyAppState extends ConsumerState<MyApp> {
         ]),
         StatefulShellBranch(routes: [
           GoRoute(
-            path: SystemPage.route,
-            pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                context: context, state: state, child: const SystemPage()),
-          )
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
             path: SystemSettingsPage.route,
             pageBuilder: (context, state) => buildPageWithDefaultTransition(
                 context: context,
                 state: state,
                 child: const SystemSettingsPage()),
           ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: SystemPage.route,
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context, state: state, child: const SystemPage()),
+          )
         ]),
       ],
     );
@@ -168,10 +168,8 @@ class MainSkeleton extends StatefulWidget {
 }
 
 class _MainSkeletonState extends State<MainSkeleton> {
-
   @override
   Widget build(BuildContext context) {
-
     var padding = isSmallScreen(context) ? 5.0 : 20.0;
     return AdaptiveScaffold(
       appBarBreakpoint: Breakpoints.standard,
