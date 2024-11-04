@@ -12,6 +12,13 @@ import (
 	"golift.io/starr/prowlarr"
 )
 
+type ProwlarrSupportType string
+
+const (
+	TV    ProwlarrSupportType = "tv"
+	Movie ProwlarrSupportType = "movie"
+)
+
 type Client struct {
 	p      *prowlarr.Prowlarr
 	apiKey string
@@ -24,7 +31,7 @@ func New(apiKey, url string) *Client {
 	return &Client{p: p, apiKey: apiKey, url: url}
 }
 
-func (c *Client) GetIndexers() ([]*db.TorznabInfo, error) {
+func (c *Client) GetIndexers(t ProwlarrSupportType) ([]*db.TorznabInfo, error) {
 	ins, err := c.p.GetIndexers()
 	if err != nil {
 		return nil, err
@@ -32,6 +39,11 @@ func (c *Client) GetIndexers() ([]*db.TorznabInfo, error) {
 	var indexers []*db.TorznabInfo
 	for _, in := range ins {
 		if !in.Enable {
+			continue
+		}
+		if t == "tv" && len(in.Capabilities.TvSearchParams) == 0 { //no tv resource in this indexer
+			continue
+		} else if t == "movie" && len(in.Capabilities.MovieSearchParams) == 0 { //no movie resource in this indexer
 			continue
 		}
 		seedRatio := 0.0
@@ -57,7 +69,7 @@ func (c *Client) GetIndexers() ([]*db.TorznabInfo, error) {
 		}
 
 		indexers = append(indexers, &db.TorznabInfo{
-			Indexers: &entIndexer,
+			Indexers:       &entIndexer,
 			TorznabSetting: setting,
 		})
 	}

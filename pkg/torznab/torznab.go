@@ -85,6 +85,12 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 		// 	log.Warnf("converting link to magnet error, error: %v, link: %v", err, item.Link)
 		// 	continue
 		// }
+		imdb := ""
+		if item.GetAttr("imdbid") != "" {
+			imdb = item.GetAttr("imdbid")
+		} else if item.GetAttr("imdb") != "" {
+			imdb = item.GetAttr("imdb")
+		}
 		r := Result{
 			Name:                 item.Title,
 			Link:                 item.Link,
@@ -92,7 +98,7 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 			Seeders:              mustAtoI(item.GetAttr("seeders")),
 			Peers:                mustAtoI(item.GetAttr("peers")),
 			Category:             mustAtoI(item.GetAttr("category")),
-			ImdbId:               item.GetAttr("imdbid"),
+			ImdbId:               imdb,
 			DownloadVolumeFactor: tryParseFloat(item.GetAttr("downloadvolumefactor")),
 			UploadVolumeFactor:   tryParseFloat(item.GetAttr("uploadvolumefactor")),
 			Source:               indexer.Name,

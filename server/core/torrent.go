@@ -33,7 +33,7 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 	}
 	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, param.SeasonNum, param.Episodes)
 
-	res := searchWithTorznab(db1, series.NameEn, series.NameCn, series.OriginalName)
+	res := searchWithTorznab(db1, prowlarr.TV, series.NameEn, series.NameCn, series.OriginalName)
 
 	var filtered []torznab.Result
 	for _, r := range res {
@@ -171,9 +171,9 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 		return nil, errors.New("no media found of id")
 	}
 
-	res := searchWithTorznab(db1, movieDetail.NameEn, movieDetail.NameCn, movieDetail.OriginalName)
+	res := searchWithTorznab(db1, prowlarr.Movie, movieDetail.NameEn, movieDetail.NameCn, movieDetail.OriginalName)
 	if movieDetail.Extras.IsJav() {
-		res1 := searchWithTorznab(db1, movieDetail.Extras.JavId)
+		res1 := searchWithTorznab(db1, prowlarr.Movie, movieDetail.Extras.JavId)
 		res = append(res, res1...)
 	}
 
@@ -227,7 +227,7 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 
 }
 
-func searchWithTorznab(db *db.Client, queries ...string) []torznab.Result {
+func searchWithTorznab(db *db.Client, t prowlarr.ProwlarrSupportType, queries ...string) []torznab.Result {
 
 	var res []torznab.Result
 	allTorznab := db.GetAllTorznabInfo()
@@ -235,7 +235,7 @@ func searchWithTorznab(db *db.Client, queries ...string) []torznab.Result {
 	p, err := db.GetProwlarrSetting()
 	if err == nil { //prowlarr exists
 		c := prowlarr.New(p.ApiKey, p.URL)
-		all, err := c.GetIndexers()
+		all, err := c.GetIndexers(t)
 		if err != nil {
 			log.Warnf("get prowlarr all indexer error: %v", err)
 		} else {
