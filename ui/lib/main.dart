@@ -193,27 +193,31 @@ class _MainSkeletonState extends State<MainSkeleton> {
         ),
         leadingWidth: isSmallScreen(context) ? 0 : 190,
         title: Container(
-            alignment: Alignment.bottomLeft,
-            child: SizedBox(
-              width: 250,
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  label: Text("在此搜索...",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      )),
-                ),
-                onSubmitted: (value) {
-                  context.go(Uri(
+          alignment: Alignment.bottomLeft,
+          child: SearchAnchor(
+              builder: (BuildContext context, SearchController controller) {
+            return Container(
+              constraints: const BoxConstraints(maxWidth: 250, maxHeight: 40),
+              child: Opacity(
+                opacity: 0.8,
+                child: SearchBar(
+                  hintText: "在此搜索...",
+                  leading: const Icon(Icons.search),
+                  controller: controller,
+                  shadowColor: WidgetStateColor.transparent,
+                  backgroundColor: WidgetStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer),
+                  onSubmitted: (value) => context.go(Uri(
                       path: SearchPage.route,
-                      queryParameters: {'query': value}).toString());
-                },
+                      queryParameters: {'query': value}).toString()),
+                ),
               ),
-            )),
+            );
+          }, suggestionsBuilder:
+                  (BuildContext context, SearchController controller) {
+            return [Text("dadada")];
+          }),
+        ),
 
         actions: [
           // IconButton(
