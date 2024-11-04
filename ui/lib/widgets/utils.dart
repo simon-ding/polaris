@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:intl/intl.dart';
 import 'package:ui/providers/APIs.dart';
 import 'dart:io' show Platform;
@@ -60,5 +61,5 @@ bool isDesktop() {
 
   bool isSmallScreen(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth < 600;
+    return screenWidth < Breakpoints.small.endWidth!.toDouble();
   }

@@ -180,42 +180,52 @@ class _MainSkeletonState extends State<MainSkeleton> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: TextButton(
-          onPressed: () => context.go(WelcomePage.routeTv),
-          child: const Text(
-            "Polaris",
-            overflow: TextOverflow.clip,
-            style: TextStyle(fontSize: 28),
+        leading: Container(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            onPressed: () => context.go(WelcomePage.routeTv),
+            child: const Text(
+              "Polaris",
+              overflow: TextOverflow.clip,
+              style: TextStyle(fontSize: 28),
+            ),
           ),
         ),
+        leadingWidth: isSmallScreen(context) ? 0 : 190,
+        title: Container(
+            alignment: Alignment.bottomLeft,
+            child: SizedBox(
+              width: 250,
+              child: TextField(
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  label: Text("在此搜索...",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      )),
+                ),
+                onSubmitted: (value) {
+                  context.go(Uri(
+                      path: SearchPage.route,
+                      queryParameters: {'query': value}).toString());
+                },
+              ),
+            )),
 
         actions: [
-          SearchAnchor(
-              builder: (BuildContext context, SearchController controller) {
-            return Container(
-              constraints: const BoxConstraints(maxWidth: 250, maxHeight: 40),
-              child: Opacity(
-                opacity: 0.8,
-                child: SearchBar(
-                  hintText: "搜索...",
-                  leading: const Icon(Icons.search),
-                  controller: controller,
-                  shadowColor: WidgetStateColor.transparent,
-                  backgroundColor: WidgetStatePropertyAll(
-                      Theme.of(context).colorScheme.primaryContainer),
-                  onSubmitted: (value) => context.go(Uri(
-                      path: SearchPage.route,
-                      queryParameters: {'query': value}).toString()),
-                ),
-              ),
-            );
-          }, suggestionsBuilder:
-                  (BuildContext context, SearchController controller) {
-            return [Text("dadada")];
-          }),
           // IconButton(
           //     onPressed: () => showCalendar(context),
           //     icon: Icon(Icons.calendar_month)),
+          IconButton(
+              onPressed: () => showDonate(context),
+              icon: Icon(
+                Icons.favorite_rounded,
+                color: Colors.red,
+              )),
+
           MenuAnchor(
             menuChildren: [
               MenuItemButton(
@@ -239,12 +249,6 @@ class _MainSkeletonState extends State<MainSkeleton> {
               );
             },
           ),
-          IconButton(
-              onPressed: () => showDonate(context),
-              icon: Icon(
-                Icons.favorite_rounded,
-                color: Colors.red,
-              )),
         ],
       ),
       useDrawer: false,
