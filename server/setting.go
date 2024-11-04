@@ -318,9 +318,11 @@ func (s *Server) SaveProwlarrSetting(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, err
 	}
-	client := prowlarr.New(in.ApiKey, in.URL)
-	if _, err := client.GetIndexers(prowlarr.TV); err != nil {
-		return nil, errors.Wrap(err, "connect to prowlarr error")
+	if !in.Disabled {
+		client := prowlarr.New(in.ApiKey, in.URL)
+		if _, err := client.GetIndexers(prowlarr.TV); err != nil {
+			return nil, errors.Wrap(err, "connect to prowlarr error")
+		}	
 	}
 	err := s.db.SaveProwlarrSetting(&in)
 	if err != nil {

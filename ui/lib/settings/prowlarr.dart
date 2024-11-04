@@ -25,9 +25,18 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
         data: (v) => FormBuilder(
               key: _formKey, //设置globalKey，用于后面获取FormState
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              initialValue: {"api_key": v.apiKey, "url": v.url},
+              initialValue: {
+                "api_key": v.apiKey,
+                "url": v.url,
+                "enabled": !v.disabled
+              },
               child: Column(
                 children: [
+                  FormBuilderSwitch(
+                    name: "enabled",
+                    title: const Text("启用"),
+                    decoration: InputDecoration(icon: Icon(Icons.check_circle)),
+                  ),
                   FormBuilderTextField(
                     name: "url",
                     decoration: const InputDecoration(
@@ -55,12 +64,16 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
                                   .read(prowlarrSettingDataProvider.notifier)
                                   .save(ProwlarrSetting(
                                       apiKey: values["api_key"],
-                                      url: values["url"]))
+                                      url: values["url"],
+                                      disabled: !values["enabled"]))
                                   .then((v) => showSnakeBar("更新成功"));
                               showLoadingWithFuture(f);
                             }
                           },
-                          child: const Padding(padding: EdgeInsets.all(10), child:  Text("保存"),)),
+                          child: const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text("保存"),
+                          )),
                     ),
                   )
                 ],

@@ -233,7 +233,7 @@ func searchWithTorznab(db *db.Client, t prowlarr.ProwlarrSupportType, queries ..
 	allTorznab := db.GetAllTorznabInfo()
 
 	p, err := db.GetProwlarrSetting()
-	if err == nil { //prowlarr exists
+	if err == nil && !p.Disabled { //prowlarr exists
 		c := prowlarr.New(p.ApiKey, p.URL)
 		all, err := c.GetIndexers(t)
 		if err != nil {

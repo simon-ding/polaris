@@ -63,6 +63,7 @@ type Limiter struct {
 }
 
 type ProwlarrSetting struct {
-	ApiKey string `json:"api_key"`
-	URL    string `json:"url"`
+	Disabled bool   `json:"disabled"`
+	ApiKey   string `json:"api_key"`
+	URL      string `json:"url"`
 }

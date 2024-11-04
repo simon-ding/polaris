@@ -32,7 +32,7 @@ var prowlarrSettingDataProvider =
 class EditSettingData extends AutoDisposeAsyncNotifier<GeneralSetting> {
   @override
   FutureOr<GeneralSetting> build() async {
-    final dio =  APIs.getDio();
+    final dio = APIs.getDio();
 
     var resp = await dio.get(APIs.settingsGeneralUrl);
     var rrr = ServerResponse.fromJson(resp.data);
@@ -509,14 +509,20 @@ class ImportListData extends AutoDisposeAsyncNotifier<List<ImportList>> {
 }
 
 class ProwlarrSetting {
+  final bool disabled;
   final String apiKey;
   final String url;
-  ProwlarrSetting({required this.apiKey, required this.url});
+  ProwlarrSetting(
+      {required this.apiKey, required this.url, required this.disabled});
   factory ProwlarrSetting.fromJson(Map<String, dynamic> json) {
-    return ProwlarrSetting(apiKey: json["api_key"], url: json["url"]);
+    return ProwlarrSetting(
+        apiKey: json["api_key"],
+        url: json["url"],
+        disabled: json["disabled"] ?? false);
   }
 
-  Map<String, dynamic> tojson() => {"api_key": apiKey, "url": url};
+  Map<String, dynamic> tojson() =>
+      {"api_key": apiKey, "url": url, "disabled": disabled};
 }
 
 class ProwlarrSettingData extends AutoDisposeAsyncNotifier<ProwlarrSetting> {
