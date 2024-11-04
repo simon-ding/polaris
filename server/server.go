@@ -132,6 +132,7 @@ func (s *Server) Serve() error {
 		importlist.POST("/add", HttpHandler(s.addImportlist))
 		importlist.DELETE("/delete", HttpHandler(s.deleteImportList))
 	}
+	log.Infof("----------- Polaris Server Successfully Started ------------")
 
 	return s.r.Run(":8080")
 }

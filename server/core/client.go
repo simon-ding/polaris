@@ -44,7 +44,7 @@ func (c *Client) registerCronJob(name string, cron string, f func() error) {
 }
 
 func (c *Client) Init() {
-	c.reloadTasks()
+	go c.reloadTasks()
 	c.addSysCron()
 }
 
@@ -82,6 +82,7 @@ func (c *Client) reloadTasks() {
 		}
 
 	}
+	log.Infof("------ task reloading done ------")
 }
 
 func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {

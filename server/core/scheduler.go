@@ -36,6 +36,7 @@ func (c *Client) addSysCron() {
 		return true
 	})
 	c.cron.Start()
+	log.Infof("--------- add cron jobs done --------")
 }
 
 func (c *Client) mustAddCron(spec string, cmd func()) {
