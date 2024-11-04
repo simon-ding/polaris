@@ -22,7 +22,8 @@ class SystemSettingsPage extends ConsumerStatefulWidget {
 class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return SelectionArea(
+        child: ListView(
       children: [
         getExpansionTile("常规", const GeneralSettings()),
         getExpansionTile("索引器", const IndexerSettings()),
@@ -33,7 +34,7 @@ class _SystemSettingsPageState extends ConsumerState<SystemSettingsPage> {
         getExpansionTile("监控列表", const Importlist()),
         getExpansionTile("认证", const AuthSettings())
       ],
-    );
+    ));
   }
 
   Widget getExpansionTile(String name, Widget body) {

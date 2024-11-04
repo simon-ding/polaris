@@ -28,21 +28,22 @@ class _MovieDetailsPageState extends ConsumerState<MovieDetailsPage> {
   Widget build(BuildContext context) {
     var seriesDetails = ref.watch(mediaDetailsProvider(widget.id));
 
-    return seriesDetails.when(
-        data: (details) {
-          return ListView(
-            children: [
-              DetailCard(details: details),
-              NestedTabBar(
-                id: widget.id,
-              )
-            ],
-          );
-        },
-        error: (err, trace) {
-          return Text("$err");
-        },
-        loading: () => const MyProgressIndicator());
+    return SelectionArea(
+        child: seriesDetails.when(
+            data: (details) {
+              return ListView(
+                children: [
+                  DetailCard(details: details),
+                  NestedTabBar(
+                    id: widget.id,
+                  )
+                ],
+              );
+            },
+            error: (err, trace) {
+              return Text("$err");
+            },
+            loading: () => const MyProgressIndicator()));
   }
 }
 

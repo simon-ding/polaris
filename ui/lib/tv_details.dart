@@ -34,156 +34,159 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     var seriesDetails = ref.watch(mediaDetailsProvider(widget.seriesId));
-    return seriesDetails.when(
-        data: (details) {
-          Map<int, List<DataRow>> m = {};
-          for (final ep in details.episodes!) {
-            var row = DataRow(cells: [
-              DataCell(Text("${ep.episodeNumber}")),
-              DataCell(Text("${ep.title}")),
-              DataCell(Opacity(
-                opacity: 0.5,
-                child: Text(ep.airDate ?? "-"),
-              )),
-              DataCell(
-                Opacity(
-                    opacity: 0.7,
-                    child: ep.status == "downloading"
-                        ? const IconButton(
-                            tooltip: "下载中",
-                            onPressed: null,
-                            icon: Icon(Icons.downloading))
-                        : (ep.status == "downloaded"
+    return SelectionArea(
+        child: seriesDetails.when(
+            data: (details) {
+              Map<int, List<DataRow>> m = {};
+              for (final ep in details.episodes!) {
+                var row = DataRow(cells: [
+                  DataCell(Text("${ep.episodeNumber}")),
+                  DataCell(Text("${ep.title}")),
+                  DataCell(Opacity(
+                    opacity: 0.5,
+                    child: Text(ep.airDate ?? "-"),
+                  )),
+                  DataCell(
+                    Opacity(
+                        opacity: 0.7,
+                        child: ep.status == "downloading"
                             ? const IconButton(
-                                tooltip: "已下载",
+                                tooltip: "下载中",
                                 onPressed: null,
-                                icon: Icon(Icons.download_done))
-                            : (ep.monitored == true
-                                ? IconButton(
-                                    tooltip: "监控中",
-                                    onPressed: () {
-                                      ref
-                                          .read(mediaDetailsProvider(
-                                                  widget.seriesId)
-                                              .notifier)
-                                          .changeMonitoringStatus(
-                                              ep.id!, false);
-                                    },
-                                    icon: const Icon(Icons.alarm))
-                                : Opacity(
-                                    opacity: 0.7,
-                                    child: IconButton(
-                                        tooltip: "未监控",
+                                icon: Icon(Icons.downloading))
+                            : (ep.status == "downloaded"
+                                ? const IconButton(
+                                    tooltip: "已下载",
+                                    onPressed: null,
+                                    icon: Icon(Icons.download_done))
+                                : (ep.monitored == true
+                                    ? IconButton(
+                                        tooltip: "监控中",
                                         onPressed: () {
                                           ref
                                               .read(mediaDetailsProvider(
                                                       widget.seriesId)
                                                   .notifier)
                                               .changeMonitoringStatus(
-                                                  ep.id!, true);
+                                                  ep.id!, false);
                                         },
-                                        icon: const Icon(Icons.alarm_off)),
-                                  )))),
-              ),
-              DataCell(Row(
-                children: [
-                  LoadingIconButton(
-                      tooltip: "搜索下载对应剧集",
-                      onPressed: () async {
-                        await ref
-                            .read(
-                                mediaDetailsProvider(widget.seriesId).notifier)
-                            .searchAndDownload(widget.seriesId,
-                                ep.seasonNumber!, ep.episodeNumber!)
-                            .then((v) => showSnakeBar("开始下载: $v"));
-                      },
-                      icon: Icons.download),
-                  const SizedBox(
-                    width: 10,
+                                        icon: const Icon(Icons.alarm))
+                                    : Opacity(
+                                        opacity: 0.7,
+                                        child: IconButton(
+                                            tooltip: "未监控",
+                                            onPressed: () {
+                                              ref
+                                                  .read(mediaDetailsProvider(
+                                                          widget.seriesId)
+                                                      .notifier)
+                                                  .changeMonitoringStatus(
+                                                      ep.id!, true);
+                                            },
+                                            icon: const Icon(Icons.alarm_off)),
+                                      )))),
                   ),
-                  Tooltip(
-                    message: "查看可用资源",
-                    child: IconButton(
-                        onPressed: () => showAvailableTorrents(widget.seriesId,
-                            ep.seasonNumber ?? 0, ep.episodeNumber ?? 0),
-                        icon: const Icon(Icons.manage_search)),
-                  )
-                ],
-              ))
-            ]);
-
-            if (m[ep.seasonNumber] == null) {
-              m[ep.seasonNumber!] = List.empty(growable: true);
-            }
-            m[ep.seasonNumber!]!.add(row);
-          }
-          List<ExpansionTile> list = List.empty(growable: true);
-          for (final k in m.keys.toList().reversed) {
-            final seasonEpisodes = DataTable(columns: [
-              const DataColumn(label: Text("#")),
-              const DataColumn(
-                label: Text("标题"),
-              ),
-              const DataColumn(label: Text("播出时间")),
-              const DataColumn(label: Text("状态")),
-              DataColumn(
-                  label: Row(
-                children: [
-                  LoadingIconButton(
-                      tooltip: "搜索下载全部剧集",
-                      onPressed: () async {
-                        await ref
-                            .read(
-                                mediaDetailsProvider(widget.seriesId).notifier)
-                            .searchAndDownload(widget.seriesId, k, 0)
-                            .then((v) => showSnakeBar("开始下载: $v"));
-                        //showLoadingWithFuture(f);
-                      },
-                      icon: Icons.download),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Tooltip(
-                    message: "查看可用资源",
-                    child: IconButton(
-                        onPressed: () =>
-                            showAvailableTorrents(widget.seriesId, k, 0),
-                        icon: const Icon(Icons.manage_search)),
-                  )
-                ],
-              ))
-            ], rows: m[k]!);
-
-            var seasonList = ExpansionTile(
-              tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              //childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-              initiallyExpanded: false,
-              title: k == 0 ? const Text("特别篇") : Text("第 $k 季"),
-              expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                screenWidth < 600
-                    ? SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: seasonEpisodes,
+                  DataCell(Row(
+                    children: [
+                      LoadingIconButton(
+                          tooltip: "搜索下载对应剧集",
+                          onPressed: () async {
+                            await ref
+                                .read(mediaDetailsProvider(widget.seriesId)
+                                    .notifier)
+                                .searchAndDownload(widget.seriesId,
+                                    ep.seasonNumber!, ep.episodeNumber!)
+                                .then((v) => showSnakeBar("开始下载: $v"));
+                          },
+                          icon: Icons.download),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Tooltip(
+                        message: "查看可用资源",
+                        child: IconButton(
+                            onPressed: () => showAvailableTorrents(
+                                widget.seriesId,
+                                ep.seasonNumber ?? 0,
+                                ep.episodeNumber ?? 0),
+                            icon: const Icon(Icons.manage_search)),
                       )
-                    : seasonEpisodes
-              ],
-            );
-            list.add(seasonList);
-          }
-          return ListView(
-            children: [
-              DetailCard(details: details),
-              Column(
-                children: list,
-              ),
-            ],
-          );
-        },
-        error: (err, trace) {
-          return Text("$err");
-        },
-        loading: () => const MyProgressIndicator());
+                    ],
+                  ))
+                ]);
+
+                if (m[ep.seasonNumber] == null) {
+                  m[ep.seasonNumber!] = List.empty(growable: true);
+                }
+                m[ep.seasonNumber!]!.add(row);
+              }
+              List<ExpansionTile> list = List.empty(growable: true);
+              for (final k in m.keys.toList().reversed) {
+                final seasonEpisodes = DataTable(columns: [
+                  const DataColumn(label: Text("#")),
+                  const DataColumn(
+                    label: Text("标题"),
+                  ),
+                  const DataColumn(label: Text("播出时间")),
+                  const DataColumn(label: Text("状态")),
+                  DataColumn(
+                      label: Row(
+                    children: [
+                      LoadingIconButton(
+                          tooltip: "搜索下载全部剧集",
+                          onPressed: () async {
+                            await ref
+                                .read(mediaDetailsProvider(widget.seriesId)
+                                    .notifier)
+                                .searchAndDownload(widget.seriesId, k, 0)
+                                .then((v) => showSnakeBar("开始下载: $v"));
+                            //showLoadingWithFuture(f);
+                          },
+                          icon: Icons.download),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Tooltip(
+                        message: "查看可用资源",
+                        child: IconButton(
+                            onPressed: () =>
+                                showAvailableTorrents(widget.seriesId, k, 0),
+                            icon: const Icon(Icons.manage_search)),
+                      )
+                    ],
+                  ))
+                ], rows: m[k]!);
+
+                var seasonList = ExpansionTile(
+                  tilePadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  //childrenPadding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+                  initiallyExpanded: false,
+                  title: k == 0 ? const Text("特别篇") : Text("第 $k 季"),
+                  expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    screenWidth < 600
+                        ? SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: seasonEpisodes,
+                          )
+                        : seasonEpisodes
+                  ],
+                );
+                list.add(seasonList);
+              }
+              return ListView(
+                children: [
+                  DetailCard(details: details),
+                  Column(
+                    children: list,
+                  ),
+                ],
+              );
+            },
+            error: (err, trace) {
+              return Text("$err");
+            },
+            loading: () => const MyProgressIndicator()));
   }
 
   Future<void> showAvailableTorrents(String id, int season, int episode) {

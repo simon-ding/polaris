@@ -23,7 +23,8 @@ class _SystemPageState extends ConsumerState<SystemPage> {
   Widget build(BuildContext context) {
     final logs = ref.watch(logFileDataProvider);
     final about = ref.watch(aboutDataProvider);
-    return SingleChildScrollView(
+    return SelectionArea(
+        child: SingleChildScrollView(
       child: Column(
         children: [
           ExpansionTile(
@@ -190,6 +191,6 @@ class _SystemPageState extends ConsumerState<SystemPage> {
           )
         ],
       ),
-    );
+    ));
   }
 }

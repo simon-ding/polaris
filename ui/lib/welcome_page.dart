@@ -38,24 +38,26 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
       data = ref.watch(tvWatchlistDataProvider);
     }
 
-    return Stack(
-      //alignment: Alignment.bottomRight,
-      children: [
-        () {
-          return switch (data) {
-            AsyncData(:final value) => SingleChildScrollView(
-                child: Wrap(
-                  alignment: WrapAlignment.start,
-                  spacing: isSmallScreen(context) ? 0 : 10,
-                  runSpacing: isSmallScreen(context) ? 10 : 20,
-                  children: getMediaAll(value),
+    return SelectionArea(
+      child: Stack(
+        //alignment: Alignment.bottomRight,
+        children: [
+          () {
+            return switch (data) {
+              AsyncData(:final value) => SingleChildScrollView(
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: isSmallScreen(context) ? 0 : 10,
+                    runSpacing: isSmallScreen(context) ? 10 : 20,
+                    children: getMediaAll(value),
+                  ),
                 ),
-              ),
-            _ => const MyProgressIndicator(),
-          };
-        }(),
-        getMoreButtonAndActions(uri)
-      ],
+              _ => const MyProgressIndicator(),
+            };
+          }(),
+          getMoreButtonAndActions(uri)
+        ],
+      ),
     );
   }
 
