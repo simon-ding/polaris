@@ -130,7 +130,7 @@ func tryParseFloat(s string) float32 {
 }
 
 func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, indexer.URL, nil)
