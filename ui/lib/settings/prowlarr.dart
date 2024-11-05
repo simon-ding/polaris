@@ -28,15 +28,10 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
               initialValue: {
                 "api_key": v.apiKey,
                 "url": v.url,
-                "enabled": !v.disabled
+                "disabled": v.disabled
               },
               child: Column(
                 children: [
-                  FormBuilderSwitch(
-                    name: "enabled",
-                    title: const Text("启用"),
-                    decoration: InputDecoration(icon: Icon(Icons.check_circle)),
-                  ),
                   FormBuilderTextField(
                     name: "url",
                     decoration: const InputDecoration(
@@ -53,6 +48,11 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
                         helperText: "Prowlarr 设置 -> 通用 -> API 密钥"),
                     validator: FormBuilderValidators.required(),
                   ),
+                  FormBuilderSwitch(
+                    name: "disabled",
+                    title: const Text("禁用 Prowlarr"),
+                    decoration: InputDecoration(icon: Icon(Icons.do_not_disturb)),
+                  ),
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(10),
@@ -65,7 +65,7 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
                                   .save(ProwlarrSetting(
                                       apiKey: values["api_key"],
                                       url: values["url"],
-                                      disabled: !values["enabled"]))
+                                      disabled: values["disabled"]))
                                   .then((v) => showSnakeBar("更新成功"));
                               showLoadingWithFuture(f);
                             }
