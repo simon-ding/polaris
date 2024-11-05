@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -230,7 +231,7 @@ func Link2Magnet(link string) (string, error) {
 			return http.ErrUseLastResponse //do not follow redirects
 		},
 	}
-	
+
 	resp, err := client.Get(link)
 	if err != nil {
 		return "", errors.Wrap(err, "get link")
@@ -252,7 +253,6 @@ func Link2Magnet(link string) (string, error) {
 	return mg.String(), nil
 }
 
-
 func MagnetHash(link string) (string, error) {
 	if mi, err := metainfo.ParseMagnetV2Uri(link); err != nil {
 		return "", errors.Errorf("magnet link is not valid: %v", err)
@@ -271,4 +271,18 @@ func MagnetHash(link string) (string, error) {
 		}
 		return hash, nil
 	}
+}
+
+func DirSize(path string) (int64, error) {
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	return size, err
 }
