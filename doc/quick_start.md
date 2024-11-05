@@ -12,15 +12,15 @@ services:
     image: ghcr.io/simon-ding/polaris:latest
     restart: always
     environment:
-      - PUID=99
-      - PGID=100
-      - TZ=Asia/Shanghai
+      - PUID=99 #程序运行的用户UID
+      - PGID=100 #程序运行的用户GID
+      - TZ=Asia/Shanghai #时区
     volumes:
       - <配置文件路径>:/app/data #程序配置文件路径
       - <下载路径>:/downloads #下载路径，需要和下载客户端配置一致
       - <媒体文件路径>:/data #媒体数据存储路径，也可以启动自己配置webdav存储
     ports:
-      - 8080:8080
+      - 8080:8080 #端口映射，冒号前的端口可自行改为需要的
 ```
 
 ### 1.2 Docker 方式安装
