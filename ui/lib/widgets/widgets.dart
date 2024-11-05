@@ -281,3 +281,23 @@ class _LoadingTextButtonState extends State<LoadingTextButton> {
     );
   }
 }
+
+class PoError extends StatelessWidget {
+  const PoError({super.key, required this.msg, required this.err});
+  final String msg;
+  final dynamic err;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("$msg ", style: TextStyle(color:Theme.of(context).colorScheme.error),),
+        Tooltip(
+          message: "$err",
+          child: Icon(Icons.info,color: Theme.of(context).colorScheme.error,),
+        )
+      ],
+    );
+  }
+}

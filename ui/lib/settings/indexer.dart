@@ -33,7 +33,7 @@ class _IndexerState extends ConsumerState<IndexerSettings> {
                     child: const Icon(Icons.add));
               }),
             ),
-        error: (err, trace) => Text("$err"),
+        error: (err, trace) => PoError(msg: "网络错误", err: err),
         loading: () => const MyProgressIndicator());
   }
 

@@ -56,7 +56,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                           ]);
                         }));
                   },
-                  error: (err, trace) => Text("$err"),
+                  error: (err, trace) => PoError(msg: "网络错误", err: err),
                   loading: () => const MyProgressIndicator())
             ],
           ),
@@ -111,7 +111,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                       ]),
                     ]);
                   },
-                  error: (err, trace) => Text("$err"),
+                  error: (err, trace) => PoError(msg: "网络错误", err: err),
                   loading: () => const MyProgressIndicator())
             ],
           ),
@@ -185,7 +185,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                       ],
                     );
                   },
-                  error: (err, trace) => Text("$err"),
+                  error: (err, trace) => PoError(msg: "网络错误", err: err),
                   loading: () => const MyProgressIndicator())
             ],
           )

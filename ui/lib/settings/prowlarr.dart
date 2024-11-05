@@ -79,7 +79,7 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
                 ],
               ),
             ),
-        error: (err, trace) => Text("$err"),
+        error: (err, trace) => PoError(msg: "网络错误", err: err),
         loading: () => const MyProgressIndicator());
   }
 }

@@ -183,9 +183,7 @@ class _TvDetailsPageState extends ConsumerState<TvDetailsPage> {
                 ],
               );
             },
-            error: (err, trace) {
-              return Text("$err");
-            },
+            error: (err, trace) => PoError(msg: "网络错误", err: err),
             loading: () => const MyProgressIndicator()));
   }
 

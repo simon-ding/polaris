@@ -43,17 +43,17 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
         //alignment: Alignment.bottomRight,
         children: [
           () {
-            return switch (data) {
-              AsyncData(:final value) => SingleChildScrollView(
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: isSmallScreen(context) ? 0 : 10,
-                    runSpacing: isSmallScreen(context) ? 10 : 20,
-                    children: getMediaAll(value),
-                  ),
-                ),
-              _ => const MyProgressIndicator(),
-            };
+            return data.when(
+                data: (value) => SingleChildScrollView(
+                      child: Wrap(
+                        alignment: WrapAlignment.start,
+                        spacing: isSmallScreen(context) ? 0 : 10,
+                        runSpacing: isSmallScreen(context) ? 10 : 20,
+                        children: getMediaAll(value),
+                      ),
+                    ),
+                error: (err, trace) => PoError(msg: "网络错误", err: err),
+                loading: () => const MyProgressIndicator());
           }(),
           getMoreButtonAndActions(uri)
         ],
