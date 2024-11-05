@@ -12,6 +12,7 @@ import (
 	"polaris/pkg"
 	"polaris/pkg/notifier/message"
 	"polaris/pkg/utils"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -269,6 +270,20 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 			if ep.Status != episode.StatusMissing {
 				wantedSeasonPack = false
 			}
+			if ep.AirDate != "" {
+				t, err := time.Parse("2006-01-02", ep.AirDate)
+				if err != nil {
+					continue
+				}
+				/*
+				 -------- now ------ t -----
+				 t - 1day < now 要检测的剧集
+				 提前一天开始检测
+				*/
+				if time.Now().Before(t.Add(-24 * time.Hour)) { //not aired
+					wantedSeasonPack = false
+				}
+			}
 		}
 		if wantedSeasonPack {
 			name, err := c.SearchAndDownload(id, seasonNum, -1)
@@ -289,6 +304,20 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 				if ep.Status != episode.StatusMissing {
 					continue
 				}
+				if ep.AirDate != "" {
+					if t, err := time.Parse("2006-01-02", ep.AirDate); err == nil {
+						/*
+						 -------- now ------ t -----
+						 t - 1day < now 要检测的剧集
+						 提前一天开始检测
+						*/
+						if time.Now().Before(t.Add(-24 * time.Hour)) { //not aired
+							continue
+						}
+
+					}
+				}
+
 				name, err := c.SearchAndDownload(id, ep.SeasonNumber, ep.EpisodeNumber)
 				if err != nil {
 					log.Warnf("finding resoruces of season %d episode %d error: %v", ep.SeasonNumber, ep.EpisodeNumber, err)
@@ -377,12 +406,12 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (
 	torrent.Start()
 
 	history, err := c.db.SaveHistoryRecord(ent.History{
-		MediaID:          ep.MediaID,
-		EpisodeID:        ep.ID,
-		SourceTitle:      r1.Name,
-		TargetDir:        targetDir,
-		Status:           history.StatusRunning,
-		Size:             r1.Size,
+		MediaID:     ep.MediaID,
+		EpisodeID:   ep.ID,
+		SourceTitle: r1.Name,
+		TargetDir:   targetDir,
+		Status:      history.StatusRunning,
+		Size:        r1.Size,
 		//Saved:            torrent.Save(),
 		Link:             magnet,
 		DownloadClientID: dlc.ID,
