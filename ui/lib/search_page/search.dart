@@ -5,6 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/welcome_data.dart';
 import 'package:ui/search_page/submit_dialog.dart';
 import 'package:ui/widgets/progress_indicator.dart';
+import 'package:ui/widgets/widgets.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key, this.query});
@@ -110,7 +111,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           }
           return cards;
         },
-        error: (err, trace) => [Text("$err")],
+        error: (err, trace) => [PoError(msg: "网络错误，请确认TMDB Key正确配置，并且服务端能够正常连接TMDB网站", err: err)],
         loading: () => [const MyProgressIndicator()]);
 
     var f = NotificationListener(
