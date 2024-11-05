@@ -52,7 +52,7 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
                         children: getMediaAll(value),
                       ),
                     ),
-                error: (err, trace) => PoError(msg: "网络错误", err: err),
+                error: (err, trace) => PoNetworkError(err: err),
                 loading: () => const MyProgressIndicator());
           }(),
           getMoreButtonAndActions(uri)

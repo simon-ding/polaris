@@ -35,7 +35,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                   onTap: () => showDownloadClientDetails(DownloadClient()),
                   child: const Icon(Icons.add));
             })),
-        error: (err, trace) => PoError(msg: "网络错误", err: err),
+        error: (err, trace) => PoNetworkError(err: err),
         loading: () => const MyProgressIndicator());
   }
 

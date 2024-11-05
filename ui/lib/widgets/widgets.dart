@@ -301,3 +301,12 @@ class PoError extends StatelessWidget {
     );
   }
 }
+
+class PoNetworkError extends StatelessWidget {
+  const PoNetworkError({super.key, required this.err});
+final dynamic err;
+  @override
+  Widget build(BuildContext context) {
+    return PoError(msg: "网络错误，请检查网络链接", err: err);
+  }
+}
