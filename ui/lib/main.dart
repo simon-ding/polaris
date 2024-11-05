@@ -53,10 +53,8 @@ class _MyAppState extends ConsumerState<MyApp> {
     final shellRoute = StatefulShellRoute.indexedStack(
       builder: (BuildContext context, GoRouterState state,
           StatefulNavigationShell navigationShell) {
-        return SelectionArea(
-          child: MainSkeleton(
-            body: navigationShell,
-          ),
+        return MainSkeleton(
+          body: navigationShell,
         );
       },
       branches: [
