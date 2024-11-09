@@ -6,6 +6,7 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/log"
+	"polaris/pkg/metadata"
 	"polaris/pkg/notifier/message"
 	"polaris/pkg/torznab"
 	"polaris/pkg/utils"
@@ -102,9 +103,41 @@ func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	if err != nil {
 		return nil, err
 	}
-	r1 := res[0]
-	log.Infof("found resource to download: %+v", r1)
-	return c.DownloadEpisodeTorrent(r1, seriesId, seasonNum, episodeNum)
+	/*
+	tmdb 校验获取的资源名，如果用资源名在tmdb搜索出来的结果能匹配上想要的资源，则认为资源有效，否则无效
+	解决名称过于简单的影视会匹配过多资源的问题， 例如：梦魇绝镇 FROM
+	*/
+	var r1 *torznab.Result
+	for _, r := range res { // 
+		m := metadata.ParseTv(r.Name)
+		se, err := c.MustTMDB().SearchMedia(m.NameEn, "", 1)
+		if err != nil {
+			log.Warnf("tmdb search error, consider this torrent ok: ", err)
+			r1 = &r
+			break
+		} else {
+			if len(se.Results) == 0 {
+				log.Debugf("tmdb search no result: %s", r.Name)
+				continue
+			}
+			series := c.db.GetMediaDetails(seriesId)
+		
+			se0 := se.Results[0]
+			if se0.ID != int64(series.TmdbID) {
+				log.Warnf("bt reosurce name not match tmdb id: %s", r.Name)
+				continue
+			} else { //resource tmdb id match
+				r1 = &r
+			}
+		}
+	}
+	if r1 != nil {
+		log.Infof("found resource to download: %+v", r1)
+		return c.DownloadEpisodeTorrent(*r1, seriesId, seasonNum, episodeNum)
+	
+	} else {
+		return nil, errors.Errorf("no resource")
+	}
 }
 
 func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexerID int) (*string, error) {
