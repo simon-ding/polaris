@@ -59,12 +59,12 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum, 
 	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
 
 	history, err := c.db.SaveHistoryRecord(ent.History{
-		MediaID:          seriesId,
-		EpisodeID:        ep.ID,
-		SourceTitle:      r1.Name,
-		TargetDir:        dir,
-		Status:           history.StatusRunning,
-		Size:             r1.Size,
+		MediaID:     seriesId,
+		EpisodeID:   ep.ID,
+		SourceTitle: r1.Name,
+		TargetDir:   dir,
+		Status:      history.StatusRunning,
+		Size:        r1.Size,
 		//Saved:            torrent.Save(),
 		Link:             magnet,
 		DownloadClientID: dlc.ID,
@@ -104,11 +104,11 @@ func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 		return nil, err
 	}
 	/*
-	tmdb 校验获取的资源名，如果用资源名在tmdb搜索出来的结果能匹配上想要的资源，则认为资源有效，否则无效
-	解决名称过于简单的影视会匹配过多资源的问题， 例如：梦魇绝镇 FROM
+		tmdb 校验获取的资源名，如果用资源名在tmdb搜索出来的结果能匹配上想要的资源，则认为资源有效，否则无效
+		解决名称过于简单的影视会匹配过多资源的问题， 例如：梦魇绝镇 FROM
 	*/
 	var r1 *torznab.Result
-	for _, r := range res { // 
+	for _, r := range res { //
 		m := metadata.ParseTv(r.Name)
 		se, err := c.MustTMDB().SearchMedia(m.NameEn, "", 1)
 		if err != nil {
@@ -117,11 +117,12 @@ func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 			break
 		} else {
 			if len(se.Results) == 0 {
-				log.Debugf("tmdb search no result: %s", r.Name)
-				continue
+				log.Debugf("tmdb search no result, consider this torrent ok: %s", r.Name) //because tv name parse is not accurate
+				r1 = &r
+				break
 			}
 			series := c.db.GetMediaDetails(seriesId)
-		
+
 			se0 := se.Results[0]
 			if se0.ID != int64(series.TmdbID) {
 				log.Warnf("bt reosurce name not match tmdb id: %s", r.Name)
@@ -134,7 +135,7 @@ func (c *Client) SearchAndDownload(seriesId, seasonNum, episodeNum int) (*string
 	if r1 != nil {
 		log.Infof("found resource to download: %+v", r1)
 		return c.DownloadEpisodeTorrent(*r1, seriesId, seasonNum, episodeNum)
-	
+
 	} else {
 		return nil, errors.Errorf("no resource")
 	}
@@ -162,12 +163,12 @@ func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexe
 	go func() {
 		ep, _ := c.db.GetMovieDummyEpisode(m.ID)
 		history, err := c.db.SaveHistoryRecord(ent.History{
-			MediaID:          m.ID,
-			EpisodeID:        ep.ID,
-			SourceTitle:      name,
-			TargetDir:        m.TargetDir,
-			Status:           history.StatusRunning,
-			Size:             size,
+			MediaID:     m.ID,
+			EpisodeID:   ep.ID,
+			SourceTitle: name,
+			TargetDir:   m.TargetDir,
+			Status:      history.StatusRunning,
+			Size:        size,
 			//Saved:            torrent.Save(),
 			Link:             magnet,
 			DownloadClientID: dlc.ID,
