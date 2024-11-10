@@ -51,7 +51,8 @@ class ProwlarrSettingState extends ConsumerState<ProwlarrSettingPage> {
                   FormBuilderSwitch(
                     name: "disabled",
                     title: const Text("禁用 Prowlarr"),
-                    decoration: InputDecoration(icon: Icon(Icons.do_not_disturb)),
+                    decoration:
+                        InputDecoration(icon: Icon(Icons.do_not_disturb)),
                   ),
                   Center(
                     child: Padding(

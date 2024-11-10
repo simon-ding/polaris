@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:ui/activity.dart';
 import 'package:ui/calendar.dart';
+import 'package:ui/init_wizard.dart';
 import 'package:ui/login_page.dart';
 import 'package:ui/movie_watchlist.dart';
 import 'package:ui/providers/APIs.dart';
@@ -125,8 +126,16 @@ class _MyAppState extends ConsumerState<MyApp> {
       routes: [
         shellRoute,
         GoRoute(
+          path: "/",
+          redirect: (context, state) => WelcomePage.routeTv,
+        ),
+        GoRoute(
           path: LoginScreen.route,
           builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: InitWizard.route,
+          builder: (context, state) => const InitWizard(),
         )
       ],
     );
@@ -171,88 +180,7 @@ class _MainSkeletonState extends State<MainSkeleton> {
     var padding = isSmallScreen(context) ? 5.0 : 20.0;
     return AdaptiveScaffold(
       appBarBreakpoint: Breakpoints.standard,
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        leading: Container(
-          alignment: Alignment.centerLeft,
-          child: TextButton(
-            onPressed: () => context.go(WelcomePage.routeTv),
-            child: const Text(
-              "Polaris",
-              overflow: TextOverflow.clip,
-              style: TextStyle(fontSize: 28),
-            ),
-          ),
-        ),
-        leadingWidth: isSmallScreen(context) ? 0 : 190,
-        title: Container(
-          alignment: Alignment.bottomLeft,
-          child: SearchAnchor(
-              builder: (BuildContext context, SearchController controller) {
-            return Container(
-              constraints: const BoxConstraints(maxWidth: 250, maxHeight: 40),
-              child: Opacity(
-                opacity: 0.8,
-                child: SearchBar(
-                  hintText: "在此搜索...",
-                  leading: const Icon(Icons.search),
-                  controller: controller,
-                  shadowColor: WidgetStateColor.transparent,
-                  backgroundColor: WidgetStatePropertyAll(
-                      Theme.of(context).colorScheme.primaryContainer),
-                  onSubmitted: (value) => context.go(Uri(
-                      path: SearchPage.route,
-                      queryParameters: {'query': value}).toString()),
-                ),
-              ),
-            );
-          }, suggestionsBuilder:
-                  (BuildContext context, SearchController controller) {
-            return [Text("dadada")];
-          }),
-        ),
-
-        actions: [
-          // IconButton(
-          //     onPressed: () => showCalendar(context),
-          //     icon: Icon(Icons.calendar_month)),
-          IconButton(
-              onPressed: () => showDonate(context),
-              icon: Icon(
-                Icons.favorite_rounded,
-                color: Colors.red,
-              )),
-
-          MenuAnchor(
-            menuChildren: [
-              MenuItemButton(
-                leadingIcon: const Icon(Icons.exit_to_app),
-                child: const Text("登出"),
-                onPressed: () async {
-                  await APIs.logout();
-                },
-              ),
-            ],
-            builder: (context, controller, child) {
-              return TextButton(
-                onPressed: () {
-                  if (controller.isOpen) {
-                    controller.close();
-                  } else {
-                    controller.open();
-                  }
-                },
-                child: const Icon(Icons.account_circle),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: appBar(),
       useDrawer: false,
       selectedIndex: widget.body.currentIndex,
       onSelectedIndexChange: (p0) => widget.body
@@ -312,6 +240,91 @@ class _MainSkeletonState extends State<MainSkeleton> {
                   image: AssetImage("assets/wechat.jpg"))),
         );
       },
+    );
+  }
+
+  AppBar appBar() {
+    return AppBar(
+      // TRY THIS: Try changing the color here to a specific color (to
+      // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+      // change color while the other colors stay the same.
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      // Here we take the value from the MyHomePage object that was created by
+      // the App.build method, and use it to set our appbar title.
+      leading: Container(
+        alignment: Alignment.centerLeft,
+        child: TextButton(
+          onPressed: () => context.go(WelcomePage.routeTv),
+          child: const Text(
+            "Polaris",
+            overflow: TextOverflow.clip,
+            style: TextStyle(fontSize: 28),
+          ),
+        ),
+      ),
+      leadingWidth: isSmallScreen(context) ? 0 : 190,
+      title: Container(
+        alignment: Alignment.bottomLeft,
+        child: SearchAnchor(
+            builder: (BuildContext context, SearchController controller) {
+          return Container(
+            constraints: const BoxConstraints(maxWidth: 250, maxHeight: 40),
+            child: Opacity(
+              opacity: 0.8,
+              child: SearchBar(
+                hintText: "在此搜索...",
+                leading: const Icon(Icons.search),
+                controller: controller,
+                shadowColor: WidgetStateColor.transparent,
+                backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.primaryContainer),
+                onSubmitted: (value) => context.go(Uri(
+                    path: SearchPage.route,
+                    queryParameters: {'query': value}).toString()),
+              ),
+            ),
+          );
+        }, suggestionsBuilder:
+                (BuildContext context, SearchController controller) {
+          return [Text("dadada")];
+        }),
+      ),
+
+      actions: [
+        // IconButton(
+        //     onPressed: () => showCalendar(context),
+        //     icon: Icon(Icons.calendar_month)),
+        IconButton(
+            onPressed: () => showDonate(context),
+            icon: Icon(
+              Icons.favorite_rounded,
+              color: Colors.red,
+            )),
+
+        MenuAnchor(
+          menuChildren: [
+            MenuItemButton(
+              leadingIcon: const Icon(Icons.exit_to_app),
+              child: const Text("登出"),
+              onPressed: () async {
+                await APIs.logout();
+              },
+            ),
+          ],
+          builder: (context, controller, child) {
+            return TextButton(
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+              child: const Icon(Icons.account_circle),
+            );
+          },
+        ),
+      ],
     );
   }
 }
