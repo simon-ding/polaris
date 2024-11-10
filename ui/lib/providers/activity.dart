@@ -27,12 +27,6 @@ class ActivityData
     extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String> {
   @override
   FutureOr<List<Activity>> build(String arg) async {
-    if (arg == "active") {
-      //refresh active downloads
-      Timer(const Duration(seconds: 5),
-          ref.invalidateSelf); //Periodically Refresh
-    }
-
     final dio = await APIs.getDio();
     var resp =
         await dio.get(APIs.activityUrl, queryParameters: {"status": arg});
@@ -43,6 +37,12 @@ class ActivityData
     List<Activity> activities = List.empty(growable: true);
     for (final a in sp.data as List) {
       activities.add(Activity.fromJson(a));
+    }
+
+    if (arg == "active") {
+      //refresh active downloads
+      Timer(const Duration(seconds: 5),
+          () => ref.invalidateSelf()); //Periodically Refresh
     }
     return activities;
   }
