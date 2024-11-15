@@ -127,26 +127,33 @@ func findEpisodes(s string) (start int, end int) {
 			n, l := adjacentNumber(s, i+1)
 
 			if n > 0 {
+				foundDash := false
 				for j := i + l + 1; j < len(rr); j++ {
 					r1 := rr[j]
-					if r1 == ' ' || r1 == '-' {
+					if r1 == '-' {
+						foundDash = true
 						continue
 					}
-					if r1 == 'e' {
+					if r1 == ' ' || r1 == 'e' {
 						continue
 					}
-					if r1 == 's' {
-						s1, l1 := adjacentNumber(s, j+1)
-						if s1 > 0 { //S01E01-S01E21
-							n1, _ := adjacentNumber(s, j+l1+2)
-							if n1 > 0 {
-								return n, n1
+
+					if foundDash {
+						if r1 == 's' {
+							s1, l1 := adjacentNumber(s, j+1)
+							if s1 > 0 { //S01E01-S01E21
+								n1, _ := adjacentNumber(s, j+l1+2)
+								if n1 > 0 {
+									return n, n1
+								}
 							}
 						}
-					}
-					n1, _ := adjacentNumber(s, j)
-					if n1 > 0 {
-						return n, n1
+						n1, _ := adjacentNumber(s, j)
+						if n1 > 0 {
+							return n, n1
+						}
+					} else {
+						break
 					}
 				}
 				return n, n
@@ -411,8 +418,8 @@ func parseName(name string) *Info {
 	//}
 
 	//tv name
-	if utils.IsASCII(name) && p < len(name) {
-		meta.NameEn = name[:p]
+	if utils.IsASCII(name) && p < len(name) && p-1 > 0 {
+		meta.NameEn = strings.TrimSpace(name[:p-1])
 		meta.NameCn = meta.NameEn
 	} else {
 		fields := strings.FieldsFunc(name, func(r rune) bool {
