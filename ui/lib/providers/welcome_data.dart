@@ -115,7 +115,7 @@ class SearchPageData
       if (sp.code != 0) {
         throw sp.message;
       }
-      //ref.invalidate(tvWatchlistDataProvider);
+      ref.invalidate(tvWatchlistDataProvider);
     } else {
       var resp = await dio.post(APIs.watchlistMovieUrl, data: {
         "tmdb_id": tmdbId,
@@ -129,6 +129,7 @@ class SearchPageData
       if (sp.code != 0) {
         throw sp.message;
       }
+      ref.invalidate(movieWatchlistDataProvider);
     }
   }
 }
