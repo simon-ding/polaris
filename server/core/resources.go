@@ -165,6 +165,7 @@ lo:
 					return nil, err
 				}
 				torrentNames = append(torrentNames, *name)
+				break lo
 			}
 		} else {
 			torrentEpisodes := make([]int, 0)
