@@ -217,7 +217,7 @@ func findEpisodes(s string) (start int, end int) {
 				if maybeSeasonPack(s) { //avoid miss match, season pack not use this rule
 					return -1, -1
 				}
-				re3 := regexp.MustCompile(`[^\d\w]\d{1,2}[^\d\w]`)
+				re3 := regexp.MustCompile(`[^(season)][^\d\w]\d{1,2}[^\d\w]`)
 				epNums := re3.FindAllString(s, -1)
 				if len(epNums) > 0 {
 
