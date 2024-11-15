@@ -21,7 +21,7 @@ func Test_ParseTV2(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, m.Season, 1)
-	assert.Equal(t, m.Episode, 4)
+	assert.Equal(t, m.StartEpisode, 4)
 	assert.Equal(t, m.IsSeasonPack, false)
 	assert.Equal(t, m.Resolution, "1080p")
 }
@@ -31,7 +31,7 @@ func Test_ParseTV3(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, m.Season, 37)
-	assert.Equal(t, m.Episode, 219)
+	assert.Equal(t, m.StartEpisode, 219)
 	assert.Equal(t, m.IsSeasonPack, false)
 	//assert.Equal(t, m.Resolution, "1080p")
 }
@@ -41,8 +41,8 @@ func Test_ParseTV4(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, m.Season, 2)
-	//assert.Equal(t, m.Episode, 219)
-	assert.Equal(t, m.IsSeasonPack, true)
+	assert.Equal(t, m.StartEpisode, 12)
+	assert.Equal(t, m.IsSeasonPack, false)
 	//assert.Equal(t, m.Resolution, "1080p")
 }
 
@@ -61,7 +61,7 @@ func Test_ParseTV6(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, m.Season, 1)
-	assert.Equal(t, m.Episode, 3)
+	assert.Equal(t, m.StartEpisode, 3)
 	assert.Equal(t, m.IsSeasonPack, false)
 	assert.Equal(t, m.Resolution, "1080p")
 }
@@ -71,7 +71,7 @@ func Test_ParseTV7(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, m.Season, 1)
-	assert.Equal(t, m.Episode, 1113)
+	assert.Equal(t, m.StartEpisode, 1113)
 	assert.Equal(t, m.IsSeasonPack, false)
 	assert.Equal(t, m.Resolution, "1080p")
 }
@@ -81,7 +81,7 @@ func Test_ParseTV8(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, m.Season, 1)
-	assert.Equal(t, m.Episode, 4)
+	assert.Equal(t, m.StartEpisode, 4)
 	assert.Equal(t, m.IsSeasonPack, false)
 	assert.Equal(t, m.Resolution, "1080p")
 }
@@ -91,7 +91,7 @@ func Test_ParseTV9(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, m.Season, 1)
-	assert.Equal(t, m.Episode, 16)
+	assert.Equal(t, m.StartEpisode, 16)
 	assert.Equal(t, m.IsSeasonPack, false)
 	assert.Equal(t, m.Resolution, "1080p")
 }
@@ -111,7 +111,7 @@ func Test_ParseTV11(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, 2, m.Season)
-	assert.Equal(t, 4, m.Episode)
+	assert.Equal(t, 4, m.StartEpisode)
 	assert.Equal(t, false, m.IsSeasonPack)
 	assert.Equal(t, "1080p", m.Resolution)
 }
@@ -121,7 +121,7 @@ func Test_ParseTV12(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, 2, m.Season)
-	assert.Equal(t, 4, m.Episode)
+	assert.Equal(t, 4, m.StartEpisode)
 	assert.Equal(t, false, m.IsSeasonPack)
 	assert.Equal(t, "1080p", m.Resolution)
 }
@@ -131,7 +131,7 @@ func Test_ParseTV13(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, 2, m.Season)
-	assert.Equal(t, 8, m.Episode)
+	assert.Equal(t, 8, m.StartEpisode)
 	assert.Equal(t, false, m.IsSeasonPack)
 	assert.Equal(t, "1080p", m.Resolution)
 }
@@ -141,10 +141,11 @@ func Test_ParseTV14(t *testing.T) {
 	m := ParseTv(s1)
 	log.Infof("results: %+v", m)
 	assert.Equal(t, 5, m.Season)
-	assert.Equal(t, 113, m.Episode)
+	assert.Equal(t, 113, m.StartEpisode)
 	assert.Equal(t, false, m.IsSeasonPack)
 	//assert.Equal(t, "720p", m.Resolution)
 }
+
 //
 
 func Test_ParseTV15(t *testing.T) {
@@ -155,6 +156,43 @@ func Test_ParseTV15(t *testing.T) {
 	assert.False(t, b)
 	//assert.Equal(t, 1, m.Season)
 	//assert.Equal(t, 113, m.Episode)
+	//assert.Equal(t, false, m.IsSeasonPack)
+	//assert.Equal(t, "720p", m.Resolution)
+}
+
+func Test_ParseTV16(t *testing.T) {
+	s1 := "Romance in the Alley 2024 S01 E24-E25 1080p WEB-DL H.264 AAC-PTerWEB"
+	m := ParseTv(s1)
+	log.Infof("results: %+v", m)
+
+	assert.Equal(t, 1, m.Season)
+	assert.Equal(t, 24, m.StartEpisode)
+	assert.Equal(t, 25, m.EndEpisode)
+	//assert.Equal(t, false, m.IsSeasonPack)
+	//assert.Equal(t, "720p", m.Resolution)
+}
+
+func Test_ParseTV17(t *testing.T) {
+	s1 := "小巷人家/Romance in the Alley 第24-25集 "
+	m := ParseTv(s1)
+	log.Infof("results: %+v", m)
+
+	assert.Equal(t, 1, m.Season)
+	assert.Equal(t, 24, m.StartEpisode)
+	assert.Equal(t, 25, m.EndEpisode)
+	//assert.Equal(t, false, m.IsSeasonPack)
+	//assert.Equal(t, "720p", m.Resolution)
+}
+
+// Romance in the Alley 2024 S01E01-S01E21 2160p WEB-DL HEVC AAC-UBWEB
+func Test_ParseTV18(t *testing.T) {
+	s1 := "Romance in the Alley 2024 S01E01-S01E21 2160p WEB-DL HEVC AAC-UBWEB "
+	m := ParseTv(s1)
+	log.Infof("results: %+v", m)
+
+	assert.Equal(t, 1, m.Season)
+	assert.Equal(t, 1, m.StartEpisode)
+	assert.Equal(t, 21, m.EndEpisode)
 	//assert.Equal(t, false, m.IsSeasonPack)
 	//assert.Equal(t, "720p", m.Resolution)
 }

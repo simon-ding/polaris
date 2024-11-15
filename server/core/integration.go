@@ -300,9 +300,9 @@ func (c *Client) findEpisodeFilesPreMoving(historyId int) error {
 			}
 
 			meta := metadata.ParseTv(f.Name())
-			if meta.Episode > 0 {
+			if meta.StartEpisode > 0 {
 				//episode exists
-				ep, err := c.db.GetEpisode(his.MediaID, seasonNum, meta.Episode)
+				ep, err := c.db.GetEpisode(his.MediaID, seasonNum, meta.StartEpisode)
 				if err != nil {
 					return err
 				}

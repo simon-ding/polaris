@@ -93,6 +93,7 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 		}
 		r := Result{
 			Name:                 item.Title,
+			Description:          item.Description,
 			Link:                 item.Link,
 			Size:                 mustAtoI(item.Size),
 			Seeders:              mustAtoI(item.GetAttr("seeders")),
@@ -180,6 +181,7 @@ func doRequest(req *http.Request) (*Response, error) {
 
 type Result struct {
 	Name                 string  `json:"name"`
+	Description          string  `json:"description"`
 	Link                 string  `json:"link"`
 	Size                 int     `json:"size"`
 	Seeders              int     `json:"seeders"`

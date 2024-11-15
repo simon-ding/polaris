@@ -36,11 +36,19 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 	res := searchWithTorznab(db1, prowlarr.TV, series.NameEn, series.NameCn, series.OriginalName)
 
 	var filtered []torznab.Result
+lo:
 	for _, r := range res {
 		//log.Infof("torrent resource: %+v", r)
 		meta := metadata.ParseTv(r.Name)
-		if meta == nil { //cannot parse name
-			continue
+
+		if meta.IsSeasonPack {//try to parse episode number with description
+			mm := metadata.ParseTv(r.Description)
+			if mm.StartEpisode > 0 { //sometimes they put episode info in desc text
+				meta.IsSeasonPack = false
+				meta.StartEpisode = mm.StartEpisode
+				meta.EndEpisode = mm.EndEpisode
+			}
+
 		}
 		if isImdbidNotMatch(series.ImdbID, r.ImdbId) { //has imdb id and not match
 			continue
@@ -61,9 +69,12 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 			continue
 		}
 
-		if len(param.Episodes) > 0 && !slices.Contains(param.Episodes, meta.Episode) { //not season pack, but episode number not equal
-			continue
-
+		if len(param.Episodes) > 0 { //not season pack, but episode number not equal
+			for i := meta.StartEpisode; i < meta.EndEpisode; i++ {
+				if !slices.Contains(param.Episodes, i) {
+					continue lo
+				}
+			}
 		} else if len(param.Episodes) == 0 && !meta.IsSeasonPack { //want season pack, but not season pack
 			continue
 		}
