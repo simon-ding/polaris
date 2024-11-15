@@ -74,6 +74,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "media_id", Type: field.TypeInt},
 		{Name: "episode_id", Type: field.TypeInt, Nullable: true},
+		{Name: "episode_nums", Type: field.TypeJSON, Nullable: true},
+		{Name: "season_num", Type: field.TypeInt, Nullable: true},
 		{Name: "source_title", Type: field.TypeString},
 		{Name: "date", Type: field.TypeTime},
 		{Name: "target_dir", Type: field.TypeString},

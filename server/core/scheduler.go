@@ -115,6 +115,38 @@ func (c *Client) postTaskProcessing(id int) {
 	}
 }
 
+func getSeasonNum(h *ent.History) int {
+	if h.SeasonNum != 0 {
+		return h.SeasonNum
+	}
+	seasonNum, err := utils.SeasonId(h.TargetDir)
+	if err != nil {
+		log.Errorf("no season id: %v", h.TargetDir)
+		seasonNum = -1
+	}
+	return seasonNum
+}
+
+func (c *Client) GetEpisodeIds(r *ent.History) []int {
+	var episodeIds []int
+	seasonNum := getSeasonNum(r)
+
+	if r.EpisodeID > 0 {
+		episodeIds = append(episodeIds, r.EpisodeID)
+	}
+	if len(r.EpisodeNums) > 0 {
+		series := c.db.GetMediaDetails(r.MediaID)
+		for _, epNum := range r.EpisodeNums {
+			for _, ep := range series.Episodes {
+				if ep.SeasonNumber == seasonNum && ep.EpisodeNumber == epNum {
+					episodeIds = append(episodeIds, ep.ID)
+				}
+			}
+		}
+	}
+	return episodeIds
+}
+
 func (c *Client) moveCompletedTask(id int) (err1 error) {
 	torrent := c.tasks[id]
 	r := c.db.GetHistory(id)
@@ -123,11 +155,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 		return nil
 	}
 	c.db.SetHistoryStatus(r.ID, history.StatusUploading)
-	seasonNum, err := utils.SeasonId(r.TargetDir)
-	if err != nil {
-		log.Errorf("no season id: %v", r.TargetDir)
-		seasonNum = -1
-	}
+
 	downloadclient, err := c.db.GetDownloadClient(r.DownloadClientID)
 	if err != nil {
 		log.Errorf("get task download client error: %v, use default one", err)
@@ -138,13 +166,19 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 		return err
 	}
 
+	seasonNum := getSeasonNum(r)
+
+	episodeIds := c.GetEpisodeIds(r)
+
 	defer func() {
 
 		if err1 != nil {
 			c.db.SetHistoryStatus(r.ID, history.StatusFail)
-			if r.EpisodeID != 0 {
-				if !c.db.IsEpisodeDownloadingOrDownloaded(r.EpisodeID) {
-					c.db.SetEpisodeStatus(r.EpisodeID, episode.StatusMissing)
+			if len(episodeIds) > 0 {
+				for _, id := range episodeIds {
+					if !c.db.IsEpisodeDownloadingOrDownloaded(id) {
+						c.db.SetEpisodeStatus(id, episode.StatusMissing)
+					}
 				}
 			} else {
 				c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
@@ -175,8 +209,10 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	}
 
 	c.db.SetHistoryStatus(r.ID, history.StatusSeeding)
-	if r.EpisodeID != 0 {
-		c.db.SetEpisodeStatus(r.EpisodeID, episode.StatusDownloaded)
+	if len(episodeIds) > 0 {
+		for _, id := range episodeIds {
+			c.db.SetEpisodeStatus(id, episode.StatusDownloaded)
+		}
 	} else {
 		c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
 	}
@@ -286,10 +322,10 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 			}
 		}
 		if wantedSeasonPack {
-			name, err := c.SearchAndDownload(id, seasonNum, -1)
+			names, err := c.SearchAndDownload(id, seasonNum)
 			if err == nil {
-				allNames = append(allNames, *name)
-				log.Infof("begin download torrent resource: %v", name)
+				allNames = append(allNames, names...)
+				log.Infof("begin download torrent resource: %v", names)
 			} else {
 				log.Warnf("finding season pack error: %v", err)
 				wantedSeasonPack = false
@@ -297,6 +333,7 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 
 		}
 		if !wantedSeasonPack {
+			seasonEpisodesWanted := make(map[int][]int, 0)
 			for _, ep := range epsides {
 				if !ep.Monitored {
 					continue
@@ -317,14 +354,16 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 
 					}
 				}
-
-				name, err := c.SearchAndDownload(id, ep.SeasonNumber, ep.EpisodeNumber)
+				seasonEpisodesWanted[ep.SeasonNumber] = append(seasonEpisodesWanted[ep.SeasonNumber], ep.EpisodeNumber)
+			}
+			for se, eps := range seasonEpisodesWanted {
+				names, err := c.SearchAndDownload(id, se, eps...)
 				if err != nil {
-					log.Warnf("finding resoruces of season %d episode %d error: %v", ep.SeasonNumber, ep.EpisodeNumber, err)
+					log.Warnf("finding resoruces of season %d episode %v error: %v", se, eps, err)
 					continue
 				} else {
-					allNames = append(allNames, *name)
-					log.Infof("begin download torrent resource: %v", name)
+					allNames = append(allNames, names...)
+					log.Infof("begin download torrent resource: %v", names)
 				}
 			}
 

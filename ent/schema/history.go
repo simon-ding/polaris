@@ -14,7 +14,9 @@ type History struct {
 func (History) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("media_id"),
-		field.Int("episode_id").Optional(),
+		field.Int("episode_id").Optional().Comment("deprecated"),
+		field.Ints("episode_nums").Optional(),
+		field.Int("season_num").Optional(),
 		field.String("source_title"),
 		field.Time("date"),
 		field.String("target_dir"),

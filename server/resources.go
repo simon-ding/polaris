@@ -120,7 +120,7 @@ func (s *Server) SearchTvAndDownload(c *gin.Context) (interface{}, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "download")
 		}
-		name = *name1
+		name = name1[0]
 	}
 
 	return gin.H{

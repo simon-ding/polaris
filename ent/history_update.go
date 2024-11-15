@@ -12,6 +12,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -73,6 +74,51 @@ func (hu *HistoryUpdate) AddEpisodeID(i int) *HistoryUpdate {
 // ClearEpisodeID clears the value of the "episode_id" field.
 func (hu *HistoryUpdate) ClearEpisodeID() *HistoryUpdate {
 	hu.mutation.ClearEpisodeID()
+	return hu
+}
+
+// SetEpisodeNums sets the "episode_nums" field.
+func (hu *HistoryUpdate) SetEpisodeNums(i []int) *HistoryUpdate {
+	hu.mutation.SetEpisodeNums(i)
+	return hu
+}
+
+// AppendEpisodeNums appends i to the "episode_nums" field.
+func (hu *HistoryUpdate) AppendEpisodeNums(i []int) *HistoryUpdate {
+	hu.mutation.AppendEpisodeNums(i)
+	return hu
+}
+
+// ClearEpisodeNums clears the value of the "episode_nums" field.
+func (hu *HistoryUpdate) ClearEpisodeNums() *HistoryUpdate {
+	hu.mutation.ClearEpisodeNums()
+	return hu
+}
+
+// SetSeasonNum sets the "season_num" field.
+func (hu *HistoryUpdate) SetSeasonNum(i int) *HistoryUpdate {
+	hu.mutation.ResetSeasonNum()
+	hu.mutation.SetSeasonNum(i)
+	return hu
+}
+
+// SetNillableSeasonNum sets the "season_num" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableSeasonNum(i *int) *HistoryUpdate {
+	if i != nil {
+		hu.SetSeasonNum(*i)
+	}
+	return hu
+}
+
+// AddSeasonNum adds i to the "season_num" field.
+func (hu *HistoryUpdate) AddSeasonNum(i int) *HistoryUpdate {
+	hu.mutation.AddSeasonNum(i)
+	return hu
+}
+
+// ClearSeasonNum clears the value of the "season_num" field.
+func (hu *HistoryUpdate) ClearSeasonNum() *HistoryUpdate {
+	hu.mutation.ClearSeasonNum()
 	return hu
 }
 
@@ -316,6 +362,26 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if hu.mutation.EpisodeIDCleared() {
 		_spec.ClearField(history.FieldEpisodeID, field.TypeInt)
 	}
+	if value, ok := hu.mutation.EpisodeNums(); ok {
+		_spec.SetField(history.FieldEpisodeNums, field.TypeJSON, value)
+	}
+	if value, ok := hu.mutation.AppendedEpisodeNums(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, history.FieldEpisodeNums, value)
+		})
+	}
+	if hu.mutation.EpisodeNumsCleared() {
+		_spec.ClearField(history.FieldEpisodeNums, field.TypeJSON)
+	}
+	if value, ok := hu.mutation.SeasonNum(); ok {
+		_spec.SetField(history.FieldSeasonNum, field.TypeInt, value)
+	}
+	if value, ok := hu.mutation.AddedSeasonNum(); ok {
+		_spec.AddField(history.FieldSeasonNum, field.TypeInt, value)
+	}
+	if hu.mutation.SeasonNumCleared() {
+		_spec.ClearField(history.FieldSeasonNum, field.TypeInt)
+	}
 	if value, ok := hu.mutation.SourceTitle(); ok {
 		_spec.SetField(history.FieldSourceTitle, field.TypeString, value)
 	}
@@ -429,6 +495,51 @@ func (huo *HistoryUpdateOne) AddEpisodeID(i int) *HistoryUpdateOne {
 // ClearEpisodeID clears the value of the "episode_id" field.
 func (huo *HistoryUpdateOne) ClearEpisodeID() *HistoryUpdateOne {
 	huo.mutation.ClearEpisodeID()
+	return huo
+}
+
+// SetEpisodeNums sets the "episode_nums" field.
+func (huo *HistoryUpdateOne) SetEpisodeNums(i []int) *HistoryUpdateOne {
+	huo.mutation.SetEpisodeNums(i)
+	return huo
+}
+
+// AppendEpisodeNums appends i to the "episode_nums" field.
+func (huo *HistoryUpdateOne) AppendEpisodeNums(i []int) *HistoryUpdateOne {
+	huo.mutation.AppendEpisodeNums(i)
+	return huo
+}
+
+// ClearEpisodeNums clears the value of the "episode_nums" field.
+func (huo *HistoryUpdateOne) ClearEpisodeNums() *HistoryUpdateOne {
+	huo.mutation.ClearEpisodeNums()
+	return huo
+}
+
+// SetSeasonNum sets the "season_num" field.
+func (huo *HistoryUpdateOne) SetSeasonNum(i int) *HistoryUpdateOne {
+	huo.mutation.ResetSeasonNum()
+	huo.mutation.SetSeasonNum(i)
+	return huo
+}
+
+// SetNillableSeasonNum sets the "season_num" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableSeasonNum(i *int) *HistoryUpdateOne {
+	if i != nil {
+		huo.SetSeasonNum(*i)
+	}
+	return huo
+}
+
+// AddSeasonNum adds i to the "season_num" field.
+func (huo *HistoryUpdateOne) AddSeasonNum(i int) *HistoryUpdateOne {
+	huo.mutation.AddSeasonNum(i)
+	return huo
+}
+
+// ClearSeasonNum clears the value of the "season_num" field.
+func (huo *HistoryUpdateOne) ClearSeasonNum() *HistoryUpdateOne {
+	huo.mutation.ClearSeasonNum()
 	return huo
 }
 
@@ -701,6 +812,26 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if huo.mutation.EpisodeIDCleared() {
 		_spec.ClearField(history.FieldEpisodeID, field.TypeInt)
+	}
+	if value, ok := huo.mutation.EpisodeNums(); ok {
+		_spec.SetField(history.FieldEpisodeNums, field.TypeJSON, value)
+	}
+	if value, ok := huo.mutation.AppendedEpisodeNums(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, history.FieldEpisodeNums, value)
+		})
+	}
+	if huo.mutation.EpisodeNumsCleared() {
+		_spec.ClearField(history.FieldEpisodeNums, field.TypeJSON)
+	}
+	if value, ok := huo.mutation.SeasonNum(); ok {
+		_spec.SetField(history.FieldSeasonNum, field.TypeInt, value)
+	}
+	if value, ok := huo.mutation.AddedSeasonNum(); ok {
+		_spec.AddField(history.FieldSeasonNum, field.TypeInt, value)
+	}
+	if huo.mutation.SeasonNumCleared() {
+		_spec.ClearField(history.FieldSeasonNum, field.TypeInt)
 	}
 	if value, ok := huo.mutation.SourceTitle(); ok {
 		_spec.SetField(history.FieldSourceTitle, field.TypeString, value)

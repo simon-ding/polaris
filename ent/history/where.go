@@ -64,6 +64,11 @@ func EpisodeID(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldEpisodeID, v))
 }
 
+// SeasonNum applies equality check predicate on the "season_num" field. It's identical to SeasonNumEQ.
+func SeasonNum(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldSeasonNum, v))
+}
+
 // SourceTitle applies equality check predicate on the "source_title" field. It's identical to SourceTitleEQ.
 func SourceTitle(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSourceTitle, v))
@@ -192,6 +197,66 @@ func EpisodeIDIsNil() predicate.History {
 // EpisodeIDNotNil applies the NotNil predicate on the "episode_id" field.
 func EpisodeIDNotNil() predicate.History {
 	return predicate.History(sql.FieldNotNull(FieldEpisodeID))
+}
+
+// EpisodeNumsIsNil applies the IsNil predicate on the "episode_nums" field.
+func EpisodeNumsIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldEpisodeNums))
+}
+
+// EpisodeNumsNotNil applies the NotNil predicate on the "episode_nums" field.
+func EpisodeNumsNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldEpisodeNums))
+}
+
+// SeasonNumEQ applies the EQ predicate on the "season_num" field.
+func SeasonNumEQ(v int) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldSeasonNum, v))
+}
+
+// SeasonNumNEQ applies the NEQ predicate on the "season_num" field.
+func SeasonNumNEQ(v int) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldSeasonNum, v))
+}
+
+// SeasonNumIn applies the In predicate on the "season_num" field.
+func SeasonNumIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldIn(FieldSeasonNum, vs...))
+}
+
+// SeasonNumNotIn applies the NotIn predicate on the "season_num" field.
+func SeasonNumNotIn(vs ...int) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldSeasonNum, vs...))
+}
+
+// SeasonNumGT applies the GT predicate on the "season_num" field.
+func SeasonNumGT(v int) predicate.History {
+	return predicate.History(sql.FieldGT(FieldSeasonNum, v))
+}
+
+// SeasonNumGTE applies the GTE predicate on the "season_num" field.
+func SeasonNumGTE(v int) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldSeasonNum, v))
+}
+
+// SeasonNumLT applies the LT predicate on the "season_num" field.
+func SeasonNumLT(v int) predicate.History {
+	return predicate.History(sql.FieldLT(FieldSeasonNum, v))
+}
+
+// SeasonNumLTE applies the LTE predicate on the "season_num" field.
+func SeasonNumLTE(v int) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldSeasonNum, v))
+}
+
+// SeasonNumIsNil applies the IsNil predicate on the "season_num" field.
+func SeasonNumIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldSeasonNum))
+}
+
+// SeasonNumNotNil applies the NotNil predicate on the "season_num" field.
+func SeasonNumNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldSeasonNum))
 }
 
 // SourceTitleEQ applies the EQ predicate on the "source_title" field.

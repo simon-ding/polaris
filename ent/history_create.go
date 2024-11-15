@@ -40,6 +40,26 @@ func (hc *HistoryCreate) SetNillableEpisodeID(i *int) *HistoryCreate {
 	return hc
 }
 
+// SetEpisodeNums sets the "episode_nums" field.
+func (hc *HistoryCreate) SetEpisodeNums(i []int) *HistoryCreate {
+	hc.mutation.SetEpisodeNums(i)
+	return hc
+}
+
+// SetSeasonNum sets the "season_num" field.
+func (hc *HistoryCreate) SetSeasonNum(i int) *HistoryCreate {
+	hc.mutation.SetSeasonNum(i)
+	return hc
+}
+
+// SetNillableSeasonNum sets the "season_num" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableSeasonNum(i *int) *HistoryCreate {
+	if i != nil {
+		hc.SetSeasonNum(*i)
+	}
+	return hc
+}
+
 // SetSourceTitle sets the "source_title" field.
 func (hc *HistoryCreate) SetSourceTitle(s string) *HistoryCreate {
 	hc.mutation.SetSourceTitle(s)
@@ -233,6 +253,14 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 	if value, ok := hc.mutation.EpisodeID(); ok {
 		_spec.SetField(history.FieldEpisodeID, field.TypeInt, value)
 		_node.EpisodeID = value
+	}
+	if value, ok := hc.mutation.EpisodeNums(); ok {
+		_spec.SetField(history.FieldEpisodeNums, field.TypeJSON, value)
+		_node.EpisodeNums = value
+	}
+	if value, ok := hc.mutation.SeasonNum(); ok {
+		_spec.SetField(history.FieldSeasonNum, field.TypeInt, value)
+		_node.SeasonNum = value
 	}
 	if value, ok := hc.mutation.SourceTitle(); ok {
 		_spec.SetField(history.FieldSourceTitle, field.TypeString, value)

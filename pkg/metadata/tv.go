@@ -20,6 +20,17 @@ type Info struct {
 	IsSeasonPack bool
 }
 
+func (m *Info) ParseExtraDescription(desc string) {
+	if m.IsSeasonPack { //try to parse episode number with description
+		mm := ParseTv(desc)
+		if mm.StartEpisode > 0 { //sometimes they put episode info in desc text
+			m.IsSeasonPack = false
+			m.StartEpisode = mm.StartEpisode
+			m.EndEpisode = mm.EndEpisode
+		}
+	}
+}
+
 func (m *Info) IsAcceptable(names ...string) bool {
 	for _, name := range names {
 		re := regexp.MustCompile(`[^\p{L}\w\s]`)

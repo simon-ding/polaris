@@ -17,6 +17,10 @@ const (
 	FieldMediaID = "media_id"
 	// FieldEpisodeID holds the string denoting the episode_id field in the database.
 	FieldEpisodeID = "episode_id"
+	// FieldEpisodeNums holds the string denoting the episode_nums field in the database.
+	FieldEpisodeNums = "episode_nums"
+	// FieldSeasonNum holds the string denoting the season_num field in the database.
+	FieldSeasonNum = "season_num"
 	// FieldSourceTitle holds the string denoting the source_title field in the database.
 	FieldSourceTitle = "source_title"
 	// FieldDate holds the string denoting the date field in the database.
@@ -44,6 +48,8 @@ var Columns = []string{
 	FieldID,
 	FieldMediaID,
 	FieldEpisodeID,
+	FieldEpisodeNums,
+	FieldSeasonNum,
 	FieldSourceTitle,
 	FieldDate,
 	FieldTargetDir,
@@ -112,6 +118,11 @@ func ByMediaID(opts ...sql.OrderTermOption) OrderOption {
 // ByEpisodeID orders the results by the episode_id field.
 func ByEpisodeID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEpisodeID, opts...).ToFunc()
+}
+
+// BySeasonNum orders the results by the season_num field.
+func BySeasonNum(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSeasonNum, opts...).ToFunc()
 }
 
 // BySourceTitle orders the results by the source_title field.
