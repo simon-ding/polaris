@@ -398,7 +398,7 @@ func parseName(name string) *Info {
 		if !utils.IsASCII(name) {
 			season = 1
 		}
-		_ = p
+		p = len(name) -1
 	}
 	meta.Season = season
 
