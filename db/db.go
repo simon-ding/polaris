@@ -483,7 +483,8 @@ func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
 	}
 	return c.ent.History.Create().SetMediaID(h.MediaID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
 		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID).
-		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSaved(h.Saved).SetLink(h.Link).Save(context.TODO())
+		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSaved(h.Saved).SetSeasonNum(h.SeasonNum).
+		SetEpisodeNums(h.EpisodeNums).SetLink(h.Link).Save(context.TODO())
 }
 
 func (c *Client) SetHistoryStatus(id int, status history.Status) error {
@@ -660,7 +661,6 @@ func (c *Client) CleanAllDanglingEpisodes() error {
 func (c *Client) AddBlacklistItem(item *ent.Blacklist) error {
 	return c.ent.Blacklist.Create().SetType(item.Type).SetValue(item.Value).SetNotes(item.Notes).Exec(context.Background())
 }
-
 
 func (c *Client) GetProwlarrSetting() (*ProwlarrSetting, error) {
 	s := c.GetSetting(SettingProwlarrInfo)

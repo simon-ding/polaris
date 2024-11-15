@@ -115,7 +115,7 @@ func (c *Client) checkBtReourceWithTmdb(r *torznab.Result, seriesId int) bool {
 	m := metadata.ParseTv(r.Name)
 	se, err := c.MustTMDB().SearchMedia(m.NameEn, "", 1)
 	if err != nil {
-		log.Warnf("tmdb search error, consider this torrent ok: ", err)
+		log.Warnf("tmdb search error, consider this torrent ok: %v", err)
 		return true
 	} else {
 		if len(se.Results) == 0 {
