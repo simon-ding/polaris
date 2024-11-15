@@ -418,7 +418,7 @@ func parseName(name string) *Info {
 	//}
 
 	//tv name
-	if utils.IsASCII(name) {
+	if utils.IsASCII(name) && p < len(name){
 		meta.NameEn = name[:p]
 		meta.NameCn = meta.NameEn
 	} else {
