@@ -391,6 +391,9 @@ func maybeSeasonPack(s string) bool {
 
 func parseName(name string) *Info {
 	meta := &Info{Season: 1}
+	if strings.TrimSpace(name) == "" {
+		return meta
+	}
 
 	season, p := findSeason(name)
 	if season == -1 {
