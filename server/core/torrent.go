@@ -41,7 +41,7 @@ lo:
 		//log.Infof("torrent resource: %+v", r)
 		meta := metadata.ParseTv(r.Name)
 
-		if meta.IsSeasonPack {//try to parse episode number with description
+		if meta.IsSeasonPack { //try to parse episode number with description
 			mm := metadata.ParseTv(r.Description)
 			if mm.StartEpisode > 0 { //sometimes they put episode info in desc text
 				meta.IsSeasonPack = false
@@ -70,7 +70,7 @@ lo:
 		}
 
 		if len(param.Episodes) > 0 { //not season pack, but episode number not equal
-			for i := meta.StartEpisode; i < meta.EndEpisode; i++ {
+			for i := meta.StartEpisode; i <= meta.EndEpisode; i++ {
 				if !slices.Contains(param.Episodes, i) {
 					continue lo
 				}

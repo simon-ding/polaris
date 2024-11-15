@@ -125,38 +125,28 @@ func findEpisodes(s string) (start int, end int) {
 		r := rr[i]
 		if r == 'e' {
 			n, l := adjacentNumber(s, i+1)
-			end := i + l
 
 			if n > 0 {
-
-				if len(rr) > end+1 && rr[end+1] == '-' { //multi episodes
-					if len(rr) > end+2 {
-						if rr[end+2] == 'e' {
-							n1, _ := adjacentNumber(s, end+3)
-							if n1 > 0 {
-								return n, n1
-							}
-						} else {
-							n1, _ := adjacentNumber(s, end+2)
+				for j := i + l + 1; j < len(rr); j++ {
+					r1 := rr[j]
+					if r1 == ' ' || r1 == '-' {
+						continue
+					}
+					if r1 == 'e' {
+						continue
+					}
+					if r1 == 's' {
+						s1, l1 := adjacentNumber(s, j+1)
+						if s1 > 0 { //S01E01-S01E21
+							n1, _ := adjacentNumber(s, j+l1+2)
 							if n1 > 0 {
 								return n, n1
 							}
 						}
 					}
-				} else if len(rr) > end+2 && rr[end+1] == ' ' && rr[end+2] == '-' {
-					start := 0
-					for j := end + 3; j < len(rr); j++ {
-						if rr[j] == ' ' || rr[j] == 'e' {
-							continue
-						}
-						start = j
-						break
-					}
-					if start != 0 {
-						n1, _ := adjacentNumber(s, start)
-						if n1 > 0 {
-							return n, n1
-						}
+					n1, _ := adjacentNumber(s, j)
+					if n1 > 0 {
+						return n, n1
 					}
 				}
 				return n, n
@@ -401,7 +391,7 @@ func parseName(name string) *Info {
 		if !utils.IsASCII(name) {
 			season = 1
 		}
-		p = len(name) -1
+		p = len(name) - 1
 	}
 	meta.Season = season
 
@@ -421,7 +411,7 @@ func parseName(name string) *Info {
 	//}
 
 	//tv name
-	if utils.IsASCII(name) && p < len(name){
+	if utils.IsASCII(name) && p < len(name) {
 		meta.NameEn = name[:p]
 		meta.NameCn = meta.NameEn
 	} else {
