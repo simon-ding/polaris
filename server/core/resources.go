@@ -38,12 +38,6 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum i
 		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", r1.Link, err)
 	}
 
-	torrent, err := trc.Download(magnet, downloadDir)
-	if err != nil {
-		return nil, errors.Wrap(err, "downloading")
-	}
-	torrent.Start()
-
 	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
 
 	if len(episodeNums) > 0 {
@@ -83,6 +77,12 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum i
 	if err != nil {
 		return nil, errors.Wrap(err, "save record")
 	}
+
+	torrent, err := trc.Download(magnet, downloadDir)
+	if err != nil {
+		return nil, errors.Wrap(err, "downloading")
+	}
+	torrent.Start()
 
 	c.tasks[history.ID] = &Task{Torrent: torrent}
 	name := r1.Name
