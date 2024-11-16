@@ -207,3 +207,9 @@ func Test_ParseTV19(t *testing.T) {
 	assert.Equal(t, true, m.IsSeasonPack)
 	//assert.Equal(t, "720p", m.Resolution)
 }
+
+func Test_Name(t *testing.T) {
+	m := Info{NameEn: "word кибердеревня новый год 2023 webrip 1080p"}
+	b := m.IsAcceptable("word")
+	assert.True(t, b)
+}

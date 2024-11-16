@@ -80,7 +80,7 @@ lo:
 			continue
 		}
 
-		if !torrentSizeOk(series, r.Size, param) {
+		if !torrentSizeOk(series, r.Size, meta.EndEpisode+1-meta.StartEpisode, param) {
 			continue
 		}
 
@@ -114,7 +114,7 @@ func imdbIDMatchExact(id1, id2 string) bool {
 	return id1 == id2
 }
 
-func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam) bool {
+func torrentSizeOk(detail *db.MediaDetails, torrentSize int, torrentEpisodeNum int, param *SearchParam) bool {
 	defaultMinSize := 80 * 1000 * 1000 //tv, 80M min
 	if detail.MediaType == media.MediaTypeMovie {
 		defaultMinSize = 200 * 1000 * 1000 // movie, 200M min
@@ -123,9 +123,13 @@ func torrentSizeOk(detail *db.MediaDetails, torrentSize int, param *SearchParam)
 		defaultMinSize = detail.Limiter.SizeMin
 	}
 
-	multiplier := 1                                                        //大小倍数，正常为1，如果是季包则为季内集数
-	if detail.MediaType == media.MediaTypeTv && len(param.Episodes) == 0 { //tv season pack
-		multiplier = seasonEpisodeCount(detail, param.SeasonNum)
+	multiplier := 1 //大小倍数，正常为1，如果是季包则为季内集数
+	if detail.MediaType == media.MediaTypeTv {
+		if len(param.Episodes) == 0 { //want tv season pack
+			multiplier = seasonEpisodeCount(detail, param.SeasonNum)
+		} else {
+			multiplier = torrentEpisodeNum
+		}
 	}
 
 	if param.CheckFileSize { //check file size when trigger automatic download
@@ -217,7 +221,7 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 			continue
 		}
 
-		if !torrentSizeOk(movieDetail, r.Size, param) {
+		if !torrentSizeOk(movieDetail, r.Size, 1, param) {
 			continue
 		}
 

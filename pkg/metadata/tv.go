@@ -13,6 +13,7 @@ import (
 type Info struct {
 	NameEn       string
 	NameCn       string
+	Year         int
 	Season       int
 	StartEpisode int
 	EndEpisode   int
@@ -32,17 +33,23 @@ func (m *Info) ParseExtraDescription(desc string) {
 }
 
 func (m *Info) IsAcceptable(names ...string) bool {
+	re := regexp.MustCompile(`[^\p{L}\w\s]`)
+
+	nameCN := re.ReplaceAllString(strings.ToLower(m.NameCn), " ")
+	nameEN := re.ReplaceAllString(strings.ToLower(m.NameEn), " ")
+	nameCN = strings.Join(strings.Fields(nameCN), " ")
+	nameEN = strings.Join(strings.Fields(nameEN), " ")
+
 	for _, name := range names {
-		re := regexp.MustCompile(`[^\p{L}\w\s]`)
 		name = re.ReplaceAllString(strings.ToLower(name), " ")
-		nameCN := re.ReplaceAllString(strings.ToLower(m.NameCn), " ")
-		nameEN := re.ReplaceAllString(strings.ToLower(m.NameEn), " ")
 		name = strings.Join(strings.Fields(name), " ")
-		nameCN = strings.Join(strings.Fields(nameCN), " ")
-		nameEN = strings.Join(strings.Fields(nameEN), " ")
 		if utils.IsASCII(name) { //ascii name should match words
 			re := regexp.MustCompile(`\b` + name + `\b`)
-			return re.MatchString(nameCN) || re.MatchString(nameEN)
+			if re.MatchString(nameCN) || re.MatchString(nameEN) {
+				return true
+			} else {
+				continue
+			}
 		}
 
 		if strings.Contains(nameCN, name) || strings.Contains(nameEN, name) {
@@ -462,17 +469,18 @@ func parseName(name string) *Info {
 				}
 			}
 		}
+		meta.NameEn = title
 
-		//匹配title中最长拉丁字符串
-		enRe := regexp.MustCompile(`[[:ascii:]]*`)
-		enM := enRe.FindAllString(title, -1)
-		if len(enM) > 0 {
-			for _, t := range enM {
-				if len(t) > len(meta.NameEn) {
-					meta.NameEn = strings.TrimSpace(strings.ToLower(t))
-				}
-			}
-		}
+		////匹配title中最长拉丁字符串
+		//enRe := regexp.MustCompile(`[[:ascii:]]*`)
+		//enM := enRe.FindAllString(title, -1)
+		//if len(enM) > 0 {
+		//	for _, t := range enM {
+		//		if len(t) > len(meta.NameEn) {
+		//			meta.NameEn = strings.TrimSpace(strings.ToLower(t))
+		//		}
+		//	}
+		//}
 
 	}
 

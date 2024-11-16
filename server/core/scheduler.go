@@ -299,12 +299,15 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 			continue
 		}
 		wantedSeasonPack := true
+		seasonEpisodesWanted := make(map[int][]int, 0)
 		for _, ep := range epsides {
 			if !ep.Monitored {
 				wantedSeasonPack = false
+				continue
 			}
 			if ep.Status != episode.StatusMissing {
 				wantedSeasonPack = false
+				continue
 			}
 			if ep.AirDate != "" {
 				t, err := time.Parse("2006-01-02", ep.AirDate)
@@ -318,8 +321,10 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 				*/
 				if time.Now().Before(t.Add(-24 * time.Hour)) { //not aired
 					wantedSeasonPack = false
+					continue
 				}
 			}
+			seasonEpisodesWanted[ep.SeasonNumber] = append(seasonEpisodesWanted[ep.SeasonNumber], ep.EpisodeNumber)
 		}
 		if wantedSeasonPack {
 			names, err := c.SearchAndDownload(id, seasonNum)
@@ -330,32 +335,9 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 				log.Warnf("finding season pack error: %v", err)
 				wantedSeasonPack = false
 			}
-
 		}
 		if !wantedSeasonPack {
-			seasonEpisodesWanted := make(map[int][]int, 0)
-			for _, ep := range epsides {
-				if !ep.Monitored {
-					continue
-				}
-				if ep.Status != episode.StatusMissing {
-					continue
-				}
-				if ep.AirDate != "" {
-					if t, err := time.Parse("2006-01-02", ep.AirDate); err == nil {
-						/*
-						 -------- now ------ t -----
-						 t - 1day < now 要检测的剧集
-						 提前一天开始检测
-						*/
-						if time.Now().Before(t.Add(-24 * time.Hour)) { //not aired
-							continue
-						}
 
-					}
-				}
-				seasonEpisodesWanted[ep.SeasonNumber] = append(seasonEpisodesWanted[ep.SeasonNumber], ep.EpisodeNumber)
-			}
 			for se, eps := range seasonEpisodesWanted {
 				names, err := c.SearchAndDownload(id, se, eps...)
 				if err != nil {
