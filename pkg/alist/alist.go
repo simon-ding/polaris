@@ -170,7 +170,7 @@ func (c *Client) UploadStream(reader io.Reader, size int64, toDir string) (*Uplo
 	}
 
 	req.Header.Add("Authorization", c.token)
-	req.Header.Add("File-Path", url.QueryEscape(toDir))
+	req.Header.Add("File-Path", url.PathEscape(toDir))
 	//req.Header.Add("As-Task", "true")
 	req.Header.Add("Content-Type", "application/octet-stream")
 	req.ContentLength = size
