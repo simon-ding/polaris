@@ -41,7 +41,7 @@ func (a *Alist) Copy(src, dest string) error {
 	a.progresser = b.Progress
 
 	uploadFunc := func(destPath string, destInfo fs.FileInfo, srcReader io.Reader, mimeType *mimetype.MIME) error {
-		_, err := a.client.UploadStream(srcReader, destPath)
+		_, err := a.client.UploadStream(srcReader, destInfo.Size(), destPath)
 		return err
 	}
 	mkdirFunc := func(dir string) error {

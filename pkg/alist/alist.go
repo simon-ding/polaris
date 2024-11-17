@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/url"
+	"polaris/log"
 	"strings"
 	"time"
 
@@ -161,16 +163,19 @@ type UploadStreamResponse struct {
 	} `json:"task"`
 }
 
-func (c *Client) UploadStream(reader io.Reader, toDir string) (*UploadStreamResponse, error) {
-	req, err := http.NewRequest(http.MethodPost, c.cfg.URL+streamUploadUrl, reader)
+func (c *Client) UploadStream(reader io.Reader, size int64, toDir string) (*UploadStreamResponse, error) {
+	req, err := http.NewRequest(http.MethodPut, c.cfg.URL+streamUploadUrl, reader)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "{{alist_token}}")
-	req.Header.Add("File-Path", toDir)
-	req.Header.Add("As-Task", "true")
-	req.Header.Add("Content-Length", "")
+
+	req.Header.Add("Authorization", c.token)
+	req.Header.Add("File-Path", url.QueryEscape(toDir))
+	//req.Header.Add("As-Task", "true")
 	req.Header.Add("Content-Type", "application/octet-stream")
+	req.ContentLength = size
+
+	log.Infof("headers: %+v, %v", req.Header, req.URL.String())
 	res, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
