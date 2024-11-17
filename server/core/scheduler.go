@@ -207,6 +207,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	if err := stImpl.Copy(filepath.Join(c.db.GetDownloadDir(), torrentName), r.TargetDir); err != nil {
 		return errors.Wrap(err, "move file")
 	}
+	torrent.UploadProgresser = stImpl.UploadProgress
 
 	c.db.SetHistoryStatus(r.ID, history.StatusSeeding)
 	if len(episodeIds) > 0 {
@@ -285,6 +286,7 @@ func (c *Client) CheckDownloadedSeriesFiles(m *ent.Media) error {
 type Task struct {
 	//Processing bool
 	pkg.Torrent
+	UploadProgresser func() float64
 }
 
 func (c *Client) DownloadSeriesAllEpisodes(id int) []string {

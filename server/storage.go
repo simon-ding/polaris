@@ -42,7 +42,7 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 			log.Infof("file name: %v", f.Name())
 		}
 	} else if in.Implementation == "alist" {
-		cfg := in.ToWebDavSetting()
+		cfg := in.ToAlistSetting()
 		_, err := storage.NewAlist(&alist.Config{URL: cfg.URL, Username: cfg.User, Password: cfg.Password}, in.TvPath)
 		if err != nil {
 			return nil, errors.Wrap(err, "alist")

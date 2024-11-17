@@ -73,7 +73,7 @@ class Activity {
       required this.saved,
       required this.progress,
       required this.size,
-      required this.seedRatio});
+      required this.seedRatio, required this.uploadProgress});
 
   final int? id;
   final int? mediaId;
@@ -86,6 +86,7 @@ class Activity {
   final int? progress;
   final int? size;
   final double seedRatio;
+  final double uploadProgress;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
@@ -99,6 +100,8 @@ class Activity {
         saved: json["saved"],
         progress: json["progress"],
         seedRatio: json["seed_ratio"],
-        size: json["size"]);
+        size: json["size"],
+        uploadProgress: json["upload_progress"]
+        );
   }
 }

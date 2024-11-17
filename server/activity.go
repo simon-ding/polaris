@@ -17,8 +17,9 @@ import (
 
 type Activity struct {
 	*ent.History
-	Progress  int     `json:"progress"`
-	SeedRatio float64 `json:"seed_ratio"`
+	Progress       int     `json:"progress"`
+	SeedRatio      float64 `json:"seed_ratio"`
+	UploadProgress float64 `json:"upload_progress"`
 }
 
 func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
@@ -43,6 +44,9 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 						log.Warnf("get task seed ratio error: %v", err)
 					} else {
 						a.SeedRatio = r
+					}
+					if task.UploadProgresser != nil {
+						a.UploadProgress = task.UploadProgresser()
 					}
 				}
 			}

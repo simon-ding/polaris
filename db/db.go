@@ -374,6 +374,15 @@ func (s *StorageInfo) ToWebDavSetting() WebdavSetting {
 	}
 }
 
+func (s *StorageInfo) ToAlistSetting() WebdavSetting {
+	return WebdavSetting{
+		URL:            s.Settings["url"],
+		User:           s.Settings["user"],
+		Password:       s.Settings["password"],
+		ChangeFileHash: s.Settings["change_file_hash"],
+	}
+}
+
 type WebdavSetting struct {
 	URL            string `json:"url"`
 	User           string `json:"user"`
