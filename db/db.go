@@ -441,7 +441,7 @@ type Storage struct {
 }
 
 func (s *Storage) ToWebDavSetting() WebdavSetting {
-	if s.Implementation != storage.ImplementationWebdav {
+	if s.Implementation != storage.ImplementationWebdav && s.Implementation != storage.ImplementationAlist{
 		panic("not webdav storage")
 	}
 	var webdavSetting WebdavSetting
