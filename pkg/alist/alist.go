@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"polaris/log"
 	"strings"
 	"time"
 
@@ -174,8 +173,6 @@ func (c *Client) UploadStream(reader io.Reader, size int64, toDir string) (*Uplo
 	req.Header.Add("As-Task", "true")
 	req.Header.Add("Content-Type", "application/octet-stream")
 	req.ContentLength = size
-
-	log.Infof("headers: %+v, %v", req.Header, req.URL.String())
 	res, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
