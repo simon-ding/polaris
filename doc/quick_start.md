@@ -9,7 +9,7 @@
 ```yaml
 services:
   polaris:
-    image: ghcr.io/simon-ding/polaris:latest
+    image: ghcr.io/simon-ding/polaris:latest 
     restart: always
     environment:
       - PUID=99 #程序运行的用户UID
@@ -22,6 +22,8 @@ services:
     ports:
       - 8080:8080 #端口映射，冒号前的端口可自行改为需要的
 ```
+
+> latest为发布版本，如果你追求新功能，且能接受bug，可以使用main tag
 
 ### 1.2 Docker 方式安装
 
