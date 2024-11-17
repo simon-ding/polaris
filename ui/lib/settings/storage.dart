@@ -70,15 +70,16 @@ class _StorageState extends ConsumerState<StorageSettings> {
                 decoration: const InputDecoration(labelText: "名称"),
                 validator: FormBuilderValidators.required(),
               ),
-              s.implementation != "local"
+              s.implementation == "webdav" || s.implementation == "alist"
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         FormBuilderTextField(
                           name: "url",
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration:
-                              const InputDecoration(labelText: "Webdav地址"),
+                          decoration: const InputDecoration(
+                              labelText: "网址",
+                              hintText: "https://abc.somewebsite.com/"),
                           validator: FormBuilderValidators.required(),
                         ),
                         FormBuilderTextField(
@@ -92,13 +93,15 @@ class _StorageState extends ConsumerState<StorageSettings> {
                           decoration: const InputDecoration(labelText: "密码"),
                           obscureText: true,
                         ),
-                        FormBuilderCheckbox(
-                          name: "change_file_hash",
-                          title: const Text(
-                            "上传时更改文件哈希",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
+                        s.implementation == "webdav"
+                            ? FormBuilderCheckbox(
+                                name: "change_file_hash",
+                                title: const Text(
+                                  "上传时更改文件哈希",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              )
+                            : Container(),
                       ],
                     )
                   : Container(),
@@ -149,6 +152,8 @@ class _StorageState extends ConsumerState<StorageSettings> {
       title = "本地存储";
     } else if (s.implementation == "webdav") {
       title = "webdav 存储";
+    } else if (s.implementation == "alist") {
+      title = "Alist 存储";
     }
 
     return showSettingDialog(
@@ -187,6 +192,18 @@ class _StorageState extends ConsumerState<StorageSettings> {
                         Navigator.of(context).pop();
                         showStorageDetails(
                             Storage(implementation: "webdav", name: "webdav1"));
+                      },
+                    ),
+                  ),
+                  SettingsCard(
+                    child: InkWell(
+                      child: const Center(
+                        child: Text("Alist"),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showStorageDetails(
+                            Storage(implementation: "alist", name: "Alist1"));
                       },
                     ),
                   )

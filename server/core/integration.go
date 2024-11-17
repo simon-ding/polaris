@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 	"polaris/db"
 	"polaris/ent/media"
 	storage1 "polaris/ent/storage"
 	"polaris/log"
+	"polaris/pkg/alist"
 	"polaris/pkg/metadata"
 	"polaris/pkg/notifier"
 	"polaris/pkg/storage"
@@ -18,6 +18,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func (c *Client) writeNfoFile(historyId int) error {
@@ -216,6 +218,13 @@ func (c *Client) getStorage(storageId int, mediaType media.MediaType) (storage.S
 		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
 		if err != nil {
 			return nil, errors.Wrap(err, "new webdav")
+		}
+		return storageImpl1, nil
+	case storage1.ImplementationAlist:
+		cfg := st.ToWebDavSetting()
+		storageImpl1, err := storage.NewAlist(&alist.Config{URL: cfg.URL, Username: cfg.User, Password: cfg.Password}, targetPath)
+		if err != nil {
+			return nil, errors.Wrap(err, "alist")
 		}
 		return storageImpl1, nil
 	}

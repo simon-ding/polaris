@@ -180,7 +180,7 @@ var (
 	StoragesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
-		{Name: "implementation", Type: field.TypeEnum, Enums: []string{"webdav", "local"}},
+		{Name: "implementation", Type: field.TypeEnum, Enums: []string{"webdav", "local", "alist"}},
 		{Name: "tv_path", Type: field.TypeString, Nullable: true},
 		{Name: "movie_path", Type: field.TypeString, Nullable: true},
 		{Name: "settings", Type: field.TypeString, Nullable: true},

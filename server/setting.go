@@ -71,7 +71,6 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 		if _, err := template.New("test").Parse(in.MovieNamingFormat); err != nil {
 			return nil, errors.Wrap(err, "movie format")
 		}
-
 		s.db.SetSetting(db.SettingMovieNamingFormat, in.MovieNamingFormat)
 	} else {
 		s.db.SetSetting(db.SettingMovieNamingFormat, "")

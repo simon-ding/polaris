@@ -2,9 +2,11 @@ package server
 
 import (
 	"fmt"
+	"os"
 	"polaris/db"
 
 	"polaris/log"
+	"polaris/pkg/alist"
 	"polaris/pkg/storage"
 	"polaris/pkg/utils"
 	"strconv"
@@ -38,6 +40,21 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 		}
 		for _, f := range fs {
 			log.Infof("file name: %v", f.Name())
+		}
+	} else if in.Implementation == "alist" {
+		cfg := in.ToWebDavSetting()
+		_, err := storage.NewAlist(&alist.Config{URL: cfg.URL, Username: cfg.User, Password: cfg.Password}, in.TvPath)
+		if err != nil {
+			return nil, errors.Wrap(err, "alist")
+		}
+	} else if in.Implementation == "local" {
+		_, err := os.Stat(in.TvPath)
+		if err != nil {
+			return nil, err
+		}
+		_, err = os.Stat(in.MoviePath)
+		if err != nil {
+			return nil, err
 		}
 	}
 	log.Infof("received add storage input: %v", in)

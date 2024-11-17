@@ -1,13 +1,12 @@
 package storage
 
 import (
+	"io"
 	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
-	"polaris/log"
 	"polaris/pkg/gowebdav"
-	"polaris/pkg/utils"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/pkg/errors"
@@ -17,6 +16,7 @@ type WebdavStorage struct {
 	fs              *gowebdav.Client
 	dir             string
 	changeMediaHash bool
+	progresser func() float64
 }
 
 func NewWebdavStorage(url, user, password, path string, changeMediaHash bool) (*WebdavStorage, error) {
@@ -31,67 +31,29 @@ func NewWebdavStorage(url, user, password, path string, changeMediaHash bool) (*
 }
 
 func (w *WebdavStorage) Copy(local, remoteDir string) error {
-	remoteBase := filepath.Join(w.dir, remoteDir, filepath.Base(local))
-	info, err := os.Stat(local)
+	b, err := NewBase(local)
 	if err != nil {
-		return errors.Wrap(err, "read source dir")
-	}
-	if info.IsDir() { //如果是路径，则只移动路径里面的文件，不管当前路径, 行为类似 move dirname/* target_dir/
-		remoteBase = filepath.Join(w.dir, remoteDir)
+		return err
 	}
 
-	//log.Infof("remove all content in %s", remoteBase)
-	//w.fs.RemoveAll(remoteBase)
-	err = filepath.Walk(local, func(path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			return errors.Wrapf(err, "read file %v", path)
+	w.progresser = b.Progress
+
+	uploadFunc := func(destPath string, destInfo fs.FileInfo, srcReader io.Reader, mtype *mimetype.MIME) error {
+		callback := func(r *http.Request) {
+			r.Header.Set("Content-Type", mtype.String())
+			r.ContentLength = destInfo.Size()
 		}
 
-		rel, err := filepath.Rel(local, path)
-		if err != nil {
-			return errors.Wrap(err, "path relation")
+		if err := w.fs.WriteStream(destPath, srcReader, 0666, callback); err != nil {
+			return errors.Wrap(err, "transmitting data error")
 		}
-		remoteName := filepath.Join(remoteBase, rel)
+		return nil
 
-		if info.IsDir() {
-			log.Infof("skip dir %v, webdav will mkdir automatically", info.Name())
+	}
 
-			// if err := w.fs.Mkdir(remoteName, 0666); err != nil {
-			// 	return errors.Wrapf(err, "mkdir %v", remoteName)
-			// }
-
-		} else { //is file
-			if w.changeMediaHash {
-				if err := utils.ChangeFileHash(path); err != nil {
-					log.Errorf("change file %v hash error: %v", path, err)
-				}
-			}
-			if f, err := os.OpenFile(path, os.O_RDONLY, 0666); err != nil {
-				return errors.Wrapf(err, "read file %v", path)
-			} else { //open success
-				defer f.Close()
-				mtype, err := mimetype.DetectFile(path)
-				if err != nil {
-					return errors.Wrap(err, "mime type error")
-				}
-
-				callback := func(r *http.Request) {
-					r.Header.Set("Content-Type", mtype.String())
-					r.ContentLength = info.Size()
-				}
-
-				if err := w.fs.WriteStream(remoteName, f, 0666, callback); err != nil {
-					return errors.Wrap(err, "transmitting data error")
-				}
-			}
-		}
-		log.Infof("file copy complete: %v", remoteName)
+	return b.Upload(filepath.Join(w.dir, remoteDir), false, true, w.changeMediaHash, uploadFunc, func(s string) error {
 		return nil
 	})
-	if err != nil {
-		return errors.Wrap(err, "move file error")
-	}
-	return nil
 }
 
 func (w *WebdavStorage) Move(local, remoteDir string) error {
@@ -111,4 +73,11 @@ func (w *WebdavStorage) ReadFile(name string) ([]byte, error) {
 
 func (w *WebdavStorage) WriteFile(name string, data []byte) error {
 	return w.fs.Write(filepath.Join(w.dir, name), data, os.ModePerm)
+}
+
+func (w *WebdavStorage) UploadProgress() float64 {
+	if w.progresser == nil {
+		return 0
+	}
+	return w.progresser()
 }

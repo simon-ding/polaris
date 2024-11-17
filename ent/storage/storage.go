@@ -67,6 +67,7 @@ type Implementation string
 const (
 	ImplementationWebdav Implementation = "webdav"
 	ImplementationLocal  Implementation = "local"
+	ImplementationAlist  Implementation = "alist"
 )
 
 func (i Implementation) String() string {
@@ -76,7 +77,7 @@ func (i Implementation) String() string {
 // ImplementationValidator is a validator for the "implementation" field enum values. It is called by the builders before save.
 func ImplementationValidator(i Implementation) error {
 	switch i {
-	case ImplementationWebdav, ImplementationLocal:
+	case ImplementationWebdav, ImplementationLocal, ImplementationAlist:
 		return nil
 	default:
 		return fmt.Errorf("storage: invalid enum value for implementation field: %q", i)

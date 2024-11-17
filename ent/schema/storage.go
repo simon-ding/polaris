@@ -14,7 +14,7 @@ type Storage struct {
 func (Storage) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").Unique(),
-		field.Enum("implementation").Values("webdav", "local"),
+		field.Enum("implementation").Values("webdav", "local", "alist"),
 		field.String("tv_path").Optional(),
 		field.String("movie_path").Optional(),
 		field.String("settings").Optional(),
