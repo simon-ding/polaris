@@ -31,7 +31,7 @@ class _StorageState extends ConsumerState<StorageSettings> {
                       child: Text(storage.name ?? ""));
                 }
                 return SettingsCard(
-                    onTap: () => showStorageDetails(Storage()),
+                    onTap: () => showSelections(),
                     child: const Icon(Icons.add));
               }),
             ),
@@ -42,7 +42,6 @@ class _StorageState extends ConsumerState<StorageSettings> {
   Future<void> showStorageDetails(Storage s) {
     final _formKey = GlobalKey<FormBuilderState>();
 
-    String selectImpl = s.implementation == null ? "local" : s.implementation!;
     final widgets =
         StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
       return FormBuilder(
@@ -50,7 +49,6 @@ class _StorageState extends ConsumerState<StorageSettings> {
           autovalidateMode: AutovalidateMode.disabled,
           initialValue: {
             "name": s.name,
-            "impl": s.implementation == null ? "local" : s.implementation!,
             "user": s.settings != null ? s.settings!["user"] ?? "" : "",
             "password": s.settings != null ? s.settings!["password"] ?? "" : "",
             "tv_path": s.tvPath,
@@ -65,27 +63,6 @@ class _StorageState extends ConsumerState<StorageSettings> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              FormBuilderDropdown<String>(
-                name: "impl",
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                decoration: const InputDecoration(labelText: "类型"),
-                onChanged: (value) {
-                  setState(() {
-                    selectImpl = value!;
-                  });
-                },
-                items: const [
-                  DropdownMenuItem(
-                    value: "local",
-                    child: Text("本地存储"),
-                  ),
-                  DropdownMenuItem(
-                    value: "webdav",
-                    child: Text("webdav"),
-                  )
-                ],
-                validator: FormBuilderValidators.required(),
-              ),
               FormBuilderTextField(
                 name: "name",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -93,7 +70,7 @@ class _StorageState extends ConsumerState<StorageSettings> {
                 decoration: const InputDecoration(labelText: "名称"),
                 validator: FormBuilderValidators.required(),
               ),
-              selectImpl != "local"
+              s.implementation != "local"
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -145,7 +122,7 @@ class _StorageState extends ConsumerState<StorageSettings> {
         final values = _formKey.currentState!.value;
         return ref.read(storageSettingProvider.notifier).addStorage(Storage(
               name: values["name"],
-              implementation: selectImpl,
+              implementation: s.implementation,
               tvPath: values["tv_path"],
               moviePath: values["movie_path"],
               settings: {
@@ -167,7 +144,56 @@ class _StorageState extends ConsumerState<StorageSettings> {
       return ref.read(storageSettingProvider.notifier).deleteStorage(s.id!);
     }
 
+    var title = "存储";
+    if (s.implementation == "local") {
+      title = "本地存储";
+    } else if (s.implementation == "webdav") {
+      title = "webdav 存储";
+    }
+
     return showSettingDialog(
-        context, '存储', s.id != null, widgets, onSubmit, onDelete);
+        context, title, s.id != null, widgets, onSubmit, onDelete);
+  }
+
+  Future<void> showSelections() {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: SizedBox(
+              height: 500,
+              width: 500,
+              child: Wrap(
+                children: [
+                  SettingsCard(
+                    child: InkWell(
+                      child: const Center(
+                        child: Text("本地存储"),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showStorageDetails(
+                            Storage(implementation: "local", name: "本地存储1"));
+                      },
+                    ),
+                  ),
+                  SettingsCard(
+                    child: InkWell(
+                      child: const Center(
+                        child: Text("webdav"),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showStorageDetails(
+                            Storage(implementation: "webdav", name: "webdav1"));
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

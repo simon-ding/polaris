@@ -6,6 +6,7 @@ import 'package:ui/providers/settings.dart';
 import 'package:ui/settings/dialog.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:ui/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Importlist extends ConsumerStatefulWidget {
   const Importlist({super.key});
@@ -31,7 +32,7 @@ class _ImportlistState extends ConsumerState<Importlist> {
                       child: Text(indexer.name ?? ""));
                 }
                 return SettingsCard(
-                    onTap: () => showImportlistDetails(ImportList()),
+                    onTap: () => showSelections(),
                     child: const Icon(Icons.add));
               }),
             ),
@@ -55,24 +56,16 @@ class _ImportlistState extends ConsumerState<Importlist> {
         },
         child: Column(
           children: [
-            FormBuilderDropdown(
-              name: "type",
-              decoration: const InputDecoration(
-                  labelText: "类型",
-                  hintText:
-                      "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/"),
-              items: const [
-                DropdownMenuItem(value: "plex", child: Text("Plex Watchlist")),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedType = value;
-                });
-              },
-            ),
-            _selectedType == "plex"
-                ? const Text(
-                    "Plex Watchlist: https://support.plex.tv/articles/universal-watchlist/")
+            list.type == "plex"
+                ? Container(
+                    alignment: Alignment.centerLeft,
+                    child: InkWell(
+                      onTap: () => launchUrl(Uri.parse(
+                          "https://support.plex.tv/articles/universal-watchlist/")),
+                      child: const Text(
+                          "https://support.plex.tv/articles/universal-watchlist/"),
+                    ),
+                  )
                 : const Text(""),
             FormBuilderTextField(
               name: "name",
@@ -141,7 +134,42 @@ class _ImportlistState extends ConsumerState<Importlist> {
       }
     }
 
+    var title = "监控列表";
+    if (list.type == "plex") {
+      title = "Plex Watchlist";
+    }
+
     return showSettingDialog(
-        context, "监控列表", list.id != null, body, onSubmit, onDelete);
+        context, title, list.id != null, body, onSubmit, onDelete);
+  }
+
+  Future<void> showSelections() {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: SizedBox(
+              height: 500,
+              width: 500,
+              child: Wrap(
+                children: [
+                  SettingsCard(
+                    child: InkWell(
+                      child: const Center(
+                        child: Text("Plex Watchlist"),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showImportlistDetails(
+                            ImportList(type: "plex", name: "PlexWatchlist1"));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

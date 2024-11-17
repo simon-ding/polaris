@@ -32,8 +32,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                     child: Text(client.name ?? ""));
               }
               return SettingsCard(
-                  onTap: () => showDownloadClientDetails(DownloadClient()),
-                  child: const Icon(Icons.add));
+                  onTap: () => showSelections(), child: const Icon(Icons.add));
             })),
         error: (err, trace) => PoNetworkError(err: err),
         loading: () => const MyProgressIndicator());
@@ -42,7 +41,6 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
   Future<void> showDownloadClientDetails(DownloadClient client) {
     final _formKey = GlobalKey<FormBuilderState>();
     var _enableAuth = isNotBlank(client.user);
-    String selectImpl = "transmission";
 
     final body =
         StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
@@ -53,29 +51,12 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
             "url": client.url,
             "user": client.user,
             "password": client.password,
-            "impl": client.implementation,
             "remove_completed_downloads": client.removeCompletedDownloads,
             "remove_failed_downloads": client.removeFailedDownloads,
             "priority": client.priority.toString(),
           },
           child: Column(
             children: [
-              FormBuilderDropdown<String>(
-                name: "impl",
-                decoration: const InputDecoration(labelText: "类型"),
-                onChanged: (value) {
-                  setState(() {
-                    selectImpl = value!;
-                  });
-                },
-                items: const [
-                  DropdownMenuItem(
-                      value: "transmission", child: Text("Transmission")),
-                  DropdownMenuItem(
-                      value: "qbittorrent", child: Text("qBittorrent")),
-                ],
-                validator: FormBuilderValidators.required(),
-              ),
               FormBuilderTextField(
                   name: "name",
                   decoration: const InputDecoration(labelText: "名称"),
@@ -90,7 +71,8 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
               ),
               FormBuilderTextField(
                   name: "priority",
-                  decoration: const InputDecoration(labelText: "优先级", helperText: "1-50, 1最高优先级，50最低优先级"),
+                  decoration: const InputDecoration(
+                      labelText: "优先级", helperText: "1-50, 1最高优先级，50最低优先级"),
                   validator: FormBuilderValidators.integer(),
                   autovalidateMode: AutovalidateMode.onUserInteraction),
               FormBuilderSwitch(
@@ -151,7 +133,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
         return ref.read(dwonloadClientsProvider.notifier).addDownloadClients(
             DownloadClient(
                 name: values["name"],
-                implementation: values["impl"],
+                implementation: client.implementation,
                 url: values["url"],
                 user: _enableAuth ? values["user"] : null,
                 password: _enableAuth ? values["password"] : null,
@@ -163,7 +145,58 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
       }
     }
 
+    var title = "下载器";
+    if (client.implementation == "transmission") {
+      title = "Transmission";
+    } else if (client.implementation == "qbittorrent") {
+      title = "qBittorrent";
+    }
+
     return showSettingDialog(
-        context, "下载器", client.id != null, body, onSubmit, onDelete);
+        context, title, client.id != null, body, onSubmit, onDelete);
+  }
+
+  Future<void> showSelections() {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: SizedBox(
+              height: 500,
+              width: 500,
+              child: Wrap(
+                children: [
+                  SettingsCard(
+                    child: InkWell(
+                      child: const Center(
+                        child: Text("Transmission"),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showDownloadClientDetails(DownloadClient(
+                            implementation: "transmission",
+                            name: "Transmission"));
+                      },
+                    ),
+                  ),
+                  SettingsCard(
+                    child: InkWell(
+                      child: const Center(
+                        child: Text("qBittorrent"),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showDownloadClientDetails(DownloadClient(
+                            implementation: "qbittorrent",
+                            name: "qBittorrent"));
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 }
