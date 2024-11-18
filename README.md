@@ -27,21 +27,22 @@
 
 - [x] 电视剧自动追踪下载
 - [x] 电影自动追踪下载
-- [x] webdav 存储支持，配合 [alist](https://github.com/alist-org/alist) 或阿里云等实现更多功能
+- [x] 本地、webdav、  [alist](https://github.com/alist-org/alist) 存储支持，使用 alist 存储支持秒传功能
 - [x] 事件通知推送，目前支持 Pushover和 Bark，还在扩充中
-- [x] 后台代理支持
+- [x] TMDB 代理支持
 - [x] 用户认证
 - [x] plex 刮削支持
 - [x] NFO 刮削文件支持
 - [x] BT/PT 支持
 - [x] qbittorrent/transmission客户端支持
+- [x] 支持导入plex watchlist，plex里标记，自动导入polaris
 - [x] and more...
 
 ## Todos
 
 
 - [ ] 更多通知客户端支持
-- [ ] 第三方watchlist导入支持
+- [ ] 更多第三方watchlist导入支持
 - [ ] 手机客户端
 
 
