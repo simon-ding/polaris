@@ -441,7 +441,7 @@ type Storage struct {
 }
 
 func (s *Storage) ToWebDavSetting() WebdavSetting {
-	if s.Implementation != storage.ImplementationWebdav && s.Implementation != storage.ImplementationAlist{
+	if s.Implementation != storage.ImplementationWebdav && s.Implementation != storage.ImplementationAlist {
 		panic("not webdav storage")
 	}
 	var webdavSetting WebdavSetting
@@ -631,19 +631,17 @@ func (c *Client) DeleteImportlist(id int) error {
 	return c.ent.ImportList.DeleteOneID(id).Exec(context.TODO())
 }
 
-func (c *Client) GetSizeLimiter(r media.Resolution) (*SizeLimiter, error) {
+func (c *Client) GetSizeLimiter(mediaType string) (*MediaSizeLimiter, error) {
 	var v string
-	if r == media.Resolution720p {
-		v = c.GetSetting(Setting720pSizeLimiter)
-	} else if r == media.Resolution1080p {
-		v = c.GetSetting(Setting1080ppSizeLimiter)
-	} else if r == media.Resolution2160p {
-		v = c.GetSetting(Setting2160ppSizeLimiter)
+	if mediaType == "tv" {
+		v = c.GetSetting(SettingTvSizeLimiter)
+	} else if mediaType == "movie" {
+		v = c.GetSetting(SettingMovieSizeLimiter)
 	} else {
-		return nil, errors.Errorf("resolution not supported: %v", r)
+		return nil, errors.Errorf("media type not supported: %v", mediaType)
 	}
 
-	var limiter SizeLimiter
+	var limiter MediaSizeLimiter
 	if v == "" {
 		return &limiter, nil
 	}
@@ -652,20 +650,19 @@ func (c *Client) GetSizeLimiter(r media.Resolution) (*SizeLimiter, error) {
 	return &limiter, err
 }
 
-func (c *Client) SetSizeLimiter(r media.Resolution, limiter *SizeLimiter) error {
+func (c *Client) SetSizeLimiter(mediaType string, limiter *MediaSizeLimiter) error {
 	data, err := json.Marshal(limiter)
 	if err != nil {
 		return err
 	}
-	if r == media.Resolution720p {
-		return c.SetSetting(Setting720pSizeLimiter, string(data))
-	} else if r == media.Resolution1080p {
-		return c.SetSetting(Setting1080ppSizeLimiter, string(data))
-	} else if r == media.Resolution2160p {
-		return c.SetSetting(Setting2160ppSizeLimiter, string(data))
+	if mediaType == "tv" {
+		return c.SetSetting(SettingTvSizeLimiter, string(data))
+	} else if mediaType == "movie" {
+		return c.SetSetting(SettingMovieSizeLimiter, string(data))
 	} else {
-		return errors.Errorf("resolution not supported: %v", r)
+		return errors.Errorf("media type not supported: %v", mediaType)
 	}
+
 }
 
 func (c *Client) GetTvNamingFormat() string {

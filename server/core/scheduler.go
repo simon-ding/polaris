@@ -434,7 +434,7 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (
 		SourceTitle: r1.Name,
 		TargetDir:   targetDir,
 		Status:      history.StatusRunning,
-		Size:        r1.Size,
+		Size:        int(r1.Size),
 		//Saved:            torrent.Save(),
 		Link:             magnet,
 		DownloadClientID: dlc.ID,

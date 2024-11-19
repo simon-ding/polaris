@@ -42,8 +42,9 @@ func (Media) Edges() []ent.Edge {
 }
 
 type MediaLimiter struct {
-	SizeMin int `json:"size_min"` //in B
-	SizeMax int `json:"size_max"` //in B
+	SizeMin    int64 `json:"size_min"` //in B
+	SizeMax    int64 `json:"size_max"` //in B
+	PreferSize int64 `json:"prefer_max"`
 }
 
 type MediaExtras struct {
@@ -51,7 +52,7 @@ type MediaExtras struct {
 	JavId        string `json:"javid"`
 	//OriginCountry    []string `json:"origin_country"`
 	OriginalLanguage string `json:"original_language"`
-	Genres []struct {
+	Genres           []struct {
 		ID   int64  `json:"id"`
 		Name string `json:"name"`
 	} `json:"genres"`

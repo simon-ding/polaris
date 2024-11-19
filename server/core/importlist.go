@@ -114,8 +114,9 @@ type AddWatchlistIn struct {
 	Resolution              string `json:"resolution" binding:"required"`
 	Folder                  string `json:"folder" binding:"required"`
 	DownloadHistoryEpisodes bool   `json:"download_history_episodes"` //for tv
-	SizeMin                 int    `json:"size_min"`
-	SizeMax                 int    `json:"size_max"`
+	SizeMin                 int64  `json:"size_min"`
+	SizeMax                 int64  `json:"size_max"`
+	PreferSize              int64  `json:"prefer_size"`
 }
 
 func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
@@ -139,7 +140,7 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	}
 	log.Infof("find detail for tv id %d: %+v", in.TmdbID, detail)
 
-	 lastSeason := 0
+	lastSeason := 0
 	for _, season := range detail.Seasons {
 		if season.SeasonNumber > lastSeason && season.EpisodeCount > 0 { //如果最新一季已经有剧集信息，则以最新一季为准
 			lastSeason = season.SeasonNumber
@@ -327,8 +328,8 @@ func (c *Client) checkMovieFolder(m *ent.Media) error {
 		return err
 	}
 
-	for _,f := range files {
-		if f.IsDir() || f.Size() < 100 * 1000 * 1000 /* 100M */{ //忽略路径和小于100M的文件
+	for _, f := range files {
+		if f.IsDir() || f.Size() < 100*1000*1000 /* 100M */ { //忽略路径和小于100M的文件
 			continue
 		}
 		meta := metadata.ParseMovie(f.Name())

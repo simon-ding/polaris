@@ -96,9 +96,9 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 			Description:          item.Description,
 			Link:                 item.Link,
 			Size:                 mustAtoI(item.Size),
-			Seeders:              mustAtoI(item.GetAttr("seeders")),
-			Peers:                mustAtoI(item.GetAttr("peers")),
-			Category:             mustAtoI(item.GetAttr("category")),
+			Seeders:              int(mustAtoI(item.GetAttr("seeders"))),
+			Peers:                int(mustAtoI(item.GetAttr("peers"))),
+			Category:             int(mustAtoI(item.GetAttr("category"))),
 			ImdbId:               imdb,
 			DownloadVolumeFactor: tryParseFloat(item.GetAttr("downloadvolumefactor")),
 			UploadVolumeFactor:   tryParseFloat(item.GetAttr("uploadvolumefactor")),
@@ -112,8 +112,8 @@ func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
 	return res
 }
 
-func mustAtoI(key string) int {
-	i, err := strconv.Atoi(key)
+func mustAtoI(key string) int64 {
+	i, err := strconv.ParseInt(key, 10, 64)
 	if err != nil {
 		log.Errorf("must atoi error: %v", err)
 		panic(err)
@@ -183,7 +183,7 @@ type Result struct {
 	Name                 string  `json:"name"`
 	Description          string  `json:"description"`
 	Link                 string  `json:"link"`
-	Size                 int     `json:"size"`
+	Size                 int64     `json:"size"`
 	Seeders              int     `json:"seeders"`
 	Peers                int     `json:"peers"`
 	Category             int     `json:"category"`

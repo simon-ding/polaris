@@ -68,7 +68,7 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum i
 		SourceTitle: r1.Name,
 		TargetDir:   dir,
 		Status:      history.StatusRunning,
-		Size:        r1.Size,
+		Size:        int(r1.Size),
 		//Saved:            torrent.Save(),
 		Link:             magnet,
 		DownloadClientID: dlc.ID,
@@ -192,7 +192,7 @@ lo:
 	return torrentNames, nil
 }
 
-func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexerID int) (*string, error) {
+func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int64, indexerID int) (*string, error) {
 	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
@@ -219,7 +219,7 @@ func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int, indexe
 			SourceTitle: name,
 			TargetDir:   m.TargetDir,
 			Status:      history.StatusRunning,
-			Size:        size,
+			Size:        int(size),
 			//Saved:            torrent.Save(),
 			Link:             magnet,
 			DownloadClientID: dlc.ID,

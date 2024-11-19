@@ -1,5 +1,7 @@
 package db
 
+import "polaris/ent/media"
+
 var Version = "undefined"
 
 const (
@@ -17,9 +19,9 @@ const (
 	SettingTvNamingFormat         = "tv_naming_format"
 	SettingMovieNamingFormat      = "movie_naming_format"
 	SettingProwlarrInfo           = "prowlarr_info"
-	Setting720pSizeLimiter        = "720p_size_limiter"
-	Setting1080ppSizeLimiter      = "1080p_size_limiter"
-	Setting2160ppSizeLimiter      = "2160p_size_limiter"
+
+	SettingTvSizeLimiter          = "tv_size_limiter"
+	SettingMovieSizeLimiter       = "movie_size_limiter"
 )
 
 const (
@@ -52,6 +54,23 @@ type NamingInfo struct {
 type ResolutionType string
 
 const JwtSerectKey = "jwt_secrect_key"
+
+type MediaSizeLimiter struct {
+	P720p SizeLimiter `json:"720p"`
+	P1080 SizeLimiter `json:"1080p"`
+	P2160 SizeLimiter `json:"2160p"`
+}
+
+func (m *MediaSizeLimiter) GetLimiter(r media.Resolution) SizeLimiter {
+	if r == media.Resolution1080p {
+		return m.P1080
+	} else if r == media.Resolution720p {
+		return m.P720p
+	} else if r == media.Resolution2160p {
+		return m.P2160
+	}
+	return SizeLimiter{}
+}
 
 type SizeLimiter struct {
 	MaxSIze    int64 `json:"max_size"`

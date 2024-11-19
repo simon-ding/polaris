@@ -7,7 +7,6 @@ import (
 	"polaris/db"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
-	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/prowlarr"
 	"polaris/pkg/qbittorrent"
@@ -331,29 +330,22 @@ func (s *Server) SaveProwlarrSetting(c *gin.Context) (interface{}, error) {
 }
 
 type ResolutionSizeLimiter struct {
-	P720  db.SizeLimiter `json:"720p"`
-	P1080 db.SizeLimiter `json:"1080p"`
-	P2160 db.SizeLimiter `json:"2160p"`
+	TvLimiter    *db.MediaSizeLimiter `json:"tv_limiter"`
+	MovieLimiter *db.MediaSizeLimiter `json:"movie_limiter"`
 }
 
 func (s *Server) GetSizeLimiter(c *gin.Context) (interface{}, error) {
-	p720, err := s.db.GetSizeLimiter(media.Resolution720p)
+	tv, err := s.db.GetSizeLimiter("tv")
 	if err != nil {
 		return nil, errors.Wrap(err, "db")
 	}
-	p1080, err := s.db.GetSizeLimiter(media.Resolution1080p)
-	if err != nil {
-		return nil, errors.Wrap(err, "db")
-	}
-
-	p2160, err := s.db.GetSizeLimiter(media.Resolution2160p)
+	movie, err := s.db.GetSizeLimiter("movie")
 	if err != nil {
 		return nil, errors.Wrap(err, "db")
 	}
 	r := ResolutionSizeLimiter{
-		P720: *p720,
-		P1080: *p1080,
-		P2160: *p2160,
+		TvLimiter:    tv,
+		MovieLimiter: movie,
 	}
 	return r, nil
 }
@@ -363,14 +355,10 @@ func (s *Server) SetSizeLimiter(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, err
 	}
-	if err := s.db.SetSizeLimiter(media.Resolution720p, &in.P720); err != nil {
+	if err := s.db.SetSizeLimiter("tv", in.TvLimiter); err != nil {
 		return nil, errors.Wrap(err, "db")
 	}
-	if err := s.db.SetSizeLimiter(media.Resolution1080p, &in.P1080); err != nil {
-		return nil, errors.Wrap(err, "db")
-	}
-
-	if err := s.db.SetSizeLimiter(media.Resolution2160p, &in.P2160); err != nil {
+	if err := s.db.SetSizeLimiter("movie", in.MovieLimiter); err != nil {
 		return nil, errors.Wrap(err, "db")
 	}
 	return "success", nil

@@ -114,8 +114,8 @@ func imdbIDMatchExact(id1, id2 string) bool {
 	return id1 == id2
 }
 
-func torrentSizeOk(detail *db.MediaDetails, torrentSize int, torrentEpisodeNum int, param *SearchParam) bool {
-	defaultMinSize := 80 * 1000 * 1000 //tv, 80M min
+func torrentSizeOk(detail *db.MediaDetails, torrentSize int64, torrentEpisodeNum int, param *SearchParam) bool {
+	defaultMinSize := int64(80 * 1000 * 1000) //tv, 80M min
 	if detail.MediaType == media.MediaTypeMovie {
 		defaultMinSize = 200 * 1000 * 1000 // movie, 200M min
 	}
@@ -134,20 +134,20 @@ func torrentSizeOk(detail *db.MediaDetails, torrentSize int, torrentEpisodeNum i
 
 	if param.CheckFileSize { //check file size when trigger automatic download
 		if detail.Limiter.SizeMin > 0 { //min size
-			sizeMin := detail.Limiter.SizeMin * multiplier
+			sizeMin := detail.Limiter.SizeMin * int64(multiplier)
 			if torrentSize < sizeMin { //比最小要求的大小还要小, min size not qualify
 				return false
 			}
 		}
 
 		if detail.Limiter.SizeMax > 0 { //max size
-			sizeMax := detail.Limiter.SizeMax * multiplier
+			sizeMax := detail.Limiter.SizeMax * int64(multiplier)
 			if torrentSize > sizeMax { //larger than max size wanted, max size not qualify
 				return false
 			}
 		}
 	}
-	return torrentSize > defaultMinSize*multiplier
+	return torrentSize > defaultMinSize*int64(multiplier)
 }
 
 func seasonEpisodeCount(detail *db.MediaDetails, seasonNum int) int {
