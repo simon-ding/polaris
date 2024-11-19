@@ -631,19 +631,41 @@ func (c *Client) DeleteImportlist(id int) error {
 	return c.ent.ImportList.DeleteOneID(id).Exec(context.TODO())
 }
 
-func (c *Client) GetSizeLimiter() (*SizeLimiter, error) {
-	v := c.GetSetting(SetttingSizeLimiter)
+func (c *Client) GetSizeLimiter(r media.Resolution) (*SizeLimiter, error) {
+	var v string
+	if r == media.Resolution720p {
+		v = c.GetSetting(Setting720pSizeLimiter)
+	} else if r == media.Resolution1080p {
+		v = c.GetSetting(Setting1080ppSizeLimiter)
+	} else if r == media.Resolution2160p {
+		v = c.GetSetting(Setting2160ppSizeLimiter)
+	} else {
+		return nil, errors.Errorf("resolution not supported: %v", r)
+	}
+
 	var limiter SizeLimiter
+	if v == "" {
+		return &limiter, nil
+	}
+
 	err := json.Unmarshal([]byte(v), &limiter)
 	return &limiter, err
 }
 
-func (c *Client) SetSizeLimiter(limiter *SizeLimiter) error {
+func (c *Client) SetSizeLimiter(r media.Resolution, limiter *SizeLimiter) error {
 	data, err := json.Marshal(limiter)
 	if err != nil {
 		return err
 	}
-	return c.SetSetting(SetttingSizeLimiter, string(data))
+	if r == media.Resolution720p {
+		return c.SetSetting(Setting720pSizeLimiter, string(data))
+	} else if r == media.Resolution1080p {
+		return c.SetSetting(Setting1080ppSizeLimiter, string(data))
+	} else if r == media.Resolution2160p {
+		return c.SetSetting(Setting2160ppSizeLimiter, string(data))
+	} else {
+		return errors.Errorf("resolution not supported: %v", r)
+	}
 }
 
 func (c *Client) GetTvNamingFormat() string {

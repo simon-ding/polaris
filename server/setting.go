@@ -7,6 +7,7 @@ import (
 	"polaris/db"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
+	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/prowlarr"
 	"polaris/pkg/qbittorrent"
@@ -103,7 +104,6 @@ func (s *Server) SetSetting(c *gin.Context) (interface{}, error) {
 	}
 	return nil, nil
 }
-
 
 func (s *Server) GetSetting(c *gin.Context) (interface{}, error) {
 	tmdb := s.db.GetSetting(db.SettingTmdbApiKey)
@@ -306,7 +306,7 @@ func (s *Server) TriggerCronJob(c *gin.Context) (interface{}, error) {
 }
 
 func (s *Server) GetProwlarrSetting(c *gin.Context) (interface{}, error) {
-	se, err :=s.db.GetProwlarrSetting()
+	se, err := s.db.GetProwlarrSetting()
 	if err != nil {
 		return &db.ProwlarrSetting{}, nil
 	}
@@ -321,11 +321,57 @@ func (s *Server) SaveProwlarrSetting(c *gin.Context) (interface{}, error) {
 		client := prowlarr.New(in.ApiKey, in.URL)
 		if _, err := client.GetIndexers(prowlarr.TV); err != nil {
 			return nil, errors.Wrap(err, "connect to prowlarr error")
-		}	
+		}
 	}
 	err := s.db.SaveProwlarrSetting(&in)
 	if err != nil {
 		return nil, err
+	}
+	return "success", nil
+}
+
+type ResolutionSizeLimiter struct {
+	P720  db.SizeLimiter `json:"720p"`
+	P1080 db.SizeLimiter `json:"1080p"`
+	P2160 db.SizeLimiter `json:"2160p"`
+}
+
+func (s *Server) GetSizeLimiter(c *gin.Context) (interface{}, error) {
+	p720, err := s.db.GetSizeLimiter(media.Resolution720p)
+	if err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+	p1080, err := s.db.GetSizeLimiter(media.Resolution1080p)
+	if err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+
+	p2160, err := s.db.GetSizeLimiter(media.Resolution2160p)
+	if err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+	r := ResolutionSizeLimiter{
+		P720: *p720,
+		P1080: *p1080,
+		P2160: *p2160,
+	}
+	return r, nil
+}
+
+func (s *Server) SetSizeLimiter(c *gin.Context) (interface{}, error) {
+	var in ResolutionSizeLimiter
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, err
+	}
+	if err := s.db.SetSizeLimiter(media.Resolution720p, &in.P720); err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+	if err := s.db.SetSizeLimiter(media.Resolution1080p, &in.P1080); err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+
+	if err := s.db.SetSizeLimiter(media.Resolution2160p, &in.P2160); err != nil {
+		return nil, errors.Wrap(err, "db")
 	}
 	return "success", nil
 }

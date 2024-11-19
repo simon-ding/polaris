@@ -14,10 +14,12 @@ const (
 	SettingNfoSupportEnabled      = "nfo_support_enabled"
 	SettingAllowQiangban          = "filter_qiangban"
 	SettingEnableTmdbAdultContent = "tmdb_adult_content"
-	SetttingSizeLimiter           = "size_limiter"
 	SettingTvNamingFormat         = "tv_naming_format"
 	SettingMovieNamingFormat      = "movie_naming_format"
 	SettingProwlarrInfo           = "prowlarr_info"
+	Setting720pSizeLimiter        = "720p_size_limiter"
+	Setting1080ppSizeLimiter      = "1080p_size_limiter"
+	Setting2160ppSizeLimiter      = "2160p_size_limiter"
 )
 
 const (
@@ -52,14 +54,9 @@ type ResolutionType string
 const JwtSerectKey = "jwt_secrect_key"
 
 type SizeLimiter struct {
-	R720p  Limiter `json:"720p"`
-	R1080p Limiter `json:"1080p"`
-	R2160p Limiter `json:"2160p"`
-}
-
-type Limiter struct {
-	Max int `json:"max"`
-	Min int `json:"min"`
+	MaxSIze    int64 `json:"max_size"`
+	MinSize    int64 `json:"min_size"`
+	PreferSIze int64 `json:"prefer_size"`
 }
 
 type ProwlarrSetting struct {

@@ -72,6 +72,8 @@ func (s *Server) Serve() error {
 		setting.POST("/cron/trigger", HttpHandler(s.TriggerCronJob))
 		setting.GET("/prowlarr", HttpHandler(s.GetProwlarrSetting))
 		setting.POST("/prowlarr", HttpHandler(s.SaveProwlarrSetting))
+		setting.GET("/limiter", HttpHandler(s.GetSizeLimiter))
+		setting.POST("/limiter", HttpHandler(s.SetSizeLimiter))
 	}
 	activity := api.Group("/activity")
 	{
