@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:quiver/strings.dart';
 import 'package:ui/providers/settings.dart';
+import 'package:ui/providers/size_limiter.dart';
 import 'package:ui/settings/dialog.dart';
 import 'package:ui/widgets/progress_indicator.dart';
 import 'package:ui/widgets/widgets.dart';
@@ -22,20 +23,28 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
   @override
   Widget build(BuildContext context) {
     var downloadClients = ref.watch(dwonloadClientsProvider);
-    return downloadClients.when(
-        data: (value) => Wrap(
-                children: List.generate(value.length + 1, (i) {
-              if (i < value.length) {
-                var client = value[i];
-                return SettingsCard(
-                    onTap: () => showDownloadClientDetails(client),
-                    child: Text(client.name ?? ""));
-              }
-              return SettingsCard(
-                  onTap: () => showSelections(), child: const Icon(Icons.add));
-            })),
-        error: (err, trace) => PoNetworkError(err: err),
-        loading: () => const MyProgressIndicator());
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        downloadClients.when(
+            data: (value) => Wrap(
+                    children: List.generate(value.length + 1, (i) {
+                  if (i < value.length) {
+                    var client = value[i];
+                    return SettingsCard(
+                        onTap: () => showDownloadClientDetails(client),
+                        child: Text(client.name ?? ""));
+                  }
+                  return SettingsCard(
+                      onTap: () => showSelections(),
+                      child: const Icon(Icons.add));
+                })),
+            error: (err, trace) => PoNetworkError(err: err),
+            loading: () => const MyProgressIndicator()),
+        Divider(),
+        getSizeLimiterWidget()
+      ],
+    );
   }
 
   Future<void> showDownloadClientDetails(DownloadClient client) {
@@ -199,4 +208,160 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
           );
         });
   }
+
+  Widget getSizeLimiterWidget() {
+    var data = ref.watch(mediaSizeLimiterDataProvider);
+    final _formKey = GlobalKey<FormBuilderState>();
+
+    return Container(
+      padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+      child: data.when(
+          data: (value) {
+            return FormBuilder(
+              key: _formKey,
+              initialValue: {
+                "tv_720p_min": toMbString(value.tvLimiter!.p720p!.minSize!),
+                "tv_720p_max": toMbString(value.tvLimiter!.p720p!.maxSize!),
+                "tv_1080p_min": toMbString(value.tvLimiter!.p1080p!.minSize!),
+                "tv_1080p_max": toMbString(value.tvLimiter!.p1080p!.maxSize!),
+                "tv_2160p_min": toMbString(value.tvLimiter!.p2160p!.minSize!),
+                "tv_2160p_max": toMbString(value.tvLimiter!.p2160p!.maxSize!),
+                "movie_720p_min":
+                    toMbString(value.movieLimiter!.p720p!.minSize!),
+                "movie_720p_max":
+                    toMbString(value.movieLimiter!.p720p!.maxSize!),
+                "movie_1080p_min":
+                    toMbString(value.movieLimiter!.p1080p!.minSize!),
+                "movie_1080p_max":
+                    toMbString(value.movieLimiter!.p1080p!.maxSize!),
+                "movie_2160p_min":
+                    toMbString(value.movieLimiter!.p2160p!.minSize!),
+                "movie_2160p_max":
+                    toMbString(value.movieLimiter!.p2160p!.maxSize!),
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "剧集大小限制",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Divider(),
+                  minMaxRow("  720p", "tv_720p_min", "tv_720p_max"),
+                  minMaxRow("1080p", "tv_1080p_min", "tv_1080p_max"),
+                  minMaxRow("2160p", "tv_2160p_min", "tv_2160p_max"),
+                  Text(
+                    "电影大小限制",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Divider(),
+                  minMaxRow("  720p", "movie_720p_min", "movie_720p_max"),
+                  minMaxRow("1080p", "movie_1080p_min", "movie_1080p_max"),
+                  minMaxRow("2160p", "movie_2160p_min", "movie_2160p_max"),
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: LoadingElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.saveAndValidate()) {
+                            var values = _formKey.currentState!.value;
+
+                            return ref
+                                .read(mediaSizeLimiterDataProvider.notifier)
+                                .submit(MediaSizeLimiter(
+                                    tvLimiter: SizeLimiter(
+                                      p720p: ResLimiter(
+                                          minSize:
+                                              toByteInt(values["tv_720p_min"]),
+                                          maxSize:
+                                              toByteInt(values["tv_720p_max"])),
+                                      p1080p: ResLimiter(
+                                          minSize:
+                                              toByteInt(values["tv_1080p_min"]),
+                                          maxSize: toByteInt(
+                                              values["tv_1080p_max"])),
+                                      p2160p: ResLimiter(
+                                          minSize:
+                                              toByteInt(values["tv_2160p_min"]),
+                                          maxSize: toByteInt(
+                                              values["tv_2160p_max"])),
+                                    ),
+                                    movieLimiter: SizeLimiter(
+                                      p720p: ResLimiter(
+                                          minSize: toByteInt(
+                                              values["movie_720p_min"]),
+                                          maxSize: toByteInt(
+                                              values["movie_720p_max"])),
+                                      p1080p: ResLimiter(
+                                          minSize: toByteInt(
+                                              values["movie_1080p_min"]),
+                                          maxSize: toByteInt(
+                                              values["movie_1080p_max"])),
+                                      p2160p: ResLimiter(
+                                          minSize: toByteInt(
+                                              values["movie_2160p_min"]),
+                                          maxSize: toByteInt(
+                                              values["movie_2160p_max"])),
+                                    )));
+                          } else {
+                            throw "validation_error";
+                          }
+                        },
+                        label: Text("保存"),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+          error: (err, trace) => Container(),
+          loading: () => const MyProgressIndicator()),
+    );
+  }
+
+  Widget minMaxRow(String title, String nameMin, String nameMax) {
+    return Row(
+      children: [
+        Flexible(flex: 2, child: Container()),
+        Flexible(
+            flex: 2,
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 16),
+            )),
+        Flexible(flex: 1, child: Container()),
+        Flexible(
+            flex: 6,
+            child: FormBuilderTextField(
+              name: nameMin,
+              decoration: InputDecoration(suffixText: "MB", labelText: "最小"),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(),
+                FormBuilderValidators.numeric()
+              ]),
+            )),
+        Flexible(flex: 1, child: Text("    -    ")),
+        Flexible(
+            flex: 6,
+            child: FormBuilderTextField(
+              name: nameMax,
+              decoration: InputDecoration(suffixText: "MB", labelText: "最大"),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(),
+                FormBuilderValidators.numeric()
+              ]),
+            )),
+        Flexible(flex: 2, child: Container()),
+      ],
+    );
+  }
+}
+
+String toMbString(int size) {
+  return (size / 1000 / 1000).toString();
+}
+
+int toByteInt(String s) {
+  return int.parse(s) * 1000 * 1000;
 }

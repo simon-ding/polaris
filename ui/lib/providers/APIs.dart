@@ -58,6 +58,8 @@ class APIs {
   static final tvParseUrl = "$_baseUrl/api/v1/setting/parse/tv";
   static final movieParseUrl = "$_baseUrl/api/v1/setting/parse/movie";
 
+  static final mediaSizeLimiterUrl = "$_baseUrl/api/v1/setting/limiter";
+
   static const tmdbApiKey = "tmdb_api_key";
   static const downloadDirKey = "download_dir";
 
@@ -131,7 +133,7 @@ class APIs {
     if (sp.code != 0) {
       throw sp.message;
     }
-    return sp.data==null? []:sp.data as List<String>;
+    return sp.data == null ? [] : sp.data as List<String>;
   }
 
   static Future<List<String>> downloadAllMovies() async {
@@ -142,7 +144,7 @@ class APIs {
     if (sp.code != 0) {
       throw sp.message;
     }
-    return sp.data==null? []:sp.data as List<String>;
+    return sp.data == null ? [] : sp.data as List<String>;
   }
 
   static Future<String> parseTvName(String s) async {

@@ -282,6 +282,52 @@ class _LoadingTextButtonState extends State<LoadingTextButton> {
   }
 }
 
+class LoadingElevatedButton extends StatefulWidget {
+  const LoadingElevatedButton(
+      {super.key, required this.onPressed, required this.label});
+  final Future<void> Function() onPressed;
+  final Widget label;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _LoadingElevatedButtonState();
+  }
+}
+
+class _LoadingElevatedButtonState extends State<LoadingElevatedButton> {
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: loading
+          ? null
+          : () async {
+              setState(() => loading = true);
+              try {
+                await widget.onPressed();
+              } catch (e) {
+                showSnakeBar("操作失败：$e");
+              } finally {
+                setState(() => loading = false);
+              }
+            },
+      icon: loading
+          ? Container(
+              width: 24,
+              height: 24,
+              padding: const EdgeInsets.all(2.0),
+              child: const CircularProgressIndicator(
+                color: Colors.grey,
+                strokeWidth: 3,
+              ),
+            )
+          : Text(""),
+      label: widget.label,
+    );
+  }
+}
+
 class PoError extends StatelessWidget {
   const PoError({super.key, required this.msg, required this.err});
   final String msg;
@@ -292,10 +338,16 @@ class PoError extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("$msg ", style: TextStyle(color:Theme.of(context).colorScheme.error),),
+        Text(
+          "$msg ",
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ),
         Tooltip(
           message: "$err",
-          child: Icon(Icons.info,color: Theme.of(context).colorScheme.error,),
+          child: Icon(
+            Icons.info,
+            color: Theme.of(context).colorScheme.error,
+          ),
         )
       ],
     );
@@ -304,9 +356,30 @@ class PoError extends StatelessWidget {
 
 class PoNetworkError extends StatelessWidget {
   const PoNetworkError({super.key, required this.err});
-final dynamic err;
+  final dynamic err;
   @override
   Widget build(BuildContext context) {
     return PoError(msg: "网络错误，请检查网络链接", err: err);
+  }
+}
+
+class PoProgressIndicator extends StatelessWidget {
+  const PoProgressIndicator({super.key, this.backgroundColor, this.value, this.icon});
+  final double? value;
+  final Color? backgroundColor;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: AlignmentDirectional.center,
+      children: [
+        CircularProgressIndicator(
+          backgroundColor: backgroundColor,
+          value: value,
+        ),
+        icon != null ? Opacity(opacity: 0.7, child: Icon(icon, color: Theme.of(context).colorScheme.primary,),):Container()
+      ],
+    );
   }
 }
