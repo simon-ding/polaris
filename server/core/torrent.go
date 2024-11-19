@@ -31,6 +31,11 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", param.MediaId)
 	}
+	limiter, err := db1.GetSizeLimiter("tv")
+	if err != nil {
+		log.Warnf("get tv size limiter: %v", err)
+		limiter = &db.MediaSizeLimiter{}
+	}
 	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, param.SeasonNum, param.Episodes)
 
 	res := searchWithTorznab(db1, prowlarr.TV, series.NameEn, series.NameCn, series.OriginalName)
@@ -80,7 +85,7 @@ lo:
 			continue
 		}
 
-		if !torrentSizeOk(series, r.Size, meta.EndEpisode+1-meta.StartEpisode, param) {
+		if !torrentSizeOk(series, limiter, r.Size, meta.EndEpisode+1-meta.StartEpisode, param) {
 			continue
 		}
 
@@ -114,11 +119,12 @@ func imdbIDMatchExact(id1, id2 string) bool {
 	return id1 == id2
 }
 
-func torrentSizeOk(detail *db.MediaDetails, torrentSize int64, torrentEpisodeNum int, param *SearchParam) bool {
+func torrentSizeOk(detail *db.MediaDetails, globalLimiter *db.MediaSizeLimiter, torrentSize int64, torrentEpisodeNum int, param *SearchParam) bool {
 	defaultMinSize := int64(80 * 1000 * 1000) //tv, 80M min
 	if detail.MediaType == media.MediaTypeMovie {
 		defaultMinSize = 200 * 1000 * 1000 // movie, 200M min
 	}
+
 	if detail.Limiter.SizeMin > 0 { //if size limiter set, use configured min size
 		defaultMinSize = detail.Limiter.SizeMin
 	}
@@ -133,8 +139,15 @@ func torrentSizeOk(detail *db.MediaDetails, torrentSize int64, torrentEpisodeNum
 	}
 
 	if param.CheckFileSize { //check file size when trigger automatic download
+
 		if detail.Limiter.SizeMin > 0 { //min size
 			sizeMin := detail.Limiter.SizeMin * int64(multiplier)
+			if torrentSize < sizeMin { //比最小要求的大小还要小, min size not qualify
+				return false
+			}
+		} else if globalLimiter != nil {
+			resLimiter := globalLimiter.GetLimiter(detail.Resolution)
+			sizeMin := resLimiter.MinSize * int64(multiplier)
 			if torrentSize < sizeMin { //比最小要求的大小还要小, min size not qualify
 				return false
 			}
@@ -142,6 +155,12 @@ func torrentSizeOk(detail *db.MediaDetails, torrentSize int64, torrentEpisodeNum
 
 		if detail.Limiter.SizeMax > 0 { //max size
 			sizeMax := detail.Limiter.SizeMax * int64(multiplier)
+			if torrentSize > sizeMax { //larger than max size wanted, max size not qualify
+				return false
+			}
+		} else if globalLimiter != nil {
+			resLimiter := globalLimiter.GetLimiter(detail.Resolution)
+			sizeMax := resLimiter.MaxSIze * int64(multiplier)
 			if torrentSize > sizeMax { //larger than max size wanted, max size not qualify
 				return false
 			}
@@ -179,6 +198,12 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	movieDetail := db1.GetMediaDetails(param.MediaId)
 	if movieDetail == nil {
 		return nil, errors.New("no media found of id")
+	}
+
+	limiter, err := db1.GetSizeLimiter("movie")
+	if err != nil {
+		log.Warnf("get tv size limiter: %v", err)
+		limiter = &db.MediaSizeLimiter{}
 	}
 
 	res := searchWithTorznab(db1, prowlarr.Movie, movieDetail.NameEn, movieDetail.NameCn, movieDetail.OriginalName)
@@ -221,7 +246,7 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 			continue
 		}
 
-		if !torrentSizeOk(movieDetail, r.Size, 1, param) {
+		if !torrentSizeOk(movieDetail, limiter, r.Size, 1, param) {
 			continue
 		}
 
