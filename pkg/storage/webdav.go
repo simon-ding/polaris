@@ -16,10 +16,12 @@ type WebdavStorage struct {
 	fs              *gowebdav.Client
 	dir             string
 	changeMediaHash bool
-	progresser func() float64
+	progresser      func() float64
+	videoFormats    []string
+	subtitleFormats []string
 }
 
-func NewWebdavStorage(url, user, password, path string, changeMediaHash bool) (*WebdavStorage, error) {
+func NewWebdavStorage(url, user, password, path string, changeMediaHash bool, videoFormats []string, subtitleFormats []string) (*WebdavStorage, error) {
 	c := gowebdav.NewClient(url, user, password)
 	if err := c.Connect(); err != nil {
 		return nil, errors.Wrap(err, "connect webdav")
@@ -27,11 +29,13 @@ func NewWebdavStorage(url, user, password, path string, changeMediaHash bool) (*
 	return &WebdavStorage{
 		fs:  c,
 		dir: path,
+		videoFormats: videoFormats,
+		subtitleFormats: subtitleFormats,
 	}, nil
 }
 
 func (w *WebdavStorage) Copy(local, remoteDir string) error {
-	b, err := NewBase(local)
+	b, err := NewBase(local, w.videoFormats, w.subtitleFormats)
 	if err != nil {
 		return err
 	}

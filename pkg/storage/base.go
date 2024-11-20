@@ -7,10 +7,12 @@ import (
 	"path/filepath"
 	"polaris/log"
 	"polaris/pkg/utils"
+	"strings"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/pkg/errors"
 )
+
 type Storage interface {
 	Move(src, dest string) error
 	Copy(src, dest string) error
@@ -20,22 +22,66 @@ type Storage interface {
 	UploadProgress() float64
 }
 
-
 type uploadFunc func(destPath string, destInfo fs.FileInfo, srcReader io.Reader, mimeType *mimetype.MIME) error
 
 type Base struct {
-	src          string
-	totalSize    int64
-	uploadedSize int64
+	src             string
+	videoFormats    []string
+	subtitleFormats []string
+	totalSize       int64
+	uploadedSize    int64
 }
 
-func NewBase(src string) (*Base, error) {
-	b := &Base{src: src}
+func NewBase(src string, videoFormats []string, subtitleFormats []string) (*Base, error) {
+	b := &Base{src: src, videoFormats: videoFormats, subtitleFormats: subtitleFormats}
 	err := b.calculateSize()
 	return b, err
 }
 
+func (b *Base) checkVideoFilesExist() bool {
+	if len(b.videoFormats) == 0 { // do not check
+		return true
+	}
+	hasVideo := false
+	filepath.Walk(b.src, func(path string, info fs.FileInfo, err error) error {
+		ext := filepath.Ext(strings.ToLower(info.Name()))
+
+		for _, f := range b.videoFormats {
+			if f == ext {
+				hasVideo = true
+			}
+		}
+		return nil
+	})
+	return hasVideo
+}
+
+func (b *Base) isFileNeeded(name string) bool {
+	ext := filepath.Ext(strings.ToLower(name))
+	if len(b.videoFormats) == 0 {
+		return true
+	} else {
+		for _, f := range b.videoFormats {
+			if f == ext {
+				return true
+			}
+		}
+	}
+	if len(b.subtitleFormats) > 0 {
+		for _, f := range b.subtitleFormats {
+			if f == ext {
+				return true
+			}
+		}
+	}
+	return false
+
+}
+
 func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool, upload uploadFunc, mkdir func(string) error) error {
+	if !b.checkVideoFilesExist() {
+		return errors.Errorf("no video file")
+	}
 	os.MkdirAll(destDir, os.ModePerm)
 
 	targetBase := filepath.Join(destDir, filepath.Base(b.src)) //文件的场景，要加上文件名, move filename ./dir/
@@ -61,6 +107,10 @@ func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool,
 		if info.IsDir() {
 			mkdir(destName)
 		} else { //is file
+			if !b.isFileNeeded(info.Name()) {
+				log.Debugf("file is not needed, skip: %s", info.Name())
+				return nil
+			}
 			if tryLink {
 				if err := os.Link(path, destName); err == nil {
 					return nil //link success
@@ -116,12 +166,11 @@ func (b *Base) calculateSize() error {
 }
 
 func (b *Base) Progress() float64 {
-	return float64(b.uploadedSize)/float64(b.totalSize)
+	return float64(b.uploadedSize) / float64(b.totalSize)
 }
 
-
 type progressReader struct {
-	R io.Reader
+	R   io.Reader
 	Add func(int)
 }
 

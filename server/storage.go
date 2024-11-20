@@ -30,7 +30,7 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 	if in.Implementation == "webdav" {
 		//test webdav
 		wd := in.ToWebDavSetting()
-		st, err := storage.NewWebdavStorage(wd.URL, wd.User, wd.Password, in.TvPath, false)
+		st, err := storage.NewWebdavStorage(wd.URL, wd.User, wd.Password, in.TvPath, false, nil, nil)
 		if err != nil {
 			return nil, errors.Wrap(err, "new webdav")
 		}
@@ -43,7 +43,7 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 		}
 	} else if in.Implementation == "alist" {
 		cfg := in.ToAlistSetting()
-		_, err := storage.NewAlist(&alist.Config{URL: cfg.URL, Username: cfg.User, Password: cfg.Password}, in.TvPath)
+		_, err := storage.NewAlist(&alist.Config{URL: cfg.URL, Username: cfg.User, Password: cfg.Password}, in.TvPath, nil, nil)
 		if err != nil {
 			return nil, errors.Wrap(err, "alist")
 		}

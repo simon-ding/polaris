@@ -11,18 +11,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-
-func NewLocalStorage(dir string) (*LocalStorage, error) {
+func NewLocalStorage(dir string, videoFormats []string, subtitleFormats []string) (*LocalStorage, error) {
 	os.MkdirAll(dir, 0655)
-	return &LocalStorage{dir: dir}, nil
+	return &LocalStorage{dir: dir, videoFormats: videoFormats, subtitleFormats: subtitleFormats}, nil
 }
 
 type LocalStorage struct {
-	dir string
+	dir             string
+	videoFormats    []string
+	subtitleFormats []string
 }
 
 func (l *LocalStorage) Copy(src, destDir string) error {
-	b, err := NewBase(src)
+	b, err := NewBase(src, l.videoFormats, l.subtitleFormats)
 	if err != nil {
 		return err
 	}

@@ -20,8 +20,10 @@ const (
 	SettingMovieNamingFormat      = "movie_naming_format"
 	SettingProwlarrInfo           = "prowlarr_info"
 
-	SettingTvSizeLimiter          = "tv_size_limiter"
-	SettingMovieSizeLimiter       = "movie_size_limiter"
+	SettingTvSizeLimiter           = "tv_size_limiter"
+	SettingMovieSizeLimiter        = "movie_size_limiter"
+	SettingAcceptedVideoFormats    = "accepted_video_formats"
+	SettingAcceptedSubtitleFormats = "accepted_subtitle_formats"
 )
 
 const (
@@ -44,6 +46,17 @@ const (
 
 const DefaultNamingFormat = "{{.NameCN}} {{.NameEN}} {{if .Year}} ({{.Year}}) {{end}}"
 
+//https://en.wikipedia.org/wiki/Video_file_format
+var defaultAcceptedVideoFormats = []string{
+	".webm", ".mkv", ".flv", ".vob", ".ogv", ".ogg", ".drc", ".mng", ".avi", ".mts", ".m2ts",".ts",
+	".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".viv", ".amv", ".mp4", ".m4p", ".m4v", 
+	".mpg", ".mp2", ".mpeg", ".mpe", ".mpv", ".m2v", ".m4v",
+	".svi", ".3gp", ".3g2", ".nsv",
+}
+
+var defaultAcceptedSubtitleFormats = []string{
+	".ass", ".srt",".vtt", ".webvtt", ".sub",
+}
 type NamingInfo struct {
 	NameCN string
 	NameEN string

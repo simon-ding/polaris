@@ -203,11 +203,20 @@ func (c *Client) getStorage(storageId int, mediaType media.MediaType) (storage.S
 	if mediaType == media.MediaTypeMovie {
 		targetPath = st.MoviePath
 	}
+	videoFormats, err := c.db.GetAcceptedVideoFormats()
+	if err != nil {
+		log.Warnf("get accepted video format error: %v", err)
+	}
+	subtitleFormats, err := c.db.GetAcceptedSubtitleFormats()
+	if err != nil {
+		log.Warnf("get accepted subtitle format error: %v", err)
+	}
+
 
 	switch st.Implementation {
 	case storage1.ImplementationLocal:
 
-		storageImpl1, err := storage.NewLocalStorage(targetPath)
+		storageImpl1, err := storage.NewLocalStorage(targetPath, videoFormats, subtitleFormats)
 		if err != nil {
 			return nil, errors.Wrap(err, "new local")
 		}
@@ -215,14 +224,14 @@ func (c *Client) getStorage(storageId int, mediaType media.MediaType) (storage.S
 
 	case storage1.ImplementationWebdav:
 		ws := st.ToWebDavSetting()
-		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true")
+		storageImpl1, err := storage.NewWebdavStorage(ws.URL, ws.User, ws.Password, targetPath, ws.ChangeFileHash == "true", videoFormats, subtitleFormats)
 		if err != nil {
 			return nil, errors.Wrap(err, "new webdav")
 		}
 		return storageImpl1, nil
 	case storage1.ImplementationAlist:
 		cfg := st.ToWebDavSetting()
-		storageImpl1, err := storage.NewAlist(&alist.Config{URL: cfg.URL, Username: cfg.User, Password: cfg.Password}, targetPath)
+		storageImpl1, err := storage.NewAlist(&alist.Config{URL: cfg.URL, Username: cfg.User, Password: cfg.Password}, targetPath, videoFormats, subtitleFormats)
 		if err != nil {
 			return nil, errors.Wrap(err, "alist")
 		}

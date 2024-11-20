@@ -10,20 +10,22 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 )
 
-func NewAlist(cfg *alist.Config, dir string) (*Alist, error) {
+func NewAlist(cfg *alist.Config, dir string, videoFormats []string, subtitleFormats []string) (*Alist, error) {
 	cl := alist.New(cfg)
 	_, err := cl.Login()
 	if err != nil {
 		return nil, err
 	}
-	return &Alist{baseDir: dir, cfg: cfg, client: cl}, nil
+	return &Alist{baseDir: dir, cfg: cfg, client: cl, videoFormats: videoFormats, subtitleFormats: subtitleFormats}, nil
 }
 
 type Alist struct {
-	baseDir    string
-	cfg        *alist.Config
-	client     *alist.Client
-	progresser func() float64
+	baseDir         string
+	cfg             *alist.Config
+	client          *alist.Client
+	progresser      func() float64
+	videoFormats    []string
+	subtitleFormats []string
 }
 
 func (a *Alist) Move(src, dest string) error {
@@ -34,7 +36,7 @@ func (a *Alist) Move(src, dest string) error {
 }
 
 func (a *Alist) Copy(src, dest string) error {
-	b, err := NewBase(src)
+	b, err := NewBase(src, a.videoFormats, a.subtitleFormats)
 	if err != nil {
 		return err
 	}

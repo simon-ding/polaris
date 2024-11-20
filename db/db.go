@@ -709,3 +709,53 @@ func (c *Client) SaveProwlarrSetting(se *ProwlarrSetting) error {
 	}
 	return c.SetSetting(SettingProwlarrInfo, string(data))
 }
+
+
+func (c *Client) getAcceptedFormats(key string) ([]string, error) {
+	v := c.GetSetting(key)
+	if v == "" {
+		return nil, nil
+	}
+	var res []string
+
+	err := json.Unmarshal([]byte(v), &res)
+	return res, err
+}
+
+func (c *Client) setAcceptedFormats(key string, v []string) error {
+	data, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	return c.SetSetting(key, string(data))
+} 
+
+func (c *Client) GetAcceptedVideoFormats() ([]string, error) {
+	res, err := c.getAcceptedFormats(SettingAcceptedVideoFormats)
+	if err != nil {
+		return nil, err
+	}
+	if res == nil {
+		return defaultAcceptedVideoFormats, nil
+	}
+	return res, nil
+}
+
+func (c *Client) SetAcceptedVideoFormats(key string, v []string) error {
+	return c.setAcceptedFormats(SettingAcceptedVideoFormats, v)
+}
+
+func (c *Client) GetAcceptedSubtitleFormats() ([]string, error) {
+	res, err := c.getAcceptedFormats(SettingAcceptedSubtitleFormats)
+	if err != nil {
+		return nil, err
+	}
+	if res== nil {
+		return defaultAcceptedSubtitleFormats, nil
+	}
+	return res, nil
+}
+
+func (c *Client) SetAcceptedSubtitleFormats(key string, v []string) error {
+	return c.setAcceptedFormats(SettingAcceptedSubtitleFormats, v)
+}
