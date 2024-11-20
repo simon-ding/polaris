@@ -55,7 +55,7 @@ var defaultAcceptedVideoFormats = []string{
 }
 
 var defaultAcceptedSubtitleFormats = []string{
-	".ass", ".srt",".vtt", ".webvtt", ".sub",
+	".ass", ".srt",".vtt", ".webvtt", ".sub", ".idx",
 }
 type NamingInfo struct {
 	NameCN string
