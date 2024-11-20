@@ -80,7 +80,7 @@ func (b *Base) isFileNeeded(name string) bool {
 
 func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool, upload uploadFunc, mkdir func(string) error) error {
 	if !b.checkVideoFilesExist() {
-		return errors.Errorf("no video file")
+		return errors.Errorf("torrent has no video file(s)")
 	}
 	os.MkdirAll(destDir, os.ModePerm)
 
