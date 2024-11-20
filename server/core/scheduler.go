@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"polaris/db"
 	"polaris/ent"
@@ -20,6 +21,10 @@ import (
 func (c *Client) addSysCron() {
 	c.registerCronJob("check_running_tasks", "@every 1m", c.checkTasks)
 	c.registerCronJob("check_available_medias_to_download", "0 0 * * * *", func() error {
+		v := os.Getenv("NO_AUTO_DOWNLOAD")
+		if v == "true" {
+			return nil
+		}
 		c.downloadAllTvSeries()
 		c.downloadAllMovies()
 		return nil

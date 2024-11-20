@@ -12,7 +12,7 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/simon-ding/polaris)
 
 
-**Polaris 是一个电视剧和电影的追踪下载软件。对动漫日剧美剧都有良好的匹配，支持webdav或者本地存储。**
+**Polaris 是一个电视剧和电影的追踪下载软件。对美剧动漫日剧都有良好的匹配，支持多种存储方式（webdav、alist、本地存储）。**
 
 </div>
 
