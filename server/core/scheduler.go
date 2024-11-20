@@ -21,7 +21,7 @@ import (
 func (c *Client) addSysCron() {
 	c.registerCronJob("check_running_tasks", "@every 1m", c.checkTasks)
 	c.registerCronJob("check_available_medias_to_download", "0 0 * * * *", func() error {
-		v := os.Getenv("NO_AUTO_DOWNLOAD")
+		v := os.Getenv("POLARIS_NO_AUTO_DOWNLOAD")
 		if v == "true" {
 			return nil
 		}
