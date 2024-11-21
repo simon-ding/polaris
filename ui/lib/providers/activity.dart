@@ -25,9 +25,15 @@ var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
 
 class ActivityData
     extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String> {
+  Timer? _timer;
+
   @override
   FutureOr<List<Activity>> build(String arg) async {
-    final dio = await APIs.getDio();
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+
+    final dio = APIs.getDio();
     var resp =
         await dio.get(APIs.activityUrl, queryParameters: {"status": arg});
     final sp = ServerResponse.fromJson(resp.data);
@@ -41,7 +47,7 @@ class ActivityData
 
     if (arg == "active") {
       //refresh active downloads
-      Timer(const Duration(seconds: 5),
+      _timer = Timer(const Duration(seconds: 5),
           () => ref.invalidateSelf()); //Periodically Refresh
     }
     return activities;
@@ -73,7 +79,8 @@ class Activity {
       required this.saved,
       required this.progress,
       required this.size,
-      required this.seedRatio, required this.uploadProgress});
+      required this.seedRatio,
+      required this.uploadProgress});
 
   final int? id;
   final int? mediaId;
@@ -101,7 +108,6 @@ class Activity {
         progress: json["progress"],
         seedRatio: json["seed_ratio"],
         size: json["size"],
-        uploadProgress: json["upload_progress"]
-        );
+        uploadProgress: json["upload_progress"]);
   }
 }
