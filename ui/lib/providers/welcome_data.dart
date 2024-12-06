@@ -108,8 +108,8 @@ class SearchPageData
         "resolution": resolution,
         "folder": folder,
         "download_history_episodes": downloadHistoryEpisodes,
-        "size_min": (limiter.start * 1000*1000).toInt(),
-        "size_max": (limiter.end * 1000*1000).toInt(),
+        "size_min": (limiter.start * 1000 * 1000).toInt(),
+        "size_max": (limiter.end * 1000 * 1000).toInt(),
       });
       var sp = ServerResponse.fromJson(resp.data);
       if (sp.code != 0) {
