@@ -7,9 +7,11 @@ import (
 	"net/url"
 	"polaris/db"
 	"polaris/log"
+	"polaris/pkg/cache"
 	"polaris/pkg/tmdb"
 	"polaris/server/core"
 	"polaris/ui"
+	"time"
 
 	ginzap "github.com/gin-contrib/zap"
 
@@ -22,20 +24,24 @@ import (
 func NewServer(db *db.Client) *Server {
 	r := gin.Default()
 	s := &Server{
-		r:        r,
-		db:       db,
-		language: db.GetLanguage(),
+		r:                r,
+		db:               db,
+		language:         db.GetLanguage(),
+		monitorNumCache:  cache.NewCache[int, int](10 * time.Minute),
+		downloadNumCache: cache.NewCache[int, int](10 * time.Minute),
 	}
 	s.core = core.NewClient(db, s.language)
 	return s
 }
 
 type Server struct {
-	r         *gin.Engine
-	db        *db.Client
-	core      *core.Client
-	language  string
-	jwtSerect string
+	r                *gin.Engine
+	db               *db.Client
+	core             *core.Client
+	language         string
+	jwtSerect        string
+	monitorNumCache  *cache.Cache[int, int]
+	downloadNumCache *cache.Cache[int, int]
 }
 
 func (s *Server) Serve() error {

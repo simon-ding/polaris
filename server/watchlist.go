@@ -102,17 +102,23 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 			MonitoredNum:  0,
 			DownloadedNum: 0,
 		}
-
-		details := s.db.GetMediaDetails(item.ID)
-
-		for _, ep := range details.Episodes {
-			if ep.Monitored {
-				ms.MonitoredNum++
-				if ep.Status == episode.StatusDownloaded {
-					ms.DownloadedNum++
+		mon, ok1 := s.monitorNumCache.Get(item.ID)
+		dow, ok2 := s.downloadNumCache.Get(item.ID)
+		if ok1 && ok2 {
+			ms.MonitoredNum = mon
+			ms.DownloadedNum = dow
+		} else {
+			details := s.db.GetMediaDetails(item.ID)
+			for _, ep := range details.Episodes {
+				if ep.Monitored {
+					ms.MonitoredNum++
+					if ep.Status == episode.StatusDownloaded {
+						ms.DownloadedNum++
+					}
 				}
 			}
 		}
+
 		res[i] = ms
 	}
 	return res, nil
