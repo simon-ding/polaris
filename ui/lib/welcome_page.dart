@@ -273,7 +273,7 @@ class MediaCard extends StatelessWidget {
                 child: Ink.image(
                     fit: BoxFit.cover,
                     image: NetworkImage(
-                      "${APIs.imagesUrl}/${item.id}/poster.jpg",
+                      "${APIs.imagesUrl}/${item.id}/poster_w500.jpg",
                     )),
               ),
               SizedBox(

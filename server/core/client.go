@@ -46,6 +46,7 @@ func (c *Client) registerCronJob(name string, cron string, f func() error) {
 func (c *Client) Init() {
 	go c.reloadTasks()
 	c.addSysCron()
+	go c.checkW500PosterOnStartup()
 }
 
 func (c *Client) reloadTasks() {

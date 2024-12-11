@@ -223,6 +223,10 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 		if err := c.downloadPoster(detail.PosterPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
+		if err := c.downloadW500Poster(detail.PosterPath, r.ID); err != nil {
+			log.Errorf("download w500 poster error: %v", err)
+		}
+
 		if err := c.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
@@ -301,6 +305,10 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 		if err := c.downloadPoster(detail.PosterPath, r.ID); err != nil {
 			log.Errorf("download poster error: %v", err)
 		}
+		if err := c.downloadW500Poster(detail.PosterPath, r.ID); err != nil {
+			log.Errorf("download w500 poster error: %v", err)
+		}
+
 		if err := c.downloadBackdrop(detail.BackdropPath, r.ID); err != nil {
 			log.Errorf("download backdrop error: %v", err)
 		}
@@ -372,6 +380,11 @@ func (c *Client) downloadPoster(path string, mediaID int) error {
 	return c.downloadImage(url, mediaID, "poster.jpg")
 }
 
+func (c *Client) downloadW500Poster(path string, mediaID int) error {
+	url := "https://image.tmdb.org/t/p/w500" + path
+	return c.downloadImage(url, mediaID, "poster_w500.jpg")
+}
+
 func (c *Client) downloadImage(url string, mediaID int, name string) error {
 
 	log.Infof("try to download image: %v", url)
@@ -395,6 +408,46 @@ func (c *Client) downloadImage(url string, mediaID int, name string) error {
 	log.Infof("image successfully downlaoded: %v", targetFile)
 	return nil
 
+}
+
+func (c *Client) checkW500PosterOnStartup() {
+	log.Infof("check all w500 posters")
+	all := c.db.GetMediaWatchlist(media.MediaTypeTv)
+	movies := c.db.GetMediaWatchlist(media.MediaTypeMovie)
+	all = append(all, movies...)
+	for _, e := range all {
+		targetFile := filepath.Join(fmt.Sprintf("%v/%d", db.ImgPath, e.ID), "poster_w500.jpg")
+		if _, err := os.Stat(targetFile); err != nil {
+			log.Infof("poster_w500.jpg not exist for %s, will download it", e.NameEn)
+
+			if e.MediaType ==media.MediaTypeTv {
+				detail, err := c.MustTMDB().GetTvDetails(e.TmdbID, db.LanguageCN)
+				if err != nil {
+					log.Warnf("get tmdb detail for %s error: %v", e.NameEn, err)
+					continue
+				}
+	
+				if err := c.downloadW500Poster(detail.PosterPath, e.ID); err != nil {
+					log.Warnf("download w500 poster error: %v", err)
+					continue
+				}
+	
+			} else {
+				detail, err := c.MustTMDB().GetMovieDetails(e.TmdbID, db.LanguageCN)
+				if err != nil {
+					log.Warnf("get tmdb detail for %s error: %v", e.NameEn, err)
+					continue
+				}
+	
+				if err := c.downloadW500Poster(detail.PosterPath, e.ID); err != nil {
+					log.Warnf("download w500 poster error: %v", err)
+					continue
+				}
+	
+			}
+
+		}
+	}
 }
 
 func (c *Client) SuggestedMovieFolderName(tmdbId int) (string, error) {
