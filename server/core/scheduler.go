@@ -203,7 +203,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	}
 	st := c.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
-	stImpl, err := c.getStorage(st.ID, series.MediaType)
+	stImpl, err := c.GetStorage(st.ID, series.MediaType)
 	if err != nil {
 		return err
 	}
@@ -243,7 +243,7 @@ func (c *Client) CheckDownloadedSeriesFiles(m *ent.Media) error {
 	}
 	log.Infof("check files in directory: %s", m.TargetDir)
 
-	var storageImpl, err = c.getStorage(m.StorageID, media.MediaTypeTv)
+	var storageImpl, err = c.GetStorage(m.StorageID, media.MediaTypeTv)
 	if err != nil {
 		return err
 	}

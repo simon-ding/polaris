@@ -35,7 +35,7 @@ func (c *Client) writeNfoFile(historyId int) error {
 	}
 
 	if md.MediaType == media.MediaTypeTv { //tvshow.nfo
-		st, err := c.getStorage(md.StorageID, media.MediaTypeTv)
+		st, err := c.GetStorage(md.StorageID, media.MediaTypeTv)
 		if err != nil {
 			return errors.Wrap(err, "get storage")
 		}
@@ -70,7 +70,7 @@ func (c *Client) writeNfoFile(historyId int) error {
 		}
 
 	} else if md.MediaType == media.MediaTypeMovie { //movie.nfo
-		st, err := c.getStorage(md.StorageID, media.MediaTypeMovie)
+		st, err := c.GetStorage(md.StorageID, media.MediaTypeMovie)
 		if err != nil {
 			return errors.Wrap(err, "get storage")
 		}
@@ -122,7 +122,7 @@ func (c *Client) writePlexmatch(historyId int) error {
 	if series.MediaType != media.MediaTypeTv { //.plexmatch only support tv series
 		return nil
 	}
-	st, err := c.getStorage(series.StorageID, media.MediaTypeTv)
+	st, err := c.GetStorage(series.StorageID, media.MediaTypeTv)
 	if err != nil {
 		return errors.Wrap(err, "get storage")
 	}
@@ -197,7 +197,7 @@ func (c *Client) nfoSupportEnabled() bool {
 	return c.db.GetSetting(db.SettingNfoSupportEnabled) == "true"
 }
 
-func (c *Client) getStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {
+func (c *Client) GetStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {
 	st := c.db.GetStorage(storageId)
 	targetPath := st.TvPath
 	if mediaType == media.MediaTypeMovie {

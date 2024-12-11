@@ -193,13 +193,25 @@ class _DetailCardState extends ConsumerState<DetailCard> {
   }
 
   Future<void> showConfirmDialog(BuildContext oriContext) {
+    var deleteFiles = false;
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("确认删除："),
-          content: Text("${widget.details.name}"),
+          title: const Text("确认删除"),
+          content: StatefulBuilder(builder: (context, setState) {
+            return CheckboxListTile(
+                value: deleteFiles,
+                title: Text("删除媒体文件"),
+                onChanged: (v) {
+                  setState(
+                    () {
+                      deleteFiles = v!;
+                    },
+                  );
+                });
+          }),
           actions: [
             TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -209,7 +221,7 @@ class _DetailCardState extends ConsumerState<DetailCard> {
                   ref
                       .read(mediaDetailsProvider(widget.details.id.toString())
                           .notifier)
-                      .delete()
+                      .delete(deleteFiles)
                       .then((v) {
                     if (oriContext.mounted) {
                       oriContext.go(widget.details.mediaType == "tv"

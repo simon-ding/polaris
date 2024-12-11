@@ -72,3 +72,7 @@ func (a *Alist) UploadProgress() float64 {
 	}
 	return a.progresser()
 }
+
+func (a *Alist) RemoveAll(path string) error {
+	return nil
+}

@@ -20,6 +20,7 @@ type Storage interface {
 	ReadFile(string) ([]byte, error)
 	WriteFile(string, []byte) error
 	UploadProgress() float64
+	RemoveAll(path string) error
 }
 
 type uploadFunc func(destPath string, destInfo fs.FileInfo, srcReader io.Reader, mimeType *mimetype.MIME) error

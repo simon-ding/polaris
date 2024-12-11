@@ -10,6 +10,7 @@ import (
 	"polaris/log"
 	"polaris/server/core"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -170,9 +171,30 @@ func (s *Server) DeleteFromWatchlist(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "convert")
 	}
+
+	deleteFiles := c.Query("delete_files")
+	if strings.ToLower(deleteFiles) == "true" {
+		//will delete local media file
+		log.Infof("will delete local media files for %d", id)
+		m, err := s.db.GetMedia(id)
+		if err != nil {
+			log.Warnf("get media: %v", err)
+		} else {
+			st, err := s.core.GetStorage(m.StorageID, m.MediaType)
+			if err != nil {
+				log.Warnf("get storage error: %v", err)
+			} else {
+				if err := st.RemoveAll(m.TargetDir); err != nil {
+					log.Warnf("remove all : %v", err)
+				}
+			}
+		}
+	}
+
 	if err := s.db.DeleteMedia(id); err != nil {
 		return nil, errors.Wrap(err, "delete db")
 	}
 	os.RemoveAll(filepath.Join(db.ImgPath, ids)) //delete image related
+
 	return "success", nil
 }

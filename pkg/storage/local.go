@@ -71,3 +71,7 @@ func (l *LocalStorage) WriteFile(name string, data []byte) error {
 func (l *LocalStorage) UploadProgress() float64 {
 	return 0
 }
+
+func (i *LocalStorage) RemoveAll(path string) error {
+	return os.RemoveAll(path)
+}

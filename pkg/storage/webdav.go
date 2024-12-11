@@ -85,3 +85,7 @@ func (w *WebdavStorage) UploadProgress() float64 {
 	}
 	return w.progresser()
 }
+
+func (w *WebdavStorage) RemoveAll(path string) error {
+	return w.fs.RemoveAll(path)
+}

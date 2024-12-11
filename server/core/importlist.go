@@ -323,7 +323,7 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 }
 
 func (c *Client) checkMovieFolder(m *ent.Media) error {
-	var storageImpl, err = c.getStorage(m.StorageID, media.MediaTypeMovie)
+	var storageImpl, err = c.GetStorage(m.StorageID, media.MediaTypeMovie)
 	if err != nil {
 		return err
 	}
