@@ -117,6 +117,8 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 					}
 				}
 			}
+			s.monitorNumCache.Set(item.ID, ms.MonitoredNum)
+			s.downloadNumCache.Set(item.ID, ms.DownloadedNum)
 		}
 
 		res[i] = ms
