@@ -44,14 +44,34 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
         children: [
           () {
             return data.when(
-                data: (value) => SingleChildScrollView(
-                      child: Wrap(
-                        alignment: WrapAlignment.start,
-                        spacing: isSmallScreen(context) ? 0 : 10,
-                        runSpacing: isSmallScreen(context) ? 10 : 20,
-                        children: getMediaAll(value),
-                      ),
-                    ),
+                data: (value) {
+                  if (value.isEmpty) {
+                    return Container(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        alignment: Alignment.center,
+                        child: const Text(
+                          "啥都没有...",
+                          style: TextStyle(fontSize: 16),
+                        ));
+                  }
+
+                  if (onlyShowUnfinished) {
+                    value = value
+                        .where((v) => v.downloadedNum != v.monitoredNum)
+                        .toList();
+                  }
+
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: cardWidth(context) ,
+                        childAspectRatio: 0.55,
+                        mainAxisSpacing: isSmallScreen(context) ? 10 : 20,
+                        crossAxisSpacing: isSmallScreen(context) ? 0 : 10),
+                    itemCount: value.length,
+                    itemBuilder: (context, index) =>
+                        MediaCard(item: value[index]),
+                  );
+                },
                 error: (err, trace) => PoNetworkError(err: err),
                 loading: () => const MyProgressIndicator());
           }(),
@@ -152,28 +172,6 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     return screenWidth < 600;
   }
-
-  List<Widget> getMediaAll(List<MediaDetail> list) {
-    if (list.isEmpty) {
-      return [
-        Container(
-            height: MediaQuery.of(context).size.height * 0.6,
-            alignment: Alignment.center,
-            child: const Text(
-              "啥都没有...",
-              style: TextStyle(fontSize: 16),
-            ))
-      ];
-    }
-    if (onlyShowUnfinished) {
-      list = list.where((v) => v.downloadedNum != v.monitoredNum).toList();
-    }
-    return List.generate(list.length, (i) {
-      final item = list[i];
-      return MediaCard(item: item);
-    });
-  }
-
   Future<void> _showNameParsingDialog() async {
     final resultController = TextEditingController();
     return showDialog<void>(
@@ -243,8 +241,6 @@ class WelcomePageState extends ConsumerState<WelcomePage> {
 
 class MediaCard extends StatelessWidget {
   final MediaDetail item;
-  static const double smallWidth = 110;
-  static const double largeWidth = 140;
 
   const MediaCard({super.key, required this.item});
   @override
@@ -265,19 +261,18 @@ class MediaCard extends StatelessWidget {
               context.go(TvDetailsPage.toRoute(item.id!));
             }
           },
-          child: Column(
+          child: LayoutBuilder(builder: (context, constraints) => Wrap(
+            direction: Axis.horizontal,
             children: <Widget>[
+              Ink.image(
+                  width: constraints.maxWidth,
+                  height: constraints.maxWidth / 2 * 3,
+                  fit: BoxFit.cover,
+                  image: NetworkImage(
+                    "${APIs.imagesUrl}/${item.id}/poster_w500.jpg",
+                  )),
               SizedBox(
-                width: cardWidth(context),
-                height: cardWidth(context) / 2 * 3,
-                child: Ink.image(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                      "${APIs.imagesUrl}/${item.id}/poster_w500.jpg",
-                    )),
-              ),
-              SizedBox(
-                  width: cardWidth(context),
+                  width: constraints.maxWidth,
                   child: Column(
                     children: [
                       LinearProgressIndicator(
@@ -297,15 +292,18 @@ class MediaCard extends StatelessWidget {
                     ],
                   )),
             ],
-          ),
+          )),
         ));
   }
+}
 
-  double cardWidth(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth < 600) {
-      return smallWidth;
-    }
-    return largeWidth;
+double cardWidth(BuildContext context) {
+  const double smallWidth = 110;
+  const double largeWidth = 140;
+
+  final screenWidth = MediaQuery.of(context).size.width;
+  if (screenWidth < 600) {
+    return smallWidth;
   }
+  return largeWidth;
 }
