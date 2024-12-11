@@ -186,6 +186,8 @@ func (s *Server) DeleteFromWatchlist(c *gin.Context) (interface{}, error) {
 			} else {
 				if err := st.RemoveAll(m.TargetDir); err != nil {
 					log.Warnf("remove all : %v", err)
+				} else {
+					log.Infof("delete media files success: %v", m.TargetDir)
 				}
 			}
 		}

@@ -87,5 +87,5 @@ func (w *WebdavStorage) UploadProgress() float64 {
 }
 
 func (w *WebdavStorage) RemoveAll(path string) error {
-	return w.fs.RemoveAll(path)
+	return w.fs.RemoveAll(filepath.Join(w.dir, path))
 }

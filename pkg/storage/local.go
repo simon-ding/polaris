@@ -72,6 +72,6 @@ func (l *LocalStorage) UploadProgress() float64 {
 	return 0
 }
 
-func (i *LocalStorage) RemoveAll(path string) error {
-	return os.RemoveAll(path)
+func (l *LocalStorage) RemoveAll(path string) error {
+	return os.RemoveAll(filepath.Join(l.dir, path))
 }
