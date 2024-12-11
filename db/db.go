@@ -251,6 +251,7 @@ func (c *Client) SaveEposideDetail2(d *ent.Episode) (int, error) {
 		SetMediaID(d.MediaID).
 		SetStatus(d.Status).
 		SetOverview(d.Overview).
+		SetMonitored(d.Monitored).
 		SetTitle(d.Title).Save(context.TODO())
 
 	return ep.ID, err
