@@ -1,11 +1,3 @@
-FROM instrumentisto/flutter:3 AS flutter
-WORKDIR /app
-COPY ./ui/pubspec.yaml ./ui/pubspec.lock ./
-RUN flutter pub get
-COPY ./ui/ ./
-RUN flutter build web --no-web-resources-cdn
-
-# 打包依赖阶段使用golang作为基础镜像
 FROM golang:1.23 as builder
 
 # 启用go module
