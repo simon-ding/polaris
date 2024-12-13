@@ -149,6 +149,11 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 
 	log.Debugf("latest season is %v", lastSeason)
 
+	alterTitles, err := c.getAlterTitles(in.TmdbID, media.MediaTypeTv)
+	if err != nil {
+		return nil, errors.Wrap(err, "get alter titles")
+	}
+
 	var epIds []int
 	for _, season := range detail.Seasons {
 		seasonId := season.SeasonNumber
@@ -195,6 +200,7 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 			epIds = append(epIds, epid)
 		}
 	}
+	
 	m := &ent.Media{
 		TmdbID:                  int(detail.ID),
 		ImdbID:                  detail.IMDbID,
@@ -213,6 +219,7 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 			OriginalLanguage: detail.OriginalLanguage,
 			Genres:           detail.Genres,
 		},
+		AlternativeTitles: alterTitles,
 	}
 
 	r, err := c.db.AddMediaWatchlist(m, epIds)
@@ -240,6 +247,42 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	return nil, nil
 }
 
+func (c *Client) getAlterTitles(tmdbId int, mediaType media.MediaType) ([]schema.AlternativeTilte, error){
+	var titles []schema.AlternativeTilte
+
+	if mediaType == media.MediaTypeTv {
+		alterTitles, err := c.MustTMDB().GetTVAlternativeTitles(tmdbId, c.language)
+		if err != nil {
+			return nil, errors.Wrap(err, "tmdb")
+		}
+		
+		for _, t := range alterTitles.Results {
+			titles = append(titles, schema.AlternativeTilte{
+				Iso3166_1: t.Iso3166_1,
+				Title: t.Title,
+				Type: t.Type,
+			})
+		}
+	
+	} else if mediaType == media.MediaTypeMovie {
+		alterTitles, err := c.MustTMDB().GetMovieAlternativeTitles(tmdbId, c.language)
+		if err != nil {
+			return nil, errors.Wrap(err, "tmdb")
+		}
+		
+		for _, t := range alterTitles.Titles {
+			titles = append(titles, schema.AlternativeTilte{
+				Iso3166_1: t.Iso3166_1,
+				Title: t.Title,
+				Type: t.Type,
+			})
+		}
+	}
+	log.Debugf("get alternative titles: %+v", titles)
+
+	return titles, nil
+}
+
 func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	log.Infof("add movie watchlist input: %+v", in)
 	detailCn, err := c.MustTMDB().GetMovieDetails(in.TmdbID, db.LanguageCN)
@@ -257,6 +300,12 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 		detail = detailEn
 	}
 	log.Infof("find detail for movie id %d: %v", in.TmdbID, detail)
+
+	alterTitles, err := c.getAlterTitles(in.TmdbID, media.MediaTypeMovie)
+	if err != nil {
+		return nil, errors.Wrap(err, "get alter titles")
+	}
+
 
 	epid, err := c.db.SaveEposideDetail(&ent.Episode{
 		SeasonNumber:  1,
@@ -284,6 +333,7 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 		StorageID:    in.StorageID,
 		TargetDir:    in.Folder,
 		Limiter:      schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
+		AlternativeTitles: alterTitles,
 	}
 
 	extras := schema.MediaExtras{

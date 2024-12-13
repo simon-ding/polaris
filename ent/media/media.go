@@ -45,6 +45,8 @@ const (
 	FieldLimiter = "limiter"
 	// FieldExtras holds the string denoting the extras field in the database.
 	FieldExtras = "extras"
+	// FieldAlternativeTitles holds the string denoting the alternative_titles field in the database.
+	FieldAlternativeTitles = "alternative_titles"
 	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
 	EdgeEpisodes = "episodes"
 	// Table holds the table name of the media in the database.
@@ -76,6 +78,7 @@ var Columns = []string{
 	FieldDownloadHistoryEpisodes,
 	FieldLimiter,
 	FieldExtras,
+	FieldAlternativeTitles,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

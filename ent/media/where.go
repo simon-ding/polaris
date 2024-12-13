@@ -795,6 +795,16 @@ func ExtrasNotNil() predicate.Media {
 	return predicate.Media(sql.FieldNotNull(FieldExtras))
 }
 
+// AlternativeTitlesIsNil applies the IsNil predicate on the "alternative_titles" field.
+func AlternativeTitlesIsNil() predicate.Media {
+	return predicate.Media(sql.FieldIsNull(FieldAlternativeTitles))
+}
+
+// AlternativeTitlesNotNil applies the NotNil predicate on the "alternative_titles" field.
+func AlternativeTitlesNotNil() predicate.Media {
+	return predicate.Media(sql.FieldNotNull(FieldAlternativeTitles))
+}
+
 // HasEpisodes applies the HasEdge predicate on the "episodes" edge.
 func HasEpisodes() predicate.Media {
 	return predicate.Media(func(s *sql.Selector) {

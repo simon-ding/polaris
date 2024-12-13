@@ -184,6 +184,12 @@ func (mc *MediaCreate) SetNillableExtras(se *schema.MediaExtras) *MediaCreate {
 	return mc
 }
 
+// SetAlternativeTitles sets the "alternative_titles" field.
+func (mc *MediaCreate) SetAlternativeTitles(st []schema.AlternativeTilte) *MediaCreate {
+	mc.mutation.SetAlternativeTitles(st)
+	return mc
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mc *MediaCreate) AddEpisodeIDs(ids ...int) *MediaCreate {
 	mc.mutation.AddEpisodeIDs(ids...)
@@ -376,6 +382,10 @@ func (mc *MediaCreate) createSpec() (*Media, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Extras(); ok {
 		_spec.SetField(media.FieldExtras, field.TypeJSON, value)
 		_node.Extras = value
+	}
+	if value, ok := mc.mutation.AlternativeTitles(); ok {
+		_spec.SetField(media.FieldAlternativeTitles, field.TypeJSON, value)
+		_node.AlternativeTitles = value
 	}
 	if nodes := mc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

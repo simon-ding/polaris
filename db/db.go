@@ -157,6 +157,7 @@ func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, er
 		SetDownloadHistoryEpisodes(m.DownloadHistoryEpisodes).
 		SetLimiter(m.Limiter).
 		SetExtras(m.Extras).
+		SetAlternativeTitles(m.AlternativeTitles).
 		AddEpisodeIDs(episodes...).
 		Save(context.TODO())
 	return r, err

@@ -5115,6 +5115,8 @@ type MediaMutation struct {
 	download_history_episodes *bool
 	limiter                   *schema.MediaLimiter
 	extras                    *schema.MediaExtras
+	alternative_titles        *[]schema.AlternativeTilte
+	appendalternative_titles  []schema.AlternativeTilte
 	clearedFields             map[string]struct{}
 	episodes                  map[int]struct{}
 	removedepisodes           map[int]struct{}
@@ -5881,6 +5883,71 @@ func (m *MediaMutation) ResetExtras() {
 	delete(m.clearedFields, media.FieldExtras)
 }
 
+// SetAlternativeTitles sets the "alternative_titles" field.
+func (m *MediaMutation) SetAlternativeTitles(st []schema.AlternativeTilte) {
+	m.alternative_titles = &st
+	m.appendalternative_titles = nil
+}
+
+// AlternativeTitles returns the value of the "alternative_titles" field in the mutation.
+func (m *MediaMutation) AlternativeTitles() (r []schema.AlternativeTilte, exists bool) {
+	v := m.alternative_titles
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAlternativeTitles returns the old "alternative_titles" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MediaMutation) OldAlternativeTitles(ctx context.Context) (v []schema.AlternativeTilte, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAlternativeTitles is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAlternativeTitles requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAlternativeTitles: %w", err)
+	}
+	return oldValue.AlternativeTitles, nil
+}
+
+// AppendAlternativeTitles adds st to the "alternative_titles" field.
+func (m *MediaMutation) AppendAlternativeTitles(st []schema.AlternativeTilte) {
+	m.appendalternative_titles = append(m.appendalternative_titles, st...)
+}
+
+// AppendedAlternativeTitles returns the list of values that were appended to the "alternative_titles" field in this mutation.
+func (m *MediaMutation) AppendedAlternativeTitles() ([]schema.AlternativeTilte, bool) {
+	if len(m.appendalternative_titles) == 0 {
+		return nil, false
+	}
+	return m.appendalternative_titles, true
+}
+
+// ClearAlternativeTitles clears the value of the "alternative_titles" field.
+func (m *MediaMutation) ClearAlternativeTitles() {
+	m.alternative_titles = nil
+	m.appendalternative_titles = nil
+	m.clearedFields[media.FieldAlternativeTitles] = struct{}{}
+}
+
+// AlternativeTitlesCleared returns if the "alternative_titles" field was cleared in this mutation.
+func (m *MediaMutation) AlternativeTitlesCleared() bool {
+	_, ok := m.clearedFields[media.FieldAlternativeTitles]
+	return ok
+}
+
+// ResetAlternativeTitles resets all changes to the "alternative_titles" field.
+func (m *MediaMutation) ResetAlternativeTitles() {
+	m.alternative_titles = nil
+	m.appendalternative_titles = nil
+	delete(m.clearedFields, media.FieldAlternativeTitles)
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
 func (m *MediaMutation) AddEpisodeIDs(ids ...int) {
 	if m.episodes == nil {
@@ -5969,7 +6036,7 @@ func (m *MediaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MediaMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 16)
 	if m.tmdb_id != nil {
 		fields = append(fields, media.FieldTmdbID)
 	}
@@ -6015,6 +6082,9 @@ func (m *MediaMutation) Fields() []string {
 	if m.extras != nil {
 		fields = append(fields, media.FieldExtras)
 	}
+	if m.alternative_titles != nil {
+		fields = append(fields, media.FieldAlternativeTitles)
+	}
 	return fields
 }
 
@@ -6053,6 +6123,8 @@ func (m *MediaMutation) Field(name string) (ent.Value, bool) {
 		return m.Limiter()
 	case media.FieldExtras:
 		return m.Extras()
+	case media.FieldAlternativeTitles:
+		return m.AlternativeTitles()
 	}
 	return nil, false
 }
@@ -6092,6 +6164,8 @@ func (m *MediaMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldLimiter(ctx)
 	case media.FieldExtras:
 		return m.OldExtras(ctx)
+	case media.FieldAlternativeTitles:
+		return m.OldAlternativeTitles(ctx)
 	}
 	return nil, fmt.Errorf("unknown Media field %s", name)
 }
@@ -6206,6 +6280,13 @@ func (m *MediaMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetExtras(v)
 		return nil
+	case media.FieldAlternativeTitles:
+		v, ok := value.([]schema.AlternativeTilte)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAlternativeTitles(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)
 }
@@ -6281,6 +6362,9 @@ func (m *MediaMutation) ClearedFields() []string {
 	if m.FieldCleared(media.FieldExtras) {
 		fields = append(fields, media.FieldExtras)
 	}
+	if m.FieldCleared(media.FieldAlternativeTitles) {
+		fields = append(fields, media.FieldAlternativeTitles)
+	}
 	return fields
 }
 
@@ -6312,6 +6396,9 @@ func (m *MediaMutation) ClearField(name string) error {
 		return nil
 	case media.FieldExtras:
 		m.ClearExtras()
+		return nil
+	case media.FieldAlternativeTitles:
+		m.ClearAlternativeTitles()
 		return nil
 	}
 	return fmt.Errorf("unknown Media nullable field %s", name)
@@ -6365,6 +6452,9 @@ func (m *MediaMutation) ResetField(name string) error {
 		return nil
 	case media.FieldExtras:
 		m.ResetExtras()
+		return nil
+	case media.FieldAlternativeTitles:
+		m.ResetAlternativeTitles()
 		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)

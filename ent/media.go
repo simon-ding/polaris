@@ -49,6 +49,8 @@ type Media struct {
 	Limiter schema.MediaLimiter `json:"limiter,omitempty"`
 	// Extras holds the value of the "extras" field.
 	Extras schema.MediaExtras `json:"extras,omitempty"`
+	// AlternativeTitles holds the value of the "alternative_titles" field.
+	AlternativeTitles []schema.AlternativeTilte `json:"alternative_titles,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MediaQuery when eager-loading is set.
 	Edges        MediaEdges `json:"edges"`
@@ -78,7 +80,7 @@ func (*Media) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case media.FieldLimiter, media.FieldExtras:
+		case media.FieldLimiter, media.FieldExtras, media.FieldAlternativeTitles:
 			values[i] = new([]byte)
 		case media.FieldDownloadHistoryEpisodes:
 			values[i] = new(sql.NullBool)
@@ -203,6 +205,14 @@ func (m *Media) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field extras: %w", err)
 				}
 			}
+		case media.FieldAlternativeTitles:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field alternative_titles", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &m.AlternativeTitles); err != nil {
+					return fmt.Errorf("unmarshal field alternative_titles: %w", err)
+				}
+			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -288,6 +298,9 @@ func (m *Media) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("extras=")
 	builder.WriteString(fmt.Sprintf("%v", m.Extras))
+	builder.WriteString(", ")
+	builder.WriteString("alternative_titles=")
+	builder.WriteString(fmt.Sprintf("%v", m.AlternativeTitles))
 	builder.WriteByte(')')
 	return builder.String()
 }

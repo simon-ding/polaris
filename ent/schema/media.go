@@ -31,6 +31,7 @@ func (Media) Fields() []ent.Field {
 		field.Bool("download_history_episodes").Optional().Default(false).Comment("tv series only"),
 		field.JSON("limiter", MediaLimiter{}).Optional(),
 		field.JSON("extras", MediaExtras{}).Optional(),
+		field.JSON("alternative_titles", []AlternativeTilte{}).Optional(),
 	}
 }
 
@@ -39,6 +40,12 @@ func (Media) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("episodes", Episode.Type),
 	}
+}
+
+type AlternativeTilte struct {
+	Iso3166_1 string `json:"iso_3166_1"`
+	Title     string `json:"title"`
+	Type      string `json:"type"`
 }
 
 type MediaLimiter struct {

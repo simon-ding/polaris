@@ -14,6 +14,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -290,6 +291,24 @@ func (mu *MediaUpdate) ClearExtras() *MediaUpdate {
 	return mu
 }
 
+// SetAlternativeTitles sets the "alternative_titles" field.
+func (mu *MediaUpdate) SetAlternativeTitles(st []schema.AlternativeTilte) *MediaUpdate {
+	mu.mutation.SetAlternativeTitles(st)
+	return mu
+}
+
+// AppendAlternativeTitles appends st to the "alternative_titles" field.
+func (mu *MediaUpdate) AppendAlternativeTitles(st []schema.AlternativeTilte) *MediaUpdate {
+	mu.mutation.AppendAlternativeTitles(st)
+	return mu
+}
+
+// ClearAlternativeTitles clears the value of the "alternative_titles" field.
+func (mu *MediaUpdate) ClearAlternativeTitles() *MediaUpdate {
+	mu.mutation.ClearAlternativeTitles()
+	return mu
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mu *MediaUpdate) AddEpisodeIDs(ids ...int) *MediaUpdate {
 	mu.mutation.AddEpisodeIDs(ids...)
@@ -453,6 +472,17 @@ func (mu *MediaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if mu.mutation.ExtrasCleared() {
 		_spec.ClearField(media.FieldExtras, field.TypeJSON)
+	}
+	if value, ok := mu.mutation.AlternativeTitles(); ok {
+		_spec.SetField(media.FieldAlternativeTitles, field.TypeJSON, value)
+	}
+	if value, ok := mu.mutation.AppendedAlternativeTitles(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, media.FieldAlternativeTitles, value)
+		})
+	}
+	if mu.mutation.AlternativeTitlesCleared() {
+		_spec.ClearField(media.FieldAlternativeTitles, field.TypeJSON)
 	}
 	if mu.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -779,6 +809,24 @@ func (muo *MediaUpdateOne) ClearExtras() *MediaUpdateOne {
 	return muo
 }
 
+// SetAlternativeTitles sets the "alternative_titles" field.
+func (muo *MediaUpdateOne) SetAlternativeTitles(st []schema.AlternativeTilte) *MediaUpdateOne {
+	muo.mutation.SetAlternativeTitles(st)
+	return muo
+}
+
+// AppendAlternativeTitles appends st to the "alternative_titles" field.
+func (muo *MediaUpdateOne) AppendAlternativeTitles(st []schema.AlternativeTilte) *MediaUpdateOne {
+	muo.mutation.AppendAlternativeTitles(st)
+	return muo
+}
+
+// ClearAlternativeTitles clears the value of the "alternative_titles" field.
+func (muo *MediaUpdateOne) ClearAlternativeTitles() *MediaUpdateOne {
+	muo.mutation.ClearAlternativeTitles()
+	return muo
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (muo *MediaUpdateOne) AddEpisodeIDs(ids ...int) *MediaUpdateOne {
 	muo.mutation.AddEpisodeIDs(ids...)
@@ -972,6 +1020,17 @@ func (muo *MediaUpdateOne) sqlSave(ctx context.Context) (_node *Media, err error
 	}
 	if muo.mutation.ExtrasCleared() {
 		_spec.ClearField(media.FieldExtras, field.TypeJSON)
+	}
+	if value, ok := muo.mutation.AlternativeTitles(); ok {
+		_spec.SetField(media.FieldAlternativeTitles, field.TypeJSON, value)
+	}
+	if value, ok := muo.mutation.AppendedAlternativeTitles(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, media.FieldAlternativeTitles, value)
+		})
+	}
+	if muo.mutation.AlternativeTitlesCleared() {
+		_spec.ClearField(media.FieldAlternativeTitles, field.TypeJSON)
 	}
 	if muo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
