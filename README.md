@@ -38,6 +38,15 @@
 - [x] 支持导入plex watchlist，plex里标记，自动导入polaris
 - [x] and more...
 
+## 支持的平台
+
+ - linux/amd64
+ - linux/arm64
+ - linux/arm/v7
+ - linux/386
+ - linux/s390x
+ - linux/ppc64le
+
 ## Todos
 
 
