@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"polaris/db"
+	"polaris/ent"
 	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/metadata"
@@ -26,6 +27,51 @@ type SearchParam struct {
 	FilterQiangban  bool //for movie, 是否过滤枪版电影
 }
 
+func names2Query(media *ent.Media) []string {
+	var names = []string{media.NameEn}
+
+	if media.NameCn != "" {
+		hasName := false
+		for _, n := range names {
+			if media.NameCn == n {
+				hasName = true
+			}
+		}
+		if !hasName {
+			names = append(names, media.NameCn)
+		}
+
+	}
+	if media.OriginalName != "" {
+		hasName := false
+		for _, n := range names {
+			if media.OriginalName == n {
+				hasName = true
+			}
+		}
+		if !hasName {
+			names = append(names, media.OriginalName)
+		}
+
+	}
+
+	for _, t := range media.AlternativeTitles {
+		if (t.Iso3166_1 == "CN" || t.Iso3166_1 == "US") && t.Type == "" {
+			hasName := false
+			for _, n := range names {
+				if t.Title == n {
+					hasName = true
+				}
+			}
+			if !hasName {
+				names = append(names, t.Title)
+			}
+		}
+	}
+	log.Debugf("name to query %+v", names)
+	return names
+}
+
 func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	series := db1.GetMediaDetails(param.MediaId)
 	if series == nil {
@@ -38,7 +84,9 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 	}
 	log.Debugf("check tv series %s, season %d, episode %v", series.NameEn, param.SeasonNum, param.Episodes)
 
-	res := searchWithTorznab(db1, prowlarr.TV, series.NameEn, series.NameCn, series.OriginalName)
+	names := names2Query(series.Media)
+
+	res := searchWithTorznab(db1, prowlarr.TV, names...)
 
 	var filtered []torznab.Result
 lo:
@@ -119,8 +167,8 @@ func imdbIDMatchExact(id1, id2 string) bool {
 	return id1 == id2
 }
 
-func torrentSizeOk(detail *db.MediaDetails, globalLimiter *db.MediaSizeLimiter, torrentSize int64, 
-		torrentEpisodeNum int, param *SearchParam) bool {
+func torrentSizeOk(detail *db.MediaDetails, globalLimiter *db.MediaSizeLimiter, torrentSize int64,
+	torrentEpisodeNum int, param *SearchParam) bool {
 
 	multiplier := 1 //大小倍数，正常为1，如果是季包则为季内集数
 	if detail.MediaType == media.MediaTypeTv {
@@ -198,8 +246,9 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 		log.Warnf("get tv size limiter: %v", err)
 		limiter = &db.MediaSizeLimiter{}
 	}
+	names := names2Query(movieDetail.Media)
 
-	res := searchWithTorznab(db1, prowlarr.Movie, movieDetail.NameEn, movieDetail.NameCn, movieDetail.OriginalName)
+	res := searchWithTorznab(db1, prowlarr.Movie, names...)
 	if movieDetail.Extras.IsJav() {
 		res1 := searchWithTorznab(db1, prowlarr.Movie, movieDetail.Extras.JavId)
 		res = append(res, res1...)
@@ -361,5 +410,7 @@ func torrentNameOk(detail *db.MediaDetails, tester NameTester) bool {
 	if detail.Extras.IsJav() && tester.IsAcceptable(detail.Extras.JavId) {
 		return true
 	}
-	return tester.IsAcceptable(detail.NameCn, detail.NameEn, detail.OriginalName)
+	names := names2Query(detail.Media)
+
+	return tester.IsAcceptable(names...)
 }
