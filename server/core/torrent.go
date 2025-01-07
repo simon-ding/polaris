@@ -6,6 +6,7 @@ import (
 	"polaris/ent"
 	"polaris/ent/media"
 	"polaris/log"
+	"polaris/pkg/gemini"
 	"polaris/pkg/metadata"
 	"polaris/pkg/prowlarr"
 	"polaris/pkg/torznab"
@@ -72,6 +73,58 @@ func names2Query(media *ent.Media) []string {
 	return names
 }
 
+func filterBasedOnGemini(cfg db.AIConfig, res []torznab.Result, names ...string) []torznab.Result {
+
+	var torrentNames []string
+	for _, r := range res {
+		torrentNames = append(torrentNames, r.Name)
+	}
+	g, err := gemini.NewClient(cfg.GeminiApiKey, cfg.GeminiModelName)
+	if err != nil {
+		log.Warnf("create gemini client: %v", err)
+		return res
+	}
+	resf, err := g.FilterTvOrMovies(torrentNames, names...)
+	if err != nil {
+		log.Warnf("filter with gemini: %v", err)
+		return res
+	}
+	var newRes []torznab.Result
+	for _, r := range res {
+		if slices.Contains(resf, r.Name) {
+			newRes = append(newRes, r)
+		}
+	}
+	return newRes
+}
+
+func filterBasedOnRules(res []torznab.Result, names ...string) []torznab.Result {
+	var filtered []torznab.Result
+	for _, r := range res {
+		meta := metadata.ParseTv(r.Name)
+		if meta.IsAcceptable(names...) {
+			filtered = append(filtered, r)
+		}
+	}
+	return filtered
+}
+
+func filterResourceNames(db1 *db.Client, res []torznab.Result, names ...string) []torznab.Result {
+	n1 := len(res)
+	cfg, err := db1.GetAIConfig()
+	if err != nil {
+		log.Warnf("get ai config: %v", err)
+	}
+	if cfg.Enabled {
+		res = filterBasedOnGemini(cfg, res, names...)
+	} else {
+		res = filterBasedOnRules(res, names...)
+	}
+	log.Infof("resource before name filtering length is %d, after filtering length is %d", n1, len(res))
+	return res
+
+}
+
 func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	series := db1.GetMediaDetails(param.MediaId)
 	if series == nil {
@@ -87,6 +140,8 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 	names := names2Query(series.Media)
 
 	res := searchWithTorznab(db1, prowlarr.TV, names...)
+
+	res = filterResourceNames(db1, res, names...)
 
 	var filtered []torznab.Result
 lo:
@@ -249,6 +304,8 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	names := names2Query(movieDetail.Media)
 
 	res := searchWithTorznab(db1, prowlarr.Movie, names...)
+	res = filterResourceNames(db1, res, names...)
+
 	if movieDetail.Extras.IsJav() {
 		res1 := searchWithTorznab(db1, prowlarr.Movie, movieDetail.Extras.JavId)
 		res = append(res, res1...)

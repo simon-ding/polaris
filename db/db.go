@@ -761,3 +761,24 @@ func (c *Client) GetAcceptedSubtitleFormats() ([]string, error) {
 func (c *Client) SetAcceptedSubtitleFormats(key string, v []string) error {
 	return c.setAcceptedFormats(SettingAcceptedSubtitleFormats, v)
 }
+
+func (c *Client) GetAIConfig() (AIConfig, error) {
+	cfg := c.GetSetting(SettingAIConfig)
+	var ai AIConfig
+	if cfg == "" {
+		return ai, nil
+	}
+	err := json.Unmarshal([]byte(cfg), &ai)
+	if err != nil {
+		return AIConfig{}, err
+	}
+	return ai, nil
+}
+
+func (c *Client) SetAIConfig(cfg *AIConfig) error {
+	if data, err := json.Marshal(cfg); err != nil {
+		return err
+	} else {
+		return c.SetSetting(SettingAIConfig, string(data))
+	}
+}

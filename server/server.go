@@ -80,6 +80,8 @@ func (s *Server) Serve() error {
 		setting.POST("/prowlarr", HttpHandler(s.SaveProwlarrSetting))
 		setting.GET("/limiter", HttpHandler(s.GetSizeLimiter))
 		setting.POST("/limiter", HttpHandler(s.SetSizeLimiter))
+		setting.GET("/ai", HttpHandler(s.GetAIConfig))
+		setting.POST("/ai", HttpHandler(s.SetAIConfig))
 	}
 	activity := api.Group("/activity")
 	{

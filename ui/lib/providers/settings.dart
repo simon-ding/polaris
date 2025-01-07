@@ -29,6 +29,9 @@ var prowlarrSettingDataProvider =
     AsyncNotifierProvider.autoDispose<ProwlarrSettingData, ProwlarrSetting>(
         ProwlarrSettingData.new);
 
+var aiConfigDataProvider =
+    AsyncNotifierProvider.autoDispose<AIConfigData, AIConfig>(AIConfigData.new);
+
 class EditSettingData extends AutoDisposeAsyncNotifier<GeneralSetting> {
   @override
   FutureOr<GeneralSetting> build() async {
@@ -547,4 +550,51 @@ class ProwlarrSettingData extends AutoDisposeAsyncNotifier<ProwlarrSetting> {
     }
     ref.invalidateSelf();
   }
+}
+
+class AIConfigData extends AutoDisposeAsyncNotifier<AIConfig> {
+  @override
+  FutureOr<AIConfig> build() async {
+    final dio = APIs.getDio();
+    var resp = await dio.get(APIs.aiConfigUrl);
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    return AIConfig.fromJson(sp.data);
+  }
+
+  Future<void> save(AIConfig ai) async {
+    final dio = APIs.getDio();
+    var resp = await dio.post(APIs.aiConfigUrl, data: ai.toJson());
+    var sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
+    }
+    ref.invalidateSelf();
+  }
+}
+
+class AIConfig {
+  final bool enabled;
+  final String geminiApiKey;
+  final String geminiModelName;
+
+  AIConfig(
+      {required this.enabled,
+      required this.geminiApiKey,
+      required this.geminiModelName});
+
+  factory AIConfig.fromJson(Map<String, dynamic> json) {
+    return AIConfig(
+        enabled: json["enabled"],
+        geminiApiKey: json["gemini_api_key"],
+        geminiModelName: json["gemini_model_name"]);
+  }
+
+  Map<String, dynamic> toJson() => {
+        "enabled": enabled,
+        "gemini_api_key": geminiApiKey,
+        "gemini_model_name": geminiModelName
+      };
 }

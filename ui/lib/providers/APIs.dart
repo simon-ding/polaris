@@ -46,6 +46,7 @@ class APIs {
   static final deleteImportlistUrl = "$_baseUrl/api/v1/importlist/delete";
   static final getAllImportlists = "$_baseUrl/api/v1/importlist/";
   static final prowlarrUrl = "$_baseUrl/api/v1/setting/prowlarr";
+  static final aiConfigUrl = "$_baseUrl/api/v1/setting/ai";
 
   static final notifierAllUrl = "$_baseUrl/api/v1/notifier/all";
   static final notifierDeleteUrl = "$_baseUrl/api/v1/notifier/id/";

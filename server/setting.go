@@ -363,3 +363,22 @@ func (s *Server) SetSizeLimiter(c *gin.Context) (interface{}, error) {
 	}
 	return "success", nil
 }
+
+func (s *Server) GetAIConfig(c *gin.Context) (interface{}, error) {
+	aiConfig, err := s.db.GetAIConfig()
+	if err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+	return aiConfig, nil
+}
+
+func (s *Server) SetAIConfig(c *gin.Context) (interface{}, error) {
+	var in db.AIConfig
+	if err := c.ShouldBindJSON(&in); err != nil {
+		return nil, err
+	}
+	if err := s.db.SetAIConfig(&in); err != nil {
+		return nil, errors.Wrap(err, "db")
+	}
+	return "success", nil
+}
