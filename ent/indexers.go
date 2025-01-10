@@ -20,7 +20,7 @@ type Indexers struct {
 	Name string `json:"name,omitempty"`
 	// Implementation holds the value of the "implementation" field.
 	Implementation string `json:"implementation,omitempty"`
-	// Settings holds the value of the "settings" field.
+	// deprecated, use api_key and url
 	Settings string `json:"settings,omitempty"`
 	// EnableRss holds the value of the "enable_rss" field.
 	EnableRss bool `json:"enable_rss,omitempty"`
@@ -29,7 +29,17 @@ type Indexers struct {
 	// minimal seed ratio requied, before removing torrent
 	SeedRatio float32 `json:"seed_ratio,omitempty"`
 	// Disabled holds the value of the "disabled" field.
-	Disabled     bool `json:"disabled,omitempty"`
+	Disabled bool `json:"disabled,omitempty"`
+	// TvSearch holds the value of the "tv_search" field.
+	TvSearch bool `json:"tv_search,omitempty"`
+	// MovieSearch holds the value of the "movie_search" field.
+	MovieSearch bool `json:"movie_search,omitempty"`
+	// APIKey holds the value of the "api_key" field.
+	APIKey string `json:"api_key,omitempty"`
+	// URL holds the value of the "url" field.
+	URL string `json:"url,omitempty"`
+	// synced from prowlarr
+	Synced       bool `json:"synced,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -38,13 +48,13 @@ func (*Indexers) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case indexers.FieldEnableRss, indexers.FieldDisabled:
+		case indexers.FieldEnableRss, indexers.FieldDisabled, indexers.FieldTvSearch, indexers.FieldMovieSearch, indexers.FieldSynced:
 			values[i] = new(sql.NullBool)
 		case indexers.FieldSeedRatio:
 			values[i] = new(sql.NullFloat64)
 		case indexers.FieldID, indexers.FieldPriority:
 			values[i] = new(sql.NullInt64)
-		case indexers.FieldName, indexers.FieldImplementation, indexers.FieldSettings:
+		case indexers.FieldName, indexers.FieldImplementation, indexers.FieldSettings, indexers.FieldAPIKey, indexers.FieldURL:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -109,6 +119,36 @@ func (i *Indexers) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.Disabled = value.Bool
 			}
+		case indexers.FieldTvSearch:
+			if value, ok := values[j].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field tv_search", values[j])
+			} else if value.Valid {
+				i.TvSearch = value.Bool
+			}
+		case indexers.FieldMovieSearch:
+			if value, ok := values[j].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field movie_search", values[j])
+			} else if value.Valid {
+				i.MovieSearch = value.Bool
+			}
+		case indexers.FieldAPIKey:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field api_key", values[j])
+			} else if value.Valid {
+				i.APIKey = value.String
+			}
+		case indexers.FieldURL:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url", values[j])
+			} else if value.Valid {
+				i.URL = value.String
+			}
+		case indexers.FieldSynced:
+			if value, ok := values[j].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field synced", values[j])
+			} else if value.Valid {
+				i.Synced = value.Bool
+			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
 		}
@@ -165,6 +205,21 @@ func (i *Indexers) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("disabled=")
 	builder.WriteString(fmt.Sprintf("%v", i.Disabled))
+	builder.WriteString(", ")
+	builder.WriteString("tv_search=")
+	builder.WriteString(fmt.Sprintf("%v", i.TvSearch))
+	builder.WriteString(", ")
+	builder.WriteString("movie_search=")
+	builder.WriteString(fmt.Sprintf("%v", i.MovieSearch))
+	builder.WriteString(", ")
+	builder.WriteString("api_key=")
+	builder.WriteString(i.APIKey)
+	builder.WriteString(", ")
+	builder.WriteString("url=")
+	builder.WriteString(i.URL)
+	builder.WriteString(", ")
+	builder.WriteString("synced=")
+	builder.WriteString(fmt.Sprintf("%v", i.Synced))
 	builder.WriteByte(')')
 	return builder.String()
 }

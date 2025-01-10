@@ -69,6 +69,12 @@ func (iu *IndexersUpdate) SetNillableSettings(s *string) *IndexersUpdate {
 	return iu
 }
 
+// ClearSettings clears the value of the "settings" field.
+func (iu *IndexersUpdate) ClearSettings() *IndexersUpdate {
+	iu.mutation.ClearSettings()
+	return iu
+}
+
 // SetEnableRss sets the "enable_rss" field.
 func (iu *IndexersUpdate) SetEnableRss(b bool) *IndexersUpdate {
 	iu.mutation.SetEnableRss(b)
@@ -151,6 +157,106 @@ func (iu *IndexersUpdate) ClearDisabled() *IndexersUpdate {
 	return iu
 }
 
+// SetTvSearch sets the "tv_search" field.
+func (iu *IndexersUpdate) SetTvSearch(b bool) *IndexersUpdate {
+	iu.mutation.SetTvSearch(b)
+	return iu
+}
+
+// SetNillableTvSearch sets the "tv_search" field if the given value is not nil.
+func (iu *IndexersUpdate) SetNillableTvSearch(b *bool) *IndexersUpdate {
+	if b != nil {
+		iu.SetTvSearch(*b)
+	}
+	return iu
+}
+
+// ClearTvSearch clears the value of the "tv_search" field.
+func (iu *IndexersUpdate) ClearTvSearch() *IndexersUpdate {
+	iu.mutation.ClearTvSearch()
+	return iu
+}
+
+// SetMovieSearch sets the "movie_search" field.
+func (iu *IndexersUpdate) SetMovieSearch(b bool) *IndexersUpdate {
+	iu.mutation.SetMovieSearch(b)
+	return iu
+}
+
+// SetNillableMovieSearch sets the "movie_search" field if the given value is not nil.
+func (iu *IndexersUpdate) SetNillableMovieSearch(b *bool) *IndexersUpdate {
+	if b != nil {
+		iu.SetMovieSearch(*b)
+	}
+	return iu
+}
+
+// ClearMovieSearch clears the value of the "movie_search" field.
+func (iu *IndexersUpdate) ClearMovieSearch() *IndexersUpdate {
+	iu.mutation.ClearMovieSearch()
+	return iu
+}
+
+// SetAPIKey sets the "api_key" field.
+func (iu *IndexersUpdate) SetAPIKey(s string) *IndexersUpdate {
+	iu.mutation.SetAPIKey(s)
+	return iu
+}
+
+// SetNillableAPIKey sets the "api_key" field if the given value is not nil.
+func (iu *IndexersUpdate) SetNillableAPIKey(s *string) *IndexersUpdate {
+	if s != nil {
+		iu.SetAPIKey(*s)
+	}
+	return iu
+}
+
+// ClearAPIKey clears the value of the "api_key" field.
+func (iu *IndexersUpdate) ClearAPIKey() *IndexersUpdate {
+	iu.mutation.ClearAPIKey()
+	return iu
+}
+
+// SetURL sets the "url" field.
+func (iu *IndexersUpdate) SetURL(s string) *IndexersUpdate {
+	iu.mutation.SetURL(s)
+	return iu
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (iu *IndexersUpdate) SetNillableURL(s *string) *IndexersUpdate {
+	if s != nil {
+		iu.SetURL(*s)
+	}
+	return iu
+}
+
+// ClearURL clears the value of the "url" field.
+func (iu *IndexersUpdate) ClearURL() *IndexersUpdate {
+	iu.mutation.ClearURL()
+	return iu
+}
+
+// SetSynced sets the "synced" field.
+func (iu *IndexersUpdate) SetSynced(b bool) *IndexersUpdate {
+	iu.mutation.SetSynced(b)
+	return iu
+}
+
+// SetNillableSynced sets the "synced" field if the given value is not nil.
+func (iu *IndexersUpdate) SetNillableSynced(b *bool) *IndexersUpdate {
+	if b != nil {
+		iu.SetSynced(*b)
+	}
+	return iu
+}
+
+// ClearSynced clears the value of the "synced" field.
+func (iu *IndexersUpdate) ClearSynced() *IndexersUpdate {
+	iu.mutation.ClearSynced()
+	return iu
+}
+
 // Mutation returns the IndexersMutation object of the builder.
 func (iu *IndexersUpdate) Mutation() *IndexersMutation {
 	return iu.mutation
@@ -201,6 +307,9 @@ func (iu *IndexersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.Settings(); ok {
 		_spec.SetField(indexers.FieldSettings, field.TypeString, value)
 	}
+	if iu.mutation.SettingsCleared() {
+		_spec.ClearField(indexers.FieldSettings, field.TypeString)
+	}
 	if value, ok := iu.mutation.EnableRss(); ok {
 		_spec.SetField(indexers.FieldEnableRss, field.TypeBool, value)
 	}
@@ -224,6 +333,36 @@ func (iu *IndexersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.DisabledCleared() {
 		_spec.ClearField(indexers.FieldDisabled, field.TypeBool)
+	}
+	if value, ok := iu.mutation.TvSearch(); ok {
+		_spec.SetField(indexers.FieldTvSearch, field.TypeBool, value)
+	}
+	if iu.mutation.TvSearchCleared() {
+		_spec.ClearField(indexers.FieldTvSearch, field.TypeBool)
+	}
+	if value, ok := iu.mutation.MovieSearch(); ok {
+		_spec.SetField(indexers.FieldMovieSearch, field.TypeBool, value)
+	}
+	if iu.mutation.MovieSearchCleared() {
+		_spec.ClearField(indexers.FieldMovieSearch, field.TypeBool)
+	}
+	if value, ok := iu.mutation.APIKey(); ok {
+		_spec.SetField(indexers.FieldAPIKey, field.TypeString, value)
+	}
+	if iu.mutation.APIKeyCleared() {
+		_spec.ClearField(indexers.FieldAPIKey, field.TypeString)
+	}
+	if value, ok := iu.mutation.URL(); ok {
+		_spec.SetField(indexers.FieldURL, field.TypeString, value)
+	}
+	if iu.mutation.URLCleared() {
+		_spec.ClearField(indexers.FieldURL, field.TypeString)
+	}
+	if value, ok := iu.mutation.Synced(); ok {
+		_spec.SetField(indexers.FieldSynced, field.TypeBool, value)
+	}
+	if iu.mutation.SyncedCleared() {
+		_spec.ClearField(indexers.FieldSynced, field.TypeBool)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -284,6 +423,12 @@ func (iuo *IndexersUpdateOne) SetNillableSettings(s *string) *IndexersUpdateOne 
 	if s != nil {
 		iuo.SetSettings(*s)
 	}
+	return iuo
+}
+
+// ClearSettings clears the value of the "settings" field.
+func (iuo *IndexersUpdateOne) ClearSettings() *IndexersUpdateOne {
+	iuo.mutation.ClearSettings()
 	return iuo
 }
 
@@ -369,6 +514,106 @@ func (iuo *IndexersUpdateOne) ClearDisabled() *IndexersUpdateOne {
 	return iuo
 }
 
+// SetTvSearch sets the "tv_search" field.
+func (iuo *IndexersUpdateOne) SetTvSearch(b bool) *IndexersUpdateOne {
+	iuo.mutation.SetTvSearch(b)
+	return iuo
+}
+
+// SetNillableTvSearch sets the "tv_search" field if the given value is not nil.
+func (iuo *IndexersUpdateOne) SetNillableTvSearch(b *bool) *IndexersUpdateOne {
+	if b != nil {
+		iuo.SetTvSearch(*b)
+	}
+	return iuo
+}
+
+// ClearTvSearch clears the value of the "tv_search" field.
+func (iuo *IndexersUpdateOne) ClearTvSearch() *IndexersUpdateOne {
+	iuo.mutation.ClearTvSearch()
+	return iuo
+}
+
+// SetMovieSearch sets the "movie_search" field.
+func (iuo *IndexersUpdateOne) SetMovieSearch(b bool) *IndexersUpdateOne {
+	iuo.mutation.SetMovieSearch(b)
+	return iuo
+}
+
+// SetNillableMovieSearch sets the "movie_search" field if the given value is not nil.
+func (iuo *IndexersUpdateOne) SetNillableMovieSearch(b *bool) *IndexersUpdateOne {
+	if b != nil {
+		iuo.SetMovieSearch(*b)
+	}
+	return iuo
+}
+
+// ClearMovieSearch clears the value of the "movie_search" field.
+func (iuo *IndexersUpdateOne) ClearMovieSearch() *IndexersUpdateOne {
+	iuo.mutation.ClearMovieSearch()
+	return iuo
+}
+
+// SetAPIKey sets the "api_key" field.
+func (iuo *IndexersUpdateOne) SetAPIKey(s string) *IndexersUpdateOne {
+	iuo.mutation.SetAPIKey(s)
+	return iuo
+}
+
+// SetNillableAPIKey sets the "api_key" field if the given value is not nil.
+func (iuo *IndexersUpdateOne) SetNillableAPIKey(s *string) *IndexersUpdateOne {
+	if s != nil {
+		iuo.SetAPIKey(*s)
+	}
+	return iuo
+}
+
+// ClearAPIKey clears the value of the "api_key" field.
+func (iuo *IndexersUpdateOne) ClearAPIKey() *IndexersUpdateOne {
+	iuo.mutation.ClearAPIKey()
+	return iuo
+}
+
+// SetURL sets the "url" field.
+func (iuo *IndexersUpdateOne) SetURL(s string) *IndexersUpdateOne {
+	iuo.mutation.SetURL(s)
+	return iuo
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (iuo *IndexersUpdateOne) SetNillableURL(s *string) *IndexersUpdateOne {
+	if s != nil {
+		iuo.SetURL(*s)
+	}
+	return iuo
+}
+
+// ClearURL clears the value of the "url" field.
+func (iuo *IndexersUpdateOne) ClearURL() *IndexersUpdateOne {
+	iuo.mutation.ClearURL()
+	return iuo
+}
+
+// SetSynced sets the "synced" field.
+func (iuo *IndexersUpdateOne) SetSynced(b bool) *IndexersUpdateOne {
+	iuo.mutation.SetSynced(b)
+	return iuo
+}
+
+// SetNillableSynced sets the "synced" field if the given value is not nil.
+func (iuo *IndexersUpdateOne) SetNillableSynced(b *bool) *IndexersUpdateOne {
+	if b != nil {
+		iuo.SetSynced(*b)
+	}
+	return iuo
+}
+
+// ClearSynced clears the value of the "synced" field.
+func (iuo *IndexersUpdateOne) ClearSynced() *IndexersUpdateOne {
+	iuo.mutation.ClearSynced()
+	return iuo
+}
+
 // Mutation returns the IndexersMutation object of the builder.
 func (iuo *IndexersUpdateOne) Mutation() *IndexersMutation {
 	return iuo.mutation
@@ -449,6 +694,9 @@ func (iuo *IndexersUpdateOne) sqlSave(ctx context.Context) (_node *Indexers, err
 	if value, ok := iuo.mutation.Settings(); ok {
 		_spec.SetField(indexers.FieldSettings, field.TypeString, value)
 	}
+	if iuo.mutation.SettingsCleared() {
+		_spec.ClearField(indexers.FieldSettings, field.TypeString)
+	}
 	if value, ok := iuo.mutation.EnableRss(); ok {
 		_spec.SetField(indexers.FieldEnableRss, field.TypeBool, value)
 	}
@@ -472,6 +720,36 @@ func (iuo *IndexersUpdateOne) sqlSave(ctx context.Context) (_node *Indexers, err
 	}
 	if iuo.mutation.DisabledCleared() {
 		_spec.ClearField(indexers.FieldDisabled, field.TypeBool)
+	}
+	if value, ok := iuo.mutation.TvSearch(); ok {
+		_spec.SetField(indexers.FieldTvSearch, field.TypeBool, value)
+	}
+	if iuo.mutation.TvSearchCleared() {
+		_spec.ClearField(indexers.FieldTvSearch, field.TypeBool)
+	}
+	if value, ok := iuo.mutation.MovieSearch(); ok {
+		_spec.SetField(indexers.FieldMovieSearch, field.TypeBool, value)
+	}
+	if iuo.mutation.MovieSearchCleared() {
+		_spec.ClearField(indexers.FieldMovieSearch, field.TypeBool)
+	}
+	if value, ok := iuo.mutation.APIKey(); ok {
+		_spec.SetField(indexers.FieldAPIKey, field.TypeString, value)
+	}
+	if iuo.mutation.APIKeyCleared() {
+		_spec.ClearField(indexers.FieldAPIKey, field.TypeString)
+	}
+	if value, ok := iuo.mutation.URL(); ok {
+		_spec.SetField(indexers.FieldURL, field.TypeString, value)
+	}
+	if iuo.mutation.URLCleared() {
+		_spec.ClearField(indexers.FieldURL, field.TypeString)
+	}
+	if value, ok := iuo.mutation.Synced(); ok {
+		_spec.SetField(indexers.FieldSynced, field.TypeBool, value)
+	}
+	if iuo.mutation.SyncedCleared() {
+		_spec.ClearField(indexers.FieldSynced, field.TypeBool)
 	}
 	_node = &Indexers{config: iuo.config}
 	_spec.Assign = _node.assignValues

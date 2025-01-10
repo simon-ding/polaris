@@ -7,7 +7,6 @@ import (
 	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/metadata"
-	"polaris/pkg/prowlarr"
 	"polaris/pkg/torznab"
 	"slices"
 	"sort"
@@ -86,7 +85,7 @@ func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error
 
 	names := names2Query(series.Media)
 
-	res := searchWithTorznab(db1, prowlarr.TV, names...)
+	res := searchWithTorznab(db1, SearchTypeTv, names...)
 
 	var filtered []torznab.Result
 lo:
@@ -248,9 +247,9 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 	}
 	names := names2Query(movieDetail.Media)
 
-	res := searchWithTorznab(db1, prowlarr.Movie, names...)
+	res := searchWithTorznab(db1, SearchTypeMovie, names...)
 	if movieDetail.Extras.IsJav() {
-		res1 := searchWithTorznab(db1, prowlarr.Movie, movieDetail.Extras.JavId)
+		res1 := searchWithTorznab(db1, SearchTypeMovie, movieDetail.Extras.JavId)
 		res = append(res, res1...)
 	}
 
@@ -304,21 +303,18 @@ func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
 
 }
 
-func searchWithTorznab(db *db.Client, t prowlarr.ProwlarrSupportType, queries ...string) []torznab.Result {
+type SearchType int
+
+const (
+	SearchTypeTv    SearchType = 1
+	SearchTypeMovie SearchType = 2
+)
+
+func searchWithTorznab(db *db.Client, t SearchType, queries ...string) []torznab.Result {
 
 	var res []torznab.Result
-	allTorznab := db.GetAllTorznabInfo()
+	allTorznab := db.GetAllIndexers()
 
-	p, err := db.GetProwlarrSetting()
-	if err == nil && !p.Disabled { //prowlarr exists
-		c := prowlarr.New(p.ApiKey, p.URL)
-		all, err := c.GetIndexers(t)
-		if err != nil {
-			log.Warnf("get prowlarr all indexer error: %v", err)
-		} else {
-			allTorznab = append(allTorznab, all...)
-		}
-	}
 	resChan := make(chan []torznab.Result)
 	var wg sync.WaitGroup
 
@@ -326,6 +322,13 @@ func searchWithTorznab(db *db.Client, t prowlarr.ProwlarrSupportType, queries ..
 		if tor.Disabled {
 			continue
 		}
+		if t == SearchTypeTv && !tor.TvSearch {
+			continue
+		}
+		if t == SearchTypeMovie && !tor.MovieSearch {
+			continue
+		}
+
 		for _, q := range queries {
 			wg.Add(1)
 

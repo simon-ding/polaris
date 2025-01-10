@@ -161,6 +161,7 @@ class Indexer {
   int? priority;
   double? seedRatio;
   bool? disabled;
+  bool? synced;
 
   Indexer(
       {this.name,
@@ -169,7 +170,8 @@ class Indexer {
       this.id,
       this.priority = 50,
       this.seedRatio = 0,
-      this.disabled});
+      this.disabled,
+      this.synced});
 
   Indexer.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -179,6 +181,7 @@ class Indexer {
     priority = json["priority"];
     seedRatio = json["seed_ratio"] ?? 0;
     disabled = json["disabled"] ?? false;
+    synced = json["synced"] ?? false;
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

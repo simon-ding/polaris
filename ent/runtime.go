@@ -71,6 +71,10 @@ func init() {
 	history.DefaultSize = historyDescSize.Default.(int)
 	indexersFields := schema.Indexers{}.Fields()
 	_ = indexersFields
+	// indexersDescSettings is the schema descriptor for settings field.
+	indexersDescSettings := indexersFields[2].Descriptor()
+	// indexers.DefaultSettings holds the default value on creation for the settings field.
+	indexers.DefaultSettings = indexersDescSettings.Default.(string)
 	// indexersDescEnableRss is the schema descriptor for enable_rss field.
 	indexersDescEnableRss := indexersFields[3].Descriptor()
 	// indexers.DefaultEnableRss holds the default value on creation for the enable_rss field.
@@ -87,6 +91,18 @@ func init() {
 	indexersDescDisabled := indexersFields[6].Descriptor()
 	// indexers.DefaultDisabled holds the default value on creation for the disabled field.
 	indexers.DefaultDisabled = indexersDescDisabled.Default.(bool)
+	// indexersDescTvSearch is the schema descriptor for tv_search field.
+	indexersDescTvSearch := indexersFields[7].Descriptor()
+	// indexers.DefaultTvSearch holds the default value on creation for the tv_search field.
+	indexers.DefaultTvSearch = indexersDescTvSearch.Default.(bool)
+	// indexersDescMovieSearch is the schema descriptor for movie_search field.
+	indexersDescMovieSearch := indexersFields[8].Descriptor()
+	// indexers.DefaultMovieSearch holds the default value on creation for the movie_search field.
+	indexers.DefaultMovieSearch = indexersDescMovieSearch.Default.(bool)
+	// indexersDescSynced is the schema descriptor for synced field.
+	indexersDescSynced := indexersFields[11].Descriptor()
+	// indexers.DefaultSynced holds the default value on creation for the synced field.
+	indexers.DefaultSynced = indexersDescSynced.Default.(bool)
 	mediaFields := schema.Media{}.Fields()
 	_ = mediaFields
 	// mediaDescCreatedAt is the schema descriptor for created_at field.

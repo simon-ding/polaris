@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"polaris/db"
+	"polaris/ent"
 	"polaris/log"
 	"slices"
 	"strconv"
@@ -74,7 +74,7 @@ func (i *Item) GetAttr(key string) string {
 	}
 	return ""
 }
-func (r *Response) ToResults(indexer *db.TorznabInfo) []Result {
+func (r *Response) ToResults(indexer *ent.Indexers) []Result {
 	var res []Result
 	for _, item := range r.Channel.Item {
 		if slices.Contains(item.Category, "3000") { //exclude audio files
@@ -130,7 +130,7 @@ func tryParseFloat(s string) float32 {
 	return float32(r)
 }
 
-func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
+func Search(indexer *ent.Indexers, keyWord string) ([]Result, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
 
@@ -139,7 +139,7 @@ func Search(indexer *db.TorznabInfo, keyWord string) ([]Result, error) {
 		return nil, errors.Wrap(err, "new request")
 	}
 	var q = url.Values{}
-	q.Add("apikey", indexer.ApiKey)
+	q.Add("apikey", indexer.APIKey)
 	q.Add("t", "search")
 	q.Add("q", keyWord)
 	req.URL.RawQuery = q.Encode()
@@ -183,7 +183,7 @@ type Result struct {
 	Name                 string  `json:"name"`
 	Description          string  `json:"description"`
 	Link                 string  `json:"link"`
-	Size                 int64     `json:"size"`
+	Size                 int64   `json:"size"`
 	Seeders              int     `json:"seeders"`
 	Peers                int     `json:"peers"`
 	Category             int     `json:"category"`

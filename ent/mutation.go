@@ -4346,6 +4346,11 @@ type IndexersMutation struct {
 	seed_ratio     *float32
 	addseed_ratio  *float32
 	disabled       *bool
+	tv_search      *bool
+	movie_search   *bool
+	api_key        *string
+	url            *string
+	synced         *bool
 	clearedFields  map[string]struct{}
 	done           bool
 	oldValue       func(context.Context) (*Indexers, error)
@@ -4553,9 +4558,22 @@ func (m *IndexersMutation) OldSettings(ctx context.Context) (v string, err error
 	return oldValue.Settings, nil
 }
 
+// ClearSettings clears the value of the "settings" field.
+func (m *IndexersMutation) ClearSettings() {
+	m.settings = nil
+	m.clearedFields[indexers.FieldSettings] = struct{}{}
+}
+
+// SettingsCleared returns if the "settings" field was cleared in this mutation.
+func (m *IndexersMutation) SettingsCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldSettings]
+	return ok
+}
+
 // ResetSettings resets all changes to the "settings" field.
 func (m *IndexersMutation) ResetSettings() {
 	m.settings = nil
+	delete(m.clearedFields, indexers.FieldSettings)
 }
 
 // SetEnableRss sets the "enable_rss" field.
@@ -4769,6 +4787,251 @@ func (m *IndexersMutation) ResetDisabled() {
 	delete(m.clearedFields, indexers.FieldDisabled)
 }
 
+// SetTvSearch sets the "tv_search" field.
+func (m *IndexersMutation) SetTvSearch(b bool) {
+	m.tv_search = &b
+}
+
+// TvSearch returns the value of the "tv_search" field in the mutation.
+func (m *IndexersMutation) TvSearch() (r bool, exists bool) {
+	v := m.tv_search
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTvSearch returns the old "tv_search" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldTvSearch(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTvSearch is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTvSearch requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTvSearch: %w", err)
+	}
+	return oldValue.TvSearch, nil
+}
+
+// ClearTvSearch clears the value of the "tv_search" field.
+func (m *IndexersMutation) ClearTvSearch() {
+	m.tv_search = nil
+	m.clearedFields[indexers.FieldTvSearch] = struct{}{}
+}
+
+// TvSearchCleared returns if the "tv_search" field was cleared in this mutation.
+func (m *IndexersMutation) TvSearchCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldTvSearch]
+	return ok
+}
+
+// ResetTvSearch resets all changes to the "tv_search" field.
+func (m *IndexersMutation) ResetTvSearch() {
+	m.tv_search = nil
+	delete(m.clearedFields, indexers.FieldTvSearch)
+}
+
+// SetMovieSearch sets the "movie_search" field.
+func (m *IndexersMutation) SetMovieSearch(b bool) {
+	m.movie_search = &b
+}
+
+// MovieSearch returns the value of the "movie_search" field in the mutation.
+func (m *IndexersMutation) MovieSearch() (r bool, exists bool) {
+	v := m.movie_search
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMovieSearch returns the old "movie_search" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldMovieSearch(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMovieSearch is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMovieSearch requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMovieSearch: %w", err)
+	}
+	return oldValue.MovieSearch, nil
+}
+
+// ClearMovieSearch clears the value of the "movie_search" field.
+func (m *IndexersMutation) ClearMovieSearch() {
+	m.movie_search = nil
+	m.clearedFields[indexers.FieldMovieSearch] = struct{}{}
+}
+
+// MovieSearchCleared returns if the "movie_search" field was cleared in this mutation.
+func (m *IndexersMutation) MovieSearchCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldMovieSearch]
+	return ok
+}
+
+// ResetMovieSearch resets all changes to the "movie_search" field.
+func (m *IndexersMutation) ResetMovieSearch() {
+	m.movie_search = nil
+	delete(m.clearedFields, indexers.FieldMovieSearch)
+}
+
+// SetAPIKey sets the "api_key" field.
+func (m *IndexersMutation) SetAPIKey(s string) {
+	m.api_key = &s
+}
+
+// APIKey returns the value of the "api_key" field in the mutation.
+func (m *IndexersMutation) APIKey() (r string, exists bool) {
+	v := m.api_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAPIKey returns the old "api_key" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldAPIKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAPIKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAPIKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAPIKey: %w", err)
+	}
+	return oldValue.APIKey, nil
+}
+
+// ClearAPIKey clears the value of the "api_key" field.
+func (m *IndexersMutation) ClearAPIKey() {
+	m.api_key = nil
+	m.clearedFields[indexers.FieldAPIKey] = struct{}{}
+}
+
+// APIKeyCleared returns if the "api_key" field was cleared in this mutation.
+func (m *IndexersMutation) APIKeyCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldAPIKey]
+	return ok
+}
+
+// ResetAPIKey resets all changes to the "api_key" field.
+func (m *IndexersMutation) ResetAPIKey() {
+	m.api_key = nil
+	delete(m.clearedFields, indexers.FieldAPIKey)
+}
+
+// SetURL sets the "url" field.
+func (m *IndexersMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *IndexersMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ClearURL clears the value of the "url" field.
+func (m *IndexersMutation) ClearURL() {
+	m.url = nil
+	m.clearedFields[indexers.FieldURL] = struct{}{}
+}
+
+// URLCleared returns if the "url" field was cleared in this mutation.
+func (m *IndexersMutation) URLCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldURL]
+	return ok
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *IndexersMutation) ResetURL() {
+	m.url = nil
+	delete(m.clearedFields, indexers.FieldURL)
+}
+
+// SetSynced sets the "synced" field.
+func (m *IndexersMutation) SetSynced(b bool) {
+	m.synced = &b
+}
+
+// Synced returns the value of the "synced" field in the mutation.
+func (m *IndexersMutation) Synced() (r bool, exists bool) {
+	v := m.synced
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSynced returns the old "synced" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldSynced(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSynced is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSynced requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSynced: %w", err)
+	}
+	return oldValue.Synced, nil
+}
+
+// ClearSynced clears the value of the "synced" field.
+func (m *IndexersMutation) ClearSynced() {
+	m.synced = nil
+	m.clearedFields[indexers.FieldSynced] = struct{}{}
+}
+
+// SyncedCleared returns if the "synced" field was cleared in this mutation.
+func (m *IndexersMutation) SyncedCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldSynced]
+	return ok
+}
+
+// ResetSynced resets all changes to the "synced" field.
+func (m *IndexersMutation) ResetSynced() {
+	m.synced = nil
+	delete(m.clearedFields, indexers.FieldSynced)
+}
+
 // Where appends a list predicates to the IndexersMutation builder.
 func (m *IndexersMutation) Where(ps ...predicate.Indexers) {
 	m.predicates = append(m.predicates, ps...)
@@ -4803,7 +5066,7 @@ func (m *IndexersMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IndexersMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 12)
 	if m.name != nil {
 		fields = append(fields, indexers.FieldName)
 	}
@@ -4824,6 +5087,21 @@ func (m *IndexersMutation) Fields() []string {
 	}
 	if m.disabled != nil {
 		fields = append(fields, indexers.FieldDisabled)
+	}
+	if m.tv_search != nil {
+		fields = append(fields, indexers.FieldTvSearch)
+	}
+	if m.movie_search != nil {
+		fields = append(fields, indexers.FieldMovieSearch)
+	}
+	if m.api_key != nil {
+		fields = append(fields, indexers.FieldAPIKey)
+	}
+	if m.url != nil {
+		fields = append(fields, indexers.FieldURL)
+	}
+	if m.synced != nil {
+		fields = append(fields, indexers.FieldSynced)
 	}
 	return fields
 }
@@ -4847,6 +5125,16 @@ func (m *IndexersMutation) Field(name string) (ent.Value, bool) {
 		return m.SeedRatio()
 	case indexers.FieldDisabled:
 		return m.Disabled()
+	case indexers.FieldTvSearch:
+		return m.TvSearch()
+	case indexers.FieldMovieSearch:
+		return m.MovieSearch()
+	case indexers.FieldAPIKey:
+		return m.APIKey()
+	case indexers.FieldURL:
+		return m.URL()
+	case indexers.FieldSynced:
+		return m.Synced()
 	}
 	return nil, false
 }
@@ -4870,6 +5158,16 @@ func (m *IndexersMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldSeedRatio(ctx)
 	case indexers.FieldDisabled:
 		return m.OldDisabled(ctx)
+	case indexers.FieldTvSearch:
+		return m.OldTvSearch(ctx)
+	case indexers.FieldMovieSearch:
+		return m.OldMovieSearch(ctx)
+	case indexers.FieldAPIKey:
+		return m.OldAPIKey(ctx)
+	case indexers.FieldURL:
+		return m.OldURL(ctx)
+	case indexers.FieldSynced:
+		return m.OldSynced(ctx)
 	}
 	return nil, fmt.Errorf("unknown Indexers field %s", name)
 }
@@ -4928,6 +5226,41 @@ func (m *IndexersMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDisabled(v)
 		return nil
+	case indexers.FieldTvSearch:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTvSearch(v)
+		return nil
+	case indexers.FieldMovieSearch:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMovieSearch(v)
+		return nil
+	case indexers.FieldAPIKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAPIKey(v)
+		return nil
+	case indexers.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
+		return nil
+	case indexers.FieldSynced:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSynced(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Indexers field %s", name)
 }
@@ -4985,11 +5318,29 @@ func (m *IndexersMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *IndexersMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(indexers.FieldSettings) {
+		fields = append(fields, indexers.FieldSettings)
+	}
 	if m.FieldCleared(indexers.FieldSeedRatio) {
 		fields = append(fields, indexers.FieldSeedRatio)
 	}
 	if m.FieldCleared(indexers.FieldDisabled) {
 		fields = append(fields, indexers.FieldDisabled)
+	}
+	if m.FieldCleared(indexers.FieldTvSearch) {
+		fields = append(fields, indexers.FieldTvSearch)
+	}
+	if m.FieldCleared(indexers.FieldMovieSearch) {
+		fields = append(fields, indexers.FieldMovieSearch)
+	}
+	if m.FieldCleared(indexers.FieldAPIKey) {
+		fields = append(fields, indexers.FieldAPIKey)
+	}
+	if m.FieldCleared(indexers.FieldURL) {
+		fields = append(fields, indexers.FieldURL)
+	}
+	if m.FieldCleared(indexers.FieldSynced) {
+		fields = append(fields, indexers.FieldSynced)
 	}
 	return fields
 }
@@ -5005,11 +5356,29 @@ func (m *IndexersMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *IndexersMutation) ClearField(name string) error {
 	switch name {
+	case indexers.FieldSettings:
+		m.ClearSettings()
+		return nil
 	case indexers.FieldSeedRatio:
 		m.ClearSeedRatio()
 		return nil
 	case indexers.FieldDisabled:
 		m.ClearDisabled()
+		return nil
+	case indexers.FieldTvSearch:
+		m.ClearTvSearch()
+		return nil
+	case indexers.FieldMovieSearch:
+		m.ClearMovieSearch()
+		return nil
+	case indexers.FieldAPIKey:
+		m.ClearAPIKey()
+		return nil
+	case indexers.FieldURL:
+		m.ClearURL()
+		return nil
+	case indexers.FieldSynced:
+		m.ClearSynced()
 		return nil
 	}
 	return fmt.Errorf("unknown Indexers nullable field %s", name)
@@ -5039,6 +5408,21 @@ func (m *IndexersMutation) ResetField(name string) error {
 		return nil
 	case indexers.FieldDisabled:
 		m.ResetDisabled()
+		return nil
+	case indexers.FieldTvSearch:
+		m.ResetTvSearch()
+		return nil
+	case indexers.FieldMovieSearch:
+		m.ResetMovieSearch()
+		return nil
+	case indexers.FieldAPIKey:
+		m.ResetAPIKey()
+		return nil
+	case indexers.FieldURL:
+		m.ResetURL()
+		return nil
+	case indexers.FieldSynced:
+		m.ResetSynced()
 		return nil
 	}
 	return fmt.Errorf("unknown Indexers field %s", name)

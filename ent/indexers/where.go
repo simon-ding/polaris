@@ -88,6 +88,31 @@ func Disabled(v bool) predicate.Indexers {
 	return predicate.Indexers(sql.FieldEQ(FieldDisabled, v))
 }
 
+// TvSearch applies equality check predicate on the "tv_search" field. It's identical to TvSearchEQ.
+func TvSearch(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldTvSearch, v))
+}
+
+// MovieSearch applies equality check predicate on the "movie_search" field. It's identical to MovieSearchEQ.
+func MovieSearch(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldMovieSearch, v))
+}
+
+// APIKey applies equality check predicate on the "api_key" field. It's identical to APIKeyEQ.
+func APIKey(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldAPIKey, v))
+}
+
+// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
+func URL(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldURL, v))
+}
+
+// Synced applies equality check predicate on the "synced" field. It's identical to SyncedEQ.
+func Synced(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldSynced, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Indexers {
 	return predicate.Indexers(sql.FieldEQ(FieldName, v))
@@ -273,6 +298,16 @@ func SettingsHasSuffix(v string) predicate.Indexers {
 	return predicate.Indexers(sql.FieldHasSuffix(FieldSettings, v))
 }
 
+// SettingsIsNil applies the IsNil predicate on the "settings" field.
+func SettingsIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldSettings))
+}
+
+// SettingsNotNil applies the NotNil predicate on the "settings" field.
+func SettingsNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldSettings))
+}
+
 // SettingsEqualFold applies the EqualFold predicate on the "settings" field.
 func SettingsEqualFold(v string) predicate.Indexers {
 	return predicate.Indexers(sql.FieldEqualFold(FieldSettings, v))
@@ -401,6 +436,216 @@ func DisabledIsNil() predicate.Indexers {
 // DisabledNotNil applies the NotNil predicate on the "disabled" field.
 func DisabledNotNil() predicate.Indexers {
 	return predicate.Indexers(sql.FieldNotNull(FieldDisabled))
+}
+
+// TvSearchEQ applies the EQ predicate on the "tv_search" field.
+func TvSearchEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldTvSearch, v))
+}
+
+// TvSearchNEQ applies the NEQ predicate on the "tv_search" field.
+func TvSearchNEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldTvSearch, v))
+}
+
+// TvSearchIsNil applies the IsNil predicate on the "tv_search" field.
+func TvSearchIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldTvSearch))
+}
+
+// TvSearchNotNil applies the NotNil predicate on the "tv_search" field.
+func TvSearchNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldTvSearch))
+}
+
+// MovieSearchEQ applies the EQ predicate on the "movie_search" field.
+func MovieSearchEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldMovieSearch, v))
+}
+
+// MovieSearchNEQ applies the NEQ predicate on the "movie_search" field.
+func MovieSearchNEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldMovieSearch, v))
+}
+
+// MovieSearchIsNil applies the IsNil predicate on the "movie_search" field.
+func MovieSearchIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldMovieSearch))
+}
+
+// MovieSearchNotNil applies the NotNil predicate on the "movie_search" field.
+func MovieSearchNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldMovieSearch))
+}
+
+// APIKeyEQ applies the EQ predicate on the "api_key" field.
+func APIKeyEQ(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldAPIKey, v))
+}
+
+// APIKeyNEQ applies the NEQ predicate on the "api_key" field.
+func APIKeyNEQ(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldAPIKey, v))
+}
+
+// APIKeyIn applies the In predicate on the "api_key" field.
+func APIKeyIn(vs ...string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldIn(FieldAPIKey, vs...))
+}
+
+// APIKeyNotIn applies the NotIn predicate on the "api_key" field.
+func APIKeyNotIn(vs ...string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotIn(FieldAPIKey, vs...))
+}
+
+// APIKeyGT applies the GT predicate on the "api_key" field.
+func APIKeyGT(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGT(FieldAPIKey, v))
+}
+
+// APIKeyGTE applies the GTE predicate on the "api_key" field.
+func APIKeyGTE(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGTE(FieldAPIKey, v))
+}
+
+// APIKeyLT applies the LT predicate on the "api_key" field.
+func APIKeyLT(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLT(FieldAPIKey, v))
+}
+
+// APIKeyLTE applies the LTE predicate on the "api_key" field.
+func APIKeyLTE(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLTE(FieldAPIKey, v))
+}
+
+// APIKeyContains applies the Contains predicate on the "api_key" field.
+func APIKeyContains(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldContains(FieldAPIKey, v))
+}
+
+// APIKeyHasPrefix applies the HasPrefix predicate on the "api_key" field.
+func APIKeyHasPrefix(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldHasPrefix(FieldAPIKey, v))
+}
+
+// APIKeyHasSuffix applies the HasSuffix predicate on the "api_key" field.
+func APIKeyHasSuffix(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldHasSuffix(FieldAPIKey, v))
+}
+
+// APIKeyIsNil applies the IsNil predicate on the "api_key" field.
+func APIKeyIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldAPIKey))
+}
+
+// APIKeyNotNil applies the NotNil predicate on the "api_key" field.
+func APIKeyNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldAPIKey))
+}
+
+// APIKeyEqualFold applies the EqualFold predicate on the "api_key" field.
+func APIKeyEqualFold(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEqualFold(FieldAPIKey, v))
+}
+
+// APIKeyContainsFold applies the ContainsFold predicate on the "api_key" field.
+func APIKeyContainsFold(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldContainsFold(FieldAPIKey, v))
+}
+
+// URLEQ applies the EQ predicate on the "url" field.
+func URLEQ(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldURL, v))
+}
+
+// URLNEQ applies the NEQ predicate on the "url" field.
+func URLNEQ(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldURL, v))
+}
+
+// URLIn applies the In predicate on the "url" field.
+func URLIn(vs ...string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldIn(FieldURL, vs...))
+}
+
+// URLNotIn applies the NotIn predicate on the "url" field.
+func URLNotIn(vs ...string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotIn(FieldURL, vs...))
+}
+
+// URLGT applies the GT predicate on the "url" field.
+func URLGT(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGT(FieldURL, v))
+}
+
+// URLGTE applies the GTE predicate on the "url" field.
+func URLGTE(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGTE(FieldURL, v))
+}
+
+// URLLT applies the LT predicate on the "url" field.
+func URLLT(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLT(FieldURL, v))
+}
+
+// URLLTE applies the LTE predicate on the "url" field.
+func URLLTE(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLTE(FieldURL, v))
+}
+
+// URLContains applies the Contains predicate on the "url" field.
+func URLContains(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldContains(FieldURL, v))
+}
+
+// URLHasPrefix applies the HasPrefix predicate on the "url" field.
+func URLHasPrefix(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldHasPrefix(FieldURL, v))
+}
+
+// URLHasSuffix applies the HasSuffix predicate on the "url" field.
+func URLHasSuffix(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldHasSuffix(FieldURL, v))
+}
+
+// URLIsNil applies the IsNil predicate on the "url" field.
+func URLIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldURL))
+}
+
+// URLNotNil applies the NotNil predicate on the "url" field.
+func URLNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldURL))
+}
+
+// URLEqualFold applies the EqualFold predicate on the "url" field.
+func URLEqualFold(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEqualFold(FieldURL, v))
+}
+
+// URLContainsFold applies the ContainsFold predicate on the "url" field.
+func URLContainsFold(v string) predicate.Indexers {
+	return predicate.Indexers(sql.FieldContainsFold(FieldURL, v))
+}
+
+// SyncedEQ applies the EQ predicate on the "synced" field.
+func SyncedEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldSynced, v))
+}
+
+// SyncedNEQ applies the NEQ predicate on the "synced" field.
+func SyncedNEQ(v bool) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldSynced, v))
+}
+
+// SyncedIsNil applies the IsNil predicate on the "synced" field.
+func SyncedIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldSynced))
+}
+
+// SyncedNotNil applies the NotNil predicate on the "synced" field.
+func SyncedNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldSynced))
 }
 
 // And groups predicates with the AND operator between them.

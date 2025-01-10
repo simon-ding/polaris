@@ -38,13 +38,14 @@ func Open() (*Client, error) {
 		return nil, errors.Wrap(err, "failed opening connection to sqlite")
 	}
 	//defer client.Close()
-	// Run the auto migration tool.
-	if err := client.Schema.Create(context.Background()); err != nil {
-		return nil, errors.Wrap(err, "failed creating schema resources")
-	}
 	c := &Client{
 		ent: client,
 	}
+	// Run the auto migration tool.
+	if err := c.migrate(); err != nil {
+		return nil, errors.Wrap(err, "migrate")
+	}
+
 	c.init()
 
 	return c, nil
@@ -265,20 +266,22 @@ type TorznabSetting struct {
 
 func (c *Client) SaveIndexer(in *ent.Indexers) error {
 
-	if in.ID != 0 {
+	count := c.ent.Indexers.Query().Where(indexers.Name(in.Name)).CountX(context.TODO())
+
+	if count > 0 || in.ID != 0 {
 		//update setting
 		return c.ent.Indexers.Update().Where(indexers.ID(in.ID)).SetName(in.Name).SetImplementation(in.Implementation).
-			SetPriority(in.Priority).SetSettings(in.Settings).SetSeedRatio(in.SeedRatio).SetDisabled(in.Disabled).Exec(context.Background())
+			SetPriority(in.Priority).SetSeedRatio(in.SeedRatio).SetDisabled(in.Disabled).
+			SetTvSearch(in.TvSearch).SetMovieSearch(in.MovieSearch).SetSettings("").SetSynced(in.Synced).
+			SetAPIKey(in.APIKey).SetURL(in.URL).
+			Exec(context.Background())
 	}
 	//create new one
-	count := c.ent.Indexers.Query().Where(indexers.Name(in.Name)).CountX(context.TODO())
-	if count > 0 {
-		return fmt.Errorf("name already esxits: %v", in.Name)
-	}
 
 	_, err := c.ent.Indexers.Create().
-		SetName(in.Name).SetImplementation(in.Implementation).SetPriority(in.Priority).SetSettings(in.Settings).SetSeedRatio(in.SeedRatio).
-		SetDisabled(in.Disabled).Save(context.TODO())
+		SetName(in.Name).SetImplementation(in.Implementation).SetPriority(in.Priority).SetSeedRatio(in.SeedRatio).
+		SetTvSearch(in.TvSearch).SetMovieSearch(in.MovieSearch).SetSettings("").SetSynced(in.Synced).
+		SetAPIKey(in.APIKey).SetURL(in.URL).SetDisabled(in.Disabled).Save(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "save db")
 	}
@@ -286,46 +289,21 @@ func (c *Client) SaveIndexer(in *ent.Indexers) error {
 	return nil
 }
 
-func (c *Client) DeleteTorznab(id int) {
+func (c *Client) DeleteIndexer(id int) {
 	c.ent.Indexers.Delete().Where(indexers.ID(id)).Exec(context.TODO())
 }
 
-func (c *Client) GetIndexer(id int) (*TorznabInfo, error) {
+func (c *Client) GetIndexer(id int) (*ent.Indexers, error) {
 	res, err := c.ent.Indexers.Query().Where(indexers.ID(id)).First(context.TODO())
 	if err != nil {
 		return nil, err
 	}
-	var ss TorznabSetting
-	err = json.Unmarshal([]byte(res.Settings), &ss)
-	if err != nil {
-
-		return nil, fmt.Errorf("unmarshal torznab %s error: %v", res.Name, err)
-	}
-	return &TorznabInfo{Indexers: res, TorznabSetting: ss}, nil
+	return res, nil
 }
 
-type TorznabInfo struct {
-	*ent.Indexers
-	TorznabSetting
-}
-
-func (c *Client) GetAllTorznabInfo() []*TorznabInfo {
-	res := c.ent.Indexers.Query().Where(indexers.Implementation(IndexerTorznabImpl)).AllX(context.TODO())
-
-	var l = make([]*TorznabInfo, 0, len(res))
-	for _, r := range res {
-		var ss TorznabSetting
-		err := json.Unmarshal([]byte(r.Settings), &ss)
-		if err != nil {
-			log.Errorf("unmarshal torznab %s error: %v", r.Name, err)
-			continue
-		}
-		l = append(l, &TorznabInfo{
-			Indexers:       r,
-			TorznabSetting: ss,
-		})
-	}
-	return l
+func (c *Client) GetAllIndexers() []*ent.Indexers {
+	res := c.ent.Indexers.Query().Where(indexers.Implementation(IndexerTorznabImpl)).Order(ent.Asc(indexers.FieldID)).AllX(context.TODO())
+	return res
 }
 
 func (c *Client) SaveDownloader(downloader *ent.DownloadClients) error {
@@ -712,7 +690,6 @@ func (c *Client) SaveProwlarrSetting(se *ProwlarrSetting) error {
 	return c.SetSetting(SettingProwlarrInfo, string(data))
 }
 
-
 func (c *Client) getAcceptedFormats(key string) ([]string, error) {
 	v := c.GetSetting(key)
 	if v == "" {
@@ -730,7 +707,7 @@ func (c *Client) setAcceptedFormats(key string, v []string) error {
 		return err
 	}
 	return c.SetSetting(key, string(data))
-} 
+}
 
 func (c *Client) GetAcceptedVideoFormats() ([]string, error) {
 	res, err := c.getAcceptedFormats(SettingAcceptedVideoFormats)
@@ -752,7 +729,7 @@ func (c *Client) GetAcceptedSubtitleFormats() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if res== nil {
+	if res == nil {
 		return defaultAcceptedSubtitleFormats, nil
 	}
 	return res, nil

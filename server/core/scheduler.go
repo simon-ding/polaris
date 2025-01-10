@@ -25,6 +25,9 @@ func (c *Client) addSysCron() {
 		if v == "true" {
 			return nil
 		}
+		if err := c.syncProwlarr(); err != nil {
+			log.Warnf("sync prowlarr error: %v", err)
+		}
 		c.downloadAllTvSeries()
 		c.downloadAllMovies()
 		return nil
@@ -224,7 +227,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	}
 	c.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
 
-	//判断是否需要删除本地文件
+	//判断是否需要删除本地文件, TODO prowlarr has no indexer id
 	r1, ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 	if downloadclient.RemoveCompletedDownloads && ok {
 		log.Debugf("download complete,remove torrent and files related, torrent: %v, seed ratio: %v", torrentName, r1)

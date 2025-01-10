@@ -25,6 +25,16 @@ const (
 	FieldSeedRatio = "seed_ratio"
 	// FieldDisabled holds the string denoting the disabled field in the database.
 	FieldDisabled = "disabled"
+	// FieldTvSearch holds the string denoting the tv_search field in the database.
+	FieldTvSearch = "tv_search"
+	// FieldMovieSearch holds the string denoting the movie_search field in the database.
+	FieldMovieSearch = "movie_search"
+	// FieldAPIKey holds the string denoting the api_key field in the database.
+	FieldAPIKey = "api_key"
+	// FieldURL holds the string denoting the url field in the database.
+	FieldURL = "url"
+	// FieldSynced holds the string denoting the synced field in the database.
+	FieldSynced = "synced"
 	// Table holds the table name of the indexers in the database.
 	Table = "indexers"
 )
@@ -39,6 +49,11 @@ var Columns = []string{
 	FieldPriority,
 	FieldSeedRatio,
 	FieldDisabled,
+	FieldTvSearch,
+	FieldMovieSearch,
+	FieldAPIKey,
+	FieldURL,
+	FieldSynced,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -52,6 +67,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultSettings holds the default value on creation for the "settings" field.
+	DefaultSettings string
 	// DefaultEnableRss holds the default value on creation for the "enable_rss" field.
 	DefaultEnableRss bool
 	// DefaultPriority holds the default value on creation for the "priority" field.
@@ -60,6 +77,12 @@ var (
 	DefaultSeedRatio float32
 	// DefaultDisabled holds the default value on creation for the "disabled" field.
 	DefaultDisabled bool
+	// DefaultTvSearch holds the default value on creation for the "tv_search" field.
+	DefaultTvSearch bool
+	// DefaultMovieSearch holds the default value on creation for the "movie_search" field.
+	DefaultMovieSearch bool
+	// DefaultSynced holds the default value on creation for the "synced" field.
+	DefaultSynced bool
 )
 
 // OrderOption defines the ordering options for the Indexers queries.
@@ -103,4 +126,29 @@ func BySeedRatio(opts ...sql.OrderTermOption) OrderOption {
 // ByDisabled orders the results by the disabled field.
 func ByDisabled(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDisabled, opts...).ToFunc()
+}
+
+// ByTvSearch orders the results by the tv_search field.
+func ByTvSearch(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTvSearch, opts...).ToFunc()
+}
+
+// ByMovieSearch orders the results by the movie_search field.
+func ByMovieSearch(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMovieSearch, opts...).ToFunc()
+}
+
+// ByAPIKey orders the results by the api_key field.
+func ByAPIKey(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAPIKey, opts...).ToFunc()
+}
+
+// ByURL orders the results by the url field.
+func ByURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// BySynced orders the results by the synced field.
+func BySynced(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSynced, opts...).ToFunc()
 }

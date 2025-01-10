@@ -31,26 +31,28 @@ func New(apiKey, url string) *Client {
 	return &Client{p: p, apiKey: apiKey, url: url}
 }
 
-func (c *Client) GetIndexers(t ProwlarrSupportType) ([]*db.TorznabInfo, error) {
+func (c *Client) GetIndexers() ([]*ent.Indexers, error) {
 	ins, err := c.p.GetIndexers()
 	if err != nil {
 		return nil, err
 	}
-	var indexers []*db.TorznabInfo
+	var indexers []*ent.Indexers
 	for _, in := range ins {
-		if !in.Enable {
-			continue
+
+		tvSearch := true
+		movieSearch := true
+		if len(in.Capabilities.TvSearchParams) == 0 { //no tv resource in this indexer
+			tvSearch = false
 		}
-		if t == "tv" && len(in.Capabilities.TvSearchParams) == 0 { //no tv resource in this indexer
-			continue
-		} else if t == "movie" && len(in.Capabilities.MovieSearchParams) == 0 { //no movie resource in this indexer
-			continue
+		if len(in.Capabilities.MovieSearchParams) == 0 { //no movie resource in this indexer
+			movieSearch = false
 		}
 		seedRatio := 0.0
 		for _, f := range in.Fields {
 			if f.Name == "torrentBaseSettings.seedRatio" && f.Value != nil {
 				if r, ok := f.Value.(float64); ok {
 					seedRatio = r
+					break
 				}
 			}
 		}
@@ -61,17 +63,18 @@ func (c *Client) GetIndexers(t ProwlarrSupportType) ([]*db.TorznabInfo, error) {
 		data, _ := json.Marshal(&setting)
 
 		entIndexer := ent.Indexers{
+			Disabled:       !in.Enable,
 			Name:           in.Name,
 			Implementation: "torznab",
 			Priority:       128 - int(in.Priority),
 			SeedRatio:      float32(seedRatio),
 			Settings:       string(data),
+			TvSearch:       tvSearch,
+			MovieSearch:    movieSearch,
+			APIKey:         c.apiKey,
+			URL:            fmt.Sprintf("%s/%d/api", strings.TrimSuffix(c.url, "/"), in.ID),
 		}
-
-		indexers = append(indexers, &db.TorznabInfo{
-			Indexers:       &entIndexer,
-			TorznabSetting: setting,
-		})
+		indexers = append(indexers, &entIndexer)
 	}
 	return indexers, nil
 }

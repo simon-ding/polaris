@@ -1,14 +1,12 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"polaris/db"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/log"
-	"polaris/pkg/prowlarr"
 	"polaris/pkg/qbittorrent"
 	"polaris/pkg/torznab"
 	"polaris/pkg/transmission"
@@ -146,29 +144,25 @@ func (s *Server) AddTorznabInfo(c *gin.Context) (interface{}, error) {
 	utils.TrimFields(&in)
 
 	log.Infof("add indexer settings: %+v", in)
-	setting := db.TorznabSetting{
-		URL:    in.URL,
-		ApiKey: in.ApiKey,
-	}
 
-	data, err := json.Marshal(setting)
-	if err != nil {
-		return nil, errors.Wrap(err, "marshal json")
-	}
 	if in.Priority > 128 {
 		in.Priority = 128
+	}
+	if in.Priority < 1 {
+		in.Priority = 1
 	}
 
 	indexer := ent.Indexers{
 		ID:             in.ID,
 		Name:           in.Name,
 		Implementation: "torznab",
-		Settings:       string(data),
 		Priority:       in.Priority,
 		Disabled:       in.Disabled,
 		SeedRatio:      in.SeedRatio,
+		APIKey:         in.ApiKey,
+		URL:            in.URL,
 	}
-	err = s.db.SaveIndexer(&indexer)
+	err := s.db.SaveIndexer(&indexer)
 	if err != nil {
 		return nil, errors.Wrap(err, "add ")
 	}
@@ -183,12 +177,12 @@ func (s *Server) DeleteTorznabInfo(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("id is not correct: %v", ids)
 	}
-	s.db.DeleteTorznab(id)
+	s.db.DeleteIndexer(id)
 	return "success", nil
 }
 
 func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
-	indexers := s.db.GetAllTorznabInfo()
+	indexers := s.db.GetAllIndexers()
 	if len(indexers) == 0 {
 		return nil, nil
 	}
@@ -316,11 +310,16 @@ func (s *Server) SaveProwlarrSetting(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, err
 	}
-	if !in.Disabled {
-		client := prowlarr.New(in.ApiKey, in.URL)
-		if _, err := client.GetIndexers(prowlarr.TV); err != nil {
-			return nil, errors.Wrap(err, "connect to prowlarr error")
+
+	if in.Disabled {
+		if err := s.core.DeleteAllProwlarrIndexers(); err != nil {
+			return nil, errors.Wrap(err, "delete prowlarr indexers")
 		}
+	} else {
+		if err := s.core.SyncProwlarrIndexers(in.ApiKey, in.URL); err != nil {
+			return nil, errors.Wrap(err, "verify prowlarr")
+		}
+
 	}
 	err := s.db.SaveProwlarrSetting(&in)
 	if err != nil {

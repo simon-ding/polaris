@@ -37,6 +37,14 @@ func (ic *IndexersCreate) SetSettings(s string) *IndexersCreate {
 	return ic
 }
 
+// SetNillableSettings sets the "settings" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableSettings(s *string) *IndexersCreate {
+	if s != nil {
+		ic.SetSettings(*s)
+	}
+	return ic
+}
+
 // SetEnableRss sets the "enable_rss" field.
 func (ic *IndexersCreate) SetEnableRss(b bool) *IndexersCreate {
 	ic.mutation.SetEnableRss(b)
@@ -93,6 +101,76 @@ func (ic *IndexersCreate) SetNillableDisabled(b *bool) *IndexersCreate {
 	return ic
 }
 
+// SetTvSearch sets the "tv_search" field.
+func (ic *IndexersCreate) SetTvSearch(b bool) *IndexersCreate {
+	ic.mutation.SetTvSearch(b)
+	return ic
+}
+
+// SetNillableTvSearch sets the "tv_search" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableTvSearch(b *bool) *IndexersCreate {
+	if b != nil {
+		ic.SetTvSearch(*b)
+	}
+	return ic
+}
+
+// SetMovieSearch sets the "movie_search" field.
+func (ic *IndexersCreate) SetMovieSearch(b bool) *IndexersCreate {
+	ic.mutation.SetMovieSearch(b)
+	return ic
+}
+
+// SetNillableMovieSearch sets the "movie_search" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableMovieSearch(b *bool) *IndexersCreate {
+	if b != nil {
+		ic.SetMovieSearch(*b)
+	}
+	return ic
+}
+
+// SetAPIKey sets the "api_key" field.
+func (ic *IndexersCreate) SetAPIKey(s string) *IndexersCreate {
+	ic.mutation.SetAPIKey(s)
+	return ic
+}
+
+// SetNillableAPIKey sets the "api_key" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableAPIKey(s *string) *IndexersCreate {
+	if s != nil {
+		ic.SetAPIKey(*s)
+	}
+	return ic
+}
+
+// SetURL sets the "url" field.
+func (ic *IndexersCreate) SetURL(s string) *IndexersCreate {
+	ic.mutation.SetURL(s)
+	return ic
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableURL(s *string) *IndexersCreate {
+	if s != nil {
+		ic.SetURL(*s)
+	}
+	return ic
+}
+
+// SetSynced sets the "synced" field.
+func (ic *IndexersCreate) SetSynced(b bool) *IndexersCreate {
+	ic.mutation.SetSynced(b)
+	return ic
+}
+
+// SetNillableSynced sets the "synced" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableSynced(b *bool) *IndexersCreate {
+	if b != nil {
+		ic.SetSynced(*b)
+	}
+	return ic
+}
+
 // Mutation returns the IndexersMutation object of the builder.
 func (ic *IndexersCreate) Mutation() *IndexersMutation {
 	return ic.mutation
@@ -128,6 +206,10 @@ func (ic *IndexersCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ic *IndexersCreate) defaults() {
+	if _, ok := ic.mutation.Settings(); !ok {
+		v := indexers.DefaultSettings
+		ic.mutation.SetSettings(v)
+	}
 	if _, ok := ic.mutation.EnableRss(); !ok {
 		v := indexers.DefaultEnableRss
 		ic.mutation.SetEnableRss(v)
@@ -144,6 +226,18 @@ func (ic *IndexersCreate) defaults() {
 		v := indexers.DefaultDisabled
 		ic.mutation.SetDisabled(v)
 	}
+	if _, ok := ic.mutation.TvSearch(); !ok {
+		v := indexers.DefaultTvSearch
+		ic.mutation.SetTvSearch(v)
+	}
+	if _, ok := ic.mutation.MovieSearch(); !ok {
+		v := indexers.DefaultMovieSearch
+		ic.mutation.SetMovieSearch(v)
+	}
+	if _, ok := ic.mutation.Synced(); !ok {
+		v := indexers.DefaultSynced
+		ic.mutation.SetSynced(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -153,9 +247,6 @@ func (ic *IndexersCreate) check() error {
 	}
 	if _, ok := ic.mutation.Implementation(); !ok {
 		return &ValidationError{Name: "implementation", err: errors.New(`ent: missing required field "Indexers.implementation"`)}
-	}
-	if _, ok := ic.mutation.Settings(); !ok {
-		return &ValidationError{Name: "settings", err: errors.New(`ent: missing required field "Indexers.settings"`)}
 	}
 	if _, ok := ic.mutation.EnableRss(); !ok {
 		return &ValidationError{Name: "enable_rss", err: errors.New(`ent: missing required field "Indexers.enable_rss"`)}
@@ -216,6 +307,26 @@ func (ic *IndexersCreate) createSpec() (*Indexers, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Disabled(); ok {
 		_spec.SetField(indexers.FieldDisabled, field.TypeBool, value)
 		_node.Disabled = value
+	}
+	if value, ok := ic.mutation.TvSearch(); ok {
+		_spec.SetField(indexers.FieldTvSearch, field.TypeBool, value)
+		_node.TvSearch = value
+	}
+	if value, ok := ic.mutation.MovieSearch(); ok {
+		_spec.SetField(indexers.FieldMovieSearch, field.TypeBool, value)
+		_node.MovieSearch = value
+	}
+	if value, ok := ic.mutation.APIKey(); ok {
+		_spec.SetField(indexers.FieldAPIKey, field.TypeString, value)
+		_node.APIKey = value
+	}
+	if value, ok := ic.mutation.URL(); ok {
+		_spec.SetField(indexers.FieldURL, field.TypeString, value)
+		_node.URL = value
+	}
+	if value, ok := ic.mutation.Synced(); ok {
+		_spec.SetField(indexers.FieldSynced, field.TypeBool, value)
+		_node.Synced = value
 	}
 	return _node, _spec
 }
