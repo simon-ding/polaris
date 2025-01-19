@@ -66,7 +66,7 @@ func (c *Client) writeNfoFile(historyId int) error {
 			if err != nil {
 				return errors.Wrap(err, "xml marshal")
 			}
-			return st.WriteFile(nfoPath, data)
+			return st.WriteFile(nfoPath, []byte(xml.Header+string(data)))
 		}
 
 	} else if md.MediaType == media.MediaTypeMovie { //movie.nfo
@@ -101,7 +101,7 @@ func (c *Client) writeNfoFile(historyId int) error {
 			if err != nil {
 				return errors.Wrap(err, "xml marshal")
 			}
-			return st.WriteFile(nfoPath, data)
+			return st.WriteFile(nfoPath, []byte(xml.Header+string(data)))
 		}
 	}
 	return nil
