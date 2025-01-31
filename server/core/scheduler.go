@@ -93,15 +93,96 @@ func (c *Client) checkTasks() error {
 					log.Infof("torrent file seed ratio reached, remove: %v, current seed ratio: %v", name, ratio)
 					torrent.Remove()
 					delete(c.tasks, id)
+					c.setHistoryStatus(id, history.StatusSuccess)
 				} else {
 					log.Infof("torrent file still sedding: %v, current seed ratio: %v", name, ratio)
 				}
 				continue
+			} else if r.Status == history.StatusRunning {
+				log.Infof("task is done: %v", name)
+				c.sendMsg(fmt.Sprintf(message.DownloadComplete, name))
+				go c.postTaskProcessing(id)	
 			}
-			log.Infof("task is done: %v", name)
-			c.sendMsg(fmt.Sprintf(message.DownloadComplete, name))
+		}
+	}
+	return nil
+}
 
-			go c.postTaskProcessing(id)
+/*
+episode 状态有3种：missing、downloading、downloaded
+
+history状态有5种：running, success, fail, uploading, seeding
+
+没有下载的剧集状态都是missing，已下载完成的都是downloaded，正在下载的是downloading
+
+对应的history状态，下载任务创建成功，正常跑着是running，出了问题失败了，就是fail，下载完成的任务会先进入uploading状态进一步处理，
+uploading状态下会传输到对应的存储里面，uploading成功如果需要做种会进入seeding状态，如果不做种进入success状态，失败了会进入fail状态
+
+seeding状态中，会定时检查做种状态，达到指定分享率，会置为success
+
+任务创建成功，episode状态会由missing置为downloading，如果任务失败重新置为missing，如果任务成功进入success或seeding，episode状态应置为downloaded
+
+*/
+
+func (c *Client) setHistoryStatus(id int, status history.Status) {
+	r := c.db.GetHistory(id)
+
+	episodeIds := c.GetEpisodeIds(r)
+
+	switch status {
+	case history.StatusRunning:
+		c.db.SetHistoryStatus(id, history.StatusRunning)
+		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusDownloading)
+	case history.StatusSuccess:
+		c.db.SetHistoryStatus(id, history.StatusSuccess)
+		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusDownloaded)
+
+	case history.StatusUploading:
+		c.db.SetHistoryStatus(id, history.StatusUploading)
+
+	case history.StatusSeeding:
+		c.db.SetHistoryStatus(id, history.StatusSeeding)
+		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusDownloaded)
+
+	case history.StatusFail:
+		c.db.SetHistoryStatus(id, history.StatusFail)
+		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusMissing)
+	default:
+		panic(fmt.Sprintf("unkown status %v", status))
+	}
+}
+
+func (c *Client) setEpsideoStatus(mediaId int, seasonNum int, episodeIds []int, status episode.Status) error {
+	detail := c.db.GetMediaDetails(mediaId)
+
+	if len(episodeIds) == 0 {
+		//should set all season
+		for _, ep := range detail.Episodes {
+			if ep.SeasonNumber == seasonNum {
+				if ep.Status == episode.StatusDownloaded {
+					//已经下载完成的任务，不再重新设置状态
+					continue
+				}
+				if err := c.db.SetEpisodeStatus(ep.ID, status); err != nil {
+					return err
+				}
+			}
+		}
+
+	} else {
+		for _, id := range episodeIds {
+			ep, err := c.db.GetEpisodeByID(id)
+			if err != nil {
+				return err
+			}
+			if ep.Status == episode.StatusDownloaded {
+				//已经下载完成的任务，不再重新设置状态
+				continue
+			}
+
+			if err := c.db.SetEpisodeStatus(id, status); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -158,11 +239,12 @@ func (c *Client) GetEpisodeIds(r *ent.History) []int {
 func (c *Client) moveCompletedTask(id int) (err1 error) {
 	torrent := c.tasks[id]
 	r := c.db.GetHistory(id)
-	if r.Status == history.StatusUploading {
-		log.Infof("task %d is already uploading, skip", id)
-		return nil
-	}
-	c.db.SetHistoryStatus(r.ID, history.StatusUploading)
+	// if r.Status == history.StatusUploading {
+	// 	log.Infof("task %d is already uploading, skip", id)
+	// 	return nil
+	// }
+
+	c.setHistoryStatus(r.ID, history.StatusUploading)
 
 	downloadclient, err := c.db.GetDownloadClient(r.DownloadClientID)
 	if err != nil {
@@ -174,23 +256,10 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 		return err
 	}
 
-	seasonNum := getSeasonNum(r)
-
-	episodeIds := c.GetEpisodeIds(r)
-
 	defer func() {
 
 		if err1 != nil {
-			c.db.SetHistoryStatus(r.ID, history.StatusFail)
-			if len(episodeIds) > 0 {
-				for _, id := range episodeIds {
-					if !c.db.IsEpisodeDownloadingOrDownloaded(id) {
-						c.db.SetEpisodeStatus(id, episode.StatusMissing)
-					}
-				}
-			} else {
-				c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusMissing)
-			}
+			c.setHistoryStatus(r.ID, history.StatusFail)
 			c.sendMsg(fmt.Sprintf(message.ProcessingFailed, err1))
 			if downloadclient.RemoveFailedDownloads {
 				log.Debugf("task failed, remove failed torrent and files related")
@@ -204,6 +273,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	if series == nil {
 		return nil
 	}
+	
 	st := c.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
 	stImpl, err := c.GetStorage(st.ID, series.MediaType)
@@ -217,23 +287,18 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	}
 	torrent.UploadProgresser = stImpl.UploadProgress
 
-	c.db.SetHistoryStatus(r.ID, history.StatusSeeding)
-	if len(episodeIds) > 0 {
-		for _, id := range episodeIds {
-			c.db.SetEpisodeStatus(id, episode.StatusDownloaded)
-		}
-	} else {
-		c.db.SetSeasonAllEpisodeStatus(r.MediaID, seasonNum, episode.StatusDownloaded)
-	}
 	c.sendMsg(fmt.Sprintf(message.ProcessingComplete, torrentName))
 
 	//判断是否需要删除本地文件, TODO prowlarr has no indexer id
 	r1, ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 	if downloadclient.RemoveCompletedDownloads && ok {
 		log.Debugf("download complete,remove torrent and files related, torrent: %v, seed ratio: %v", torrentName, r1)
-		c.db.SetHistoryStatus(r.ID, history.StatusSuccess)
+		c.setHistoryStatus(r.ID, history.StatusSuccess)
 		delete(c.tasks, r.ID)
 		torrent.Remove()
+	} else {
+		log.Infof("task complete but still needs seeding: %v", torrentName)
+		c.setHistoryStatus(r.ID, history.StatusSeeding)
 	}
 
 	log.Infof("move downloaded files to target dir success, file: %v, target dir: %v", torrentName, r.TargetDir)

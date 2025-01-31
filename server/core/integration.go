@@ -279,6 +279,7 @@ func (c *Client) findEpisodeFilesPreMoving(historyId int) error {
 	if err != nil {
 		return err
 	}
+
 	target := filepath.Join(downloadDir, name)
 	fi, err := os.Stat(target)
 	if err != nil {
