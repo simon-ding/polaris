@@ -96,7 +96,7 @@ func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool,
 	}
 	log.Debugf("local storage target base dir is: %v", targetBase)
 
-	err = walkFn(func(path string, info fs.FileInfo) error {
+	err = walkFn(func(path string, info fs.FileInfo) (err error) {
 		if err != nil {
 			return err
 		}
@@ -113,6 +113,13 @@ func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool,
 				log.Debugf("file is not needed, skip: %s", info.Name())
 				return nil
 			}
+			
+			defer func ()  {
+				if err == nil {
+					log.Infof("copy file success, filename %s, destination %s", rel, destName)
+				}
+			}()
+
 			if tryLink {
 				if err := os.Link(path, destName); err == nil {
 					return nil //link success
