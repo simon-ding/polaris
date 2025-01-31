@@ -13,9 +13,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+type WalkFn func(fn func(path string, info fs.FileInfo) error) error
 type Storage interface {
-	Move(src, dest string) error
-	Copy(src, dest string) error
+	//Move(src, dest string) error
+	Copy(src, dest string, walkFn WalkFn) error
 	ReadDir(dir string) ([]fs.FileInfo, error)
 	ReadFile(string) ([]byte, error)
 	WriteFile(string, []byte) error
@@ -79,7 +80,7 @@ func (b *Base) isFileNeeded(name string) bool {
 
 }
 
-func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool, upload uploadFunc, mkdir func(string) error) error {
+func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool, upload uploadFunc, mkdir func(string) error, walkFn WalkFn) error {
 	if !b.checkVideoFilesExist() {
 		return errors.Errorf("torrent has no video file(s)")
 	}
@@ -95,7 +96,7 @@ func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool,
 	}
 	log.Debugf("local storage target base dir is: %v", targetBase)
 
-	err = filepath.Walk(b.src, func(path string, info fs.FileInfo, err error) error {
+	err = walkFn(func(path string, info fs.FileInfo) error {
 		if err != nil {
 			return err
 		}

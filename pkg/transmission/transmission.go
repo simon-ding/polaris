@@ -3,7 +3,10 @@ package transmission
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"net/url"
+	"os"
+	"path/filepath"
 	"polaris/log"
 	"polaris/pkg"
 	"polaris/pkg/utils"
@@ -211,4 +214,29 @@ func (t *Torrent) Size() (int, error) {
 
 func (t *Torrent) GetHash() string {
 	return t.hash
+}
+
+func (t *Torrent) WalkFunc() func(fn func(path string, info fs.FileInfo) error) error {
+	tt, err := t.getTorrent()
+	if err != nil {
+		return func(fn func(path string, info fs.FileInfo) error) error {
+			return errors.Wrap(err, "get torrent info")
+		}
+	}
+	return func(fn func(path string, info fs.FileInfo) error) error {
+		for _, file := range tt.Files {
+			name := filepath.Join(*tt.DownloadDir, file.Name)
+			info, err := os.Stat(name)
+			if err != nil {
+				return err
+			}
+			if err := fn(name, info); err != nil {
+				return err
+			}
+
+		}
+		return nil
+
+	}
+
 }

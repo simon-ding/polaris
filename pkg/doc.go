@@ -1,5 +1,7 @@
 package pkg
 
+import "io/fs"
+
 type Torrent interface {
 	Name() (string, error)
 	Progress() (int, error)
@@ -11,10 +13,10 @@ type Torrent interface {
 	SeedRatio() (float64, error)
 	GetHash() string
 	//Reload() error
+	WalkFunc() func(fn func(path string, info fs.FileInfo) error) error
 }
 
 type Downloader interface {
 	GetAll() ([]Torrent, error)
 	Download(link, dir string) (Torrent, error)
 }
-

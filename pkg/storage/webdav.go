@@ -34,7 +34,7 @@ func NewWebdavStorage(url, user, password, path string, changeMediaHash bool, vi
 	}, nil
 }
 
-func (w *WebdavStorage) Copy(local, remoteDir string) error {
+func (w *WebdavStorage) Copy(local, remoteDir string, walkFn WalkFn) error {
 	b, err := NewBase(local, w.videoFormats, w.subtitleFormats)
 	if err != nil {
 		return err
@@ -57,14 +57,7 @@ func (w *WebdavStorage) Copy(local, remoteDir string) error {
 
 	return b.Upload(filepath.Join(w.dir, remoteDir), false, true, w.changeMediaHash, uploadFunc, func(s string) error {
 		return nil
-	})
-}
-
-func (w *WebdavStorage) Move(local, remoteDir string) error {
-	if err := w.Copy(local, remoteDir); err != nil {
-		return err
-	}
-	return os.RemoveAll(local)
+	}, walkFn)
 }
 
 func (w *WebdavStorage) ReadDir(dir string) ([]fs.FileInfo, error) {

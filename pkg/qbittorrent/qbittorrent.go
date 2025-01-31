@@ -2,7 +2,9 @@ package qbittorrent
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"polaris/pkg"
 	"polaris/pkg/go-qbittorrent/qbt"
 	"polaris/pkg/utils"
@@ -202,4 +204,50 @@ func (t *Torrent) SeedRatio() (float64, error) {
 		return 0, err
 	}
 	return qb.Ratio, nil
+}
+
+func (t *Torrent) Walk(f func(string) error) error {
+	files, err := t.c.TorrentFiles(t.hash)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		if err := f(file.Name); err != nil {
+			return errors.Errorf("proccess file (%s) error: %v", file.Name, err)
+		}
+	}
+	return nil
+}
+
+func (t *Torrent) WalkFunc() func(fn func(path string, info fs.FileInfo) error) error {
+	files, err := t.c.TorrentFiles(t.hash)
+	if err != nil {
+		return func(fn func(path string, info fs.FileInfo) error) error {
+			return err
+		}
+	}
+	path, err := t.c.DefaultSavePath()
+	if err != nil {
+		return func(fn func(path string, info fs.FileInfo) error) error {
+			return err
+		}
+	}
+	
+	return func(fn func(path string, info fs.FileInfo) error) error {
+		for _, file := range files {
+			name := filepath.Join(path, file.Name)
+			info, err := os.Stat(name)
+			if err != nil {
+				return err
+			}
+
+			if err := fn(name, info); err != nil {
+				return errors.Errorf("proccess file (%s) error: %v", file.Name, err)
+			}
+		}
+		return nil
+
+	}
+
 }

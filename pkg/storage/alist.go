@@ -3,7 +3,6 @@ package storage
 import (
 	"io"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"polaris/pkg/alist"
 
@@ -28,14 +27,7 @@ type Alist struct {
 	subtitleFormats []string
 }
 
-func (a *Alist) Move(src, dest string) error {
-	if err := a.Copy(src, dest); err != nil {
-		return err
-	}
-	return os.RemoveAll(src)
-}
-
-func (a *Alist) Copy(src, dest string) error {
+func (a *Alist) Copy(src, dest string, walkFn WalkFn) error {
 	b, err := NewBase(src, a.videoFormats, a.subtitleFormats)
 	if err != nil {
 		return err
@@ -51,7 +43,7 @@ func (a *Alist) Copy(src, dest string) error {
 	}
 
 	baseDest := filepath.Join(a.baseDir, dest)
-	return b.Upload(baseDest, false, false, false, uploadFunc, mkdirFunc)
+	return b.Upload(baseDest, false, false, false, uploadFunc, mkdirFunc, walkFn)
 }
 
 func (a *Alist) ReadDir(dir string) ([]fs.FileInfo, error) {

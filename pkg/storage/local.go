@@ -22,7 +22,7 @@ type LocalStorage struct {
 	subtitleFormats []string
 }
 
-func (l *LocalStorage) Copy(src, destDir string) error {
+func (l *LocalStorage) Copy(src, destDir string,walkFn WalkFn) error {
 	b, err := NewBase(src, l.videoFormats, l.subtitleFormats)
 	if err != nil {
 		return err
@@ -44,14 +44,7 @@ func (l *LocalStorage) Copy(src, destDir string) error {
 	}
 	return b.Upload(baseDest, true, false, false, uploadFunc, func(s string) error {
 		return os.Mkdir(s, os.ModePerm)
-	})
-}
-
-func (l *LocalStorage) Move(src, destDir string) error {
-	if err := l.Copy(src, destDir); err != nil {
-		return err
-	}
-	return os.RemoveAll(src)
+	}, walkFn)
 }
 
 func (l *LocalStorage) ReadDir(dir string) ([]fs.FileInfo, error) {
