@@ -60,6 +60,10 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 }
 
 func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
+	err := c.c.DownloadLinks([]string{link}, qbt.DownloadOptions{Savepath: &dir, Category: &c.category})
+	if err != nil {
+		return nil, errors.Wrap(err, "qbt download")
+	}
 	magnet, err := utils.Link2Magnet(link)
 	if err != nil {
 		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", link, err)
@@ -69,10 +73,7 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "get hash")
 	}
-	err = c.c.DownloadLinks([]string{magnet}, qbt.DownloadOptions{Savepath: &dir, Category: &c.category})
-	if err != nil {
-		return nil, errors.Wrap(err, "qbt download")
-	}
+
 	return &Torrent{hash: hash, c: c.c}, nil
 
 }

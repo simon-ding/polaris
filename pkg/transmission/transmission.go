@@ -61,6 +61,16 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 }
 
 func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
+
+	t, err := c.c.TorrentAdd(context.TODO(), transmissionrpc.TorrentAddPayload{
+		Filename:    &link,
+		DownloadDir: &dir,
+	})
+	if err != nil {
+		return nil, err
+	}
+	log.Debugf("get torrent info: %+v", t)
+
 	magnet, err := utils.Link2Magnet(link)
 	if err != nil {
 		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", link, err)
@@ -70,12 +80,6 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "get hash")
 	}
-
-	t, err := c.c.TorrentAdd(context.TODO(), transmissionrpc.TorrentAddPayload{
-		Filename:    &magnet,
-		DownloadDir: &dir,
-	})
-	log.Debugf("get torrent info: %+v", t)
 
 	return &Torrent{
 		hash: hash,
