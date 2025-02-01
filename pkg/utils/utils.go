@@ -222,6 +222,33 @@ func isWSL() bool {
 	return strings.Contains(strings.ToLower(string(releaseData)), "microsoft")
 }
 
+func Link2Hash(link string) (string, error) {
+	if strings.HasPrefix(strings.ToLower(link), "magnet:") {
+		return MagnetHash(link)
+	}
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse //do not follow redirects
+		},
+	}
+
+	resp, err := client.Get(link)
+	if err != nil {
+		return "", errors.Wrap(err, "get link")
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+		//redirects
+		tourl := resp.Header.Get("Location")
+		return Link2Hash(tourl)
+	}
+	info, err := metainfo.Load(resp.Body)
+	if err != nil {
+		return "", errors.Wrap(err, "parse response")
+	}
+	return info.HashInfoBytes().AsString(), nil
+}
+
 func Link2Magnet(link string) (string, error) {
 	if strings.HasPrefix(strings.ToLower(link), "magnet:") {
 		return link, nil

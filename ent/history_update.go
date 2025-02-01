@@ -259,6 +259,26 @@ func (hu *HistoryUpdate) ClearLink() *HistoryUpdate {
 	return hu
 }
 
+// SetHash sets the "hash" field.
+func (hu *HistoryUpdate) SetHash(s string) *HistoryUpdate {
+	hu.mutation.SetHash(s)
+	return hu
+}
+
+// SetNillableHash sets the "hash" field if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableHash(s *string) *HistoryUpdate {
+	if s != nil {
+		hu.SetHash(*s)
+	}
+	return hu
+}
+
+// ClearHash clears the value of the "hash" field.
+func (hu *HistoryUpdate) ClearHash() *HistoryUpdate {
+	hu.mutation.ClearHash()
+	return hu
+}
+
 // SetStatus sets the "status" field.
 func (hu *HistoryUpdate) SetStatus(h history.Status) *HistoryUpdate {
 	hu.mutation.SetStatus(h)
@@ -420,6 +440,12 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if hu.mutation.LinkCleared() {
 		_spec.ClearField(history.FieldLink, field.TypeString)
+	}
+	if value, ok := hu.mutation.Hash(); ok {
+		_spec.SetField(history.FieldHash, field.TypeString, value)
+	}
+	if hu.mutation.HashCleared() {
+		_spec.ClearField(history.FieldHash, field.TypeString)
 	}
 	if value, ok := hu.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
@@ -680,6 +706,26 @@ func (huo *HistoryUpdateOne) ClearLink() *HistoryUpdateOne {
 	return huo
 }
 
+// SetHash sets the "hash" field.
+func (huo *HistoryUpdateOne) SetHash(s string) *HistoryUpdateOne {
+	huo.mutation.SetHash(s)
+	return huo
+}
+
+// SetNillableHash sets the "hash" field if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableHash(s *string) *HistoryUpdateOne {
+	if s != nil {
+		huo.SetHash(*s)
+	}
+	return huo
+}
+
+// ClearHash clears the value of the "hash" field.
+func (huo *HistoryUpdateOne) ClearHash() *HistoryUpdateOne {
+	huo.mutation.ClearHash()
+	return huo
+}
+
 // SetStatus sets the "status" field.
 func (huo *HistoryUpdateOne) SetStatus(h history.Status) *HistoryUpdateOne {
 	huo.mutation.SetStatus(h)
@@ -871,6 +917,12 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if huo.mutation.LinkCleared() {
 		_spec.ClearField(history.FieldLink, field.TypeString)
+	}
+	if value, ok := huo.mutation.Hash(); ok {
+		_spec.SetField(history.FieldHash, field.TypeString, value)
+	}
+	if huo.mutation.HashCleared() {
+		_spec.ClearField(history.FieldHash, field.TypeString)
 	}
 	if value, ok := huo.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)

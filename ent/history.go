@@ -38,8 +38,10 @@ type History struct {
 	DownloadClientID int `json:"download_client_id,omitempty"`
 	// IndexerID holds the value of the "indexer_id" field.
 	IndexerID int `json:"indexer_id,omitempty"`
-	// Link holds the value of the "link" field.
+	// deprecated, use hash instead
 	Link string `json:"link,omitempty"`
+	// torrent hash
+	Hash string `json:"hash,omitempty"`
 	// Status holds the value of the "status" field.
 	Status history.Status `json:"status,omitempty"`
 	// deprecated
@@ -56,7 +58,7 @@ func (*History) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case history.FieldID, history.FieldMediaID, history.FieldEpisodeID, history.FieldSeasonNum, history.FieldSize, history.FieldDownloadClientID, history.FieldIndexerID:
 			values[i] = new(sql.NullInt64)
-		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldLink, history.FieldStatus, history.FieldSaved:
+		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldLink, history.FieldHash, history.FieldStatus, history.FieldSaved:
 			values[i] = new(sql.NullString)
 		case history.FieldDate:
 			values[i] = new(sql.NullTime)
@@ -149,6 +151,12 @@ func (h *History) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				h.Link = value.String
 			}
+		case history.FieldHash:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field hash", values[i])
+			} else if value.Valid {
+				h.Hash = value.String
+			}
 		case history.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
@@ -229,6 +237,9 @@ func (h *History) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("link=")
 	builder.WriteString(h.Link)
+	builder.WriteString(", ")
+	builder.WriteString("hash=")
+	builder.WriteString(h.Hash)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", h.Status))

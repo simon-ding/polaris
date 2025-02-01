@@ -63,7 +63,7 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 	return torrents, nil
 }
 
-func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
+func (c *Client) Download(link, hash, dir string) (pkg.Torrent, error) {
 
 	t, err := c.c.TorrentAdd(context.TODO(), transmissionrpc.TorrentAddPayload{
 		Filename:    &link,
@@ -74,16 +74,6 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	}
 	log.Debugf("get torrent info: %+v", t)
 
-	magnet, err := utils.Link2Magnet(link)
-	if err != nil {
-		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", link, err)
-	}
-
-	hash, err := utils.MagnetHash(magnet)
-	if err != nil {
-		return nil, errors.Wrap(err, "get hash")
-	}
-
 	return &Torrent{
 		hash: hash,
 		c:    c.c,
@@ -91,18 +81,8 @@ func (c *Client) Download(link, dir string) (pkg.Torrent, error) {
 	}, err
 }
 
-func NewTorrent(cfg Config, link string) (*Torrent, error) {
+func NewTorrentHash(cfg Config, hash string) (*Torrent, error) {
 	c, err := NewClient(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	magnet, err := utils.Link2Magnet(link)
-	if err != nil {
-		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", link, err)
-	}
-
-	hash, err := utils.MagnetHash(magnet)
 	if err != nil {
 		return nil, err
 	}
@@ -113,9 +93,24 @@ func NewTorrent(cfg Config, link string) (*Torrent, error) {
 		//cfg: cfg,
 	}
 	if !t.Exists() {
-		return nil, errors.Errorf("torrent not exist: %v", magnet)
+		return nil, errors.Errorf("torrent not exist: %v", hash)
 	}
 	return t, nil
+}
+
+func NewTorrent(cfg Config, link string) (*Torrent, error) {
+
+	magnet, err := utils.Link2Magnet(link)
+	if err != nil {
+		return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", link, err)
+	}
+
+	hash, err := utils.MagnetHash(magnet)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewTorrentHash(cfg, hash)
 }
 
 type Torrent struct {

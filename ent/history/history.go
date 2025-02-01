@@ -35,6 +35,8 @@ const (
 	FieldIndexerID = "indexer_id"
 	// FieldLink holds the string denoting the link field in the database.
 	FieldLink = "link"
+	// FieldHash holds the string denoting the hash field in the database.
+	FieldHash = "hash"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldSaved holds the string denoting the saved field in the database.
@@ -57,6 +59,7 @@ var Columns = []string{
 	FieldDownloadClientID,
 	FieldIndexerID,
 	FieldLink,
+	FieldHash,
 	FieldStatus,
 	FieldSaved,
 }
@@ -158,6 +161,11 @@ func ByIndexerID(opts ...sql.OrderTermOption) OrderOption {
 // ByLink orders the results by the link field.
 func ByLink(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLink, opts...).ToFunc()
+}
+
+// ByHash orders the results by the hash field.
+func ByHash(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHash, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

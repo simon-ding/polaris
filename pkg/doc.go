@@ -18,5 +18,5 @@ type Torrent interface {
 
 type Downloader interface {
 	GetAll() ([]Torrent, error)
-	Download(link, dir string) (Torrent, error)
+	Download(link, hash, dir string) (Torrent, error)
 }

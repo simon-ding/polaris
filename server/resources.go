@@ -164,7 +164,13 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 		return s.core.DownloadEpisodeTorrent(res, in.MediaID, in.Season, in.Episode)
 	} else {
 		//movie
-		return s.core.DownloadMovie(m, in.Link, in.Name, in.Size, in.IndexerId)
+		name := in.Name
+		if name == "" {
+			name = m.OriginalName
+		}
+
+		res := torznab.Result{Name: name, Link: in.Link, Size: in.Size, IndexerId: in.IndexerId}
+		return s.core.DownloadMovie(m, res)
 	}
 
 }

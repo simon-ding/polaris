@@ -83,6 +83,7 @@ var (
 		{Name: "download_client_id", Type: field.TypeInt, Nullable: true},
 		{Name: "indexer_id", Type: field.TypeInt, Nullable: true},
 		{Name: "link", Type: field.TypeString, Nullable: true},
+		{Name: "hash", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"running", "success", "fail", "uploading", "seeding"}},
 		{Name: "saved", Type: field.TypeString, Nullable: true},
 	}

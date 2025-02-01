@@ -101,7 +101,7 @@ func (c *Client) checkTasks() error {
 			} else if r.Status == history.StatusRunning {
 				log.Infof("task is done: %v", name)
 				c.sendMsg(fmt.Sprintf(message.DownloadComplete, name))
-				go c.postTaskProcessing(id)	
+				go c.postTaskProcessing(id)
 			}
 		}
 	}
@@ -273,7 +273,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	if series == nil {
 		return nil
 	}
-	
+
 	st := c.db.GetStorage(series.StorageID)
 	log.Infof("move task files to target dir: %v", r.TargetDir)
 	stImpl, err := c.GetStorage(st.ID, series.MediaType)
@@ -459,18 +459,15 @@ func (c *Client) DownloadMovieByID(id int) (string, error) {
 		return "", nil
 	}
 
-	if name, err := c.downloadMovieSingleEpisode(ep, detail.TargetDir); err != nil {
+	if name, err := c.downloadMovieSingleEpisode(detail.Media, ep); err != nil {
 		return "", errors.Wrap(err, "download movie")
 	} else {
 		return name, nil
 	}
 }
 
-func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (string, error) {
-	trc, dlc, err := c.GetDownloadClient()
-	if err != nil {
-		return "", errors.Wrap(err, "connect transmission")
-	}
+func (c *Client) downloadMovieSingleEpisode(m *ent.Media, ep *ent.Episode) (string, error) {
+
 	qiangban := c.db.GetSetting(db.SettingAllowQiangban)
 	allowQiangban := false
 	if qiangban == "true" {
@@ -484,43 +481,16 @@ func (c *Client) downloadMovieSingleEpisode(ep *ent.Episode, targetDir string) (
 		FilterQiangban:  !allowQiangban,
 	})
 	if err != nil {
-
 		return "", errors.Wrap(err, "search movie")
 	}
 	r1 := res[0]
 	log.Infof("begin download torrent resource: %v", r1.Name)
 
-	magnet, err := utils.Link2Magnet(r1.Link)
+	s, err := c.downloadTorrent(m, r1, 0)
 	if err != nil {
-		return "", errors.Errorf("converting link to magnet error, link: %v, error: %v", r1.Link, err)
+		return "", err
 	}
-
-	torrent, err := trc.Download(magnet, c.db.GetDownloadDir())
-	if err != nil {
-		return "", errors.Wrap(err, "downloading")
-	}
-	torrent.Start()
-
-	history, err := c.db.SaveHistoryRecord(ent.History{
-		MediaID:     ep.MediaID,
-		EpisodeID:   ep.ID,
-		SourceTitle: r1.Name,
-		TargetDir:   targetDir,
-		Status:      history.StatusRunning,
-		Size:        int(r1.Size),
-		//Saved:            torrent.Save(),
-		Link:             magnet,
-		DownloadClientID: dlc.ID,
-		IndexerID:        r1.IndexerId,
-	})
-	if err != nil {
-		log.Errorf("save history error: %v", err)
-	}
-
-	c.tasks[history.ID] = &Task{Torrent: torrent}
-
-	c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
-	return r1.Name, nil
+	return *s, nil
 }
 
 func (c *Client) checkAllSeriesNewSeason() error {

@@ -6,6 +6,7 @@ import (
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/history"
+	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/metadata"
 	"polaris/pkg/notifier/message"
@@ -16,95 +17,13 @@ import (
 )
 
 func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum int, episodeNums ...int) (*string, error) {
-	trc, dlc, err := c.GetDownloadClient()
+
+	series, err := c.db.GetMedia(seriesId)
 	if err != nil {
-		return nil, errors.Wrap(err, "connect transmission")
-	}
-	series := c.db.GetMediaDetails(seriesId)
-	if series == nil {
 		return nil, fmt.Errorf("no tv series of id %v", seriesId)
 	}
 
-	//check space available
-	downloadDir := c.db.GetDownloadDir()
-	size := utils.AvailableSpace(downloadDir)
-	if size < uint64(r1.Size) {
-		log.Errorf("space available %v, space needed %v", size, r1.Size)
-		return nil, errors.New("no enough space")
-	}
-
-	// magnet, err := utils.Link2Magnet(r1.Link)
-	// if err != nil {
-	// 	return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", r1.Link, err)
-	// }
-
-	dir := fmt.Sprintf("%s/Season %02d/", series.TargetDir, seasonNum)
-
-	if len(episodeNums) > 0 {
-		for _, epNum := range episodeNums {
-			var ep *ent.Episode
-			for _, e := range series.Episodes {
-				if e.SeasonNumber == seasonNum && e.EpisodeNumber == epNum {
-					ep = e
-				}
-			}
-			if ep == nil {
-				return nil, errors.Errorf("no episode of season %d episode %d", seasonNum, epNum)
-			}
-
-			if ep.Status == episode.StatusMissing {
-				c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
-			}
-
-		}
-	} else { //season package download
-		c.db.SetSeasonAllEpisodeStatus(seriesId, seasonNum, episode.StatusDownloading)
-
-	}
-	history, err := c.db.SaveHistoryRecord(ent.History{
-		MediaID:     seriesId,
-		EpisodeNums: episodeNums,
-		SeasonNum:   seasonNum,
-		SourceTitle: r1.Name,
-		TargetDir:   dir,
-		Status:      history.StatusRunning,
-		Size:        int(r1.Size),
-		//Saved:            torrent.Save(),
-		Link:             r1.Link,
-		DownloadClientID: dlc.ID,
-		IndexerID:        r1.IndexerId,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "save record")
-	}
-
-	torrent, err := trc.Download(r1.Link, downloadDir)
-	if err != nil {
-		return nil, errors.Wrap(err, "downloading")
-	}
-	torrent.Start()
-
-	c.tasks[history.ID] = &Task{Torrent: torrent}
-	name := r1.Name
-
-	if len(episodeNums) > 0 {
-		buff := &bytes.Buffer{}
-		for i, ep := range episodeNums {
-			if i != 0 {
-				buff.WriteString(",")
-
-			}
-			buff.WriteString(fmt.Sprint(ep))
-		}
-		name = fmt.Sprintf("第%s集 (%s)", buff.String(), name)
-	} else {
-		name = fmt.Sprintf("全集 (%s)", name)
-	}
-
-	c.sendMsg(fmt.Sprintf(message.BeginDownload, name))
-
-	log.Infof("success add %s to download task", r1.Name)
-	return &r1.Name, nil
+	return c.downloadTorrent(series, r1, seasonNum, episodeNums...)
 }
 
 /*
@@ -192,53 +111,95 @@ lo:
 	return torrentNames, nil
 }
 
-func (c *Client) DownloadMovie(m *ent.Media, link, name string, size int64, indexerID int) (*string, error) {
+func (c *Client) DownloadMovie(m *ent.Media, r1 torznab.Result) (*string, error) {
+	return c.downloadTorrent(m, r1, 0)
+}
+
+func (c *Client) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int, episodeNums ...int) (*string, error) {
 	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")
 	}
-	// magnet, err := utils.Link2Magnet(link)
-	// if err != nil {
-	// 	return nil, errors.Errorf("converting link to magnet error, link: %v, error: %v", link, err)
-	// }
 
-	torrent, err := trc.Download(link, c.db.GetDownloadDir())
+	//check space available
+	downloadDir := c.db.GetDownloadDir()
+	size := utils.AvailableSpace(downloadDir)
+	if size < uint64(r1.Size) {
+		log.Errorf("space available %v, space needed %v", size, r1.Size)
+		return nil, errors.New("no enough space")
+	}
+
+	var name = r1.Name
+	var targetDir = m.TargetDir
+	if m.MediaType == media.MediaTypeTv { //tv download
+		targetDir = fmt.Sprintf("%s/Season %02d/", m.TargetDir, seasonNum)
+
+		if len(episodeNums) > 0 {
+			for _, epNum := range episodeNums {
+				ep, err := c.db.GetEpisode(m.ID, seasonNum, epNum)
+				if err != nil {
+					return nil, errors.Errorf("no episode of season %d episode %d", seasonNum, epNum)
+
+				}
+				if ep.Status == episode.StatusMissing {
+					c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+				}
+			}
+			buff := &bytes.Buffer{}
+			for i, ep := range episodeNums {
+				if i != 0 {
+					buff.WriteString(",")
+
+				}
+				buff.WriteString(fmt.Sprint(ep))
+			}
+			name = fmt.Sprintf("第%s集 (%s)", buff.String(), name)
+
+		} else { //season package download
+			name = fmt.Sprintf("全集 (%s)", name)
+			c.db.SetSeasonAllEpisodeStatus(m.ID, seasonNum, episode.StatusDownloading)
+		}
+
+	} else {
+		ep, _ := c.db.GetMovieDummyEpisode(m.ID)
+		if ep.Status == episode.StatusMissing {
+			c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+		}
+
+	}
+	hash, err := utils.Link2Hash(r1.Link)
+	if err != nil {
+		return nil, errors.Wrap(err, "get hash")
+	}
+	history, err := c.db.SaveHistoryRecord(ent.History{
+		MediaID:     m.ID,
+		EpisodeNums: episodeNums,
+		SeasonNum:   seasonNum,
+		SourceTitle: r1.Name,
+		TargetDir:   targetDir,
+		Status:      history.StatusRunning,
+		Size:        int(r1.Size),
+		//Saved:            torrent.Save(),
+		Link:             r1.Link,
+		Hash:             hash,
+		DownloadClientID: dlc.ID,
+		IndexerID:        r1.IndexerId,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "save record")
+	}
+
+	torrent, err := trc.Download(r1.Link, hash, downloadDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "downloading")
 	}
 	torrent.Start()
 
-	if name == "" {
-		name = m.OriginalName
-	}
-	go func() {
-		ep, _ := c.db.GetMovieDummyEpisode(m.ID)
-		history, err := c.db.SaveHistoryRecord(ent.History{
-			MediaID:     m.ID,
-			EpisodeID:   ep.ID,
-			SourceTitle: name,
-			TargetDir:   m.TargetDir,
-			Status:      history.StatusRunning,
-			Size:        int(size),
-			//Saved:            torrent.Save(),
-			Link:             link,
-			DownloadClientID: dlc.ID,
-			IndexerID:        indexerID,
-		})
-		if err != nil {
-			log.Errorf("save history error: %v", err)
-		}
-
-		c.tasks[history.ID] = &Task{Torrent: torrent}
-
-		if ep.Status == episode.StatusMissing {
-			c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
-		}
-
-	}()
+	c.tasks[history.ID] = &Task{Torrent: torrent}
 
 	c.sendMsg(fmt.Sprintf(message.BeginDownload, name))
-	log.Infof("success add %s to download task", name)
-	return &name, nil
 
+	log.Infof("success add %s to download task", r1.Name)
+
+	return &r1.Name, nil
 }

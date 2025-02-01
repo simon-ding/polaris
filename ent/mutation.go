@@ -2350,6 +2350,7 @@ type HistoryMutation struct {
 	indexer_id            *int
 	addindexer_id         *int
 	link                  *string
+	hash                  *string
 	status                *history.Status
 	saved                 *string
 	clearedFields         map[string]struct{}
@@ -3070,6 +3071,55 @@ func (m *HistoryMutation) ResetLink() {
 	delete(m.clearedFields, history.FieldLink)
 }
 
+// SetHash sets the "hash" field.
+func (m *HistoryMutation) SetHash(s string) {
+	m.hash = &s
+}
+
+// Hash returns the value of the "hash" field in the mutation.
+func (m *HistoryMutation) Hash() (r string, exists bool) {
+	v := m.hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHash returns the old "hash" field's value of the History entity.
+// If the History object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *HistoryMutation) OldHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHash: %w", err)
+	}
+	return oldValue.Hash, nil
+}
+
+// ClearHash clears the value of the "hash" field.
+func (m *HistoryMutation) ClearHash() {
+	m.hash = nil
+	m.clearedFields[history.FieldHash] = struct{}{}
+}
+
+// HashCleared returns if the "hash" field was cleared in this mutation.
+func (m *HistoryMutation) HashCleared() bool {
+	_, ok := m.clearedFields[history.FieldHash]
+	return ok
+}
+
+// ResetHash resets all changes to the "hash" field.
+func (m *HistoryMutation) ResetHash() {
+	m.hash = nil
+	delete(m.clearedFields, history.FieldHash)
+}
+
 // SetStatus sets the "status" field.
 func (m *HistoryMutation) SetStatus(h history.Status) {
 	m.status = &h
@@ -3189,7 +3239,7 @@ func (m *HistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.media_id != nil {
 		fields = append(fields, history.FieldMediaID)
 	}
@@ -3222,6 +3272,9 @@ func (m *HistoryMutation) Fields() []string {
 	}
 	if m.link != nil {
 		fields = append(fields, history.FieldLink)
+	}
+	if m.hash != nil {
+		fields = append(fields, history.FieldHash)
 	}
 	if m.status != nil {
 		fields = append(fields, history.FieldStatus)
@@ -3259,6 +3312,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.IndexerID()
 	case history.FieldLink:
 		return m.Link()
+	case history.FieldHash:
+		return m.Hash()
 	case history.FieldStatus:
 		return m.Status()
 	case history.FieldSaved:
@@ -3294,6 +3349,8 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldIndexerID(ctx)
 	case history.FieldLink:
 		return m.OldLink(ctx)
+	case history.FieldHash:
+		return m.OldHash(ctx)
 	case history.FieldStatus:
 		return m.OldStatus(ctx)
 	case history.FieldSaved:
@@ -3383,6 +3440,13 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLink(v)
+		return nil
+	case history.FieldHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHash(v)
 		return nil
 	case history.FieldStatus:
 		v, ok := value.(history.Status)
@@ -3521,6 +3585,9 @@ func (m *HistoryMutation) ClearedFields() []string {
 	if m.FieldCleared(history.FieldLink) {
 		fields = append(fields, history.FieldLink)
 	}
+	if m.FieldCleared(history.FieldHash) {
+		fields = append(fields, history.FieldHash)
+	}
 	if m.FieldCleared(history.FieldSaved) {
 		fields = append(fields, history.FieldSaved)
 	}
@@ -3555,6 +3622,9 @@ func (m *HistoryMutation) ClearField(name string) error {
 		return nil
 	case history.FieldLink:
 		m.ClearLink()
+		return nil
+	case history.FieldHash:
+		m.ClearHash()
 		return nil
 	case history.FieldSaved:
 		m.ClearSaved()
@@ -3599,6 +3669,9 @@ func (m *HistoryMutation) ResetField(name string) error {
 		return nil
 	case history.FieldLink:
 		m.ResetLink()
+		return nil
+	case history.FieldHash:
+		m.ResetHash()
 		return nil
 	case history.FieldStatus:
 		m.ResetStatus()

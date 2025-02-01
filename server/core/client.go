@@ -59,27 +59,55 @@ func (c *Client) reloadTasks() {
 		}
 
 		if dl.Implementation == downloadclients.ImplementationTransmission {
-			to, err := transmission.NewTorrent(transmission.Config{
-				URL:      dl.URL,
-				User:     dl.User,
-				Password: dl.Password,
-			}, t.Link)
-			if err != nil {
-				log.Warnf("get task error: %v", err)
-				continue
+			if t.Hash != "" { //优先使用hash
+				to, err := transmission.NewTorrentHash(transmission.Config{
+					URL:      dl.URL,
+					User:     dl.User,
+					Password: dl.Password,
+				}, t.Hash)
+				if err != nil {
+					log.Warnf("get task error: %v", err)
+					continue
+				}
+				c.tasks[t.ID] = &Task{Torrent: to}	
+			} else if t.Link != "" {
+				to, err := transmission.NewTorrent(transmission.Config{
+					URL:      dl.URL,
+					User:     dl.User,
+					Password: dl.Password,
+				}, t.Link)
+				if err != nil {
+					log.Warnf("get task error: %v", err)
+					continue
+				}
+				c.tasks[t.ID] = &Task{Torrent: to}	
 			}
-			c.tasks[t.ID] = &Task{Torrent: to}
 		} else if dl.Implementation == downloadclients.ImplementationQbittorrent {
-			to, err := qbittorrent.NewTorrent(qbittorrent.Info{
-				URL:      dl.URL,
-				User:     dl.User,
-				Password: dl.Password,
-			}, t.Link)
-			if err != nil {
-				log.Warnf("get task error: %v", err)
-				continue
+			if t.Hash != "" {
+				to, err := qbittorrent.NewTorrentHash(qbittorrent.Info{
+					URL:      dl.URL,
+					User:     dl.User,
+					Password: dl.Password,
+				}, t.Hash)
+				if err != nil {
+					log.Warnf("get task error: %v", err)
+					continue
+				}
+				c.tasks[t.ID] = &Task{Torrent: to}
+	
+			} else if t.Link != "" {
+				to, err := qbittorrent.NewTorrent(qbittorrent.Info{
+					URL:      dl.URL,
+					User:     dl.User,
+					Password: dl.Password,
+				}, t.Link)
+				if err != nil {
+					log.Warnf("get task error: %v", err)
+					continue
+				}
+				c.tasks[t.ID] = &Task{Torrent: to}
+	
 			}
-			c.tasks[t.ID] = &Task{Torrent: to}
 		}
 
 	}

@@ -134,6 +134,20 @@ func (hc *HistoryCreate) SetNillableLink(s *string) *HistoryCreate {
 	return hc
 }
 
+// SetHash sets the "hash" field.
+func (hc *HistoryCreate) SetHash(s string) *HistoryCreate {
+	hc.mutation.SetHash(s)
+	return hc
+}
+
+// SetNillableHash sets the "hash" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableHash(s *string) *HistoryCreate {
+	if s != nil {
+		hc.SetHash(*s)
+	}
+	return hc
+}
+
 // SetStatus sets the "status" field.
 func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
 	hc.mutation.SetStatus(h)
@@ -289,6 +303,10 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 	if value, ok := hc.mutation.Link(); ok {
 		_spec.SetField(history.FieldLink, field.TypeString, value)
 		_node.Link = value
+	}
+	if value, ok := hc.mutation.Hash(); ok {
+		_spec.SetField(history.FieldHash, field.TypeString, value)
+		_node.Hash = value
 	}
 	if value, ok := hc.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
