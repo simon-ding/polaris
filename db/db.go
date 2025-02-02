@@ -17,6 +17,7 @@ import (
 	"polaris/ent/storage"
 	"polaris/log"
 	"polaris/pkg/utils"
+	"slices"
 	"strings"
 	"time"
 
@@ -462,9 +463,9 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 }
 
 func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
-	return c.ent.History.Create().SetMediaID(h.MediaID).SetEpisodeID(h.EpisodeID).SetDate(time.Now()).
+	return c.ent.History.Create().SetMediaID(h.MediaID).SetDate(time.Now()).
 		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID).
-		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSaved(h.Saved).SetSeasonNum(h.SeasonNum).
+		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSeasonNum(h.SeasonNum).
 		SetEpisodeNums(h.EpisodeNums).SetHash(h.Hash).SetLink(h.Link).Save(context.TODO())
 }
 
@@ -520,8 +521,12 @@ func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {
 }
 
 func (c *Client) IsEpisodeDownloadingOrDownloaded(id int) bool {
-	his := c.ent.History.Query().Where(history.EpisodeID(id)).AllX(context.Background())
+	ep, _ := c.GetEpisodeByID(id)
+	his := c.ent.History.Query().Where(history.EpisodeNumsNotNil()).AllX(context.Background())
 	for _, h := range his {
+		if !slices.Contains(h.EpisodeNums, ep.EpisodeNumber) {
+			continue
+		}
 		if h.Status != history.StatusFail {
 			return true
 		}
