@@ -246,7 +246,7 @@ func Link2Hash(link string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "parse response")
 	}
-	return info.HashInfoBytes().AsString(), nil
+	return info.HashInfoBytes().HexString(), nil
 }
 
 func Link2Magnet(link string) (string, error) {
