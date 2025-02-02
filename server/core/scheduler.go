@@ -132,59 +132,42 @@ func (c *Client) setHistoryStatus(id int, status history.Status) {
 	switch status {
 	case history.StatusRunning:
 		c.db.SetHistoryStatus(id, history.StatusRunning)
-		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusDownloading)
+		c.setEpsideoStatus(episodeIds, episode.StatusDownloading)
 	case history.StatusSuccess:
 		c.db.SetHistoryStatus(id, history.StatusSuccess)
-		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusDownloaded)
+		c.setEpsideoStatus(episodeIds, episode.StatusDownloaded)
 
 	case history.StatusUploading:
 		c.db.SetHistoryStatus(id, history.StatusUploading)
 
 	case history.StatusSeeding:
 		c.db.SetHistoryStatus(id, history.StatusSeeding)
-		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusDownloaded)
+		c.setEpsideoStatus(episodeIds, episode.StatusDownloaded)
 
 	case history.StatusFail:
 		c.db.SetHistoryStatus(id, history.StatusFail)
-		c.setEpsideoStatus(r.MediaID, r.SeasonNum, episodeIds, episode.StatusMissing)
+		c.setEpsideoStatus(episodeIds, episode.StatusMissing)
 	default:
 		panic(fmt.Sprintf("unkown status %v", status))
 	}
 }
 
-func (c *Client) setEpsideoStatus(mediaId int, seasonNum int, episodeIds []int, status episode.Status) error {
-	detail := c.db.GetMediaDetails(mediaId)
-
-	if len(episodeIds) == 0 {
-		//should set all season
-		for _, ep := range detail.Episodes {
-			if ep.SeasonNumber == seasonNum {
-				if ep.Status == episode.StatusDownloaded {
-					//已经下载完成的任务，不再重新设置状态
-					continue
-				}
-				if err := c.db.SetEpisodeStatus(ep.ID, status); err != nil {
-					return err
-				}
-			}
+func (c *Client) setEpsideoStatus(episodeIds []int, status episode.Status) error {
+	for _, id := range episodeIds {
+		ep, err := c.db.GetEpisodeByID(id)
+		if err != nil {
+			return err
+		}
+		if ep.Status == episode.StatusDownloaded {
+			//已经下载完成的任务，不再重新设置状态
+			continue
 		}
 
-	} else {
-		for _, id := range episodeIds {
-			ep, err := c.db.GetEpisodeByID(id)
-			if err != nil {
-				return err
-			}
-			if ep.Status == episode.StatusDownloaded {
-				//已经下载完成的任务，不再重新设置状态
-				continue
-			}
-
-			if err := c.db.SetEpisodeStatus(id, status); err != nil {
-				return err
-			}
+		if err := c.db.SetEpisodeStatus(id, status); err != nil {
+			return err
 		}
 	}
+
 	return nil
 }
 
@@ -223,8 +206,9 @@ func (c *Client) GetEpisodeIds(r *ent.History) []int {
 	if r.EpisodeID > 0 {
 		episodeIds = append(episodeIds, r.EpisodeID)
 	}
+	series := c.db.GetMediaDetails(r.MediaID)
+
 	if len(r.EpisodeNums) > 0 {
-		series := c.db.GetMediaDetails(r.MediaID)
 		for _, epNum := range r.EpisodeNums {
 			for _, ep := range series.Episodes {
 				if ep.SeasonNumber == seasonNum && ep.EpisodeNumber == epNum {
@@ -232,6 +216,13 @@ func (c *Client) GetEpisodeIds(r *ent.History) []int {
 				}
 			}
 		}
+	} else {
+		for _, ep := range series.Episodes {
+			if ep.SeasonNumber == seasonNum {
+				episodeIds = append(episodeIds, ep.ID)
+			}
+		}
+
 	}
 	return episodeIds
 }

@@ -102,19 +102,13 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		return nil, errors.Wrap(err, "db")
 	}
 
-	if his.EpisodeID != 0 {
-		if !s.db.IsEpisodeDownloadingOrDownloaded(his.EpisodeID) {
-			s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
-		}
+	episodeIds := s.core.GetEpisodeIds(his)
 
-	} else {
-		seasonNum, err := utils.SeasonId(his.TargetDir)
-		if err != nil {
-			log.Errorf("no season id: %v", his.TargetDir)
-			seasonNum = -1
-		}
-		if his.Status == history.StatusRunning || his.Status == history.StatusUploading {
-			s.db.SetSeasonAllEpisodeStatus(his.MediaID, seasonNum, episode.StatusMissing)
+	for _, id := range episodeIds {
+		ep, _ := s.db.GetEpisode(his.MediaID, his.SeasonNum, id)
+		if !s.db.IsEpisodeDownloadingOrDownloaded(id) && ep.Status != episode.StatusDownloaded {
+			//没有正在下载中或者下载完成的任务，并且episode状态不是已经下载完成
+			s.db.SetEpisodeStatus(his.EpisodeID, episode.StatusMissing)
 		}
 	}
 
