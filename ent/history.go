@@ -20,8 +20,6 @@ type History struct {
 	ID int `json:"id,omitempty"`
 	// MediaID holds the value of the "media_id" field.
 	MediaID int `json:"media_id,omitempty"`
-	// deprecated
-	EpisodeID int `json:"episode_id,omitempty"`
 	// EpisodeNums holds the value of the "episode_nums" field.
 	EpisodeNums []int `json:"episode_nums,omitempty"`
 	// SeasonNum holds the value of the "season_num" field.
@@ -43,9 +41,7 @@ type History struct {
 	// torrent hash
 	Hash string `json:"hash,omitempty"`
 	// Status holds the value of the "status" field.
-	Status history.Status `json:"status,omitempty"`
-	// deprecated
-	Saved        string `json:"saved,omitempty"`
+	Status       history.Status `json:"status,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -56,9 +52,9 @@ func (*History) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case history.FieldEpisodeNums:
 			values[i] = new([]byte)
-		case history.FieldID, history.FieldMediaID, history.FieldEpisodeID, history.FieldSeasonNum, history.FieldSize, history.FieldDownloadClientID, history.FieldIndexerID:
+		case history.FieldID, history.FieldMediaID, history.FieldSeasonNum, history.FieldSize, history.FieldDownloadClientID, history.FieldIndexerID:
 			values[i] = new(sql.NullInt64)
-		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldLink, history.FieldHash, history.FieldStatus, history.FieldSaved:
+		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldLink, history.FieldHash, history.FieldStatus:
 			values[i] = new(sql.NullString)
 		case history.FieldDate:
 			values[i] = new(sql.NullTime)
@@ -88,12 +84,6 @@ func (h *History) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field media_id", values[i])
 			} else if value.Valid {
 				h.MediaID = int(value.Int64)
-			}
-		case history.FieldEpisodeID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field episode_id", values[i])
-			} else if value.Valid {
-				h.EpisodeID = int(value.Int64)
 			}
 		case history.FieldEpisodeNums:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -163,12 +153,6 @@ func (h *History) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				h.Status = history.Status(value.String)
 			}
-		case history.FieldSaved:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field saved", values[i])
-			} else if value.Valid {
-				h.Saved = value.String
-			}
 		default:
 			h.selectValues.Set(columns[i], values[i])
 		}
@@ -208,9 +192,6 @@ func (h *History) String() string {
 	builder.WriteString("media_id=")
 	builder.WriteString(fmt.Sprintf("%v", h.MediaID))
 	builder.WriteString(", ")
-	builder.WriteString("episode_id=")
-	builder.WriteString(fmt.Sprintf("%v", h.EpisodeID))
-	builder.WriteString(", ")
 	builder.WriteString("episode_nums=")
 	builder.WriteString(fmt.Sprintf("%v", h.EpisodeNums))
 	builder.WriteString(", ")
@@ -243,9 +224,6 @@ func (h *History) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", h.Status))
-	builder.WriteString(", ")
-	builder.WriteString("saved=")
-	builder.WriteString(h.Saved)
 	builder.WriteByte(')')
 	return builder.String()
 }

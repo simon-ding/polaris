@@ -15,8 +15,6 @@ const (
 	FieldID = "id"
 	// FieldMediaID holds the string denoting the media_id field in the database.
 	FieldMediaID = "media_id"
-	// FieldEpisodeID holds the string denoting the episode_id field in the database.
-	FieldEpisodeID = "episode_id"
 	// FieldEpisodeNums holds the string denoting the episode_nums field in the database.
 	FieldEpisodeNums = "episode_nums"
 	// FieldSeasonNum holds the string denoting the season_num field in the database.
@@ -39,8 +37,6 @@ const (
 	FieldHash = "hash"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldSaved holds the string denoting the saved field in the database.
-	FieldSaved = "saved"
 	// Table holds the table name of the history in the database.
 	Table = "histories"
 )
@@ -49,7 +45,6 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldMediaID,
-	FieldEpisodeID,
 	FieldEpisodeNums,
 	FieldSeasonNum,
 	FieldSourceTitle,
@@ -61,7 +56,6 @@ var Columns = []string{
 	FieldLink,
 	FieldHash,
 	FieldStatus,
-	FieldSaved,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -118,11 +112,6 @@ func ByMediaID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMediaID, opts...).ToFunc()
 }
 
-// ByEpisodeID orders the results by the episode_id field.
-func ByEpisodeID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEpisodeID, opts...).ToFunc()
-}
-
 // BySeasonNum orders the results by the season_num field.
 func BySeasonNum(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSeasonNum, opts...).ToFunc()
@@ -171,9 +160,4 @@ func ByHash(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
-}
-
-// BySaved orders the results by the saved field.
-func BySaved(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSaved, opts...).ToFunc()
 }

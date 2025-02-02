@@ -73,7 +73,6 @@ var (
 	HistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "media_id", Type: field.TypeInt},
-		{Name: "episode_id", Type: field.TypeInt, Nullable: true},
 		{Name: "episode_nums", Type: field.TypeJSON, Nullable: true},
 		{Name: "season_num", Type: field.TypeInt, Nullable: true},
 		{Name: "source_title", Type: field.TypeString},
@@ -85,7 +84,6 @@ var (
 		{Name: "link", Type: field.TypeString, Nullable: true},
 		{Name: "hash", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"running", "success", "fail", "uploading", "seeding"}},
-		{Name: "saved", Type: field.TypeString, Nullable: true},
 	}
 	// HistoriesTable holds the schema information for the "histories" table.
 	HistoriesTable = &schema.Table{

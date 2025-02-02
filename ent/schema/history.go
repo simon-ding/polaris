@@ -14,7 +14,7 @@ type History struct {
 func (History) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("media_id"),
-		field.Int("episode_id").Optional().Comment("deprecated"),
+		//field.Int("episode_id").Optional().Comment("deprecated"),
 		field.Ints("episode_nums").Optional(),
 		field.Int("season_num").Optional(),
 		field.String("source_title"),
@@ -26,7 +26,7 @@ func (History) Fields() []ent.Field {
 		field.String("link").Optional().Comment("deprecated, use hash instead"), //should be magnet link
 		field.String("hash").Optional().Comment("torrent hash"),
 		field.Enum("status").Values("running", "success", "fail", "uploading", "seeding"),
-		field.String("saved").Optional().Comment("deprecated"), //deprecated
+		//field.String("saved").Optional().Comment("deprecated"), //deprecated
 	}
 }
 

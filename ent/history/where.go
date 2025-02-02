@@ -59,11 +59,6 @@ func MediaID(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldMediaID, v))
 }
 
-// EpisodeID applies equality check predicate on the "episode_id" field. It's identical to EpisodeIDEQ.
-func EpisodeID(v int) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldEpisodeID, v))
-}
-
 // SeasonNum applies equality check predicate on the "season_num" field. It's identical to SeasonNumEQ.
 func SeasonNum(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldSeasonNum, v))
@@ -109,11 +104,6 @@ func Hash(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldHash, v))
 }
 
-// Saved applies equality check predicate on the "saved" field. It's identical to SavedEQ.
-func Saved(v string) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldSaved, v))
-}
-
 // MediaIDEQ applies the EQ predicate on the "media_id" field.
 func MediaIDEQ(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldMediaID, v))
@@ -152,56 +142,6 @@ func MediaIDLT(v int) predicate.History {
 // MediaIDLTE applies the LTE predicate on the "media_id" field.
 func MediaIDLTE(v int) predicate.History {
 	return predicate.History(sql.FieldLTE(FieldMediaID, v))
-}
-
-// EpisodeIDEQ applies the EQ predicate on the "episode_id" field.
-func EpisodeIDEQ(v int) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldEpisodeID, v))
-}
-
-// EpisodeIDNEQ applies the NEQ predicate on the "episode_id" field.
-func EpisodeIDNEQ(v int) predicate.History {
-	return predicate.History(sql.FieldNEQ(FieldEpisodeID, v))
-}
-
-// EpisodeIDIn applies the In predicate on the "episode_id" field.
-func EpisodeIDIn(vs ...int) predicate.History {
-	return predicate.History(sql.FieldIn(FieldEpisodeID, vs...))
-}
-
-// EpisodeIDNotIn applies the NotIn predicate on the "episode_id" field.
-func EpisodeIDNotIn(vs ...int) predicate.History {
-	return predicate.History(sql.FieldNotIn(FieldEpisodeID, vs...))
-}
-
-// EpisodeIDGT applies the GT predicate on the "episode_id" field.
-func EpisodeIDGT(v int) predicate.History {
-	return predicate.History(sql.FieldGT(FieldEpisodeID, v))
-}
-
-// EpisodeIDGTE applies the GTE predicate on the "episode_id" field.
-func EpisodeIDGTE(v int) predicate.History {
-	return predicate.History(sql.FieldGTE(FieldEpisodeID, v))
-}
-
-// EpisodeIDLT applies the LT predicate on the "episode_id" field.
-func EpisodeIDLT(v int) predicate.History {
-	return predicate.History(sql.FieldLT(FieldEpisodeID, v))
-}
-
-// EpisodeIDLTE applies the LTE predicate on the "episode_id" field.
-func EpisodeIDLTE(v int) predicate.History {
-	return predicate.History(sql.FieldLTE(FieldEpisodeID, v))
-}
-
-// EpisodeIDIsNil applies the IsNil predicate on the "episode_id" field.
-func EpisodeIDIsNil() predicate.History {
-	return predicate.History(sql.FieldIsNull(FieldEpisodeID))
-}
-
-// EpisodeIDNotNil applies the NotNil predicate on the "episode_id" field.
-func EpisodeIDNotNil() predicate.History {
-	return predicate.History(sql.FieldNotNull(FieldEpisodeID))
 }
 
 // EpisodeNumsIsNil applies the IsNil predicate on the "episode_nums" field.
@@ -742,81 +682,6 @@ func StatusIn(vs ...Status) predicate.History {
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.History {
 	return predicate.History(sql.FieldNotIn(FieldStatus, vs...))
-}
-
-// SavedEQ applies the EQ predicate on the "saved" field.
-func SavedEQ(v string) predicate.History {
-	return predicate.History(sql.FieldEQ(FieldSaved, v))
-}
-
-// SavedNEQ applies the NEQ predicate on the "saved" field.
-func SavedNEQ(v string) predicate.History {
-	return predicate.History(sql.FieldNEQ(FieldSaved, v))
-}
-
-// SavedIn applies the In predicate on the "saved" field.
-func SavedIn(vs ...string) predicate.History {
-	return predicate.History(sql.FieldIn(FieldSaved, vs...))
-}
-
-// SavedNotIn applies the NotIn predicate on the "saved" field.
-func SavedNotIn(vs ...string) predicate.History {
-	return predicate.History(sql.FieldNotIn(FieldSaved, vs...))
-}
-
-// SavedGT applies the GT predicate on the "saved" field.
-func SavedGT(v string) predicate.History {
-	return predicate.History(sql.FieldGT(FieldSaved, v))
-}
-
-// SavedGTE applies the GTE predicate on the "saved" field.
-func SavedGTE(v string) predicate.History {
-	return predicate.History(sql.FieldGTE(FieldSaved, v))
-}
-
-// SavedLT applies the LT predicate on the "saved" field.
-func SavedLT(v string) predicate.History {
-	return predicate.History(sql.FieldLT(FieldSaved, v))
-}
-
-// SavedLTE applies the LTE predicate on the "saved" field.
-func SavedLTE(v string) predicate.History {
-	return predicate.History(sql.FieldLTE(FieldSaved, v))
-}
-
-// SavedContains applies the Contains predicate on the "saved" field.
-func SavedContains(v string) predicate.History {
-	return predicate.History(sql.FieldContains(FieldSaved, v))
-}
-
-// SavedHasPrefix applies the HasPrefix predicate on the "saved" field.
-func SavedHasPrefix(v string) predicate.History {
-	return predicate.History(sql.FieldHasPrefix(FieldSaved, v))
-}
-
-// SavedHasSuffix applies the HasSuffix predicate on the "saved" field.
-func SavedHasSuffix(v string) predicate.History {
-	return predicate.History(sql.FieldHasSuffix(FieldSaved, v))
-}
-
-// SavedIsNil applies the IsNil predicate on the "saved" field.
-func SavedIsNil() predicate.History {
-	return predicate.History(sql.FieldIsNull(FieldSaved))
-}
-
-// SavedNotNil applies the NotNil predicate on the "saved" field.
-func SavedNotNil() predicate.History {
-	return predicate.History(sql.FieldNotNull(FieldSaved))
-}
-
-// SavedEqualFold applies the EqualFold predicate on the "saved" field.
-func SavedEqualFold(v string) predicate.History {
-	return predicate.History(sql.FieldEqualFold(FieldSaved, v))
-}
-
-// SavedContainsFold applies the ContainsFold predicate on the "saved" field.
-func SavedContainsFold(v string) predicate.History {
-	return predicate.History(sql.FieldContainsFold(FieldSaved, v))
 }
 
 // And groups predicates with the AND operator between them.

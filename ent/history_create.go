@@ -26,20 +26,6 @@ func (hc *HistoryCreate) SetMediaID(i int) *HistoryCreate {
 	return hc
 }
 
-// SetEpisodeID sets the "episode_id" field.
-func (hc *HistoryCreate) SetEpisodeID(i int) *HistoryCreate {
-	hc.mutation.SetEpisodeID(i)
-	return hc
-}
-
-// SetNillableEpisodeID sets the "episode_id" field if the given value is not nil.
-func (hc *HistoryCreate) SetNillableEpisodeID(i *int) *HistoryCreate {
-	if i != nil {
-		hc.SetEpisodeID(*i)
-	}
-	return hc
-}
-
 // SetEpisodeNums sets the "episode_nums" field.
 func (hc *HistoryCreate) SetEpisodeNums(i []int) *HistoryCreate {
 	hc.mutation.SetEpisodeNums(i)
@@ -154,20 +140,6 @@ func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
 	return hc
 }
 
-// SetSaved sets the "saved" field.
-func (hc *HistoryCreate) SetSaved(s string) *HistoryCreate {
-	hc.mutation.SetSaved(s)
-	return hc
-}
-
-// SetNillableSaved sets the "saved" field if the given value is not nil.
-func (hc *HistoryCreate) SetNillableSaved(s *string) *HistoryCreate {
-	if s != nil {
-		hc.SetSaved(*s)
-	}
-	return hc
-}
-
 // Mutation returns the HistoryMutation object of the builder.
 func (hc *HistoryCreate) Mutation() *HistoryMutation {
 	return hc.mutation
@@ -264,10 +236,6 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 		_spec.SetField(history.FieldMediaID, field.TypeInt, value)
 		_node.MediaID = value
 	}
-	if value, ok := hc.mutation.EpisodeID(); ok {
-		_spec.SetField(history.FieldEpisodeID, field.TypeInt, value)
-		_node.EpisodeID = value
-	}
 	if value, ok := hc.mutation.EpisodeNums(); ok {
 		_spec.SetField(history.FieldEpisodeNums, field.TypeJSON, value)
 		_node.EpisodeNums = value
@@ -311,10 +279,6 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 	if value, ok := hc.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
-	}
-	if value, ok := hc.mutation.Saved(); ok {
-		_spec.SetField(history.FieldSaved, field.TypeString, value)
-		_node.Saved = value
 	}
 	return _node, _spec
 }

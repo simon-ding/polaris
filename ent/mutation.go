@@ -2334,8 +2334,6 @@ type HistoryMutation struct {
 	id                    *int
 	media_id              *int
 	addmedia_id           *int
-	episode_id            *int
-	addepisode_id         *int
 	episode_nums          *[]int
 	appendepisode_nums    []int
 	season_num            *int
@@ -2352,7 +2350,6 @@ type HistoryMutation struct {
 	link                  *string
 	hash                  *string
 	status                *history.Status
-	saved                 *string
 	clearedFields         map[string]struct{}
 	done                  bool
 	oldValue              func(context.Context) (*History, error)
@@ -2511,76 +2508,6 @@ func (m *HistoryMutation) AddedMediaID() (r int, exists bool) {
 func (m *HistoryMutation) ResetMediaID() {
 	m.media_id = nil
 	m.addmedia_id = nil
-}
-
-// SetEpisodeID sets the "episode_id" field.
-func (m *HistoryMutation) SetEpisodeID(i int) {
-	m.episode_id = &i
-	m.addepisode_id = nil
-}
-
-// EpisodeID returns the value of the "episode_id" field in the mutation.
-func (m *HistoryMutation) EpisodeID() (r int, exists bool) {
-	v := m.episode_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEpisodeID returns the old "episode_id" field's value of the History entity.
-// If the History object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *HistoryMutation) OldEpisodeID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEpisodeID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEpisodeID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEpisodeID: %w", err)
-	}
-	return oldValue.EpisodeID, nil
-}
-
-// AddEpisodeID adds i to the "episode_id" field.
-func (m *HistoryMutation) AddEpisodeID(i int) {
-	if m.addepisode_id != nil {
-		*m.addepisode_id += i
-	} else {
-		m.addepisode_id = &i
-	}
-}
-
-// AddedEpisodeID returns the value that was added to the "episode_id" field in this mutation.
-func (m *HistoryMutation) AddedEpisodeID() (r int, exists bool) {
-	v := m.addepisode_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearEpisodeID clears the value of the "episode_id" field.
-func (m *HistoryMutation) ClearEpisodeID() {
-	m.episode_id = nil
-	m.addepisode_id = nil
-	m.clearedFields[history.FieldEpisodeID] = struct{}{}
-}
-
-// EpisodeIDCleared returns if the "episode_id" field was cleared in this mutation.
-func (m *HistoryMutation) EpisodeIDCleared() bool {
-	_, ok := m.clearedFields[history.FieldEpisodeID]
-	return ok
-}
-
-// ResetEpisodeID resets all changes to the "episode_id" field.
-func (m *HistoryMutation) ResetEpisodeID() {
-	m.episode_id = nil
-	m.addepisode_id = nil
-	delete(m.clearedFields, history.FieldEpisodeID)
 }
 
 // SetEpisodeNums sets the "episode_nums" field.
@@ -3156,55 +3083,6 @@ func (m *HistoryMutation) ResetStatus() {
 	m.status = nil
 }
 
-// SetSaved sets the "saved" field.
-func (m *HistoryMutation) SetSaved(s string) {
-	m.saved = &s
-}
-
-// Saved returns the value of the "saved" field in the mutation.
-func (m *HistoryMutation) Saved() (r string, exists bool) {
-	v := m.saved
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSaved returns the old "saved" field's value of the History entity.
-// If the History object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *HistoryMutation) OldSaved(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSaved is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSaved requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSaved: %w", err)
-	}
-	return oldValue.Saved, nil
-}
-
-// ClearSaved clears the value of the "saved" field.
-func (m *HistoryMutation) ClearSaved() {
-	m.saved = nil
-	m.clearedFields[history.FieldSaved] = struct{}{}
-}
-
-// SavedCleared returns if the "saved" field was cleared in this mutation.
-func (m *HistoryMutation) SavedCleared() bool {
-	_, ok := m.clearedFields[history.FieldSaved]
-	return ok
-}
-
-// ResetSaved resets all changes to the "saved" field.
-func (m *HistoryMutation) ResetSaved() {
-	m.saved = nil
-	delete(m.clearedFields, history.FieldSaved)
-}
-
 // Where appends a list predicates to the HistoryMutation builder.
 func (m *HistoryMutation) Where(ps ...predicate.History) {
 	m.predicates = append(m.predicates, ps...)
@@ -3239,12 +3117,9 @@ func (m *HistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 12)
 	if m.media_id != nil {
 		fields = append(fields, history.FieldMediaID)
-	}
-	if m.episode_id != nil {
-		fields = append(fields, history.FieldEpisodeID)
 	}
 	if m.episode_nums != nil {
 		fields = append(fields, history.FieldEpisodeNums)
@@ -3279,9 +3154,6 @@ func (m *HistoryMutation) Fields() []string {
 	if m.status != nil {
 		fields = append(fields, history.FieldStatus)
 	}
-	if m.saved != nil {
-		fields = append(fields, history.FieldSaved)
-	}
 	return fields
 }
 
@@ -3292,8 +3164,6 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case history.FieldMediaID:
 		return m.MediaID()
-	case history.FieldEpisodeID:
-		return m.EpisodeID()
 	case history.FieldEpisodeNums:
 		return m.EpisodeNums()
 	case history.FieldSeasonNum:
@@ -3316,8 +3186,6 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Hash()
 	case history.FieldStatus:
 		return m.Status()
-	case history.FieldSaved:
-		return m.Saved()
 	}
 	return nil, false
 }
@@ -3329,8 +3197,6 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case history.FieldMediaID:
 		return m.OldMediaID(ctx)
-	case history.FieldEpisodeID:
-		return m.OldEpisodeID(ctx)
 	case history.FieldEpisodeNums:
 		return m.OldEpisodeNums(ctx)
 	case history.FieldSeasonNum:
@@ -3353,8 +3219,6 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldHash(ctx)
 	case history.FieldStatus:
 		return m.OldStatus(ctx)
-	case history.FieldSaved:
-		return m.OldSaved(ctx)
 	}
 	return nil, fmt.Errorf("unknown History field %s", name)
 }
@@ -3370,13 +3234,6 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMediaID(v)
-		return nil
-	case history.FieldEpisodeID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEpisodeID(v)
 		return nil
 	case history.FieldEpisodeNums:
 		v, ok := value.([]int)
@@ -3455,13 +3312,6 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
-	case history.FieldSaved:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSaved(v)
-		return nil
 	}
 	return fmt.Errorf("unknown History field %s", name)
 }
@@ -3472,9 +3322,6 @@ func (m *HistoryMutation) AddedFields() []string {
 	var fields []string
 	if m.addmedia_id != nil {
 		fields = append(fields, history.FieldMediaID)
-	}
-	if m.addepisode_id != nil {
-		fields = append(fields, history.FieldEpisodeID)
 	}
 	if m.addseason_num != nil {
 		fields = append(fields, history.FieldSeasonNum)
@@ -3498,8 +3345,6 @@ func (m *HistoryMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case history.FieldMediaID:
 		return m.AddedMediaID()
-	case history.FieldEpisodeID:
-		return m.AddedEpisodeID()
 	case history.FieldSeasonNum:
 		return m.AddedSeasonNum()
 	case history.FieldSize:
@@ -3523,13 +3368,6 @@ func (m *HistoryMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddMediaID(v)
-		return nil
-	case history.FieldEpisodeID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddEpisodeID(v)
 		return nil
 	case history.FieldSeasonNum:
 		v, ok := value.(int)
@@ -3567,9 +3405,6 @@ func (m *HistoryMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *HistoryMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(history.FieldEpisodeID) {
-		fields = append(fields, history.FieldEpisodeID)
-	}
 	if m.FieldCleared(history.FieldEpisodeNums) {
 		fields = append(fields, history.FieldEpisodeNums)
 	}
@@ -3588,9 +3423,6 @@ func (m *HistoryMutation) ClearedFields() []string {
 	if m.FieldCleared(history.FieldHash) {
 		fields = append(fields, history.FieldHash)
 	}
-	if m.FieldCleared(history.FieldSaved) {
-		fields = append(fields, history.FieldSaved)
-	}
 	return fields
 }
 
@@ -3605,9 +3437,6 @@ func (m *HistoryMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *HistoryMutation) ClearField(name string) error {
 	switch name {
-	case history.FieldEpisodeID:
-		m.ClearEpisodeID()
-		return nil
 	case history.FieldEpisodeNums:
 		m.ClearEpisodeNums()
 		return nil
@@ -3626,9 +3455,6 @@ func (m *HistoryMutation) ClearField(name string) error {
 	case history.FieldHash:
 		m.ClearHash()
 		return nil
-	case history.FieldSaved:
-		m.ClearSaved()
-		return nil
 	}
 	return fmt.Errorf("unknown History nullable field %s", name)
 }
@@ -3639,9 +3465,6 @@ func (m *HistoryMutation) ResetField(name string) error {
 	switch name {
 	case history.FieldMediaID:
 		m.ResetMediaID()
-		return nil
-	case history.FieldEpisodeID:
-		m.ResetEpisodeID()
 		return nil
 	case history.FieldEpisodeNums:
 		m.ResetEpisodeNums()
@@ -3675,9 +3498,6 @@ func (m *HistoryMutation) ResetField(name string) error {
 		return nil
 	case history.FieldStatus:
 		m.ResetStatus()
-		return nil
-	case history.FieldSaved:
-		m.ResetSaved()
 		return nil
 	}
 	return fmt.Errorf("unknown History field %s", name)

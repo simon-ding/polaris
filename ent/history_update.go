@@ -50,33 +50,6 @@ func (hu *HistoryUpdate) AddMediaID(i int) *HistoryUpdate {
 	return hu
 }
 
-// SetEpisodeID sets the "episode_id" field.
-func (hu *HistoryUpdate) SetEpisodeID(i int) *HistoryUpdate {
-	hu.mutation.ResetEpisodeID()
-	hu.mutation.SetEpisodeID(i)
-	return hu
-}
-
-// SetNillableEpisodeID sets the "episode_id" field if the given value is not nil.
-func (hu *HistoryUpdate) SetNillableEpisodeID(i *int) *HistoryUpdate {
-	if i != nil {
-		hu.SetEpisodeID(*i)
-	}
-	return hu
-}
-
-// AddEpisodeID adds i to the "episode_id" field.
-func (hu *HistoryUpdate) AddEpisodeID(i int) *HistoryUpdate {
-	hu.mutation.AddEpisodeID(i)
-	return hu
-}
-
-// ClearEpisodeID clears the value of the "episode_id" field.
-func (hu *HistoryUpdate) ClearEpisodeID() *HistoryUpdate {
-	hu.mutation.ClearEpisodeID()
-	return hu
-}
-
 // SetEpisodeNums sets the "episode_nums" field.
 func (hu *HistoryUpdate) SetEpisodeNums(i []int) *HistoryUpdate {
 	hu.mutation.SetEpisodeNums(i)
@@ -293,26 +266,6 @@ func (hu *HistoryUpdate) SetNillableStatus(h *history.Status) *HistoryUpdate {
 	return hu
 }
 
-// SetSaved sets the "saved" field.
-func (hu *HistoryUpdate) SetSaved(s string) *HistoryUpdate {
-	hu.mutation.SetSaved(s)
-	return hu
-}
-
-// SetNillableSaved sets the "saved" field if the given value is not nil.
-func (hu *HistoryUpdate) SetNillableSaved(s *string) *HistoryUpdate {
-	if s != nil {
-		hu.SetSaved(*s)
-	}
-	return hu
-}
-
-// ClearSaved clears the value of the "saved" field.
-func (hu *HistoryUpdate) ClearSaved() *HistoryUpdate {
-	hu.mutation.ClearSaved()
-	return hu
-}
-
 // Mutation returns the HistoryMutation object of the builder.
 func (hu *HistoryUpdate) Mutation() *HistoryMutation {
 	return hu.mutation
@@ -372,15 +325,6 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := hu.mutation.AddedMediaID(); ok {
 		_spec.AddField(history.FieldMediaID, field.TypeInt, value)
-	}
-	if value, ok := hu.mutation.EpisodeID(); ok {
-		_spec.SetField(history.FieldEpisodeID, field.TypeInt, value)
-	}
-	if value, ok := hu.mutation.AddedEpisodeID(); ok {
-		_spec.AddField(history.FieldEpisodeID, field.TypeInt, value)
-	}
-	if hu.mutation.EpisodeIDCleared() {
-		_spec.ClearField(history.FieldEpisodeID, field.TypeInt)
 	}
 	if value, ok := hu.mutation.EpisodeNums(); ok {
 		_spec.SetField(history.FieldEpisodeNums, field.TypeJSON, value)
@@ -450,12 +394,6 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := hu.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := hu.mutation.Saved(); ok {
-		_spec.SetField(history.FieldSaved, field.TypeString, value)
-	}
-	if hu.mutation.SavedCleared() {
-		_spec.ClearField(history.FieldSaved, field.TypeString)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, hu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{history.Label}
@@ -494,33 +432,6 @@ func (huo *HistoryUpdateOne) SetNillableMediaID(i *int) *HistoryUpdateOne {
 // AddMediaID adds i to the "media_id" field.
 func (huo *HistoryUpdateOne) AddMediaID(i int) *HistoryUpdateOne {
 	huo.mutation.AddMediaID(i)
-	return huo
-}
-
-// SetEpisodeID sets the "episode_id" field.
-func (huo *HistoryUpdateOne) SetEpisodeID(i int) *HistoryUpdateOne {
-	huo.mutation.ResetEpisodeID()
-	huo.mutation.SetEpisodeID(i)
-	return huo
-}
-
-// SetNillableEpisodeID sets the "episode_id" field if the given value is not nil.
-func (huo *HistoryUpdateOne) SetNillableEpisodeID(i *int) *HistoryUpdateOne {
-	if i != nil {
-		huo.SetEpisodeID(*i)
-	}
-	return huo
-}
-
-// AddEpisodeID adds i to the "episode_id" field.
-func (huo *HistoryUpdateOne) AddEpisodeID(i int) *HistoryUpdateOne {
-	huo.mutation.AddEpisodeID(i)
-	return huo
-}
-
-// ClearEpisodeID clears the value of the "episode_id" field.
-func (huo *HistoryUpdateOne) ClearEpisodeID() *HistoryUpdateOne {
-	huo.mutation.ClearEpisodeID()
 	return huo
 }
 
@@ -740,26 +651,6 @@ func (huo *HistoryUpdateOne) SetNillableStatus(h *history.Status) *HistoryUpdate
 	return huo
 }
 
-// SetSaved sets the "saved" field.
-func (huo *HistoryUpdateOne) SetSaved(s string) *HistoryUpdateOne {
-	huo.mutation.SetSaved(s)
-	return huo
-}
-
-// SetNillableSaved sets the "saved" field if the given value is not nil.
-func (huo *HistoryUpdateOne) SetNillableSaved(s *string) *HistoryUpdateOne {
-	if s != nil {
-		huo.SetSaved(*s)
-	}
-	return huo
-}
-
-// ClearSaved clears the value of the "saved" field.
-func (huo *HistoryUpdateOne) ClearSaved() *HistoryUpdateOne {
-	huo.mutation.ClearSaved()
-	return huo
-}
-
 // Mutation returns the HistoryMutation object of the builder.
 func (huo *HistoryUpdateOne) Mutation() *HistoryMutation {
 	return huo.mutation
@@ -850,15 +741,6 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	if value, ok := huo.mutation.AddedMediaID(); ok {
 		_spec.AddField(history.FieldMediaID, field.TypeInt, value)
 	}
-	if value, ok := huo.mutation.EpisodeID(); ok {
-		_spec.SetField(history.FieldEpisodeID, field.TypeInt, value)
-	}
-	if value, ok := huo.mutation.AddedEpisodeID(); ok {
-		_spec.AddField(history.FieldEpisodeID, field.TypeInt, value)
-	}
-	if huo.mutation.EpisodeIDCleared() {
-		_spec.ClearField(history.FieldEpisodeID, field.TypeInt)
-	}
 	if value, ok := huo.mutation.EpisodeNums(); ok {
 		_spec.SetField(history.FieldEpisodeNums, field.TypeJSON, value)
 	}
@@ -926,12 +808,6 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if value, ok := huo.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
-	}
-	if value, ok := huo.mutation.Saved(); ok {
-		_spec.SetField(history.FieldSaved, field.TypeString, value)
-	}
-	if huo.mutation.SavedCleared() {
-		_spec.ClearField(history.FieldSaved, field.TypeString)
 	}
 	_node = &History{config: huo.config}
 	_spec.Assign = _node.assignValues

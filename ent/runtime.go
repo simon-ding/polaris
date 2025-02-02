@@ -66,7 +66,7 @@ func init() {
 	historyFields := schema.History{}.Fields()
 	_ = historyFields
 	// historyDescSize is the schema descriptor for size field.
-	historyDescSize := historyFields[7].Descriptor()
+	historyDescSize := historyFields[6].Descriptor()
 	// history.DefaultSize holds the default value on creation for the size field.
 	history.DefaultSize = historyDescSize.Default.(int)
 	indexersFields := schema.Indexers{}.Fields()

@@ -203,9 +203,9 @@ func (c *Client) GetEpisodeIds(r *ent.History) []int {
 	var episodeIds []int
 	seasonNum := getSeasonNum(r)
 
-	if r.EpisodeID > 0 {
-		episodeIds = append(episodeIds, r.EpisodeID)
-	}
+	// if r.EpisodeID > 0 {
+	// 	episodeIds = append(episodeIds, r.EpisodeID)
+	// }
 	series := c.db.GetMediaDetails(r.MediaID)
 
 	if len(r.EpisodeNums) > 0 {
