@@ -134,4 +134,6 @@ docker compose up -d
 详细配置请看 [配置篇](./configuration.md)
 
 
+## 6. FAQ
 
+- [常见问题 FAQ](./faq.md)

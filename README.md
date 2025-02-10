@@ -47,6 +47,10 @@
  - linux/s390x
  - linux/ppc64le
 
+## FAQ
+
+- [常见问题 FAQ](./doc/faq.md)
+
 ## Todos
 
 
