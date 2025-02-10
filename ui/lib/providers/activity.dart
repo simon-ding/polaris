@@ -5,7 +5,7 @@ import 'package:ui/providers/APIs.dart';
 import 'package:ui/providers/server_response.dart';
 
 var activitiesDataProvider = AsyncNotifierProvider.autoDispose
-    .family<ActivityData, List<Activity>, String>(ActivityData.new);
+    .family<ActivityData, List<Activity>, ActivityStatus>(ActivityData.new);
 
 var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   (ref, arg) async {
@@ -23,32 +23,53 @@ var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   },
 );
 
+enum ActivityStatus {
+  active,
+  seeding,
+  archive,
+}
+
 class ActivityData
-    extends AutoDisposeFamilyAsyncNotifier<List<Activity>, String> {
+    extends AutoDisposeFamilyAsyncNotifier<List<Activity>, ActivityStatus> {
   Timer? _timer;
 
   @override
-  FutureOr<List<Activity>> build(String arg) async {
+  FutureOr<List<Activity>> build(ActivityStatus arg) async {
     if (_timer != null) {
       _timer!.cancel();
     }
 
     final dio = APIs.getDio();
+
+    var status = arg == ActivityStatus.archive
+        ? "archive"
+        : "active"; //archive or active
     var resp =
-        await dio.get(APIs.activityUrl, queryParameters: {"status": arg});
+        await dio.get(APIs.activityUrl, queryParameters: {"status": status});
     final sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;
     }
     List<Activity> activities = List.empty(growable: true);
     for (final a in sp.data as List) {
-      activities.add(Activity.fromJson(a));
+      var activity = Activity.fromJson(a);
+      if (arg == ActivityStatus.archive) {
+        activities.add(activity);
+      } else {
+        if (arg == ActivityStatus.active && activity.status != "seeding") {
+          activities.add(activity);
+        } else if (arg == ActivityStatus.seeding &&
+            activity.status == "seeding") {
+          activities.add(activity);
+        }
+      }
     }
 
-    if (arg == "active") {
+    if (status == "active") {
       //refresh active downloads
+      _timer?.cancel();
       _timer = Timer(const Duration(seconds: 5),
-          () => ref.invalidateSelf()); //Periodically Refresh
+          ref.invalidateSelf); //Periodically Refresh
     }
     return activities;
   }

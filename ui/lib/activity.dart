@@ -20,7 +20,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
   @override
   void initState() {
     super.initState();
-    _nestedTabController = new TabController(length: 2, vsync: this);
+    _nestedTabController = new TabController(length: 3, vsync: this);
   }
 
   @override
@@ -49,6 +49,9 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
               text: "下载中",
             ),
             Tab(
+              text: "做种中",
+            ),
+            Tab(
               text: "历史记录",
             ),
           ],
@@ -56,10 +59,12 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
         Builder(builder: (context) {
           AsyncValue<List<Activity>>? activitiesWatcher;
 
-          if (selectedTab == 1) {
-            activitiesWatcher = ref.watch(activitiesDataProvider("archive"));
+          if (selectedTab == 2) {
+            activitiesWatcher = ref.watch(activitiesDataProvider(ActivityStatus.archive));
+          } else if (selectedTab == 1) {
+            activitiesWatcher = ref.watch(activitiesDataProvider(ActivityStatus.seeding));
           } else if (selectedTab == 0) {
-            activitiesWatcher = ref.watch(activitiesDataProvider("active"));
+            activitiesWatcher = ref.watch(activitiesDataProvider(ActivityStatus.active));
           }
 
           return activitiesWatcher!.when(
@@ -158,7 +163,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
   Function(int) onDelete() {
     return (id) {
       final f = ref
-          .read(activitiesDataProvider("active").notifier)
+          .read(activitiesDataProvider(ActivityStatus.active).notifier)
           .deleteActivity(id);
       showLoadingWithFuture(f);
     };
