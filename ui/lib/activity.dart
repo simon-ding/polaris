@@ -140,7 +140,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                               ],
                             ),
                           ),
-                          trailing: selectedTab == 0
+                          trailing: selectedTab != 2
                               ? IconButton(
                                   tooltip: "删除任务",
                                   onPressed: () => onDelete()(ac.id!),
