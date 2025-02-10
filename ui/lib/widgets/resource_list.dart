@@ -23,7 +23,7 @@ class ResourceList extends ConsumerWidget {
       seasonNumber: seasonNum,
       episodeNumber: episodeNum
     )));
-    return torrents.when(
+    var widgets = torrents.when(
         data: (v) {
           bool hasPrivate = false;
           for (final item in v) {
@@ -83,5 +83,9 @@ class ResourceList extends ConsumerWidget {
               : Text("$err");
         },
         loading: () => const MyProgressIndicator());
+    return isSmallScreen(context)
+        ? SingleChildScrollView(
+            scrollDirection: Axis.horizontal, child: widgets)
+        : widgets;
   }
 }
