@@ -31,14 +31,8 @@ enum ActivityStatus {
 
 class ActivityData
     extends AutoDisposeFamilyAsyncNotifier<List<Activity>, ActivityStatus> {
-  Timer? _timer;
-
   @override
   FutureOr<List<Activity>> build(ActivityStatus arg) async {
-    if (_timer != null) {
-      _timer!.cancel();
-    }
-
     final dio = APIs.getDio();
 
     var status = arg == ActivityStatus.archive
@@ -67,9 +61,9 @@ class ActivityData
 
     if (status == "active") {
       //refresh active downloads
-      _timer?.cancel();
-      _timer = Timer(const Duration(seconds: 5),
+      final _timer = Timer(const Duration(seconds: 5),
           ref.invalidateSelf); //Periodically Refresh
+      ref.onDispose(_timer.cancel);
     }
     return activities;
   }
