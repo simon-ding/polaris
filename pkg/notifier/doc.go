@@ -30,6 +30,7 @@ func init() {
 	handler.Store("dingtalk", NewDingTalkClient)
 	handler.Store("telegram", NewTelegramClient)
 	handler.Store("bark", NewbarkClient)
+	handler.Store("serverchan", NewServerChanClient)
 }
 
 func Gethandler(name string) (HandlerFunc, bool) {

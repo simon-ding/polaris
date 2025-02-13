@@ -73,6 +73,8 @@ func toNotificationClient(cl *ent.NotificationClient) (*NotificationClient, erro
 		settings = notifier.TelegramConfig{}
 	case "bark":
 		settings = notifier.BarkConfig{}
+	case "serverchan":
+		settings = notifier.ServerChanConfig{}
 	}
 	err := json.Unmarshal([]byte(cl.Settings), &settings)
 	if err != nil {

@@ -84,6 +84,17 @@ class _NotifierState extends ConsumerState<NotifierSettings> {
                         showBarkNotifierDetails(NotifierData());
                       },
                     ),
+                  ),
+                  SettingsCard(
+                    child: InkWell(
+                      child: const Center(
+                        child: Text("Server酱"),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showServerChanNotifierDetails(NotifierData());
+                      },
+                    ),
                   )
                 ],
               ),
@@ -98,8 +109,62 @@ class _NotifierState extends ConsumerState<NotifierSettings> {
         return showBarkNotifierDetails(notifier);
       case "pushover":
         return showPushoverNotifierDetails(notifier);
+      case "serverchan":
+        return showServerChanNotifierDetails(notifier);
     }
     return Future<void>.value();
+  }
+
+  Future<void> showServerChanNotifierDetails(NotifierData notifier) {
+    final _formKey = GlobalKey<FormBuilderState>();
+
+    var body = FormBuilder(
+      key: _formKey,
+      initialValue: {
+        "name": notifier.name,
+        "enabled": notifier.enabled ?? true,
+        "key": notifier.settings != null ? notifier.settings!["key"] : "",
+      },
+      child: Column(
+        children: [
+          const Text("https://sct.ftqq.com/"),
+          FormBuilderTextField(
+            name: "name",
+            decoration: Commons.requiredTextFieldStyle(text: "名称"),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.required(),
+          ),
+          FormBuilderTextField(
+            name: "key",
+            decoration: Commons.requiredTextFieldStyle(text: "Key"),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.required(),
+          ),
+          FormBuilderSwitch(name: "enabled", title: const Text("启用"))
+        ],
+      ),
+    );
+    onDelete() async {
+      return ref.read(notifiersDataProvider.notifier).delete(notifier.id!);
+    }
+
+    onSubmit() async {
+      if (_formKey.currentState!.saveAndValidate()) {
+        var values = _formKey.currentState!.value;
+        return ref.read(notifiersDataProvider.notifier).add(NotifierData(
+                name: values["name"],
+                service: "serverchan",
+                enabled: values["enabled"],
+                settings: {
+                  "key": values["key"],
+                }));
+      } else {
+        throw "validation_error";
+      }
+    }
+
+    return showSettingDialog(
+        context, "Server酱", notifier.id != null, body, onSubmit, onDelete);
   }
 
   Future<void> showBarkNotifierDetails(NotifierData notifier) {
