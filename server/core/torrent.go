@@ -72,9 +72,9 @@ func names2Query(media *ent.Media) []string {
 }
 
 func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
-	series := db1.GetMediaDetails(param.MediaId)
-	if series == nil {
-		return nil, fmt.Errorf("no tv series of id %v", param.MediaId)
+	series, err := db1.GetMediaDetails(param.MediaId)
+	if err != nil {
+		return nil, fmt.Errorf("no tv series of id %v: %v", param.MediaId, err)
 	}
 	limiter, err := db1.GetSizeLimiter("tv")
 	if err != nil {
@@ -235,9 +235,9 @@ func isNoSeasonSeries(detail *db.MediaDetails) bool {
 }
 
 func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
-	movieDetail := db1.GetMediaDetails(param.MediaId)
-	if movieDetail == nil {
-		return nil, errors.New("no media found of id")
+	movieDetail, err := db1.GetMediaDetails(param.MediaId)
+	if err != nil {
+		return nil, err
 	}
 
 	limiter, err := db1.GetSizeLimiter("movie")

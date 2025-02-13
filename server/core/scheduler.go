@@ -206,7 +206,11 @@ func (c *Client) GetEpisodeIds(r *ent.History) []int {
 	// if r.EpisodeID > 0 {
 	// 	episodeIds = append(episodeIds, r.EpisodeID)
 	// }
-	series := c.db.GetMediaDetails(r.MediaID)
+	series, err := c.db.GetMediaDetails(r.MediaID)
+	if err != nil {
+		log.Errorf("get media details error: %v", err)
+		return []int{}
+	}
 
 	if len(r.EpisodeNums) > 0 {
 		for _, epNum := range r.EpisodeNums {
@@ -260,9 +264,9 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 		}
 	}()
 
-	series := c.db.GetMediaDetails(r.MediaID)
-	if series == nil {
-		return nil
+	series, err := c.db.GetMediaDetails(r.MediaID)
+	if err != nil {
+		return err
 	}
 
 	st := c.db.GetStorage(series.StorageID)
@@ -354,7 +358,11 @@ type Task struct {
 }
 
 func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
-	tvDetail := c.db.GetMediaDetails(id)
+	tvDetail, err := c.db.GetMediaDetails(id)
+	if err != nil {
+		log.Errorf("get media details error: %v", err)
+		return nil
+	}
 	m := make(map[int][]*ent.Episode)
 	for _, ep := range tvDetail.Episodes {
 		m[ep.SeasonNumber] = append(m[ep.SeasonNumber], ep)
@@ -441,7 +449,10 @@ func (c *Client) downloadAllMovies() {
 }
 
 func (c *Client) DownloadMovieByID(id int) (string, error) {
-	detail := c.db.GetMediaDetails(id)
+	detail, err := c.db.GetMediaDetails(id)
+	if err != nil {
+		return "", errors.Wrap(err, "get media details")
+	}
 	if len(detail.Episodes) == 0 {
 		return "", fmt.Errorf("no related dummy episode: %v", detail.NameEn)
 	}

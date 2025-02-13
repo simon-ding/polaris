@@ -196,11 +196,10 @@ type MediaDetails struct {
 	Episodes []*ent.Episode `json:"episodes"`
 }
 
-func (c *Client) GetMediaDetails(id int) *MediaDetails {
+func (c *Client) GetMediaDetails(id int) (*MediaDetails, error) {
 	se, err := c.ent.Media.Query().Where(media.ID(id)).First(context.TODO())
 	if err != nil {
-		log.Errorf("get series %d: %v", id, err)
-		return nil
+		return nil, errors.Errorf("get series %d: %v", id, err)
 	}
 	var md = &MediaDetails{
 		Media: se,
@@ -208,12 +207,11 @@ func (c *Client) GetMediaDetails(id int) *MediaDetails {
 
 	ep, err := se.QueryEpisodes().All(context.Background())
 	if err != nil {
-		log.Errorf("get episodes %d: %v", id, err)
-		return nil
+		return nil, errors.Errorf("get episodes %d: %v", id, err)
 	}
 	md.Episodes = ep
 
-	return md
+	return md, nil
 }
 
 func (c *Client) GetMedia(id int) (*ent.Media, error) {

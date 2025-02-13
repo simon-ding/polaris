@@ -41,7 +41,11 @@ func (c *Client) checkBtReourceWithTmdb(r *torznab.Result, seriesId int) bool {
 			log.Debugf("tmdb search no result, consider this torrent ok: %s", r.Name) //because tv name parse is not accurate
 			return true
 		}
-		series := c.db.GetMediaDetails(seriesId)
+		series, err := c.db.GetMediaDetails(seriesId)
+		if err != nil {
+			log.Warnf("get media details error: %v", err)
+			return false
+		}
 
 		se0 := se.Results[0]
 		if se0.ID != int64(series.TmdbID) {

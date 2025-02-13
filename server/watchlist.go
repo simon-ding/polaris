@@ -109,7 +109,10 @@ func (s *Server) GetTvWatchlist(c *gin.Context) (interface{}, error) {
 			ms.MonitoredNum = mon
 			ms.DownloadedNum = dow
 		} else {
-			details := s.db.GetMediaDetails(item.ID)
+			details, err := s.db.GetMediaDetails(item.ID)
+			if err != nil {
+				return nil, errors.Wrap(err, "get details")
+			}
 			for _, ep := range details.Episodes {
 				if ep.Monitored {
 					ms.MonitoredNum++
@@ -160,7 +163,10 @@ func (s *Server) GetMediaDetails(c *gin.Context) (interface{}, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "convert")
 	}
-	detail := s.db.GetMediaDetails(id)
+	detail, err := s.db.GetMediaDetails(id)
+	if err != nil {
+		return nil, errors.Wrap(err, "get details")
+	}
 	st := s.db.GetStorage(detail.StorageID)
 	return MediaDetails{MediaDetails: detail, Storage: &st.Storage}, nil
 }
