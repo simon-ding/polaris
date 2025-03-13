@@ -1,7 +1,8 @@
 module polaris
 
-go 1.23
-toolchain go1.23.1
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	entgo.io/ent v0.13.1
