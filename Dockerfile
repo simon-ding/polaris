@@ -1,8 +1,8 @@
 FROM golang:1.23 as builder
 
 # 启用go module
-ENV GO111MODULE=on \
-    GOPROXY=https://goproxy.cn,direct
+ENV GO111MODULE=on
+    #GOPROXY=https://goproxy.cn,direct
 
 WORKDIR /app
 
