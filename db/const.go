@@ -4,7 +4,7 @@ import "polaris/ent/media"
 
 var (
 	Version    = "undefined"
-	TmdbApiKey = ""
+	DefaultTmdbApiKey = ""
 )
 
 const (
