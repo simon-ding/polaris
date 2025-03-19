@@ -111,7 +111,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           }
           return cards;
         },
-        error: (err, trace) => [PoError(msg: "网络错误，请确认TMDB Key正确配置，并且能够正常连接到TMDB网站", err: err)],
+        error: (err, trace) => [PoError(msg: "网络错误，请确保本地网络能够正常访问TMDB网站", err: err)],
         loading: () => [const MyProgressIndicator()]);
 
     var f = NotificationListener(
