@@ -6,6 +6,8 @@ ENV GO111MODULE=on
 
 WORKDIR /app
 
+ARG TMDB_API_KEY
+
 COPY  go.mod .
 COPY  go.sum .
 RUN go mod download
@@ -13,7 +15,7 @@ RUN go mod download
 COPY . .
 
 # 指定OS等，并go build
-RUN CGO_ENABLED=0 go build -o polaris -ldflags="-X polaris/db.Version=$(git describe --tags --long)"  ./cmd/ 
+RUN CGO_ENABLED=0 go build -o polaris -ldflags="-X polaris/db.Version=$(git describe --tags --long) -X polaris/db.TmdbApiKey=$(echo $TMDB_API_KEY)"  ./cmd/ 
 
 FROM debian:stable-slim
 

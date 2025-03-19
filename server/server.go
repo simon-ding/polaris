@@ -146,7 +146,7 @@ func (s *Server) Serve() error {
 }
 
 func (s *Server) TMDB() (*tmdb.Client, error) {
-	api := s.db.GetSetting(db.SettingTmdbApiKey)
+	api := s.db.GetTmdbApiKey()
 	if api == "" {
 		return nil, errors.New("TMDB apiKey not set")
 	}

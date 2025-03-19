@@ -2,7 +2,10 @@ package db
 
 import "polaris/ent/media"
 
-var Version = "undefined"
+var (
+	Version    = "undefined"
+	TmdbApiKey = ""
+)
 
 const (
 	SettingTmdbApiKey             = "tmdb_api_key"
@@ -48,15 +51,16 @@ const DefaultNamingFormat = "{{.NameCN}} {{.NameEN}} {{if .Year}} ({{.Year}}) {{
 
 //https://en.wikipedia.org/wiki/Video_file_format
 var defaultAcceptedVideoFormats = []string{
-	".webm", ".mkv", ".flv", ".vob", ".ogv", ".ogg", ".drc", ".mng", ".avi", ".mts", ".m2ts",".ts",
-	".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".viv", ".amv", ".mp4", ".m4p", ".m4v", 
+	".webm", ".mkv", ".flv", ".vob", ".ogv", ".ogg", ".drc", ".mng", ".avi", ".mts", ".m2ts", ".ts",
+	".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".viv", ".amv", ".mp4", ".m4p", ".m4v",
 	".mpg", ".mp2", ".mpeg", ".mpe", ".mpv", ".m2v", ".m4v",
 	".svi", ".3gp", ".3g2", ".nsv",
 }
 
 var defaultAcceptedSubtitleFormats = []string{
-	".ass", ".srt",".vtt", ".webvtt", ".sub", ".idx",
+	".ass", ".srt", ".vtt", ".webvtt", ".sub", ".idx",
 }
+
 type NamingInfo struct {
 	NameCN string
 	NameEN string

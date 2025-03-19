@@ -733,3 +733,12 @@ func (c *Client) GetAcceptedSubtitleFormats() ([]string, error) {
 func (c *Client) SetAcceptedSubtitleFormats(key string, v []string) error {
 	return c.setAcceptedFormats(SettingAcceptedSubtitleFormats, v)
 }
+
+
+func (c *Client) GetTmdbApiKey() string {
+	k := c.GetSetting(SettingTmdbApiKey)
+	if k == "" {
+		return TmdbApiKey
+	}
+	return k
+}

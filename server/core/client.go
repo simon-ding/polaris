@@ -145,7 +145,7 @@ func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, erro
 }
 
 func (c *Client) TMDB() (*tmdb.Client, error) {
-	api := c.db.GetSetting(db.SettingTmdbApiKey)
+	api := c.db.GetTmdbApiKey()
 	if api == "" {
 		return nil, errors.New("TMDB apiKey not set")
 	}

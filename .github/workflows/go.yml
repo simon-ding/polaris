@@ -58,4 +58,6 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}
 
