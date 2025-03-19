@@ -46,10 +46,9 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
               children: [
                 FormBuilderTextField(
                   name: "tmdb_api",
-                  decoration: Commons.requiredTextFieldStyle(
-                      text: "TMDB Api Key", icon: const Icon(Icons.key)),
+                  decoration: const InputDecoration(
+                      labelText: "TMDB Api Key", icon: Icon(Icons.key), helperText: "未防止被限流，可以提供自定义的 TMDB Api Key"),
                   //
-                  validator: FormBuilderValidators.required(),
                 ),
                 FormBuilderTextField(
                   name: "download_dir",
