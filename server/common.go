@@ -7,12 +7,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Coder interface {
+	Code() int
+}
+
+
 func HttpHandler(f func(*gin.Context) (interface{}, error)) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		r, err := f(ctx)
 		if err != nil {
 			log.Errorf("url %v return error: %v", ctx.Request.URL, err)
+			cc, ok := err.(Coder)
+			if ok {
+				ctx.JSON(200, Response{
+					Code:    cc.Code(),
+					Message: fmt.Sprintf("%v", err),
+				})
+				return
+	
+			}
 			ctx.JSON(200, Response{
 				Code:    1,
 				Message: fmt.Sprintf("%v", err),
