@@ -17,7 +17,7 @@ func (DownloadClients) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("enable"),
 		field.String("name"),
-		field.Enum("implementation").Values("transmission", "qbittorrent"),
+		field.Enum("implementation").Values("transmission", "qbittorrent", "buildin"),
 		field.String("url"),
 		field.String("user").Default(""),
 		field.String("password").Default(""),

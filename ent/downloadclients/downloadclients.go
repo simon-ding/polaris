@@ -91,6 +91,7 @@ type Implementation string
 const (
 	ImplementationTransmission Implementation = "transmission"
 	ImplementationQbittorrent  Implementation = "qbittorrent"
+	ImplementationBuildin      Implementation = "buildin"
 )
 
 func (i Implementation) String() string {
@@ -100,7 +101,7 @@ func (i Implementation) String() string {
 // ImplementationValidator is a validator for the "implementation" field enum values. It is called by the builders before save.
 func ImplementationValidator(i Implementation) error {
 	switch i {
-	case ImplementationTransmission, ImplementationQbittorrent:
+	case ImplementationTransmission, ImplementationQbittorrent, ImplementationBuildin:
 		return nil
 	default:
 		return fmt.Errorf("downloadclients: invalid enum value for implementation field: %q", i)

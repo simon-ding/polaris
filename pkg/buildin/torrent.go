@@ -12,6 +12,16 @@ import (
 	"strings"
 )
 
+func NewDownloader(downloadDir string) (*Downloader, error) {
+	cfg := torrent.NewDefaultClientConfig()
+	cfg.DataDir = downloadDir
+	t, err := torrent.NewClient(cfg)
+	if err != nil {
+		return nil, errors.Wrapf(err, "create torrent client")
+	}
+	return &Downloader{cl: t}, nil
+}
+
 type Downloader struct {
 	cl *torrent.Client
 }
@@ -21,8 +31,9 @@ func (d *Downloader) GetAll() ([]pkg.Torrent, error) {
 	var res []pkg.Torrent
 	for _, t := range ts {
 		res = append(res, &Torrent{
-			t:  t,
-			cl: d.cl,
+			t:    t,
+			cl:   d.cl,
+			hash: t.InfoHash().HexString(),
 		})
 	}
 	return res, nil
@@ -35,6 +46,7 @@ func (d *Downloader) Download(link, hash, dir string) (pkg.Torrent, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to add magnet: %v", err)
 		}
+		<-t.GotInfo()
 		return &Torrent{
 			t:    t,
 			cl:   d.cl,
@@ -65,6 +77,7 @@ func (d *Downloader) Download(link, hash, dir string) (pkg.Torrent, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to add torrent: %v", err)
 	}
+	<-t.GotInfo()
 	return &Torrent{
 		t:    t,
 		cl:   d.cl,
@@ -107,13 +120,20 @@ func (t *Torrent) Start() error {
 	return nil
 }
 
+// TODO delete local data
 func (t *Torrent) Remove() error {
 	t.t.Drop()
 	return nil
 }
 
 func (t *Torrent) Exists() bool {
-	return true
+	tors := t.cl.Torrents()
+	for _, to := range tors {
+		if to.InfoHash().HexString() == t.hash {
+			return true
+		}
+	}
+	return false
 }
 
 func (t *Torrent) SeedRatio() (float64, error) {

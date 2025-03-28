@@ -6,6 +6,7 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/log"
 	"polaris/pkg"
+	"polaris/pkg/buildin"
 	"polaris/pkg/qbittorrent"
 	"polaris/pkg/tmdb"
 	"polaris/pkg/transmission"
@@ -69,7 +70,7 @@ func (c *Client) reloadTasks() {
 					log.Warnf("get task error: %v", err)
 					continue
 				}
-				c.tasks[t.ID] = &Task{Torrent: to}	
+				c.tasks[t.ID] = &Task{Torrent: to}
 			} else if t.Link != "" {
 				to, err := transmission.NewTorrent(transmission.Config{
 					URL:      dl.URL,
@@ -80,7 +81,7 @@ func (c *Client) reloadTasks() {
 					log.Warnf("get task error: %v", err)
 					continue
 				}
-				c.tasks[t.ID] = &Task{Torrent: to}	
+				c.tasks[t.ID] = &Task{Torrent: to}
 			}
 		} else if dl.Implementation == downloadclients.ImplementationQbittorrent {
 			if t.Hash != "" {
@@ -94,7 +95,7 @@ func (c *Client) reloadTasks() {
 					continue
 				}
 				c.tasks[t.ID] = &Task{Torrent: to}
-	
+
 			} else if t.Link != "" {
 				to, err := qbittorrent.NewTorrent(qbittorrent.Info{
 					URL:      dl.URL,
@@ -106,12 +107,17 @@ func (c *Client) reloadTasks() {
 					continue
 				}
 				c.tasks[t.ID] = &Task{Torrent: to}
-	
+
 			}
 		}
 
 	}
 	log.Infof("------ task reloading done ------")
+}
+
+func (c *Client) buildInDownloader() (pkg.Downloader, error) {
+	dir := c.db.GetDownloadDir()
+	return buildin.NewDownloader(dir)
 }
 
 func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {
@@ -139,8 +145,16 @@ func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, erro
 				continue
 			}
 			return qbt, d, nil
+		} else if d.Implementation == downloadclients.ImplementationBuildin {
+			bin, err := c.buildInDownloader()
+			if err != nil {
+				log.Warnf("connect to download client error: %v", d.URL)
+				continue
+			}
+			return bin, d, nil
 		}
 	}
+
 	return nil, nil, errors.Errorf("no available download client")
 }
 

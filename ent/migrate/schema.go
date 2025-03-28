@@ -26,7 +26,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "enable", Type: field.TypeBool},
 		{Name: "name", Type: field.TypeString},
-		{Name: "implementation", Type: field.TypeEnum, Enums: []string{"transmission", "qbittorrent"}},
+		{Name: "implementation", Type: field.TypeEnum, Enums: []string{"transmission", "qbittorrent", "buildin"}},
 		{Name: "url", Type: field.TypeString},
 		{Name: "user", Type: field.TypeString, Default: ""},
 		{Name: "password", Type: field.TypeString, Default: ""},

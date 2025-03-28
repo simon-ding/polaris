@@ -324,6 +324,12 @@ func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
 		log.Errorf("no download client")
 		return nil
 	}
+	cc = append(cc, &ent.DownloadClients{
+		Implementation: downloadclients.ImplementationBuildin,
+		Name:           "内建下载器",
+		Priority1:      9999,
+		Enable:         true,
+	})
 	return cc
 }
 
@@ -733,7 +739,6 @@ func (c *Client) GetAcceptedSubtitleFormats() ([]string, error) {
 func (c *Client) SetAcceptedSubtitleFormats(key string, v []string) error {
 	return c.setAcceptedFormats(SettingAcceptedSubtitleFormats, v)
 }
-
 
 func (c *Client) GetTmdbApiKey() string {
 	k := c.GetSetting(SettingTmdbApiKey)
