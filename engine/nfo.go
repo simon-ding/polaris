@@ -1,4 +1,4 @@
-package core
+package engine
 
 import "encoding/xml"
 

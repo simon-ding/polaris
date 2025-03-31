@@ -4,11 +4,11 @@ import (
 	"os"
 	"path/filepath"
 	"polaris/db"
+	"polaris/engine"
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/media"
 	"polaris/log"
-	"polaris/server/core"
 	"strconv"
 	"strings"
 
@@ -68,7 +68,7 @@ type addWatchlistIn struct {
 }
 
 func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
-	var in core.AddWatchlistIn
+	var in engine.AddWatchlistIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}
@@ -76,7 +76,7 @@ func (s *Server) AddTv2Watchlist(c *gin.Context) (interface{}, error) {
 }
 
 func (s *Server) AddMovie2Watchlist(c *gin.Context) (interface{}, error) {
-	var in core.AddWatchlistIn
+	var in engine.AddWatchlistIn
 	if err := c.ShouldBindJSON(&in); err != nil {
 		return nil, errors.Wrap(err, "bind query")
 	}

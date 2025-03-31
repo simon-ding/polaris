@@ -6,10 +6,10 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"polaris/db"
+	"polaris/engine"
 	"polaris/log"
 	"polaris/pkg/cache"
 	"polaris/pkg/tmdb"
-	"polaris/server/core"
 	"polaris/ui"
 	"time"
 
@@ -30,14 +30,14 @@ func NewServer(db *db.Client) *Server {
 		monitorNumCache:  cache.NewCache[int, int](10 * time.Minute),
 		downloadNumCache: cache.NewCache[int, int](10 * time.Minute),
 	}
-	s.core = core.NewClient(db, s.language)
+	s.core = engine.NewEngine(db, s.language)
 	return s
 }
 
 type Server struct {
 	r                *gin.Engine
 	db               *db.Client
-	core             *core.Client
+	core             *engine.Engine
 	language         string
 	jwtSerect        string
 	monitorNumCache  *cache.Cache[int, int]

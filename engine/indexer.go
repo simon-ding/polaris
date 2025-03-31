@@ -1,4 +1,4 @@
-package core
+package engine
 
 import (
 	"polaris/ent"
@@ -11,7 +11,7 @@ import (
 
 const prowlarrPrefix = "Prowlarr_"
 
-func (c *Client) SyncProwlarrIndexers(apiKey, url string) error {
+func (c *Engine) SyncProwlarrIndexers(apiKey, url string) error {
 	client := prowlarr.New(apiKey, url)
 	if ins, err := client.GetIndexers(); err != nil {
 		return errors.Wrap(err, "connect to prowlarr error")
@@ -22,7 +22,7 @@ func (c *Client) SyncProwlarrIndexers(apiKey, url string) error {
 		}
 		all := c.db.GetAllIndexers()
 		for _, index := range all {
-			
+
 			if index.Synced {
 				if !prowlarrNames[strings.TrimPrefix(index.Name, prowlarrPrefix)] {
 					c.db.DeleteIndexer(index.ID) //remove deleted indexers
@@ -52,7 +52,7 @@ func (c *Client) SyncProwlarrIndexers(apiKey, url string) error {
 	return nil
 }
 
-func (c *Client) syncProwlarr() error {
+func (c *Engine) syncProwlarr() error {
 	p, err := c.db.GetProwlarrSetting()
 	if err != nil {
 		return errors.Wrap(err, "db")
@@ -67,8 +67,7 @@ func (c *Client) syncProwlarr() error {
 	return nil
 }
 
-
-func (c *Client) DeleteAllProwlarrIndexers() error {
+func (c *Engine) DeleteAllProwlarrIndexers() error {
 	all := c.db.GetAllIndexers()
 	for _, index := range all {
 		if index.Synced {

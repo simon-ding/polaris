@@ -1,4 +1,4 @@
-package core
+package engine
 
 import (
 	"bytes"
@@ -21,7 +21,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) writeNfoFile(historyId int) error {
+func (c *Engine) writeNfoFile(historyId int) error {
 	if !c.nfoSupportEnabled() {
 		return nil
 	}
@@ -106,7 +106,7 @@ func (c *Client) writeNfoFile(historyId int) error {
 	return nil
 }
 
-func (c *Client) writePlexmatch(historyId int) error {
+func (c *Engine) writePlexmatch(historyId int) error {
 
 	if !c.plexmatchEnabled() {
 		return nil
@@ -169,15 +169,15 @@ func (c *Client) writePlexmatch(historyId int) error {
 	return st.WriteFile(seasonPlex, buff.Bytes())
 }
 
-func (c *Client) plexmatchEnabled() bool {
+func (c *Engine) plexmatchEnabled() bool {
 	return c.db.GetSetting(db.SettingPlexMatchEnabled) == "true"
 }
 
-func (c *Client) nfoSupportEnabled() bool {
+func (c *Engine) nfoSupportEnabled() bool {
 	return c.db.GetSetting(db.SettingNfoSupportEnabled) == "true"
 }
 
-func (c *Client) GetStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {
+func (c *Engine) GetStorage(storageId int, mediaType media.MediaType) (storage.Storage, error) {
 	st := c.db.GetStorage(storageId)
 	targetPath := st.TvPath
 	if mediaType == media.MediaTypeMovie {
@@ -219,7 +219,7 @@ func (c *Client) GetStorage(storageId int, mediaType media.MediaType) (storage.S
 	return nil, errors.New("no storage found")
 }
 
-func (c *Client) sendMsg(msg string) {
+func (c *Engine) sendMsg(msg string) {
 	clients, err := c.db.GetAllNotificationClients2()
 	if err != nil {
 		log.Errorf("query notification clients: %v", err)
@@ -248,7 +248,7 @@ func (c *Client) sendMsg(msg string) {
 	}
 }
 
-func (c *Client) findEpisodeFilesPreMoving(historyId int) error {
+func (c *Engine) findEpisodeFilesPreMoving(historyId int) error {
 	his := c.db.GetHistory(historyId)
 
 	episodeIds := c.GetEpisodeIds(his)

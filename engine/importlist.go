@@ -1,4 +1,4 @@
-package core
+package engine
 
 import (
 	"bytes"
@@ -25,7 +25,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) periodicallyUpdateImportlist() error {
+func (c *Engine) periodicallyUpdateImportlist() error {
 	log.Infof("begin check import list")
 	lists, err := c.db.GetAllImportLists()
 	if err != nil {
@@ -119,7 +119,7 @@ type AddWatchlistIn struct {
 	PreferSize              int64  `json:"prefer_size"`
 }
 
-func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
+func (c *Engine) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	log.Debugf("add tv watchlist input %+v", in)
 	if in.Folder == "" {
 		return nil, errors.New("folder should be provided")
@@ -200,7 +200,7 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 			epIds = append(epIds, epid)
 		}
 	}
-	
+
 	m := &ent.Media{
 		TmdbID:                  int(detail.ID),
 		ImdbID:                  detail.IMDbID,
@@ -247,7 +247,7 @@ func (c *Client) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	return nil, nil
 }
 
-func (c *Client) getAlterTitles(tmdbId int, mediaType media.MediaType) ([]schema.AlternativeTilte, error){
+func (c *Engine) getAlterTitles(tmdbId int, mediaType media.MediaType) ([]schema.AlternativeTilte, error) {
 	var titles []schema.AlternativeTilte
 
 	if mediaType == media.MediaTypeTv {
@@ -255,26 +255,26 @@ func (c *Client) getAlterTitles(tmdbId int, mediaType media.MediaType) ([]schema
 		if err != nil {
 			return nil, errors.Wrap(err, "tmdb")
 		}
-		
+
 		for _, t := range alterTitles.Results {
 			titles = append(titles, schema.AlternativeTilte{
 				Iso3166_1: t.Iso3166_1,
-				Title: t.Title,
-				Type: t.Type,
+				Title:     t.Title,
+				Type:      t.Type,
 			})
 		}
-	
+
 	} else if mediaType == media.MediaTypeMovie {
 		alterTitles, err := c.MustTMDB().GetMovieAlternativeTitles(tmdbId, c.language)
 		if err != nil {
 			return nil, errors.Wrap(err, "tmdb")
 		}
-		
+
 		for _, t := range alterTitles.Titles {
 			titles = append(titles, schema.AlternativeTilte{
 				Iso3166_1: t.Iso3166_1,
-				Title: t.Title,
-				Type: t.Type,
+				Title:     t.Title,
+				Type:      t.Type,
 			})
 		}
 	}
@@ -283,7 +283,7 @@ func (c *Client) getAlterTitles(tmdbId int, mediaType media.MediaType) ([]schema
 	return titles, nil
 }
 
-func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
+func (c *Engine) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	log.Infof("add movie watchlist input: %+v", in)
 	detailCn, err := c.MustTMDB().GetMovieDetails(in.TmdbID, db.LanguageCN)
 	if err != nil {
@@ -306,7 +306,6 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 		return nil, errors.Wrap(err, "get alter titles")
 	}
 
-
 	epid, err := c.db.SaveEposideDetail(&ent.Episode{
 		SeasonNumber:  1,
 		EpisodeNumber: 1,
@@ -321,18 +320,18 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	log.Infof("added dummy episode for movie: %v", nameEn)
 
 	movie := ent.Media{
-		TmdbID:       int(detail.ID),
-		ImdbID:       detail.IMDbID,
-		MediaType:    media.MediaTypeMovie,
-		NameCn:       nameCn,
-		NameEn:       nameEn,
-		OriginalName: detail.OriginalTitle,
-		Overview:     detail.Overview,
-		AirDate:      detail.ReleaseDate,
-		Resolution:   media.Resolution(in.Resolution),
-		StorageID:    in.StorageID,
-		TargetDir:    in.Folder,
-		Limiter:      schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
+		TmdbID:            int(detail.ID),
+		ImdbID:            detail.IMDbID,
+		MediaType:         media.MediaTypeMovie,
+		NameCn:            nameCn,
+		NameEn:            nameEn,
+		OriginalName:      detail.OriginalTitle,
+		Overview:          detail.Overview,
+		AirDate:           detail.ReleaseDate,
+		Resolution:        media.Resolution(in.Resolution),
+		StorageID:         in.StorageID,
+		TargetDir:         in.Folder,
+		Limiter:           schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
 		AlternativeTitles: alterTitles,
 	}
 
@@ -372,7 +371,7 @@ func (c *Client) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 
 }
 
-func (c *Client) checkMovieFolder(m *ent.Media) error {
+func (c *Engine) checkMovieFolder(m *ent.Media) error {
 	var storageImpl, err = c.GetStorage(m.StorageID, media.MediaTypeMovie)
 	if err != nil {
 		return err
@@ -406,7 +405,7 @@ func IsJav(detail *tmdb.MovieDetails) bool {
 	return false
 }
 
-func (c *Client) GetJavid(id int) string {
+func (c *Engine) GetJavid(id int) string {
 	alters, err := c.MustTMDB().GetMovieAlternativeTitles(id, c.language)
 	if err != nil {
 		return ""
@@ -419,23 +418,23 @@ func (c *Client) GetJavid(id int) string {
 	return ""
 }
 
-func (c *Client) downloadBackdrop(path string, mediaID int) error {
+func (c *Engine) downloadBackdrop(path string, mediaID int) error {
 	url := "https://image.tmdb.org/t/p/original" + path
 	return c.downloadImage(url, mediaID, "backdrop.jpg")
 }
 
-func (c *Client) downloadPoster(path string, mediaID int) error {
+func (c *Engine) downloadPoster(path string, mediaID int) error {
 	var url = "https://image.tmdb.org/t/p/original" + path
 
 	return c.downloadImage(url, mediaID, "poster.jpg")
 }
 
-func (c *Client) downloadW500Poster(path string, mediaID int) error {
+func (c *Engine) downloadW500Poster(path string, mediaID int) error {
 	url := "https://image.tmdb.org/t/p/w500" + path
 	return c.downloadImage(url, mediaID, "poster_w500.jpg")
 }
 
-func (c *Client) downloadImage(url string, mediaID int, name string) error {
+func (c *Engine) downloadImage(url string, mediaID int, name string) error {
 
 	log.Infof("try to download image: %v", url)
 	var resp, err = http.Get(url)
@@ -460,7 +459,7 @@ func (c *Client) downloadImage(url string, mediaID int, name string) error {
 
 }
 
-func (c *Client) checkW500PosterOnStartup() {
+func (c *Engine) checkW500PosterOnStartup() {
 	log.Infof("check all w500 posters")
 	all := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	movies := c.db.GetMediaWatchlist(media.MediaTypeMovie)
@@ -470,37 +469,37 @@ func (c *Client) checkW500PosterOnStartup() {
 		if _, err := os.Stat(targetFile); err != nil {
 			log.Infof("poster_w500.jpg not exist for %s, will download it", e.NameEn)
 
-			if e.MediaType ==media.MediaTypeTv {
+			if e.MediaType == media.MediaTypeTv {
 				detail, err := c.MustTMDB().GetTvDetails(e.TmdbID, db.LanguageCN)
 				if err != nil {
 					log.Warnf("get tmdb detail for %s error: %v", e.NameEn, err)
 					continue
 				}
-	
+
 				if err := c.downloadW500Poster(detail.PosterPath, e.ID); err != nil {
 					log.Warnf("download w500 poster error: %v", err)
 					continue
 				}
-	
+
 			} else {
 				detail, err := c.MustTMDB().GetMovieDetails(e.TmdbID, db.LanguageCN)
 				if err != nil {
 					log.Warnf("get tmdb detail for %s error: %v", e.NameEn, err)
 					continue
 				}
-	
+
 				if err := c.downloadW500Poster(detail.PosterPath, e.ID); err != nil {
 					log.Warnf("download w500 poster error: %v", err)
 					continue
 				}
-	
+
 			}
 
 		}
 	}
 }
 
-func (c *Client) SuggestedMovieFolderName(tmdbId int) (string, error) {
+func (c *Engine) SuggestedMovieFolderName(tmdbId int) (string, error) {
 
 	d1, err := c.MustTMDB().GetMovieDetails(tmdbId, c.language)
 	if err != nil {
@@ -545,7 +544,7 @@ func (c *Client) SuggestedMovieFolderName(tmdbId int) (string, error) {
 	return res, nil
 }
 
-func (c *Client) SuggestedSeriesFolderName(tmdbId int) (string, error) {
+func (c *Engine) SuggestedSeriesFolderName(tmdbId int) (string, error) {
 
 	d, err := c.MustTMDB().GetTvDetails(tmdbId, c.language)
 	if err != nil {

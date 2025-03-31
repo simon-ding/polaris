@@ -1,4 +1,4 @@
-package core
+package engine
 
 import (
 	"polaris/db"
@@ -16,8 +16,8 @@ import (
 	"github.com/robfig/cron"
 )
 
-func NewClient(db *db.Client, language string) *Client {
-	return &Client{
+func NewEngine(db *db.Client, language string) *Engine {
+	return &Engine{
 		db:       db,
 		cron:     cron.New(),
 		tasks:    make(map[int]*Task, 0),
@@ -29,7 +29,7 @@ type scheduler struct {
 	cron string
 	f    func() error
 }
-type Client struct {
+type Engine struct {
 	db         *db.Client
 	cron       *cron.Cron
 	tasks      map[int]*Task
@@ -37,20 +37,20 @@ type Client struct {
 	schedulers utils.Map[string, scheduler]
 }
 
-func (c *Client) registerCronJob(name string, cron string, f func() error) {
+func (c *Engine) registerCronJob(name string, cron string, f func() error) {
 	c.schedulers.Store(name, scheduler{
 		cron: cron,
 		f:    f,
 	})
 }
 
-func (c *Client) Init() {
+func (c *Engine) Init() {
 	go c.reloadTasks()
 	c.addSysCron()
 	go c.checkW500PosterOnStartup()
 }
 
-func (c *Client) reloadTasks() {
+func (c *Engine) reloadTasks() {
 	allTasks := c.db.GetRunningHistories()
 	for _, t := range allTasks {
 		dl, err := c.db.GetDownloadClient(t.DownloadClientID)
@@ -115,12 +115,12 @@ func (c *Client) reloadTasks() {
 	log.Infof("------ task reloading done ------")
 }
 
-func (c *Client) buildInDownloader() (pkg.Downloader, error) {
+func (c *Engine) buildInDownloader() (pkg.Downloader, error) {
 	dir := c.db.GetDownloadDir()
 	return buildin.NewDownloader(dir)
 }
 
-func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {
+func (c *Engine) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {
 	downloaders := c.db.GetAllDonloadClients()
 	for _, d := range downloaders {
 		if !d.Enable {
@@ -158,7 +158,7 @@ func (c *Client) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, erro
 	return nil, nil, errors.Errorf("no available download client")
 }
 
-func (c *Client) TMDB() (*tmdb.Client, error) {
+func (c *Engine) TMDB() (*tmdb.Client, error) {
 	api := c.db.GetTmdbApiKey()
 	if api == "" {
 		return nil, errors.New("TMDB apiKey not set")
@@ -168,7 +168,7 @@ func (c *Client) TMDB() (*tmdb.Client, error) {
 	return tmdb.NewClient(api, proxy, adult == "true")
 }
 
-func (c *Client) MustTMDB() *tmdb.Client {
+func (c *Engine) MustTMDB() *tmdb.Client {
 	t, err := c.TMDB()
 	if err != nil {
 		log.Panicf("get tmdb: %v", err)
@@ -176,7 +176,7 @@ func (c *Client) MustTMDB() *tmdb.Client {
 	return t
 }
 
-func (c *Client) RemoveTaskAndTorrent(id int) error {
+func (c *Engine) RemoveTaskAndTorrent(id int) error {
 	torrent := c.tasks[id]
 	if torrent != nil {
 		if err := torrent.Remove(); err != nil {
@@ -187,6 +187,6 @@ func (c *Client) RemoveTaskAndTorrent(id int) error {
 	return nil
 }
 
-func (c *Client) GetTasks() map[int]*Task {
+func (c *Engine) GetTasks() map[int]*Task {
 	return c.tasks
 }

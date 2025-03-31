@@ -1,4 +1,4 @@
-package core
+package engine
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) addSysCron() {
+func (c *Engine) addSysCron() {
 	c.registerCronJob("check_running_tasks", "@every 1m", c.checkTasks)
 	c.registerCronJob("check_available_medias_to_download", "0 0 * * * *", func() error {
 		v := os.Getenv("POLARIS_NO_AUTO_DOWNLOAD")
@@ -48,14 +48,14 @@ func (c *Client) addSysCron() {
 	log.Infof("--------- add cron jobs done --------")
 }
 
-func (c *Client) mustAddCron(spec string, cmd func()) {
+func (c *Engine) mustAddCron(spec string, cmd func()) {
 	if err := c.cron.AddFunc(spec, cmd); err != nil {
 		log.Errorf("add func error: %v", err)
 		panic(err)
 	}
 }
 
-func (c *Client) TriggerCronJob(name string) error {
+func (c *Engine) TriggerCronJob(name string) error {
 	job, ok := c.schedulers.Load(name)
 	if !ok {
 		return fmt.Errorf("job name not exists: %s", name)
@@ -63,7 +63,7 @@ func (c *Client) TriggerCronJob(name string) error {
 	return job.f()
 }
 
-func (c *Client) checkTasks() error {
+func (c *Engine) checkTasks() error {
 	log.Debug("begin check tasks...")
 	for id, t := range c.tasks {
 		r := c.db.GetHistory(id)
@@ -124,7 +124,7 @@ seeding状态中，会定时检查做种状态，达到指定分享率，会置�
 
 */
 
-func (c *Client) setHistoryStatus(id int, status history.Status) {
+func (c *Engine) setHistoryStatus(id int, status history.Status) {
 	r := c.db.GetHistory(id)
 
 	episodeIds := c.GetEpisodeIds(r)
@@ -152,7 +152,7 @@ func (c *Client) setHistoryStatus(id int, status history.Status) {
 	}
 }
 
-func (c *Client) setEpsideoStatus(episodeIds []int, status episode.Status) error {
+func (c *Engine) setEpsideoStatus(episodeIds []int, status episode.Status) error {
 	for _, id := range episodeIds {
 		ep, err := c.db.GetEpisodeByID(id)
 		if err != nil {
@@ -171,7 +171,7 @@ func (c *Client) setEpsideoStatus(episodeIds []int, status episode.Status) error
 	return nil
 }
 
-func (c *Client) postTaskProcessing(id int) {
+func (c *Engine) postTaskProcessing(id int) {
 	if err := c.findEpisodeFilesPreMoving(id); err != nil {
 		log.Errorf("finding all episode file error: %v", err)
 	} else {
@@ -199,7 +199,7 @@ func getSeasonNum(h *ent.History) int {
 	return seasonNum
 }
 
-func (c *Client) GetEpisodeIds(r *ent.History) []int {
+func (c *Engine) GetEpisodeIds(r *ent.History) []int {
 	var episodeIds []int
 	seasonNum := getSeasonNum(r)
 
@@ -231,7 +231,7 @@ func (c *Client) GetEpisodeIds(r *ent.History) []int {
 	return episodeIds
 }
 
-func (c *Client) moveCompletedTask(id int) (err1 error) {
+func (c *Engine) moveCompletedTask(id int) (err1 error) {
 	torrent := c.tasks[id]
 	r := c.db.GetHistory(id)
 	// if r.Status == history.StatusUploading {
@@ -300,7 +300,7 @@ func (c *Client) moveCompletedTask(id int) (err1 error) {
 	return nil
 }
 
-func (c *Client) CheckDownloadedSeriesFiles(m *ent.Media) error {
+func (c *Engine) CheckDownloadedSeriesFiles(m *ent.Media) error {
 	if m.MediaType != media.MediaTypeTv {
 		return nil
 	}
@@ -357,7 +357,7 @@ type Task struct {
 	UploadProgresser func() float64
 }
 
-func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
+func (c *Engine) DownloadSeriesAllEpisodes(id int) []string {
 	tvDetail, err := c.db.GetMediaDetails(id)
 	if err != nil {
 		log.Errorf("get media details error: %v", err)
@@ -429,7 +429,7 @@ func (c *Client) DownloadSeriesAllEpisodes(id int) []string {
 	return allNames
 }
 
-func (c *Client) downloadAllTvSeries() {
+func (c *Engine) downloadAllTvSeries() {
 	log.Infof("begin check all tv series resources")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
@@ -437,7 +437,7 @@ func (c *Client) downloadAllTvSeries() {
 	}
 }
 
-func (c *Client) downloadAllMovies() {
+func (c *Engine) downloadAllMovies() {
 	log.Infof("begin check all movie resources")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeMovie)
 
@@ -448,7 +448,7 @@ func (c *Client) downloadAllMovies() {
 	}
 }
 
-func (c *Client) DownloadMovieByID(id int) (string, error) {
+func (c *Engine) DownloadMovieByID(id int) (string, error) {
 	detail, err := c.db.GetMediaDetails(id)
 	if err != nil {
 		return "", errors.Wrap(err, "get media details")
@@ -468,7 +468,7 @@ func (c *Client) DownloadMovieByID(id int) (string, error) {
 	}
 }
 
-func (c *Client) downloadMovieSingleEpisode(m *ent.Media, ep *ent.Episode) (string, error) {
+func (c *Engine) downloadMovieSingleEpisode(m *ent.Media, ep *ent.Episode) (string, error) {
 
 	qiangban := c.db.GetSetting(db.SettingAllowQiangban)
 	allowQiangban := false
@@ -495,7 +495,7 @@ func (c *Client) downloadMovieSingleEpisode(m *ent.Media, ep *ent.Episode) (stri
 	return *s, nil
 }
 
-func (c *Client) checkAllSeriesNewSeason() error {
+func (c *Engine) checkAllSeriesNewSeason() error {
 	log.Infof("begin checking series all new season")
 	allSeries := c.db.GetMediaWatchlist(media.MediaTypeTv)
 	for _, series := range allSeries {
@@ -507,7 +507,7 @@ func (c *Client) checkAllSeriesNewSeason() error {
 	return nil
 }
 
-func (c *Client) checkSeiesNewSeason(media *ent.Media) error {
+func (c *Engine) checkSeiesNewSeason(media *ent.Media) error {
 	d, err := c.MustTMDB().GetTvDetails(media.TmdbID, c.language)
 	if err != nil {
 		return errors.Wrap(err, "tmdb")
@@ -545,7 +545,7 @@ func (c *Client) checkSeiesNewSeason(media *ent.Media) error {
 	return nil
 }
 
-func (c *Client) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (float64, bool) {
+func (c *Engine) isSeedRatioLimitReached(indexId int, t pkg.Torrent) (float64, bool) {
 	indexer, err := c.db.GetIndexer(indexId)
 	if err != nil {
 		return 0, true

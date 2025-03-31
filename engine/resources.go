@@ -1,4 +1,4 @@
-package core
+package engine
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum int, episodeNums ...int) (*string, error) {
+func (c *Engine) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum int, episodeNums ...int) (*string, error) {
 
 	series, err := c.db.GetMedia(seriesId)
 	if err != nil {
@@ -30,7 +30,7 @@ func (c *Client) DownloadEpisodeTorrent(r1 torznab.Result, seriesId, seasonNum i
 tmdb 校验获取的资源名，如果用资源名在tmdb搜索出来的结果能匹配上想要的资源，则认为资源有效，否则无效
 解决名称过于简单的影视会匹配过多资源的问题， 例如：梦魇绝镇 FROM
 */
-func (c *Client) checkBtReourceWithTmdb(r *torznab.Result, seriesId int) bool {
+func (c *Engine) checkBtReourceWithTmdb(r *torznab.Result, seriesId int) bool {
 	m := metadata.ParseTv(r.Name)
 	se, err := c.MustTMDB().SearchMedia(m.NameEn, "", 1)
 	if err != nil {
@@ -57,7 +57,7 @@ func (c *Client) checkBtReourceWithTmdb(r *torznab.Result, seriesId int) bool {
 	}
 }
 
-func (c *Client) SearchAndDownload(seriesId, seasonNum int, episodeNums ...int) ([]string, error) {
+func (c *Engine) SearchAndDownload(seriesId, seasonNum int, episodeNums ...int) ([]string, error) {
 
 	res, err := SearchTvSeries(c.db, &SearchParam{
 		MediaId:         seriesId,
@@ -115,11 +115,11 @@ lo:
 	return torrentNames, nil
 }
 
-func (c *Client) DownloadMovie(m *ent.Media, r1 torznab.Result) (*string, error) {
+func (c *Engine) DownloadMovie(m *ent.Media, r1 torznab.Result) (*string, error) {
 	return c.downloadTorrent(m, r1, 0)
 }
 
-func (c *Client) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int, episodeNums ...int) (*string, error) {
+func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int, episodeNums ...int) (*string, error) {
 	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "connect transmission")

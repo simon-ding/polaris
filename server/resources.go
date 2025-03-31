@@ -3,10 +3,10 @@ package server
 import (
 	"fmt"
 	"polaris/db"
+	"polaris/engine"
 	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/torznab"
-	"polaris/server/core"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +15,7 @@ import (
 
 func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*string, error) {
 
-	res, err := core.SearchTvSeries(s.db, &core.SearchParam{
+	res, err := engine.SearchTvSeries(s.db, &engine.SearchParam{
 		MediaId:         seriesId,
 		SeasonNum:       seasonNum,
 		Episodes:        nil,
@@ -54,7 +54,7 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 		if in.Episode == 0 {
 			//search season package
 			log.Infof("search series season package S%02d", in.Season)
-			res, err = core.SearchTvSeries(s.db, &core.SearchParam{
+			res, err = engine.SearchTvSeries(s.db, &engine.SearchParam{
 				MediaId:   in.ID,
 				SeasonNum: in.Season,
 				Episodes:  nil,
@@ -64,7 +64,7 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 			}
 		} else {
 			log.Infof("search series episode S%02dE%02d", in.Season, in.Episode)
-			res, err = core.SearchTvSeries(s.db, &core.SearchParam{
+			res, err = engine.SearchTvSeries(s.db, &engine.SearchParam{
 				MediaId:   in.ID,
 				SeasonNum: in.Season,
 				Episodes:  []int{in.Episode},
@@ -85,7 +85,7 @@ func (s *Server) SearchAvailableTorrents(c *gin.Context) (interface{}, error) {
 			allowQiangban = true
 		}
 
-		res, err = core.SearchMovie(s.db, &core.SearchParam{
+		res, err = engine.SearchMovie(s.db, &engine.SearchParam{
 			MediaId:        in.ID,
 			FilterQiangban: !allowQiangban,
 		})
