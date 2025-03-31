@@ -2,28 +2,33 @@ package buildin
 
 import (
 	"fmt"
-	"github.com/anacrolix/torrent"
-	"github.com/anacrolix/torrent/metainfo"
-	"github.com/pkg/errors"
 	"io/fs"
 	"net/http"
 	"os"
+	"path/filepath"
+	"polaris/log"
 	"polaris/pkg"
 	"strings"
+
+	"github.com/anacrolix/torrent"
+	"github.com/anacrolix/torrent/metainfo"
+	"github.com/pkg/errors"
 )
 
 func NewDownloader(downloadDir string) (*Downloader, error) {
 	cfg := torrent.NewDefaultClientConfig()
 	cfg.DataDir = downloadDir
+	cfg.ListenPort = 51243
 	t, err := torrent.NewClient(cfg)
 	if err != nil {
 		return nil, errors.Wrapf(err, "create torrent client")
 	}
-	return &Downloader{cl: t}, nil
+	return &Downloader{cl: t, dir: downloadDir}, nil
 }
 
 type Downloader struct {
-	cl *torrent.Client
+	cl  *torrent.Client
+	dir string
 }
 
 func (d *Downloader) GetAll() ([]pkg.Torrent, error) {
@@ -51,6 +56,7 @@ func (d *Downloader) Download(link, hash, dir string) (pkg.Torrent, error) {
 			t:    t,
 			cl:   d.cl,
 			hash: hash,
+			dir:  d.dir,
 		}, nil
 	}
 	client := &http.Client{
@@ -82,6 +88,27 @@ func (d *Downloader) Download(link, hash, dir string) (pkg.Torrent, error) {
 		t:    t,
 		cl:   d.cl,
 		hash: hash,
+		dir:  d.dir,
+	}, nil
+}
+
+func NewTorrentFromHash(hash string, downloadDir string) (*Torrent, error) {
+	cl, err := NewDownloader(downloadDir)
+	if err != nil {
+		return nil, errors.Wrap(err, "create downloader")
+	}
+	ttt := cl.cl.Torrents()
+	log.Infof("all torrents: %+v", ttt)
+	t, _ := cl.cl.AddTorrentInfoHash(metainfo.NewHashFromHex(hash))
+	// if new {
+	// 	return nil, fmt.Errorf("torrent not found")
+	// }
+	<-t.GotInfo()
+	return &Torrent{
+		t:    t,
+		cl:   cl.cl,
+		hash: hash,
+		dir:  downloadDir,
 	}, nil
 }
 
@@ -89,6 +116,7 @@ type Torrent struct {
 	t    *torrent.Torrent
 	cl   *torrent.Client
 	hash string
+	dir  string
 }
 
 func (t *Torrent) Name() (string, error) {
@@ -120,8 +148,14 @@ func (t *Torrent) Start() error {
 	return nil
 }
 
-// TODO delete local data
 func (t *Torrent) Remove() error {
+	files := t.t.Files()
+	for _, file := range files {
+		name := file.Path()
+		if err := os.RemoveAll(filepath.Join(t.dir, name)); err != nil {
+			return errors.Errorf("remove file (%s) error: %v", file.Path(), err)
+		}
+	}
 	t.t.Drop()
 	return nil
 }
@@ -149,7 +183,7 @@ func (t *Torrent) WalkFunc() func(fn func(path string, info fs.FileInfo) error) 
 
 	return func(fn func(path string, info fs.FileInfo) error) error {
 		for _, file := range files {
-			name := file.Path()
+			name := filepath.Join(t.dir, file.Path())
 			info, err := os.Stat(name)
 			if err != nil {
 				return err

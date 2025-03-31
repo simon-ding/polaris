@@ -122,7 +122,7 @@ func (c *Engine) DownloadMovie(m *ent.Media, r1 torznab.Result) (*string, error)
 func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int, episodeNums ...int) (*string, error) {
 	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
-		return nil, errors.Wrap(err, "connect transmission")
+		return nil, errors.Wrap(err, "get download client")
 	}
 
 	//check space available
