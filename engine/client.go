@@ -50,9 +50,32 @@ func (c *Engine) Init() {
 	go c.checkW500PosterOnStartup()
 }
 
+func (c *Engine) reloadUsingBuildinDownloader(h *ent.History) error{
+	cl, err := buildin.NewDownloader(c.db.GetDownloadDir())
+	if err != nil {
+		log.Warnf("buildin downloader error: %v", err)
+	}
+	t, err := cl.Download(h.Link, h.Hash, c.db.GetDownloadDir())
+	if err != nil {
+		return errors.Wrap(err, "download torrent")
+	}
+	c.tasks[h.ID] = &Task{Torrent: t}
+	return nil
+}
+
 func (c *Engine) reloadTasks() {
 	allTasks := c.db.GetRunningHistories()
 	for _, t := range allTasks {
+		if t.DownloadClientID == 0 {
+			log.Warnf("assume buildin downloader: %v", t.SourceTitle)
+			err := c.reloadUsingBuildinDownloader(t)
+			if err != nil {
+				log.Warnf("buildin downloader error: %v", err)
+			} else {
+				log.Infof("success reloading buildin task: %v", t.SourceTitle)
+			}
+			continue
+		}
 		dl, err := c.db.GetDownloadClient(t.DownloadClientID)
 		if err != nil {
 			log.Warnf("no download client related: %v", t.SourceTitle)
