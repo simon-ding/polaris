@@ -17,7 +17,7 @@ type TMDB struct {
 
 func LoadConfig() (*Config, error) {
 	viper.SetConfigName("config") // name of config file (without extension)
-	viper.SetConfigType("yml")   // REQUIRED if the config file does not have the extension in the name
+	viper.SetConfigType("yml")    // REQUIRED if the config file does not have the extension in the name
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("/app/data")
 
