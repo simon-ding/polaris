@@ -135,7 +135,11 @@ func (t *Torrent) Progress() (int, error) {
 	if t.t.Complete().Bool() {
 		return 100, nil
 	}
-	return int(t.t.BytesCompleted() * 100 / t.TotalSize()), nil
+	p := int(t.t.BytesCompleted() * 100 / t.TotalSize())
+	if p >= 100 {
+		p = 99
+	}
+	return 99, nil
 }
 
 func (t *Torrent) Stop() error {
