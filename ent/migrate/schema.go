@@ -83,7 +83,7 @@ var (
 		{Name: "indexer_id", Type: field.TypeInt, Nullable: true},
 		{Name: "link", Type: field.TypeString, Nullable: true},
 		{Name: "hash", Type: field.TypeString, Nullable: true},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"running", "success", "fail", "uploading", "seeding"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"running", "success", "fail", "uploading", "seeding", "removed"}},
 	}
 	// HistoriesTable holds the schema information for the "histories" table.
 	HistoriesTable = &schema.Table{

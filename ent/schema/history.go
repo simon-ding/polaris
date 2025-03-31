@@ -25,7 +25,7 @@ func (History) Fields() []ent.Field {
 		field.Int("indexer_id").Optional(),
 		field.String("link").Optional().Comment("deprecated, use hash instead"), //should be magnet link
 		field.String("hash").Optional().Comment("torrent hash"),
-		field.Enum("status").Values("running", "success", "fail", "uploading", "seeding"),
+		field.Enum("status").Values("running", "success", "fail", "uploading", "seeding", "removed"),
 		//field.String("saved").Optional().Comment("deprecated"), //deprecated
 	}
 }

@@ -499,7 +499,7 @@ func (c *Client) GetHistory(id int) *ent.History {
 }
 
 func (c *Client) DeleteHistory(id int) error {
-	_, err := c.ent.History.Delete().Where(history.ID(id)).Exec(context.Background())
+	 err := c.ent.History.Update().Where(history.ID(id)).SetStatus(history.StatusRemoved).Exec(context.Background())
 	return err
 }
 
