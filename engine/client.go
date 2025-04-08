@@ -20,7 +20,8 @@ func NewEngine(db *db.Client, language string) *Engine {
 	return &Engine{
 		db:       db,
 		cron:     cron.New(),
-		tasks:    make(map[int]*Task, 0),
+		tasks:    utils.Map[int, *Task]{},
+		schedulers: utils.Map[string, scheduler]{},
 		language: language,
 	}
 }
@@ -32,7 +33,7 @@ type scheduler struct {
 type Engine struct {
 	db         *db.Client
 	cron       *cron.Cron
-	tasks      map[int]*Task
+	tasks      utils.Map[int, *Task]
 	language   string
 	schedulers utils.Map[string, scheduler]
 }
@@ -59,7 +60,7 @@ func (c *Engine) reloadUsingBuildinDownloader(h *ent.History) error{
 	if err != nil {
 		return errors.Wrap(err, "download torrent")
 	}
-	c.tasks[h.ID] = &Task{Torrent: t}
+	c.tasks.Store(h.ID,  &Task{Torrent: t})
 	return nil
 }
 
@@ -93,7 +94,7 @@ func (c *Engine) reloadTasks() {
 					log.Warnf("get task error: %v", err)
 					continue
 				}
-				c.tasks[t.ID] = &Task{Torrent: to}
+				c.tasks.Store(t.ID, &Task{Torrent: to})
 			} else if t.Link != "" {
 				to, err := transmission.NewTorrent(transmission.Config{
 					URL:      dl.URL,
@@ -104,7 +105,7 @@ func (c *Engine) reloadTasks() {
 					log.Warnf("get task error: %v", err)
 					continue
 				}
-				c.tasks[t.ID] = &Task{Torrent: to}
+				c.tasks.Store(t.ID, &Task{Torrent: to})
 			}
 		} else if dl.Implementation == downloadclients.ImplementationQbittorrent {
 			if t.Hash != "" {
@@ -117,7 +118,7 @@ func (c *Engine) reloadTasks() {
 					log.Warnf("get task error: %v", err)
 					continue
 				}
-				c.tasks[t.ID] = &Task{Torrent: to}
+				c.tasks.Store(t.ID, &Task{Torrent: to})
 
 			} else if t.Link != "" {
 				to, err := qbittorrent.NewTorrent(qbittorrent.Info{
@@ -129,8 +130,7 @@ func (c *Engine) reloadTasks() {
 					log.Warnf("get task error: %v", err)
 					continue
 				}
-				c.tasks[t.ID] = &Task{Torrent: to}
-
+				c.tasks.Store(t.ID, &Task{Torrent: to})
 			}
 		}
 
@@ -200,16 +200,16 @@ func (c *Engine) MustTMDB() *tmdb.Client {
 }
 
 func (c *Engine) RemoveTaskAndTorrent(id int) error {
-	torrent := c.tasks[id]
-	if torrent != nil {
+	torrent, ok := c.tasks.Load(id)
+	if ok {
 		if err := torrent.Remove(); err != nil {
 			return errors.Wrap(err, "remove torrent")
 		}
-		delete(c.tasks, id)
+		c.tasks.Delete(id)
 	}
 	return nil
 }
 
-func (c *Engine) GetTasks() map[int]*Task {
+func (c *Engine) GetTasks() utils.Map[int, *Task] {
 	return c.tasks
 }

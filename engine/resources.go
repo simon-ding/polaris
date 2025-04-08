@@ -199,7 +199,7 @@ func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int,
 	}
 	torrent.Start()
 
-	c.tasks[history.ID] = &Task{Torrent: torrent}
+	c.tasks.Store(history.ID, &Task{Torrent: torrent})
 
 	c.sendMsg(fmt.Sprintf(message.BeginDownload, name))
 

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"polaris/engine"
 	"polaris/ent"
 	"polaris/ent/blacklist"
 	"polaris/ent/episode"
@@ -31,7 +32,8 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 			a := Activity{
 				History: h,
 			}
-			for id, task := range s.core.GetTasks() {
+			tasks := s.core.GetTasks()
+			tasks.Range(func(id int, task *engine.Task) bool {
 				if h.ID == id && task.Exists() {
 					p, err := task.Progress()
 					if err != nil {
@@ -49,7 +51,9 @@ func (s *Server) GetAllActivities(c *gin.Context) (interface{}, error) {
 						a.UploadProgress = task.UploadProgresser()
 					}
 				}
-			}
+				return true
+			})
+
 			activities = append(activities, a)
 		}
 	} else {

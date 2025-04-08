@@ -253,7 +253,7 @@ func (c *Engine) findEpisodeFilesPreMoving(historyId int) error {
 
 	episodeIds := c.GetEpisodeIds(his)
 
-	task := c.tasks[historyId]
+	task, _ := c.tasks.Load(historyId)
 
 	ff, err := c.db.GetAcceptedVideoFormats()
 	if err != nil {

@@ -65,46 +65,50 @@ func (c *Engine) TriggerCronJob(name string) error {
 
 func (c *Engine) checkTasks() error {
 	log.Debug("begin check tasks...")
-	for id, t := range c.tasks {
+	c.tasks.Range(func(id int, t *Task) bool {
 		r := c.db.GetHistory(id)
 		if !t.Exists() {
 			log.Infof("task no longer exists: %v", id)
 
-			delete(c.tasks, id)
-			continue
+			c.tasks.Delete(id)
+			return true
 		}
 		name, err := t.Name()
 		if err != nil {
-			return errors.Wrap(err, "get name")
+			log.Warnf("get task name error: %v", err)
+			return true
 		}
 
 		progress, err := t.Progress()
 		if err != nil {
-			return errors.Wrap(err, "get progress")
+			log.Warnf("get task progress error: %v", err)
+			return true
 		}
 		log.Infof("task (%s) percentage done: %d%%", name, progress)
 		if progress == 100 {
 
 			if r.Status == history.StatusSeeding {
 				//task already success, check seed ratio
-				torrent := c.tasks[id]
+				torrent, _ := c.tasks.Load(id)
 				ratio, ok := c.isSeedRatioLimitReached(r.IndexerID, torrent)
 				if ok {
 					log.Infof("torrent file seed ratio reached, remove: %v, current seed ratio: %v", name, ratio)
 					torrent.Remove()
-					delete(c.tasks, id)
+					c.tasks.Delete(id)
 					c.setHistoryStatus(id, history.StatusSuccess)
 				} else {
 					log.Infof("torrent file still sedding: %v, current seed ratio: %v", name, ratio)
 				}
-				continue
+				return true
 			} else if r.Status == history.StatusRunning {
 				log.Infof("task is done: %v", name)
 				c.sendMsg(fmt.Sprintf(message.DownloadComplete, name))
 				go c.postTaskProcessing(id)
 			}
 		}
-	}
+
+		return true
+	})
 	return nil
 }
 
@@ -232,7 +236,7 @@ func (c *Engine) GetEpisodeIds(r *ent.History) []int {
 }
 
 func (c *Engine) moveCompletedTask(id int) (err1 error) {
-	torrent := c.tasks[id]
+	torrent, _ := c.tasks.Load(id)
 	r := c.db.GetHistory(id)
 	// if r.Status == history.StatusUploading {
 	// 	log.Infof("task %d is already uploading, skip", id)
@@ -258,7 +262,7 @@ func (c *Engine) moveCompletedTask(id int) (err1 error) {
 			c.sendMsg(fmt.Sprintf(message.ProcessingFailed, err1))
 			if downloadclient.RemoveFailedDownloads {
 				log.Debugf("task failed, remove failed torrent and files related")
-				delete(c.tasks, r.ID)
+				c.tasks.Delete(r.ID)
 				torrent.Remove()
 			}
 		}
@@ -289,7 +293,7 @@ func (c *Engine) moveCompletedTask(id int) (err1 error) {
 	if downloadclient.RemoveCompletedDownloads && ok {
 		log.Debugf("download complete,remove torrent and files related, torrent: %v, seed ratio: %v", torrentName, r1)
 		c.setHistoryStatus(r.ID, history.StatusSuccess)
-		delete(c.tasks, r.ID)
+		c.tasks.Delete(r.ID)
 		torrent.Remove()
 	} else {
 		log.Infof("task complete but still needs seeding: %v", torrentName)
