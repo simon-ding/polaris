@@ -1,17 +1,12 @@
-package main
+package cmd
 
-import "C"
 import (
 	"polaris/db"
 	"polaris/log"
 	"polaris/server"
 )
 
-func main() {
-	Start()
-}
 
-//export Start
 func Start() {
 	log.Infof("------------------- Starting Polaris ---------------------")
 

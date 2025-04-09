@@ -15,7 +15,7 @@ RUN go mod download
 COPY . .
 
 # 指定OS等，并go build
-RUN CGO_ENABLED=0 go build -o polaris -ldflags="-X polaris/db.Version=$(git describe --tags --long) -X polaris/db.DefaultTmdbApiKey=$(echo $TMDB_API_KEY)"  ./cmd/ 
+RUN CGO_ENABLED=0 go build -o polaris -ldflags="-X polaris/db.Version=$(git describe --tags --long) -X polaris/db.DefaultTmdbApiKey=$(echo $TMDB_API_KEY)"  ./cmd/polaris
 
 FROM debian:stable-slim
 
