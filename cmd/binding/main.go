@@ -1,11 +1,8 @@
 package main
 
 import "C"
-import (
-	"polaris/db"
-	"polaris/log"
-	"polaris/server"
-)
+import "polaris/cmd"
+
 func main() {}
 
 //export Start
