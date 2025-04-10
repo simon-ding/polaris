@@ -1,15 +1,20 @@
 package cmd
 
 import (
+	"os"
 	"polaris/db"
 	"polaris/log"
 	"polaris/server"
 )
 
+func Start(sharedLib bool) {
+	if sharedLib || os.Getenv("GIN_MODE") == "release" {
+		log.InitLogger(true)
+	} else {
+		log.InitLogger(false)
+	}
 
-func Start() {
 	log.Infof("------------------- Starting Polaris ---------------------")
-
 	dbClient, err := db.Open()
 	if err != nil {
 		log.Panicf("init db error: %v", err)

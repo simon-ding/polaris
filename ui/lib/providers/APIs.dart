@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/providers/server_response.dart';
+import 'package:ui/widgets/utils.dart';
 
 class APIs {
   static final _baseUrl = baseUrl();
@@ -68,6 +69,9 @@ class APIs {
 
   static String baseUrl() {
     if (kReleaseMode) {
+      if (isDesktop()) {
+        return "http://127.0.0.1:8080";
+      }
       return "";
     }
     return "http://127.0.0.1:8080";

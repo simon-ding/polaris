@@ -3,5 +3,5 @@ package main
 import "polaris/cmd"
 
 func main() {
-	cmd.Start()
+	cmd.Start(false)
 }

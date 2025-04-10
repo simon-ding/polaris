@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:ui/activity.dart';
+import 'package:ui/ffi/backend.dart';
 import 'package:ui/init_wizard.dart';
 import 'package:ui/login_page.dart';
 import 'package:ui/movie_watchlist.dart';
@@ -15,7 +16,11 @@ import 'package:ui/tv_details.dart';
 import 'package:ui/welcome_page.dart';
 import 'package:ui/widgets/utils.dart';
 
-void main() {
+void main() async {
+  if (isDesktop()) {
+    FFIBackend().start();
+  }
+
   initializeDateFormatting()
       .then((_) => runApp(const ProviderScope(child: MyApp())));
 }

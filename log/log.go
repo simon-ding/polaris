@@ -15,12 +15,12 @@ var atom zap.AtomicLevel
 
 const dataPath = "./data"
 
-func init() {
+func InitLogger(toFile bool) {
 	atom = zap.NewAtomicLevel()
 	atom.SetLevel(zap.DebugLevel)
 
 	w := zapcore.Lock(os.Stdout)
-	if os.Getenv("GIN_MODE") == "release" {
+	if toFile {
 		w = zapcore.AddSync(&lumberjack.Logger{
 			Filename:   filepath.Join(dataPath, "logs", "polaris.log"),
 			MaxSize:    50, // megabytes

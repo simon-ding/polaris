@@ -20,7 +20,7 @@ type LogFile struct {
 func (s *Server) GetAllLogs(c *gin.Context) (interface{}, error) {
 	fs, err := os.ReadDir(db.LogPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "read log dir")
+		return []LogFile{}, nil
 	}
 	var logs []LogFile
 	for _, f := range fs {
