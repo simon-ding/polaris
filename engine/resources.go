@@ -125,13 +125,14 @@ func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int,
 		return nil, errors.Wrap(err, "get download client")
 	}
 
-	//check space available
 	downloadDir := c.db.GetDownloadDir()
-	size := utils.AvailableSpace(downloadDir)
-	if size < uint64(r1.Size) {
-		log.Errorf("space available %v, space needed %v", size, r1.Size)
-		return nil, errors.New("no enough space")
-	}
+	
+	//due to reported bug by user, this will be temporarily disabled
+	// size := utils.AvailableSpace(downloadDir)
+	// if size < uint64(r1.Size) {
+	// 	log.Errorf("space available %v, space needed %v", size, r1.Size)
+	// 	return nil, errors.New("not enough space")
+	// }
 
 	var name = r1.Name
 	var targetDir = m.TargetDir
