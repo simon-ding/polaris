@@ -69,7 +69,7 @@ class APIs {
 
   static String baseUrl() {
     if (kReleaseMode) {
-      if (isDesktop()) {
+      if (!kIsWeb) {
         return "http://127.0.0.1:8080";
       }
       return "";
