@@ -21,7 +21,7 @@
 
 ## 快速开始
 
-若要体验请确保本机有docker环境，然后执行：
+若要体验，请确保本机有docker环境，然后执行：
 
 ```bash
 docker run -p 8080:8080 ghcr.io/simon-ding/polaris:latest
