@@ -2,14 +2,14 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:ui/widgets/utils.dart' as Utils;
+import 'package:flutter/foundation.dart';
 
 
 class FFIBackend {
   final lib = DynamicLibrary.open(libname());
 
   static String libname() {
-    if (Utils.isDesktop()) {
+    if (!kIsWeb) {
       if (Platform.isWindows) {
         return 'libpolaris.dll';
       } else if (Platform.isLinux) {
