@@ -21,14 +21,14 @@
 
 ## 快速开始
 
-确保本机有docker环境，然后执行：
+若要体验请确保本机有docker环境，然后执行：
 
 ```bash
 docker run -p 8080:8080 ghcr.io/simon-ding/polaris:latest
 ```
 随后访问 http://127.0.0.1:8080 ，即可快速体验Polaris的功能
 
-详细教程请参考 [【快速开始】](./doc/quick_start.md)
+正式部署请参考 [【快速开始】](./doc/quick_start.md)
 
 ## Features
 
