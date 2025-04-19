@@ -150,7 +150,7 @@ func Search(indexer *ent.Indexers, keyWord string) ([]Result, error) {
 		log.Debugf("not found in cache, need query again: %v", key)
 		res, err := doRequest(req)
 		if err != nil {
-			cc.Set(key, nil)
+			//cc.Set(key, nil)
 			return nil, errors.Wrap(err, "do http request")
 		}
 		cacheRes = res.ToResults(indexer)
