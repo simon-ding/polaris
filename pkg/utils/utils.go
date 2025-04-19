@@ -222,9 +222,10 @@ func isWSL() bool {
 	return strings.Contains(strings.ToLower(string(releaseData)), "microsoft")
 }
 
-func Link2Hash(link string) (string, error) {
+func GetRealLinkAndHash(link string) (string, string, error) {
 	if strings.HasPrefix(strings.ToLower(link), "magnet:") {
-		return MagnetHash(link)
+		hash, err := MagnetHash(link)
+		return link, hash, err
 	}
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -234,19 +235,19 @@ func Link2Hash(link string) (string, error) {
 
 	resp, err := client.Get(link)
 	if err != nil {
-		return "", errors.Wrap(err, "get link")
+		return "", "", errors.Wrap(err, "get link")
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
 		//redirects
 		tourl := resp.Header.Get("Location")
-		return Link2Hash(tourl)
+		return GetRealLinkAndHash(tourl)
 	}
 	info, err := metainfo.Load(resp.Body)
 	if err != nil {
-		return "", errors.Wrap(err, "parse response")
+		return "", "", errors.Wrap(err, "parse response")
 	}
-	return info.HashInfoBytes().HexString(), nil
+	return link,info.HashInfoBytes().HexString(), nil
 }
 
 func Link2Magnet(link string) (string, error) {

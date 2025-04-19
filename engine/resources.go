@@ -172,10 +172,13 @@ func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int,
 		}
 
 	}
-	hash, err := utils.Link2Hash(r1.Link)
+	
+	link, hash, err := utils.GetRealLinkAndHash(r1.Link)
 	if err != nil {
 		return nil, errors.Wrap(err, "get hash")
 	}
+	r1.Link = link
+
 	history, err := c.db.SaveHistoryRecord(ent.History{
 		MediaID:     m.ID,
 		EpisodeNums: episodeNums,
