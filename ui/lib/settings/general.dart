@@ -47,7 +47,7 @@ class _GeneralState extends ConsumerState<GeneralSettings> {
                 FormBuilderTextField(
                   name: "tmdb_api",
                   decoration: const InputDecoration(
-                      labelText: "TMDB Api Key", icon: Icon(Icons.key), helperText: "未防止被限流，可以提供自定义的 TMDB Api Key"),
+                      labelText: "TMDB Api Key", icon: Icon(Icons.key), helperText: "为防止被限流，可以提供自定义的 TMDB Api Key"),
                   //
                 ),
                 FormBuilderTextField(
