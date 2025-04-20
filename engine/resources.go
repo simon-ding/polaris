@@ -165,7 +165,7 @@ func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, seasonNum int,
 			c.db.SetSeasonAllEpisodeStatus(m.ID, seasonNum, episode.StatusDownloading)
 		}
 
-	} else {
+	} else {//movie download
 		ep, _ := c.db.GetMovieDummyEpisode(m.ID)
 		if ep.Status == episode.StatusMissing {
 			c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)

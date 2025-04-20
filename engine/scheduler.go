@@ -204,35 +204,37 @@ func getSeasonNum(h *ent.History) int {
 }
 
 func (c *Engine) GetEpisodeIds(r *ent.History) []int {
-	var episodeIds []int
-	seasonNum := getSeasonNum(r)
 
-	// if r.EpisodeID > 0 {
-	// 	episodeIds = append(episodeIds, r.EpisodeID)
-	// }
 	series, err := c.db.GetMediaDetails(r.MediaID)
 	if err != nil {
 		log.Errorf("get media details error: %v", err)
 		return []int{}
 	}
+	if series.MediaType == media.MediaTypeMovie { //movie
+		ep, _ := c.db.GetMovieDummyEpisode(series.ID)
+		return []int{ep.ID}
+	} else { //tv
+		var episodeIds []int
+		seasonNum := getSeasonNum(r)
 
-	if len(r.EpisodeNums) > 0 {
-		for _, epNum := range r.EpisodeNums {
+		if len(r.EpisodeNums) > 0 {
+			for _, epNum := range r.EpisodeNums {
+				for _, ep := range series.Episodes {
+					if ep.SeasonNumber == seasonNum && ep.EpisodeNumber == epNum {
+						episodeIds = append(episodeIds, ep.ID)
+					}
+				}
+			}
+		} else {
 			for _, ep := range series.Episodes {
-				if ep.SeasonNumber == seasonNum && ep.EpisodeNumber == epNum {
+				if ep.SeasonNumber == seasonNum {
 					episodeIds = append(episodeIds, ep.ID)
 				}
 			}
-		}
-	} else {
-		for _, ep := range series.Episodes {
-			if ep.SeasonNumber == seasonNum {
-				episodeIds = append(episodeIds, ep.ID)
-			}
-		}
 
+		}
+		return episodeIds
 	}
-	return episodeIds
 }
 
 func (c *Engine) moveCompletedTask(id int) (err1 error) {
