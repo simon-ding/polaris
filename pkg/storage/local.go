@@ -48,7 +48,6 @@ func (l *LocalStorage) Copy(src, destDir string,walkFn WalkFn) error {
 			}
 
 		}
-		log.Infof("copy file %s to %s success", srcReader, destPath)
 		return nil
 	}
 	return b.Upload(baseDest, true, false, false, uploadFunc, func(s string) error {
