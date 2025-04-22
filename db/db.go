@@ -68,14 +68,14 @@ func (c *client) init() {
 		log.Infof("set default log level")
 		c.SetSetting(SettingLogLevel, "info")
 	}
-	if tr := c.GetAllDonloadClients(); len(tr) == 0 {
-		log.Warnf("no download client, set default download client")
-		c.SaveDownloader(&ent.DownloadClients{
-			Name:           "transmission",
-			Implementation: downloadclients.ImplementationTransmission,
-			URL:            "http://transmission:9091",
-		})
-	}
+	// if tr := c.GetAllDonloadClients(); len(tr) == 0 {
+	// 	log.Warnf("no download client, set default download client")
+	// 	c.SaveDownloader(&ent.DownloadClients{
+	// 		Name:           "transmission",
+	// 		Implementation: downloadclients.ImplementationTransmission,
+	// 		URL:            "http://transmission:9091",
+	// 	})
+	// }
 }
 
 func (c *client) generateJwtSerectIfNotExist() {
