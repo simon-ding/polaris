@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"polaris/log"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/pkg/errors"
@@ -30,6 +31,13 @@ func (l *LocalStorage) Copy(src, destDir string,walkFn WalkFn) error {
 
 	baseDest := filepath.Join(l.dir, destDir)
 	uploadFunc := func(destPath string, destInfo fs.FileInfo, srcReader io.Reader, mimeType *mimetype.MIME) error {
+		baseDir := filepath.Dir(destPath)
+		if _, err := os.Stat(baseDir); os.IsNotExist(err) {
+			if err := os.MkdirAll(baseDir, os.ModePerm); err != nil {
+				return errors.Wrapf(err, "create dir %s", baseDir)
+			}
+			log.Infof("create local dir %s", baseDir)
+		}
 		if writer, err := os.OpenFile(destPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm); err != nil {
 			return errors.Wrapf(err, "create file %s", destPath)
 		} else {
