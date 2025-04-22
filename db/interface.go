@@ -8,6 +8,40 @@ import (
 )
 
 type Database interface {
+	Settings
+
+	MediaApis
+
+	EpisodeApis
+
+	IndexerApis
+
+	HistoryApis
+
+	SaveDownloader(downloader *ent.DownloadClients) error
+	GetAllDonloadClients() []*ent.DownloadClients
+	DeleteDownloadCLient(id int)
+	GetDownloadClient(id int) (*ent.DownloadClients, error)
+
+	AddStorage(st *StorageInfo) error
+	GetAllStorage() []*ent.Storage
+	GetStorage(id int) *Storage
+	DeleteStorage(id int) error
+	SetDefaultStorage(id int) error
+	SetDefaultStorageByName(name string) error
+
+	GetAllImportLists() ([]*ent.ImportList, error)
+	AddImportlist(il *ent.ImportList) error
+	DeleteImportlist(id int) error
+
+	GetAllNotificationClients2() ([]*ent.NotificationClient, error)
+	GetAllNotificationClients() ([]*NotificationClient, error)
+	AddNotificationClient(name, service string, setting string, enabled bool) error
+	DeleteNotificationClient(id int) error
+	GetNotificationClient(id int) (*NotificationClient, error)
+}
+
+type Settings interface {
 	GetSetting(key string) string
 	SetSetting(key, value string) error
 	GetLanguage() string
@@ -22,6 +56,9 @@ type Database interface {
 	SetAcceptedSubtitleFormats(key string, v []string) error
 	GetTmdbApiKey() string
 
+}
+
+type MediaApis interface {
 	AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, error)
 	GetMediaWatchlist(mediaType media.MediaType) []*ent.Media
 	GetMediaDetails(id int) (*MediaDetails, error)
@@ -31,7 +68,9 @@ type Database interface {
 	EditMediaMetadata(in EditMediaData) error
 	GetSizeLimiter(mediaType string) (*MediaSizeLimiter, error)
 	SetSizeLimiter(mediaType string, limiter *MediaSizeLimiter) error
+}
 
+type EpisodeApis interface {
 	GetEpisode(seriesId, seasonNum, episodeNum int) (*ent.Episode, error)
 	GetEpisodeByID(epID int) (*ent.Episode, error)
 	UpdateEpiode(episodeId int, name, overview string) error
@@ -47,23 +86,17 @@ type Database interface {
 	GetSeasonEpisodes(mediaId, seasonNum int) ([]*ent.Episode, error)
 	CleanAllDanglingEpisodes() error
 
+}
+
+type IndexerApis interface {
 	SaveIndexer(in *ent.Indexers) error
 	DeleteIndexer(id int)
 	GetIndexer(id int) (*ent.Indexers, error)
 	GetAllIndexers() []*ent.Indexers
 
-	SaveDownloader(downloader *ent.DownloadClients) error
-	GetAllDonloadClients() []*ent.DownloadClients
-	DeleteDownloadCLient(id int)
-	GetDownloadClient(id int) (*ent.DownloadClients, error)
+}
 
-	AddStorage(st *StorageInfo) error
-	GetAllStorage() []*ent.Storage
-	GetStorage(id int) *Storage
-	DeleteStorage(id int) error
-	SetDefaultStorage(id int) error
-	SetDefaultStorageByName(name string) error
-
+type HistoryApis interface {
 	SaveHistoryRecord(h ent.History) (*ent.History, error)
 	SetHistoryStatus(id int, status history.Status) error
 	GetRunningHistories() ent.Histories
@@ -71,15 +104,5 @@ type Database interface {
 	GetHistories() ent.Histories
 	DeleteHistory(id int) error
 	GetDownloadHistory(mediaID int) ([]*ent.History, error)
-	GetMovieDummyEpisode(movieId int) (*ent.Episode, error)
-
-	GetAllImportLists() ([]*ent.ImportList, error)
-	AddImportlist(il *ent.ImportList) error
-	DeleteImportlist(id int) error
-
-	GetAllNotificationClients2() ([]*ent.NotificationClient, error)
-	GetAllNotificationClients() ([]*NotificationClient, error)
-	AddNotificationClient(name, service string, setting string, enabled bool) error
-	DeleteNotificationClient(id int) error
-	GetNotificationClient(id int) (*NotificationClient, error)
+	GetMovieDummyEpisode(movieId int) (*ent.Episode, error)	
 }
