@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -23,6 +25,7 @@ func (Episode) Fields() []ent.Field {
 		field.Enum("status").Values("missing", "downloading", "downloaded").Default("missing"),
 		field.Bool("monitored").Default(false).StructTag("json:\"monitored\""), //whether this episode is monitored
 		field.String("target_file").Optional(),
+		field.Time("create_time").Optional().Default(time.Now).Immutable(),
 	}
 }
 

@@ -4,6 +4,7 @@ package episode
 
 import (
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -32,6 +33,8 @@ const (
 	FieldMonitored = "monitored"
 	// FieldTargetFile holds the string denoting the target_file field in the database.
 	FieldTargetFile = "target_file"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// EdgeMedia holds the string denoting the media edge name in mutations.
 	EdgeMedia = "media"
 	// Table holds the table name of the episode in the database.
@@ -57,6 +60,7 @@ var Columns = []string{
 	FieldStatus,
 	FieldMonitored,
 	FieldTargetFile,
+	FieldCreateTime,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -72,6 +76,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultMonitored holds the default value on creation for the "monitored" field.
 	DefaultMonitored bool
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
 )
 
 // Status defines the type for the "status" enum field.
@@ -152,6 +158,11 @@ func ByMonitored(opts ...sql.OrderTermOption) OrderOption {
 // ByTargetFile orders the results by the target_file field.
 func ByTargetFile(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTargetFile, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
 // ByMediaField orders the results by media field.

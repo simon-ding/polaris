@@ -278,6 +278,9 @@ func (eu *EpisodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if eu.mutation.TargetFileCleared() {
 		_spec.ClearField(episode.FieldTargetFile, field.TypeString)
 	}
+	if eu.mutation.CreateTimeCleared() {
+		_spec.ClearField(episode.FieldCreateTime, field.TypeTime)
+	}
 	if eu.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -606,6 +609,9 @@ func (euo *EpisodeUpdateOne) sqlSave(ctx context.Context) (_node *Episode, err e
 	}
 	if euo.mutation.TargetFileCleared() {
 		_spec.ClearField(episode.FieldTargetFile, field.TypeString)
+	}
+	if euo.mutation.CreateTimeCleared() {
+		_spec.ClearField(episode.FieldCreateTime, field.TypeTime)
 	}
 	if euo.mutation.MediaCleared() {
 		edge := &sqlgraph.EdgeSpec{

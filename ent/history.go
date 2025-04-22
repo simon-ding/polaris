@@ -41,7 +41,9 @@ type History struct {
 	// torrent hash
 	Hash string `json:"hash,omitempty"`
 	// Status holds the value of the "status" field.
-	Status       history.Status `json:"status,omitempty"`
+	Status history.Status `json:"status,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime   time.Time `json:"create_time,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -56,7 +58,7 @@ func (*History) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case history.FieldSourceTitle, history.FieldTargetDir, history.FieldLink, history.FieldHash, history.FieldStatus:
 			values[i] = new(sql.NullString)
-		case history.FieldDate:
+		case history.FieldDate, history.FieldCreateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -153,6 +155,12 @@ func (h *History) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				h.Status = history.Status(value.String)
 			}
+		case history.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				h.CreateTime = value.Time
+			}
 		default:
 			h.selectValues.Set(columns[i], values[i])
 		}
@@ -224,6 +232,9 @@ func (h *History) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", h.Status))
+	builder.WriteString(", ")
+	builder.WriteString("create_time=")
+	builder.WriteString(h.CreateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

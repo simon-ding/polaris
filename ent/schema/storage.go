@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -20,6 +22,7 @@ func (Storage) Fields() []ent.Field {
 		field.String("settings").Optional(),
 		field.Bool("deleted").Default(false),
 		field.Bool("default").Default(false),
+		field.Time("create_time").Optional().Default(time.Now).Immutable(),
 	}
 }
 

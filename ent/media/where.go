@@ -110,6 +110,11 @@ func DownloadHistoryEpisodes(v bool) predicate.Media {
 	return predicate.Media(sql.FieldEQ(FieldDownloadHistoryEpisodes, v))
 }
 
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Media {
+	return predicate.Media(sql.FieldEQ(FieldCreateTime, v))
+}
+
 // TmdbIDEQ applies the EQ predicate on the "tmdb_id" field.
 func TmdbIDEQ(v int) predicate.Media {
 	return predicate.Media(sql.FieldEQ(FieldTmdbID, v))
@@ -803,6 +808,56 @@ func AlternativeTitlesIsNil() predicate.Media {
 // AlternativeTitlesNotNil applies the NotNil predicate on the "alternative_titles" field.
 func AlternativeTitlesNotNil() predicate.Media {
 	return predicate.Media(sql.FieldNotNull(FieldAlternativeTitles))
+}
+
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Media {
+	return predicate.Media(sql.FieldEQ(FieldCreateTime, v))
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Media {
+	return predicate.Media(sql.FieldNEQ(FieldCreateTime, v))
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Media {
+	return predicate.Media(sql.FieldIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Media {
+	return predicate.Media(sql.FieldNotIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Media {
+	return predicate.Media(sql.FieldGT(FieldCreateTime, v))
+}
+
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Media {
+	return predicate.Media(sql.FieldGTE(FieldCreateTime, v))
+}
+
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Media {
+	return predicate.Media(sql.FieldLT(FieldCreateTime, v))
+}
+
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Media {
+	return predicate.Media(sql.FieldLTE(FieldCreateTime, v))
+}
+
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.Media {
+	return predicate.Media(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.Media {
+	return predicate.Media(sql.FieldNotNull(FieldCreateTime))
 }
 
 // HasEpisodes applies the HasEdge predicate on the "episodes" edge.

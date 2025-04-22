@@ -51,6 +51,8 @@ type Media struct {
 	Extras schema.MediaExtras `json:"extras,omitempty"`
 	// AlternativeTitles holds the value of the "alternative_titles" field.
 	AlternativeTitles []schema.AlternativeTilte `json:"alternative_titles,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MediaQuery when eager-loading is set.
 	Edges        MediaEdges `json:"edges"`
@@ -88,7 +90,7 @@ func (*Media) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case media.FieldImdbID, media.FieldMediaType, media.FieldNameCn, media.FieldNameEn, media.FieldOriginalName, media.FieldOverview, media.FieldAirDate, media.FieldResolution, media.FieldTargetDir:
 			values[i] = new(sql.NullString)
-		case media.FieldCreatedAt:
+		case media.FieldCreatedAt, media.FieldCreateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -213,6 +215,12 @@ func (m *Media) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field alternative_titles: %w", err)
 				}
 			}
+		case media.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				m.CreateTime = value.Time
+			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -301,6 +309,9 @@ func (m *Media) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("alternative_titles=")
 	builder.WriteString(fmt.Sprintf("%v", m.AlternativeTitles))
+	builder.WriteString(", ")
+	builder.WriteString("create_time=")
+	builder.WriteString(m.CreateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

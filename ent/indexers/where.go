@@ -4,6 +4,7 @@ package indexers
 
 import (
 	"polaris/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -111,6 +112,11 @@ func URL(v string) predicate.Indexers {
 // Synced applies equality check predicate on the "synced" field. It's identical to SyncedEQ.
 func Synced(v bool) predicate.Indexers {
 	return predicate.Indexers(sql.FieldEQ(FieldSynced, v))
+}
+
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldCreateTime, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -646,6 +652,56 @@ func SyncedIsNil() predicate.Indexers {
 // SyncedNotNil applies the NotNil predicate on the "synced" field.
 func SyncedNotNil() predicate.Indexers {
 	return predicate.Indexers(sql.FieldNotNull(FieldSynced))
+}
+
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldEQ(FieldCreateTime, v))
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNEQ(FieldCreateTime, v))
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGT(FieldCreateTime, v))
+}
+
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldGTE(FieldCreateTime, v))
+}
+
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLT(FieldCreateTime, v))
+}
+
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Indexers {
+	return predicate.Indexers(sql.FieldLTE(FieldCreateTime, v))
+}
+
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.Indexers {
+	return predicate.Indexers(sql.FieldNotNull(FieldCreateTime))
 }
 
 // And groups predicates with the AND operator between them.

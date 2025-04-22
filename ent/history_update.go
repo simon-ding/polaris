@@ -394,6 +394,9 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := hu.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
 	}
+	if hu.mutation.CreateTimeCleared() {
+		_spec.ClearField(history.FieldCreateTime, field.TypeTime)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, hu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{history.Label}
@@ -808,6 +811,9 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 	}
 	if value, ok := huo.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
+	}
+	if huo.mutation.CreateTimeCleared() {
+		_spec.ClearField(history.FieldCreateTime, field.TypeTime)
 	}
 	_node = &History{config: huo.config}
 	_spec.Assign = _node.assignValues

@@ -484,6 +484,9 @@ func (mu *MediaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mu.mutation.AlternativeTitlesCleared() {
 		_spec.ClearField(media.FieldAlternativeTitles, field.TypeJSON)
 	}
+	if mu.mutation.CreateTimeCleared() {
+		_spec.ClearField(media.FieldCreateTime, field.TypeTime)
+	}
 	if mu.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -1031,6 +1034,9 @@ func (muo *MediaUpdateOne) sqlSave(ctx context.Context) (_node *Media, err error
 	}
 	if muo.mutation.AlternativeTitlesCleared() {
 		_spec.ClearField(media.FieldAlternativeTitles, field.TypeJSON)
+	}
+	if muo.mutation.CreateTimeCleared() {
+		_spec.ClearField(media.FieldCreateTime, field.TypeTime)
 	}
 	if muo.mutation.EpisodesCleared() {
 		edge := &sqlgraph.EdgeSpec{

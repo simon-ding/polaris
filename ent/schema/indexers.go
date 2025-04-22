@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -25,6 +27,7 @@ func (Indexers) Fields() []ent.Field {
 		field.String("api_key").Optional(),
 		field.String("url").Optional(),
 		field.Bool("synced").Optional().Default(false).Comment("synced from prowlarr"),
+		field.Time("create_time").Optional().Default(time.Now).Immutable(),
 	}
 }
 

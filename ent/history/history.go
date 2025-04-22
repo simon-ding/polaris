@@ -4,6 +4,7 @@ package history
 
 import (
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -37,6 +38,8 @@ const (
 	FieldHash = "hash"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// Table holds the table name of the history in the database.
 	Table = "histories"
 )
@@ -56,6 +59,7 @@ var Columns = []string{
 	FieldLink,
 	FieldHash,
 	FieldStatus,
+	FieldCreateTime,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -71,6 +75,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultSize holds the default value on creation for the "size" field.
 	DefaultSize int
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
 )
 
 // Status defines the type for the "status" enum field.
@@ -161,4 +167,9 @@ func ByHash(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }

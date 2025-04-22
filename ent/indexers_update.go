@@ -364,6 +364,9 @@ func (iu *IndexersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if iu.mutation.SyncedCleared() {
 		_spec.ClearField(indexers.FieldSynced, field.TypeBool)
 	}
+	if iu.mutation.CreateTimeCleared() {
+		_spec.ClearField(indexers.FieldCreateTime, field.TypeTime)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{indexers.Label}
@@ -750,6 +753,9 @@ func (iuo *IndexersUpdateOne) sqlSave(ctx context.Context) (_node *Indexers, err
 	}
 	if iuo.mutation.SyncedCleared() {
 		_spec.ClearField(indexers.FieldSynced, field.TypeBool)
+	}
+	if iuo.mutation.CreateTimeCleared() {
+		_spec.ClearField(indexers.FieldCreateTime, field.TypeTime)
 	}
 	_node = &Indexers{config: iuo.config}
 	_spec.Assign = _node.assignValues

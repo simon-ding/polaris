@@ -2,6 +2,7 @@ package schema
 
 import (
 	"errors"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
@@ -34,6 +35,7 @@ func (DownloadClients) Fields() []ent.Field {
 		field.Bool("remove_completed_downloads").Default(true),
 		field.Bool("remove_failed_downloads").Default(true),
 		field.String("tags").Default(""),
+		field.Time("create_time").Optional().Default(time.Now).Immutable(),
 	}
 }
 

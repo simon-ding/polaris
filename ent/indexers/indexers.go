@@ -3,6 +3,8 @@
 package indexers
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -35,6 +37,8 @@ const (
 	FieldURL = "url"
 	// FieldSynced holds the string denoting the synced field in the database.
 	FieldSynced = "synced"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// Table holds the table name of the indexers in the database.
 	Table = "indexers"
 )
@@ -54,6 +58,7 @@ var Columns = []string{
 	FieldAPIKey,
 	FieldURL,
 	FieldSynced,
+	FieldCreateTime,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -83,6 +88,8 @@ var (
 	DefaultMovieSearch bool
 	// DefaultSynced holds the default value on creation for the "synced" field.
 	DefaultSynced bool
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
 )
 
 // OrderOption defines the ordering options for the Indexers queries.
@@ -151,4 +158,9 @@ func ByURL(opts ...sql.OrderTermOption) OrderOption {
 // BySynced orders the results by the synced field.
 func BySynced(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSynced, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }

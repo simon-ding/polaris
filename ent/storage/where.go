@@ -4,6 +4,7 @@ package storage
 
 import (
 	"polaris/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -81,6 +82,11 @@ func Deleted(v bool) predicate.Storage {
 // Default applies equality check predicate on the "default" field. It's identical to DefaultEQ.
 func Default(v bool) predicate.Storage {
 	return predicate.Storage(sql.FieldEQ(FieldDefault, v))
+}
+
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldCreateTime, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -411,6 +417,56 @@ func DefaultEQ(v bool) predicate.Storage {
 // DefaultNEQ applies the NEQ predicate on the "default" field.
 func DefaultNEQ(v bool) predicate.Storage {
 	return predicate.Storage(sql.FieldNEQ(FieldDefault, v))
+}
+
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldEQ(FieldCreateTime, v))
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldNEQ(FieldCreateTime, v))
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldNotIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldGT(FieldCreateTime, v))
+}
+
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldGTE(FieldCreateTime, v))
+}
+
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldLT(FieldCreateTime, v))
+}
+
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Storage {
+	return predicate.Storage(sql.FieldLTE(FieldCreateTime, v))
+}
+
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.Storage {
+	return predicate.Storage(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.Storage {
+	return predicate.Storage(sql.FieldNotNull(FieldCreateTime))
 }
 
 // And groups predicates with the AND operator between them.

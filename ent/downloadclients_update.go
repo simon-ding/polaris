@@ -283,6 +283,9 @@ func (dcu *DownloadClientsUpdate) sqlSave(ctx context.Context) (n int, err error
 	if value, ok := dcu.mutation.Tags(); ok {
 		_spec.SetField(downloadclients.FieldTags, field.TypeString, value)
 	}
+	if dcu.mutation.CreateTimeCleared() {
+		_spec.ClearField(downloadclients.FieldCreateTime, field.TypeTime)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, dcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{downloadclients.Label}
@@ -588,6 +591,9 @@ func (dcuo *DownloadClientsUpdateOne) sqlSave(ctx context.Context) (_node *Downl
 	}
 	if value, ok := dcuo.mutation.Tags(); ok {
 		_spec.SetField(downloadclients.FieldTags, field.TypeString, value)
+	}
+	if dcuo.mutation.CreateTimeCleared() {
+		_spec.ClearField(downloadclients.FieldCreateTime, field.TypeTime)
 	}
 	_node = &DownloadClients{config: dcuo.config}
 	_spec.Assign = _node.assignValues

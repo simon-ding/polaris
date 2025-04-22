@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"polaris/ent/episode"
 	"polaris/ent/media"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -106,6 +107,20 @@ func (ec *EpisodeCreate) SetNillableTargetFile(s *string) *EpisodeCreate {
 	return ec
 }
 
+// SetCreateTime sets the "create_time" field.
+func (ec *EpisodeCreate) SetCreateTime(t time.Time) *EpisodeCreate {
+	ec.mutation.SetCreateTime(t)
+	return ec
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (ec *EpisodeCreate) SetNillableCreateTime(t *time.Time) *EpisodeCreate {
+	if t != nil {
+		ec.SetCreateTime(*t)
+	}
+	return ec
+}
+
 // SetMedia sets the "media" edge to the Media entity.
 func (ec *EpisodeCreate) SetMedia(m *Media) *EpisodeCreate {
 	return ec.SetMediaID(m.ID)
@@ -153,6 +168,10 @@ func (ec *EpisodeCreate) defaults() {
 	if _, ok := ec.mutation.Monitored(); !ok {
 		v := episode.DefaultMonitored
 		ec.mutation.SetMonitored(v)
+	}
+	if _, ok := ec.mutation.CreateTime(); !ok {
+		v := episode.DefaultCreateTime()
+		ec.mutation.SetCreateTime(v)
 	}
 }
 
@@ -241,6 +260,10 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.TargetFile(); ok {
 		_spec.SetField(episode.FieldTargetFile, field.TypeString, value)
 		_node.TargetFile = value
+	}
+	if value, ok := ec.mutation.CreateTime(); ok {
+		_spec.SetField(episode.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
 	if nodes := ec.mutation.MediaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

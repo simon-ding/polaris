@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/storage"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -101,6 +102,20 @@ func (sc *StorageCreate) SetNillableDefault(b *bool) *StorageCreate {
 	return sc
 }
 
+// SetCreateTime sets the "create_time" field.
+func (sc *StorageCreate) SetCreateTime(t time.Time) *StorageCreate {
+	sc.mutation.SetCreateTime(t)
+	return sc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (sc *StorageCreate) SetNillableCreateTime(t *time.Time) *StorageCreate {
+	if t != nil {
+		sc.SetCreateTime(*t)
+	}
+	return sc
+}
+
 // Mutation returns the StorageMutation object of the builder.
 func (sc *StorageCreate) Mutation() *StorageMutation {
 	return sc.mutation
@@ -143,6 +158,10 @@ func (sc *StorageCreate) defaults() {
 	if _, ok := sc.mutation.Default(); !ok {
 		v := storage.DefaultDefault
 		sc.mutation.SetDefault(v)
+	}
+	if _, ok := sc.mutation.CreateTime(); !ok {
+		v := storage.DefaultCreateTime()
+		sc.mutation.SetCreateTime(v)
 	}
 }
 
@@ -218,6 +237,10 @@ func (sc *StorageCreate) createSpec() (*Storage, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Default(); ok {
 		_spec.SetField(storage.FieldDefault, field.TypeBool, value)
 		_node.Default = value
+	}
+	if value, ok := sc.mutation.CreateTime(); ok {
+		_spec.SetField(storage.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
 	return _node, _spec
 }

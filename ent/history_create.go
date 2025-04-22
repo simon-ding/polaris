@@ -140,6 +140,20 @@ func (hc *HistoryCreate) SetStatus(h history.Status) *HistoryCreate {
 	return hc
 }
 
+// SetCreateTime sets the "create_time" field.
+func (hc *HistoryCreate) SetCreateTime(t time.Time) *HistoryCreate {
+	hc.mutation.SetCreateTime(t)
+	return hc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (hc *HistoryCreate) SetNillableCreateTime(t *time.Time) *HistoryCreate {
+	if t != nil {
+		hc.SetCreateTime(*t)
+	}
+	return hc
+}
+
 // Mutation returns the HistoryMutation object of the builder.
 func (hc *HistoryCreate) Mutation() *HistoryMutation {
 	return hc.mutation
@@ -178,6 +192,10 @@ func (hc *HistoryCreate) defaults() {
 	if _, ok := hc.mutation.Size(); !ok {
 		v := history.DefaultSize
 		hc.mutation.SetSize(v)
+	}
+	if _, ok := hc.mutation.CreateTime(); !ok {
+		v := history.DefaultCreateTime()
+		hc.mutation.SetCreateTime(v)
 	}
 }
 
@@ -279,6 +297,10 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 	if value, ok := hc.mutation.Status(); ok {
 		_spec.SetField(history.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := hc.mutation.CreateTime(); ok {
+		_spec.SetField(history.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
 	return _node, _spec
 }

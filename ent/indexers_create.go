@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/indexers"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -171,6 +172,20 @@ func (ic *IndexersCreate) SetNillableSynced(b *bool) *IndexersCreate {
 	return ic
 }
 
+// SetCreateTime sets the "create_time" field.
+func (ic *IndexersCreate) SetCreateTime(t time.Time) *IndexersCreate {
+	ic.mutation.SetCreateTime(t)
+	return ic
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (ic *IndexersCreate) SetNillableCreateTime(t *time.Time) *IndexersCreate {
+	if t != nil {
+		ic.SetCreateTime(*t)
+	}
+	return ic
+}
+
 // Mutation returns the IndexersMutation object of the builder.
 func (ic *IndexersCreate) Mutation() *IndexersMutation {
 	return ic.mutation
@@ -237,6 +252,10 @@ func (ic *IndexersCreate) defaults() {
 	if _, ok := ic.mutation.Synced(); !ok {
 		v := indexers.DefaultSynced
 		ic.mutation.SetSynced(v)
+	}
+	if _, ok := ic.mutation.CreateTime(); !ok {
+		v := indexers.DefaultCreateTime()
+		ic.mutation.SetCreateTime(v)
 	}
 }
 
@@ -327,6 +346,10 @@ func (ic *IndexersCreate) createSpec() (*Indexers, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Synced(); ok {
 		_spec.SetField(indexers.FieldSynced, field.TypeBool, value)
 		_node.Synced = value
+	}
+	if value, ok := ic.mutation.CreateTime(); ok {
+		_spec.SetField(indexers.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
 	return _node, _spec
 }

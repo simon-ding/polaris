@@ -4,6 +4,7 @@ package downloadclients
 
 import (
 	"polaris/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -101,6 +102,11 @@ func RemoveFailedDownloads(v bool) predicate.DownloadClients {
 // Tags applies equality check predicate on the "tags" field. It's identical to TagsEQ.
 func Tags(v string) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldEQ(FieldTags, v))
+}
+
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldCreateTime, v))
 }
 
 // EnableEQ applies the EQ predicate on the "enable" field.
@@ -581,6 +587,56 @@ func TagsEqualFold(v string) predicate.DownloadClients {
 // TagsContainsFold applies the ContainsFold predicate on the "tags" field.
 func TagsContainsFold(v string) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldContainsFold(FieldTags, v))
+}
+
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldCreateTime, v))
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNEQ(FieldCreateTime, v))
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNotIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGT(FieldCreateTime, v))
+}
+
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldGTE(FieldCreateTime, v))
+}
+
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLT(FieldCreateTime, v))
+}
+
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldLTE(FieldCreateTime, v))
+}
+
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNotNull(FieldCreateTime))
 }
 
 // And groups predicates with the AND operator between them.

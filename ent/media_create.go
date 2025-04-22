@@ -190,6 +190,20 @@ func (mc *MediaCreate) SetAlternativeTitles(st []schema.AlternativeTilte) *Media
 	return mc
 }
 
+// SetCreateTime sets the "create_time" field.
+func (mc *MediaCreate) SetCreateTime(t time.Time) *MediaCreate {
+	mc.mutation.SetCreateTime(t)
+	return mc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (mc *MediaCreate) SetNillableCreateTime(t *time.Time) *MediaCreate {
+	if t != nil {
+		mc.SetCreateTime(*t)
+	}
+	return mc
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by IDs.
 func (mc *MediaCreate) AddEpisodeIDs(ids ...int) *MediaCreate {
 	mc.mutation.AddEpisodeIDs(ids...)
@@ -255,6 +269,10 @@ func (mc *MediaCreate) defaults() {
 	if _, ok := mc.mutation.DownloadHistoryEpisodes(); !ok {
 		v := media.DefaultDownloadHistoryEpisodes
 		mc.mutation.SetDownloadHistoryEpisodes(v)
+	}
+	if _, ok := mc.mutation.CreateTime(); !ok {
+		v := media.DefaultCreateTime()
+		mc.mutation.SetCreateTime(v)
 	}
 }
 
@@ -386,6 +404,10 @@ func (mc *MediaCreate) createSpec() (*Media, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.AlternativeTitles(); ok {
 		_spec.SetField(media.FieldAlternativeTitles, field.TypeJSON, value)
 		_node.AlternativeTitles = value
+	}
+	if value, ok := mc.mutation.CreateTime(); ok {
+		_spec.SetField(media.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
 	if nodes := mc.mutation.EpisodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

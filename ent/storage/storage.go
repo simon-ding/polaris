@@ -4,6 +4,7 @@ package storage
 
 import (
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -27,6 +28,8 @@ const (
 	FieldDeleted = "deleted"
 	// FieldDefault holds the string denoting the default field in the database.
 	FieldDefault = "default"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// Table holds the table name of the storage in the database.
 	Table = "storages"
 )
@@ -41,6 +44,7 @@ var Columns = []string{
 	FieldSettings,
 	FieldDeleted,
 	FieldDefault,
+	FieldCreateTime,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -58,6 +62,8 @@ var (
 	DefaultDeleted bool
 	// DefaultDefault holds the default value on creation for the "default" field.
 	DefaultDefault bool
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
 )
 
 // Implementation defines the type for the "implementation" enum field.
@@ -125,4 +131,9 @@ func ByDeleted(opts ...sql.OrderTermOption) OrderOption {
 // ByDefault orders the results by the default field.
 func ByDefault(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDefault, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }

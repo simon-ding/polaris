@@ -47,6 +47,8 @@ const (
 	FieldExtras = "extras"
 	// FieldAlternativeTitles holds the string denoting the alternative_titles field in the database.
 	FieldAlternativeTitles = "alternative_titles"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// EdgeEpisodes holds the string denoting the episodes edge name in mutations.
 	EdgeEpisodes = "episodes"
 	// Table holds the table name of the media in the database.
@@ -79,6 +81,7 @@ var Columns = []string{
 	FieldLimiter,
 	FieldExtras,
 	FieldAlternativeTitles,
+	FieldCreateTime,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -98,6 +101,8 @@ var (
 	DefaultAirDate string
 	// DefaultDownloadHistoryEpisodes holds the default value on creation for the "download_history_episodes" field.
 	DefaultDownloadHistoryEpisodes bool
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
 )
 
 // MediaType defines the type for the "media_type" enum field.
@@ -222,6 +227,11 @@ func ByTargetDir(opts ...sql.OrderTermOption) OrderOption {
 // ByDownloadHistoryEpisodes orders the results by the download_history_episodes field.
 func ByDownloadHistoryEpisodes(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDownloadHistoryEpisodes, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
 // ByEpisodesCount orders the results by episodes count.

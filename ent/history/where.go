@@ -104,6 +104,11 @@ func Hash(v string) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldHash, v))
 }
 
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldCreateTime, v))
+}
+
 // MediaIDEQ applies the EQ predicate on the "media_id" field.
 func MediaIDEQ(v int) predicate.History {
 	return predicate.History(sql.FieldEQ(FieldMediaID, v))
@@ -682,6 +687,56 @@ func StatusIn(vs ...Status) predicate.History {
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.History {
 	return predicate.History(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.History {
+	return predicate.History(sql.FieldEQ(FieldCreateTime, v))
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.History {
+	return predicate.History(sql.FieldNEQ(FieldCreateTime, v))
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.History {
+	return predicate.History(sql.FieldIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.History {
+	return predicate.History(sql.FieldNotIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.History {
+	return predicate.History(sql.FieldGT(FieldCreateTime, v))
+}
+
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.History {
+	return predicate.History(sql.FieldGTE(FieldCreateTime, v))
+}
+
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.History {
+	return predicate.History(sql.FieldLT(FieldCreateTime, v))
+}
+
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.History {
+	return predicate.History(sql.FieldLTE(FieldCreateTime, v))
+}
+
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.History {
+	return predicate.History(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.History {
+	return predicate.History(sql.FieldNotNull(FieldCreateTime))
 }
 
 // And groups predicates with the AND operator between them.

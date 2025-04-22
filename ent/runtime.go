@@ -57,18 +57,30 @@ func init() {
 	downloadclientsDescTags := downloadclientsFields[10].Descriptor()
 	// downloadclients.DefaultTags holds the default value on creation for the tags field.
 	downloadclients.DefaultTags = downloadclientsDescTags.Default.(string)
+	// downloadclientsDescCreateTime is the schema descriptor for create_time field.
+	downloadclientsDescCreateTime := downloadclientsFields[11].Descriptor()
+	// downloadclients.DefaultCreateTime holds the default value on creation for the create_time field.
+	downloadclients.DefaultCreateTime = downloadclientsDescCreateTime.Default.(func() time.Time)
 	episodeFields := schema.Episode{}.Fields()
 	_ = episodeFields
 	// episodeDescMonitored is the schema descriptor for monitored field.
 	episodeDescMonitored := episodeFields[7].Descriptor()
 	// episode.DefaultMonitored holds the default value on creation for the monitored field.
 	episode.DefaultMonitored = episodeDescMonitored.Default.(bool)
+	// episodeDescCreateTime is the schema descriptor for create_time field.
+	episodeDescCreateTime := episodeFields[9].Descriptor()
+	// episode.DefaultCreateTime holds the default value on creation for the create_time field.
+	episode.DefaultCreateTime = episodeDescCreateTime.Default.(func() time.Time)
 	historyFields := schema.History{}.Fields()
 	_ = historyFields
 	// historyDescSize is the schema descriptor for size field.
 	historyDescSize := historyFields[6].Descriptor()
 	// history.DefaultSize holds the default value on creation for the size field.
 	history.DefaultSize = historyDescSize.Default.(int)
+	// historyDescCreateTime is the schema descriptor for create_time field.
+	historyDescCreateTime := historyFields[12].Descriptor()
+	// history.DefaultCreateTime holds the default value on creation for the create_time field.
+	history.DefaultCreateTime = historyDescCreateTime.Default.(func() time.Time)
 	indexersFields := schema.Indexers{}.Fields()
 	_ = indexersFields
 	// indexersDescSettings is the schema descriptor for settings field.
@@ -103,6 +115,10 @@ func init() {
 	indexersDescSynced := indexersFields[11].Descriptor()
 	// indexers.DefaultSynced holds the default value on creation for the synced field.
 	indexers.DefaultSynced = indexersDescSynced.Default.(bool)
+	// indexersDescCreateTime is the schema descriptor for create_time field.
+	indexersDescCreateTime := indexersFields[12].Descriptor()
+	// indexers.DefaultCreateTime holds the default value on creation for the create_time field.
+	indexers.DefaultCreateTime = indexersDescCreateTime.Default.(func() time.Time)
 	mediaFields := schema.Media{}.Fields()
 	_ = mediaFields
 	// mediaDescCreatedAt is the schema descriptor for created_at field.
@@ -117,6 +133,10 @@ func init() {
 	mediaDescDownloadHistoryEpisodes := mediaFields[12].Descriptor()
 	// media.DefaultDownloadHistoryEpisodes holds the default value on creation for the download_history_episodes field.
 	media.DefaultDownloadHistoryEpisodes = mediaDescDownloadHistoryEpisodes.Default.(bool)
+	// mediaDescCreateTime is the schema descriptor for create_time field.
+	mediaDescCreateTime := mediaFields[16].Descriptor()
+	// media.DefaultCreateTime holds the default value on creation for the create_time field.
+	media.DefaultCreateTime = mediaDescCreateTime.Default.(func() time.Time)
 	notificationclientFields := schema.NotificationClient{}.Fields()
 	_ = notificationclientFields
 	// notificationclientDescEnabled is the schema descriptor for enabled field.
@@ -133,4 +153,8 @@ func init() {
 	storageDescDefault := storageFields[6].Descriptor()
 	// storage.DefaultDefault holds the default value on creation for the default field.
 	storage.DefaultDefault = storageDescDefault.Default.(bool)
+	// storageDescCreateTime is the schema descriptor for create_time field.
+	storageDescCreateTime := storageFields[7].Descriptor()
+	// storage.DefaultCreateTime holds the default value on creation for the create_time field.
+	storage.DefaultCreateTime = storageDescCreateTime.Default.(func() time.Time)
 }

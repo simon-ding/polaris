@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/downloadclients"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -141,6 +142,20 @@ func (dcc *DownloadClientsCreate) SetNillableTags(s *string) *DownloadClientsCre
 	return dcc
 }
 
+// SetCreateTime sets the "create_time" field.
+func (dcc *DownloadClientsCreate) SetCreateTime(t time.Time) *DownloadClientsCreate {
+	dcc.mutation.SetCreateTime(t)
+	return dcc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillableCreateTime(t *time.Time) *DownloadClientsCreate {
+	if t != nil {
+		dcc.SetCreateTime(*t)
+	}
+	return dcc
+}
+
 // Mutation returns the DownloadClientsMutation object of the builder.
 func (dcc *DownloadClientsCreate) Mutation() *DownloadClientsMutation {
 	return dcc.mutation
@@ -203,6 +218,10 @@ func (dcc *DownloadClientsCreate) defaults() {
 	if _, ok := dcc.mutation.Tags(); !ok {
 		v := downloadclients.DefaultTags
 		dcc.mutation.SetTags(v)
+	}
+	if _, ok := dcc.mutation.CreateTime(); !ok {
+		v := downloadclients.DefaultCreateTime()
+		dcc.mutation.SetCreateTime(v)
 	}
 }
 
@@ -320,6 +339,10 @@ func (dcc *DownloadClientsCreate) createSpec() (*DownloadClients, *sqlgraph.Crea
 	if value, ok := dcc.mutation.Tags(); ok {
 		_spec.SetField(downloadclients.FieldTags, field.TypeString, value)
 		_node.Tags = value
+	}
+	if value, ok := dcc.mutation.CreateTime(); ok {
+		_spec.SetField(downloadclients.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
 	return _node, _spec
 }

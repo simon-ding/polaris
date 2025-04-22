@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"polaris/ent/storage"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -29,7 +30,9 @@ type Storage struct {
 	// Deleted holds the value of the "deleted" field.
 	Deleted bool `json:"deleted,omitempty"`
 	// Default holds the value of the "default" field.
-	Default      bool `json:"default,omitempty"`
+	Default bool `json:"default,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime   time.Time `json:"create_time,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -44,6 +47,8 @@ func (*Storage) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case storage.FieldName, storage.FieldImplementation, storage.FieldTvPath, storage.FieldMoviePath, storage.FieldSettings:
 			values[i] = new(sql.NullString)
+		case storage.FieldCreateTime:
+			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -107,6 +112,12 @@ func (s *Storage) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Default = value.Bool
 			}
+		case storage.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				s.CreateTime = value.Time
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -163,6 +174,9 @@ func (s *Storage) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("default=")
 	builder.WriteString(fmt.Sprintf("%v", s.Default))
+	builder.WriteString(", ")
+	builder.WriteString("create_time=")
+	builder.WriteString(s.CreateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

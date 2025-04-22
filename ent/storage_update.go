@@ -227,6 +227,9 @@ func (su *StorageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Default(); ok {
 		_spec.SetField(storage.FieldDefault, field.TypeBool, value)
 	}
+	if su.mutation.CreateTimeCleared() {
+		_spec.ClearField(storage.FieldCreateTime, field.TypeTime)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{storage.Label}
@@ -476,6 +479,9 @@ func (suo *StorageUpdateOne) sqlSave(ctx context.Context) (_node *Storage, err e
 	}
 	if value, ok := suo.mutation.Default(); ok {
 		_spec.SetField(storage.FieldDefault, field.TypeBool, value)
+	}
+	if suo.mutation.CreateTimeCleared() {
+		_spec.ClearField(storage.FieldCreateTime, field.TypeTime)
 	}
 	_node = &Storage{config: suo.config}
 	_spec.Assign = _node.assignValues

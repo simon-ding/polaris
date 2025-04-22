@@ -520,6 +520,7 @@ type DownloadClientsMutation struct {
 	remove_completed_downloads *bool
 	remove_failed_downloads    *bool
 	tags                       *string
+	create_time                *time.Time
 	clearedFields              map[string]struct{}
 	done                       bool
 	oldValue                   func(context.Context) (*DownloadClients, error)
@@ -1040,6 +1041,55 @@ func (m *DownloadClientsMutation) ResetTags() {
 	m.tags = nil
 }
 
+// SetCreateTime sets the "create_time" field.
+func (m *DownloadClientsMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *DownloadClientsMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the DownloadClients entity.
+// If the DownloadClients object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DownloadClientsMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *DownloadClientsMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[downloadclients.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *DownloadClientsMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[downloadclients.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *DownloadClientsMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, downloadclients.FieldCreateTime)
+}
+
 // Where appends a list predicates to the DownloadClientsMutation builder.
 func (m *DownloadClientsMutation) Where(ps ...predicate.DownloadClients) {
 	m.predicates = append(m.predicates, ps...)
@@ -1074,7 +1124,7 @@ func (m *DownloadClientsMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DownloadClientsMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.enable != nil {
 		fields = append(fields, downloadclients.FieldEnable)
 	}
@@ -1108,6 +1158,9 @@ func (m *DownloadClientsMutation) Fields() []string {
 	if m.tags != nil {
 		fields = append(fields, downloadclients.FieldTags)
 	}
+	if m.create_time != nil {
+		fields = append(fields, downloadclients.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -1138,6 +1191,8 @@ func (m *DownloadClientsMutation) Field(name string) (ent.Value, bool) {
 		return m.RemoveFailedDownloads()
 	case downloadclients.FieldTags:
 		return m.Tags()
+	case downloadclients.FieldCreateTime:
+		return m.CreateTime()
 	}
 	return nil, false
 }
@@ -1169,6 +1224,8 @@ func (m *DownloadClientsMutation) OldField(ctx context.Context, name string) (en
 		return m.OldRemoveFailedDownloads(ctx)
 	case downloadclients.FieldTags:
 		return m.OldTags(ctx)
+	case downloadclients.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown DownloadClients field %s", name)
 }
@@ -1255,6 +1312,13 @@ func (m *DownloadClientsMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTags(v)
 		return nil
+	case downloadclients.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
 	}
 	return fmt.Errorf("unknown DownloadClients field %s", name)
 }
@@ -1299,7 +1363,11 @@ func (m *DownloadClientsMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *DownloadClientsMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(downloadclients.FieldCreateTime) {
+		fields = append(fields, downloadclients.FieldCreateTime)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1312,6 +1380,11 @@ func (m *DownloadClientsMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *DownloadClientsMutation) ClearField(name string) error {
+	switch name {
+	case downloadclients.FieldCreateTime:
+		m.ClearCreateTime()
+		return nil
+	}
 	return fmt.Errorf("unknown DownloadClients nullable field %s", name)
 }
 
@@ -1351,6 +1424,9 @@ func (m *DownloadClientsMutation) ResetField(name string) error {
 		return nil
 	case downloadclients.FieldTags:
 		m.ResetTags()
+		return nil
+	case downloadclients.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown DownloadClients field %s", name)
@@ -1420,6 +1496,7 @@ type EpisodeMutation struct {
 	status            *episode.Status
 	monitored         *bool
 	target_file       *string
+	create_time       *time.Time
 	clearedFields     map[string]struct{}
 	media             *int
 	clearedmedia      bool
@@ -1916,6 +1993,55 @@ func (m *EpisodeMutation) ResetTargetFile() {
 	delete(m.clearedFields, episode.FieldTargetFile)
 }
 
+// SetCreateTime sets the "create_time" field.
+func (m *EpisodeMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *EpisodeMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EpisodeMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *EpisodeMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[episode.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *EpisodeMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[episode.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *EpisodeMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, episode.FieldCreateTime)
+}
+
 // ClearMedia clears the "media" edge to the Media entity.
 func (m *EpisodeMutation) ClearMedia() {
 	m.clearedmedia = true
@@ -1977,7 +2103,7 @@ func (m *EpisodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EpisodeMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.media != nil {
 		fields = append(fields, episode.FieldMediaID)
 	}
@@ -2005,6 +2131,9 @@ func (m *EpisodeMutation) Fields() []string {
 	if m.target_file != nil {
 		fields = append(fields, episode.FieldTargetFile)
 	}
+	if m.create_time != nil {
+		fields = append(fields, episode.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -2031,6 +2160,8 @@ func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Monitored()
 	case episode.FieldTargetFile:
 		return m.TargetFile()
+	case episode.FieldCreateTime:
+		return m.CreateTime()
 	}
 	return nil, false
 }
@@ -2058,6 +2189,8 @@ func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldMonitored(ctx)
 	case episode.FieldTargetFile:
 		return m.OldTargetFile(ctx)
+	case episode.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown Episode field %s", name)
 }
@@ -2130,6 +2263,13 @@ func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTargetFile(v)
 		return nil
+	case episode.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
 }
@@ -2193,6 +2333,9 @@ func (m *EpisodeMutation) ClearedFields() []string {
 	if m.FieldCleared(episode.FieldTargetFile) {
 		fields = append(fields, episode.FieldTargetFile)
 	}
+	if m.FieldCleared(episode.FieldCreateTime) {
+		fields = append(fields, episode.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -2212,6 +2355,9 @@ func (m *EpisodeMutation) ClearField(name string) error {
 		return nil
 	case episode.FieldTargetFile:
 		m.ClearTargetFile()
+		return nil
+	case episode.FieldCreateTime:
+		m.ClearCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode nullable field %s", name)
@@ -2247,6 +2393,9 @@ func (m *EpisodeMutation) ResetField(name string) error {
 		return nil
 	case episode.FieldTargetFile:
 		m.ResetTargetFile()
+		return nil
+	case episode.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
@@ -2350,6 +2499,7 @@ type HistoryMutation struct {
 	link                  *string
 	hash                  *string
 	status                *history.Status
+	create_time           *time.Time
 	clearedFields         map[string]struct{}
 	done                  bool
 	oldValue              func(context.Context) (*History, error)
@@ -3083,6 +3233,55 @@ func (m *HistoryMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetCreateTime sets the "create_time" field.
+func (m *HistoryMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *HistoryMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the History entity.
+// If the History object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *HistoryMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *HistoryMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[history.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *HistoryMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[history.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *HistoryMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, history.FieldCreateTime)
+}
+
 // Where appends a list predicates to the HistoryMutation builder.
 func (m *HistoryMutation) Where(ps ...predicate.History) {
 	m.predicates = append(m.predicates, ps...)
@@ -3117,7 +3316,7 @@ func (m *HistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HistoryMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.media_id != nil {
 		fields = append(fields, history.FieldMediaID)
 	}
@@ -3154,6 +3353,9 @@ func (m *HistoryMutation) Fields() []string {
 	if m.status != nil {
 		fields = append(fields, history.FieldStatus)
 	}
+	if m.create_time != nil {
+		fields = append(fields, history.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -3186,6 +3388,8 @@ func (m *HistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Hash()
 	case history.FieldStatus:
 		return m.Status()
+	case history.FieldCreateTime:
+		return m.CreateTime()
 	}
 	return nil, false
 }
@@ -3219,6 +3423,8 @@ func (m *HistoryMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldHash(ctx)
 	case history.FieldStatus:
 		return m.OldStatus(ctx)
+	case history.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown History field %s", name)
 }
@@ -3311,6 +3517,13 @@ func (m *HistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case history.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
 		return nil
 	}
 	return fmt.Errorf("unknown History field %s", name)
@@ -3423,6 +3636,9 @@ func (m *HistoryMutation) ClearedFields() []string {
 	if m.FieldCleared(history.FieldHash) {
 		fields = append(fields, history.FieldHash)
 	}
+	if m.FieldCleared(history.FieldCreateTime) {
+		fields = append(fields, history.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -3454,6 +3670,9 @@ func (m *HistoryMutation) ClearField(name string) error {
 		return nil
 	case history.FieldHash:
 		m.ClearHash()
+		return nil
+	case history.FieldCreateTime:
+		m.ClearCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown History nullable field %s", name)
@@ -3498,6 +3717,9 @@ func (m *HistoryMutation) ResetField(name string) error {
 		return nil
 	case history.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case history.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown History field %s", name)
@@ -4244,6 +4466,7 @@ type IndexersMutation struct {
 	api_key        *string
 	url            *string
 	synced         *bool
+	create_time    *time.Time
 	clearedFields  map[string]struct{}
 	done           bool
 	oldValue       func(context.Context) (*Indexers, error)
@@ -4925,6 +5148,55 @@ func (m *IndexersMutation) ResetSynced() {
 	delete(m.clearedFields, indexers.FieldSynced)
 }
 
+// SetCreateTime sets the "create_time" field.
+func (m *IndexersMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *IndexersMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Indexers entity.
+// If the Indexers object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndexersMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *IndexersMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[indexers.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *IndexersMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[indexers.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *IndexersMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, indexers.FieldCreateTime)
+}
+
 // Where appends a list predicates to the IndexersMutation builder.
 func (m *IndexersMutation) Where(ps ...predicate.Indexers) {
 	m.predicates = append(m.predicates, ps...)
@@ -4959,7 +5231,7 @@ func (m *IndexersMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IndexersMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.name != nil {
 		fields = append(fields, indexers.FieldName)
 	}
@@ -4996,6 +5268,9 @@ func (m *IndexersMutation) Fields() []string {
 	if m.synced != nil {
 		fields = append(fields, indexers.FieldSynced)
 	}
+	if m.create_time != nil {
+		fields = append(fields, indexers.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -5028,6 +5303,8 @@ func (m *IndexersMutation) Field(name string) (ent.Value, bool) {
 		return m.URL()
 	case indexers.FieldSynced:
 		return m.Synced()
+	case indexers.FieldCreateTime:
+		return m.CreateTime()
 	}
 	return nil, false
 }
@@ -5061,6 +5338,8 @@ func (m *IndexersMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldURL(ctx)
 	case indexers.FieldSynced:
 		return m.OldSynced(ctx)
+	case indexers.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown Indexers field %s", name)
 }
@@ -5154,6 +5433,13 @@ func (m *IndexersMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSynced(v)
 		return nil
+	case indexers.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Indexers field %s", name)
 }
@@ -5235,6 +5521,9 @@ func (m *IndexersMutation) ClearedFields() []string {
 	if m.FieldCleared(indexers.FieldSynced) {
 		fields = append(fields, indexers.FieldSynced)
 	}
+	if m.FieldCleared(indexers.FieldCreateTime) {
+		fields = append(fields, indexers.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -5272,6 +5561,9 @@ func (m *IndexersMutation) ClearField(name string) error {
 		return nil
 	case indexers.FieldSynced:
 		m.ClearSynced()
+		return nil
+	case indexers.FieldCreateTime:
+		m.ClearCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Indexers nullable field %s", name)
@@ -5316,6 +5608,9 @@ func (m *IndexersMutation) ResetField(name string) error {
 		return nil
 	case indexers.FieldSynced:
 		m.ResetSynced()
+		return nil
+	case indexers.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Indexers field %s", name)
@@ -5394,6 +5689,7 @@ type MediaMutation struct {
 	extras                    *schema.MediaExtras
 	alternative_titles        *[]schema.AlternativeTilte
 	appendalternative_titles  []schema.AlternativeTilte
+	create_time               *time.Time
 	clearedFields             map[string]struct{}
 	episodes                  map[int]struct{}
 	removedepisodes           map[int]struct{}
@@ -6225,6 +6521,55 @@ func (m *MediaMutation) ResetAlternativeTitles() {
 	delete(m.clearedFields, media.FieldAlternativeTitles)
 }
 
+// SetCreateTime sets the "create_time" field.
+func (m *MediaMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *MediaMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Media entity.
+// If the Media object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MediaMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *MediaMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[media.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *MediaMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[media.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *MediaMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, media.FieldCreateTime)
+}
+
 // AddEpisodeIDs adds the "episodes" edge to the Episode entity by ids.
 func (m *MediaMutation) AddEpisodeIDs(ids ...int) {
 	if m.episodes == nil {
@@ -6313,7 +6658,7 @@ func (m *MediaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MediaMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.tmdb_id != nil {
 		fields = append(fields, media.FieldTmdbID)
 	}
@@ -6362,6 +6707,9 @@ func (m *MediaMutation) Fields() []string {
 	if m.alternative_titles != nil {
 		fields = append(fields, media.FieldAlternativeTitles)
 	}
+	if m.create_time != nil {
+		fields = append(fields, media.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -6402,6 +6750,8 @@ func (m *MediaMutation) Field(name string) (ent.Value, bool) {
 		return m.Extras()
 	case media.FieldAlternativeTitles:
 		return m.AlternativeTitles()
+	case media.FieldCreateTime:
+		return m.CreateTime()
 	}
 	return nil, false
 }
@@ -6443,6 +6793,8 @@ func (m *MediaMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldExtras(ctx)
 	case media.FieldAlternativeTitles:
 		return m.OldAlternativeTitles(ctx)
+	case media.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown Media field %s", name)
 }
@@ -6564,6 +6916,13 @@ func (m *MediaMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAlternativeTitles(v)
 		return nil
+	case media.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)
 }
@@ -6642,6 +7001,9 @@ func (m *MediaMutation) ClearedFields() []string {
 	if m.FieldCleared(media.FieldAlternativeTitles) {
 		fields = append(fields, media.FieldAlternativeTitles)
 	}
+	if m.FieldCleared(media.FieldCreateTime) {
+		fields = append(fields, media.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -6676,6 +7038,9 @@ func (m *MediaMutation) ClearField(name string) error {
 		return nil
 	case media.FieldAlternativeTitles:
 		m.ClearAlternativeTitles()
+		return nil
+	case media.FieldCreateTime:
+		m.ClearCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Media nullable field %s", name)
@@ -6732,6 +7097,9 @@ func (m *MediaMutation) ResetField(name string) error {
 		return nil
 	case media.FieldAlternativeTitles:
 		m.ResetAlternativeTitles()
+		return nil
+	case media.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Media field %s", name)
@@ -7702,6 +8070,7 @@ type StorageMutation struct {
 	settings       *string
 	deleted        *bool
 	_default       *bool
+	create_time    *time.Time
 	clearedFields  map[string]struct{}
 	done           bool
 	oldValue       func(context.Context) (*Storage, error)
@@ -8097,6 +8466,55 @@ func (m *StorageMutation) ResetDefault() {
 	m._default = nil
 }
 
+// SetCreateTime sets the "create_time" field.
+func (m *StorageMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *StorageMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Storage entity.
+// If the Storage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StorageMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *StorageMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[storage.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *StorageMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[storage.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *StorageMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, storage.FieldCreateTime)
+}
+
 // Where appends a list predicates to the StorageMutation builder.
 func (m *StorageMutation) Where(ps ...predicate.Storage) {
 	m.predicates = append(m.predicates, ps...)
@@ -8131,7 +8549,7 @@ func (m *StorageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StorageMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, storage.FieldName)
 	}
@@ -8152,6 +8570,9 @@ func (m *StorageMutation) Fields() []string {
 	}
 	if m._default != nil {
 		fields = append(fields, storage.FieldDefault)
+	}
+	if m.create_time != nil {
+		fields = append(fields, storage.FieldCreateTime)
 	}
 	return fields
 }
@@ -8175,6 +8596,8 @@ func (m *StorageMutation) Field(name string) (ent.Value, bool) {
 		return m.Deleted()
 	case storage.FieldDefault:
 		return m.Default()
+	case storage.FieldCreateTime:
+		return m.CreateTime()
 	}
 	return nil, false
 }
@@ -8198,6 +8621,8 @@ func (m *StorageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDeleted(ctx)
 	case storage.FieldDefault:
 		return m.OldDefault(ctx)
+	case storage.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown Storage field %s", name)
 }
@@ -8256,6 +8681,13 @@ func (m *StorageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDefault(v)
 		return nil
+	case storage.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Storage field %s", name)
 }
@@ -8295,6 +8727,9 @@ func (m *StorageMutation) ClearedFields() []string {
 	if m.FieldCleared(storage.FieldSettings) {
 		fields = append(fields, storage.FieldSettings)
 	}
+	if m.FieldCleared(storage.FieldCreateTime) {
+		fields = append(fields, storage.FieldCreateTime)
+	}
 	return fields
 }
 
@@ -8317,6 +8752,9 @@ func (m *StorageMutation) ClearField(name string) error {
 		return nil
 	case storage.FieldSettings:
 		m.ClearSettings()
+		return nil
+	case storage.FieldCreateTime:
+		m.ClearCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Storage nullable field %s", name)
@@ -8346,6 +8784,9 @@ func (m *StorageMutation) ResetField(name string) error {
 		return nil
 	case storage.FieldDefault:
 		m.ResetDefault()
+		return nil
+	case storage.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Storage field %s", name)

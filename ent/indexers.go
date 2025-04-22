@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"polaris/ent/indexers"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -39,7 +40,9 @@ type Indexers struct {
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
 	// synced from prowlarr
-	Synced       bool `json:"synced,omitempty"`
+	Synced bool `json:"synced,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime   time.Time `json:"create_time,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -56,6 +59,8 @@ func (*Indexers) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case indexers.FieldName, indexers.FieldImplementation, indexers.FieldSettings, indexers.FieldAPIKey, indexers.FieldURL:
 			values[i] = new(sql.NullString)
+		case indexers.FieldCreateTime:
+			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -149,6 +154,12 @@ func (i *Indexers) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.Synced = value.Bool
 			}
+		case indexers.FieldCreateTime:
+			if value, ok := values[j].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[j])
+			} else if value.Valid {
+				i.CreateTime = value.Time
+			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
 		}
@@ -220,6 +231,9 @@ func (i *Indexers) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("synced=")
 	builder.WriteString(fmt.Sprintf("%v", i.Synced))
+	builder.WriteString(", ")
+	builder.WriteString("create_time=")
+	builder.WriteString(i.CreateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -32,6 +32,7 @@ func (Media) Fields() []ent.Field {
 		field.JSON("limiter", MediaLimiter{}).Optional(),
 		field.JSON("extras", MediaExtras{}).Optional(),
 		field.JSON("alternative_titles", []AlternativeTilte{}).Optional(),
+		field.Time("create_time").Optional().Default(time.Now).Immutable(),
 	}
 }
 

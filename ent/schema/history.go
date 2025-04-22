@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -26,6 +28,7 @@ func (History) Fields() []ent.Field {
 		field.String("link").Optional().Comment("deprecated, use hash instead"), //should be magnet link
 		field.String("hash").Optional().Comment("torrent hash"),
 		field.Enum("status").Values("running", "success", "fail", "uploading", "seeding", "removed"),
+		field.Time("create_time").Optional().Default(time.Now).Immutable(),
 		//field.String("saved").Optional().Comment("deprecated"), //deprecated
 	}
 }

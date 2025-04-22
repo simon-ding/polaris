@@ -35,6 +35,7 @@ var (
 		{Name: "remove_completed_downloads", Type: field.TypeBool, Default: true},
 		{Name: "remove_failed_downloads", Type: field.TypeBool, Default: true},
 		{Name: "tags", Type: field.TypeString, Default: ""},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
 	}
 	// DownloadClientsTable holds the schema information for the "download_clients" table.
 	DownloadClientsTable = &schema.Table{
@@ -53,6 +54,7 @@ var (
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"missing", "downloading", "downloaded"}, Default: "missing"},
 		{Name: "monitored", Type: field.TypeBool, Default: false},
 		{Name: "target_file", Type: field.TypeString, Nullable: true},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
 		{Name: "media_id", Type: field.TypeInt, Nullable: true},
 	}
 	// EpisodesTable holds the schema information for the "episodes" table.
@@ -63,7 +65,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "episodes_media_episodes",
-				Columns:    []*schema.Column{EpisodesColumns[9]},
+				Columns:    []*schema.Column{EpisodesColumns[10]},
 				RefColumns: []*schema.Column{MediaColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -84,6 +86,7 @@ var (
 		{Name: "link", Type: field.TypeString, Nullable: true},
 		{Name: "hash", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"running", "success", "fail", "uploading", "seeding", "removed"}},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
 	}
 	// HistoriesTable holds the schema information for the "histories" table.
 	HistoriesTable = &schema.Table{
@@ -122,6 +125,7 @@ var (
 		{Name: "api_key", Type: field.TypeString, Nullable: true},
 		{Name: "url", Type: field.TypeString, Nullable: true},
 		{Name: "synced", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
 	}
 	// IndexersTable holds the schema information for the "indexers" table.
 	IndexersTable = &schema.Table{
@@ -148,6 +152,7 @@ var (
 		{Name: "limiter", Type: field.TypeJSON, Nullable: true},
 		{Name: "extras", Type: field.TypeJSON, Nullable: true},
 		{Name: "alternative_titles", Type: field.TypeJSON, Nullable: true},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
 	}
 	// MediaTable holds the schema information for the "media" table.
 	MediaTable = &schema.Table{
@@ -191,6 +196,7 @@ var (
 		{Name: "settings", Type: field.TypeString, Nullable: true},
 		{Name: "deleted", Type: field.TypeBool, Default: false},
 		{Name: "default", Type: field.TypeBool, Default: false},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
 	}
 	// StoragesTable holds the schema information for the "storages" table.
 	StoragesTable = &schema.Table{

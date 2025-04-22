@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"polaris/ent/downloadclients"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -37,7 +38,9 @@ type DownloadClients struct {
 	// RemoveFailedDownloads holds the value of the "remove_failed_downloads" field.
 	RemoveFailedDownloads bool `json:"remove_failed_downloads,omitempty"`
 	// Tags holds the value of the "tags" field.
-	Tags         string `json:"tags,omitempty"`
+	Tags string `json:"tags,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime   time.Time `json:"create_time,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -52,6 +55,8 @@ func (*DownloadClients) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case downloadclients.FieldName, downloadclients.FieldImplementation, downloadclients.FieldURL, downloadclients.FieldUser, downloadclients.FieldPassword, downloadclients.FieldSettings, downloadclients.FieldTags:
 			values[i] = new(sql.NullString)
+		case downloadclients.FieldCreateTime:
+			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -139,6 +144,12 @@ func (dc *DownloadClients) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				dc.Tags = value.String
 			}
+		case downloadclients.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				dc.CreateTime = value.Time
+			}
 		default:
 			dc.selectValues.Set(columns[i], values[i])
 		}
@@ -207,6 +218,9 @@ func (dc *DownloadClients) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tags=")
 	builder.WriteString(dc.Tags)
+	builder.WriteString(", ")
+	builder.WriteString("create_time=")
+	builder.WriteString(dc.CreateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

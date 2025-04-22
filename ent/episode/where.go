@@ -4,6 +4,7 @@ package episode
 
 import (
 	"polaris/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -92,6 +93,11 @@ func Monitored(v bool) predicate.Episode {
 // TargetFile applies equality check predicate on the "target_file" field. It's identical to TargetFileEQ.
 func TargetFile(v string) predicate.Episode {
 	return predicate.Episode(sql.FieldEQ(FieldTargetFile, v))
+}
+
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldCreateTime, v))
 }
 
 // MediaIDEQ applies the EQ predicate on the "media_id" field.
@@ -502,6 +508,56 @@ func TargetFileEqualFold(v string) predicate.Episode {
 // TargetFileContainsFold applies the ContainsFold predicate on the "target_file" field.
 func TargetFileContainsFold(v string) predicate.Episode {
 	return predicate.Episode(sql.FieldContainsFold(FieldTargetFile, v))
+}
+
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldEQ(FieldCreateTime, v))
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldNEQ(FieldCreateTime, v))
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldNotIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldGT(FieldCreateTime, v))
+}
+
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldGTE(FieldCreateTime, v))
+}
+
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldLT(FieldCreateTime, v))
+}
+
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Episode {
+	return predicate.Episode(sql.FieldLTE(FieldCreateTime, v))
+}
+
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.Episode {
+	return predicate.Episode(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.Episode {
+	return predicate.Episode(sql.FieldNotNull(FieldCreateTime))
 }
 
 // HasMedia applies the HasEdge predicate on the "media" edge.

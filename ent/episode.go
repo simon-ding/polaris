@@ -7,6 +7,7 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/media"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -35,6 +36,8 @@ type Episode struct {
 	Monitored bool `json:"monitored"`
 	// TargetFile holds the value of the "target_file" field.
 	TargetFile string `json:"target_file,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EpisodeQuery when eager-loading is set.
 	Edges        EpisodeEdges `json:"edges"`
@@ -72,6 +75,8 @@ func (*Episode) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case episode.FieldTitle, episode.FieldOverview, episode.FieldAirDate, episode.FieldStatus, episode.FieldTargetFile:
 			values[i] = new(sql.NullString)
+		case episode.FieldCreateTime:
+			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -147,6 +152,12 @@ func (e *Episode) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.TargetFile = value.String
 			}
+		case episode.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				e.CreateTime = value.Time
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -214,6 +225,9 @@ func (e *Episode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("target_file=")
 	builder.WriteString(e.TargetFile)
+	builder.WriteString(", ")
+	builder.WriteString("create_time=")
+	builder.WriteString(e.CreateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -4,6 +4,7 @@ package downloadclients
 
 import (
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -35,6 +36,8 @@ const (
 	FieldRemoveFailedDownloads = "remove_failed_downloads"
 	// FieldTags holds the string denoting the tags field in the database.
 	FieldTags = "tags"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// Table holds the table name of the downloadclients in the database.
 	Table = "download_clients"
 )
@@ -53,6 +56,7 @@ var Columns = []string{
 	FieldRemoveCompletedDownloads,
 	FieldRemoveFailedDownloads,
 	FieldTags,
+	FieldCreateTime,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -82,6 +86,8 @@ var (
 	DefaultRemoveFailedDownloads bool
 	// DefaultTags holds the default value on creation for the "tags" field.
 	DefaultTags string
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
 )
 
 // Implementation defines the type for the "implementation" enum field.
@@ -169,4 +175,9 @@ func ByRemoveFailedDownloads(opts ...sql.OrderTermOption) OrderOption {
 // ByTags orders the results by the tags field.
 func ByTags(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTags, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
