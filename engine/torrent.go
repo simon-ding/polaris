@@ -71,7 +71,7 @@ func names2Query(media *ent.Media) []string {
 	return names
 }
 
-func SearchTvSeries(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
+func SearchTvSeries(db1 db.Database, param *SearchParam) ([]torznab.Result, error) {
 	series, err := db1.GetMediaDetails(param.MediaId)
 	if err != nil {
 		return nil, fmt.Errorf("no tv series of id %v: %v", param.MediaId, err)
@@ -234,7 +234,7 @@ func isNoSeasonSeries(detail *db.MediaDetails) bool {
 	return hasSeason2 && !season2HasEpisode1 //only one 1st episode
 }
 
-func SearchMovie(db1 *db.Client, param *SearchParam) ([]torznab.Result, error) {
+func SearchMovie(db1 db.Database, param *SearchParam) ([]torznab.Result, error) {
 	movieDetail, err := db1.GetMediaDetails(param.MediaId)
 	if err != nil {
 		return nil, err
@@ -310,7 +310,7 @@ const (
 	SearchTypeMovie SearchType = 2
 )
 
-func searchWithTorznab(db *db.Client, t SearchType, queries ...string) []torznab.Result {
+func searchWithTorznab(db db.Database, t SearchType, queries ...string) []torznab.Result {
 
 	var res []torznab.Result
 	allTorznab := db.GetAllIndexers()

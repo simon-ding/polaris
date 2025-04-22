@@ -11,11 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) GetAllNotificationClients2() ([]*ent.NotificationClient, error) {
+func (c *client) GetAllNotificationClients2() ([]*ent.NotificationClient, error) {
 	return c.ent.NotificationClient.Query().All(context.TODO())
 }
 
-func (c *Client) GetAllNotificationClients() ([]*NotificationClient, error) {
+func (c *client) GetAllNotificationClients() ([]*NotificationClient, error) {
 	all, err := c.ent.NotificationClient.Query().All(context.TODO())
 	if err != nil {
 		return nil, errors.Wrap(err, "query db")
@@ -31,7 +31,7 @@ func (c *Client) GetAllNotificationClients() ([]*NotificationClient, error) {
 	return all1, nil
 }
 
-func (c *Client) AddNotificationClient(name, service string, setting string, enabled bool) error {
+func (c *client) AddNotificationClient(name, service string, setting string, enabled bool) error {
 	// data, err := json.Marshal(setting)
 	// if err != nil {
 	// 	return errors.Wrap(err, "json")
@@ -48,12 +48,12 @@ func (c *Client) AddNotificationClient(name, service string, setting string, ena
 		SetSettings(setting).SetEnabled(enabled).Exec(context.Background())
 }
 
-func (c *Client) DeleteNotificationClient(id int) error {
+func (c *client) DeleteNotificationClient(id int) error {
 	_, err := c.ent.NotificationClient.Delete().Where(notificationclient.ID(id)).Exec(context.Background())
 	return err
 }
 
-func (c *Client) GetNotificationClient(id int) (*NotificationClient, error) {
+func (c *client) GetNotificationClient(id int) (*NotificationClient, error) {
 	noti, err := c.ent.NotificationClient.Query().Where(notificationclient.ID(id)).First(context.Background())
 	if err != nil {
 		return nil, errors.Wrap(err, "query")

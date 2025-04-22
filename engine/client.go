@@ -16,7 +16,7 @@ import (
 	"github.com/robfig/cron"
 )
 
-func NewEngine(db *db.Client, language string) *Engine {
+func NewEngine(db db.Database, language string) *Engine {
 	return &Engine{
 		db:       db,
 		cron:     cron.New(),
@@ -31,7 +31,7 @@ type scheduler struct {
 	f    func() error
 }
 type Engine struct {
-	db         *db.Client
+	db         db.Database
 	cron       *cron.Cron
 	tasks      utils.Map[int, *Task]
 	language   string

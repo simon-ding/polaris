@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) migrate() error {
+func (c *client) migrate() error {
 	// Run the auto migration tool.
 	if err := c.ent.Schema.Create(context.Background()); err != nil {
 		return errors.Wrap(err, "failed creating schema resources")
@@ -20,7 +20,7 @@ func (c *Client) migrate() error {
 	return nil
 }
 
-func (c *Client) migrateIndexerSetting() error {
+func (c *client) migrateIndexerSetting() error {
 	indexers := c.GetAllIndexers()
 	for _, in := range indexers {
 

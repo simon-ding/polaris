@@ -21,7 +21,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewServer(db *db.Client) *Server {
+func NewServer(db db.Database) *Server {
 	r := gin.Default()
 	s := &Server{
 		r:                r,
@@ -36,7 +36,7 @@ func NewServer(db *db.Client) *Server {
 
 type Server struct {
 	r                *gin.Engine
-	db               *db.Client
+	db               db.Database
 	core             *engine.Engine
 	language         string
 	jwtSerect        string

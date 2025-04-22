@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"polaris/engine"
 	"polaris/ent"
-	"polaris/ent/blacklist"
 	"polaris/ent/episode"
 	"polaris/ent/history"
-	"polaris/ent/schema"
 	"polaris/log"
 	"polaris/pkg/utils"
 	"strconv"
@@ -124,19 +122,19 @@ func (s *Server) addTorrent2Blacklist(link string) error {
 	if link == "" {
 		return nil
 	}
-	if hash, err := utils.MagnetHash(link); err != nil {
+	if _, err := utils.MagnetHash(link); err != nil {
 		return err
 	} else {
-		item := ent.Blacklist{
-			Type: blacklist.TypeTorrent,
-			Value: schema.BlacklistValue{
-				TorrentHash: hash,
-			},
-		}
-		err := s.db.AddBlacklistItem(&item)
-		if err != nil {
-			return errors.Wrap(err, "add to db")
-		}
+		// item := ent.Blacklist{
+		// 	Type: blacklist.TypeTorrent,
+		// 	Value: schema.BlacklistValue{
+		// 		TorrentHash: hash,
+		// 	},
+		// }
+		// err := s.db.AddBlacklistItem(&item)
+		// if err != nil {
+		// 	return errors.Wrap(err, "add to db")
+		// }
 	}
 	return nil
 }

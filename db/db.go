@@ -28,19 +28,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Client struct {
+type client struct {
 	ent *ent.Client
 }
 
-func Open() (*Client, error) {
+func Open() (Database, error) {
 	os.Mkdir(DataPath, 0777)
-	client, err := ent.Open(dialect.SQLite, fmt.Sprintf("file:%v/polaris.db?cache=shared&_fk=1", DataPath))
+	cl, err := ent.Open(dialect.SQLite, fmt.Sprintf("file:%v/polaris.db?cache=shared&_fk=1", DataPath))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed opening connection to sqlite")
 	}
 	//defer client.Close()
-	c := &Client{
-		ent: client,
+	c := &client{
+		ent: cl,
 	}
 	// Run the auto migration tool.
 	if err := c.migrate(); err != nil {
@@ -52,7 +52,7 @@ func Open() (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) init() {
+func (c *client) init() {
 	c.generateJwtSerectIfNotExist()
 	if err := c.generateDefaultLocalStorage(); err != nil {
 		log.Errorf("generate default storage: %v", err)
@@ -78,7 +78,7 @@ func (c *Client) init() {
 	}
 }
 
-func (c *Client) generateJwtSerectIfNotExist() {
+func (c *client) generateJwtSerectIfNotExist() {
 	v := c.GetSetting(JwtSerectKey)
 	if v == "" {
 		log.Infof("generate jwt serect")
@@ -87,7 +87,7 @@ func (c *Client) generateJwtSerectIfNotExist() {
 	}
 }
 
-func (c *Client) generateDefaultLocalStorage() error {
+func (c *client) generateDefaultLocalStorage() error {
 	n, _ := c.ent.Storage.Query().Count(context.TODO())
 	if n != 0 {
 		return nil
@@ -102,7 +102,7 @@ func (c *Client) generateDefaultLocalStorage() error {
 	})
 }
 
-func (c *Client) GetSetting(key string) string {
+func (c *client) GetSetting(key string) string {
 	v, err := c.ent.Settings.Query().Where(settings.Key(key)).Only(context.TODO())
 	if err != nil {
 		log.Debugf("get setting by key: %s error: %v", key, err)
@@ -111,7 +111,7 @@ func (c *Client) GetSetting(key string) string {
 	return v.Value
 }
 
-func (c *Client) SetSetting(key, value string) error {
+func (c *client) SetSetting(key, value string) error {
 	v, err := c.ent.Settings.Query().Where(settings.Key(key)).Only(context.TODO())
 	if err != nil {
 		log.Infof("create new setting")
@@ -122,7 +122,7 @@ func (c *Client) SetSetting(key, value string) error {
 	return err
 }
 
-func (c *Client) GetLanguage() string {
+func (c *client) GetLanguage() string {
 	lang := c.GetSetting(SettingLanguage)
 	log.Infof("get application language: %s", lang)
 	if lang == "" {
@@ -131,7 +131,7 @@ func (c *Client) GetLanguage() string {
 	return lang
 }
 
-func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, error) {
+func (c *client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, error) {
 	count := c.ent.Media.Query().Where(media.TmdbID(m.TmdbID)).CountX(context.Background())
 	if count > 0 {
 		return nil, fmt.Errorf("tv series %s already in watchlist", m.NameEn)
@@ -166,7 +166,7 @@ func (c *Client) AddMediaWatchlist(m *ent.Media, episodes []int) (*ent.Media, er
 
 }
 
-func (c *Client) GetMediaWatchlist(mediaType media.MediaType) []*ent.Media {
+func (c *client) GetMediaWatchlist(mediaType media.MediaType) []*ent.Media {
 	list, err := c.ent.Media.Query().Where(media.MediaTypeEQ(mediaType)).Order(ent.Desc(media.FieldID)).All(context.TODO())
 	if err != nil {
 		log.Infof("query wtach list error: %v", err)
@@ -175,19 +175,19 @@ func (c *Client) GetMediaWatchlist(mediaType media.MediaType) []*ent.Media {
 	return list
 }
 
-func (c *Client) GetEpisode(seriesId, seasonNum, episodeNum int) (*ent.Episode, error) {
+func (c *client) GetEpisode(seriesId, seasonNum, episodeNum int) (*ent.Episode, error) {
 	return c.ent.Episode.Query().Where(episode.MediaID(seriesId), episode.SeasonNumber(seasonNum),
 		episode.EpisodeNumber(episodeNum)).First(context.TODO())
 }
-func (c *Client) GetEpisodeByID(epID int) (*ent.Episode, error) {
+func (c *client) GetEpisodeByID(epID int) (*ent.Episode, error) {
 	return c.ent.Episode.Query().Where(episode.ID(epID)).First(context.TODO())
 }
 
-func (c *Client) UpdateEpiode(episodeId int, name, overview string) error {
+func (c *client) UpdateEpiode(episodeId int, name, overview string) error {
 	return c.ent.Episode.Update().Where(episode.ID(episodeId)).SetTitle(name).SetOverview(overview).Exec(context.TODO())
 }
 
-func (c *Client) UpdateEpiode2(episodeId int, name, overview, airdate string) error {
+func (c *client) UpdateEpiode2(episodeId int, name, overview, airdate string) error {
 	return c.ent.Episode.Update().Where(episode.ID(episodeId)).SetTitle(name).SetOverview(overview).SetAirDate(airdate).Exec(context.TODO())
 }
 
@@ -196,7 +196,7 @@ type MediaDetails struct {
 	Episodes []*ent.Episode `json:"episodes"`
 }
 
-func (c *Client) GetMediaDetails(id int) (*MediaDetails, error) {
+func (c *client) GetMediaDetails(id int) (*MediaDetails, error) {
 	se, err := c.ent.Media.Query().Where(media.ID(id)).First(context.TODO())
 	if err != nil {
 		return nil, errors.Errorf("get series %d: %v", id, err)
@@ -214,11 +214,11 @@ func (c *Client) GetMediaDetails(id int) (*MediaDetails, error) {
 	return md, nil
 }
 
-func (c *Client) GetMedia(id int) (*ent.Media, error) {
+func (c *client) GetMedia(id int) (*ent.Media, error) {
 	return c.ent.Media.Query().Where(media.ID(id)).First(context.TODO())
 }
 
-func (c *Client) DeleteMedia(id int) error {
+func (c *client) DeleteMedia(id int) error {
 	_, err := c.ent.Episode.Delete().Where(episode.MediaID(id)).Exec(context.TODO())
 	if err != nil {
 		return err
@@ -230,7 +230,7 @@ func (c *Client) DeleteMedia(id int) error {
 	return c.CleanAllDanglingEpisodes()
 }
 
-func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
+func (c *client) SaveEposideDetail(d *ent.Episode) (int, error) {
 	ep, err := c.ent.Episode.Create().
 		SetAirDate(d.AirDate).
 		SetSeasonNumber(d.SeasonNumber).
@@ -244,7 +244,7 @@ func (c *Client) SaveEposideDetail(d *ent.Episode) (int, error) {
 	return ep.ID, nil
 }
 
-func (c *Client) SaveEposideDetail2(d *ent.Episode) (int, error) {
+func (c *client) SaveEposideDetail2(d *ent.Episode) (int, error) {
 	ep, err := c.ent.Episode.Create().
 		SetAirDate(d.AirDate).
 		SetSeasonNumber(d.SeasonNumber).
@@ -263,7 +263,7 @@ type TorznabSetting struct {
 	ApiKey string `json:"api_key"`
 }
 
-func (c *Client) SaveIndexer(in *ent.Indexers) error {
+func (c *client) SaveIndexer(in *ent.Indexers) error {
 
 	count := c.ent.Indexers.Query().Where(indexers.Name(in.Name)).CountX(context.TODO())
 
@@ -288,11 +288,11 @@ func (c *Client) SaveIndexer(in *ent.Indexers) error {
 	return nil
 }
 
-func (c *Client) DeleteIndexer(id int) {
+func (c *client) DeleteIndexer(id int) {
 	c.ent.Indexers.Delete().Where(indexers.ID(id)).Exec(context.TODO())
 }
 
-func (c *Client) GetIndexer(id int) (*ent.Indexers, error) {
+func (c *client) GetIndexer(id int) (*ent.Indexers, error) {
 	res, err := c.ent.Indexers.Query().Where(indexers.ID(id)).First(context.TODO())
 	if err != nil {
 		return nil, err
@@ -300,12 +300,12 @@ func (c *Client) GetIndexer(id int) (*ent.Indexers, error) {
 	return res, nil
 }
 
-func (c *Client) GetAllIndexers() []*ent.Indexers {
+func (c *client) GetAllIndexers() []*ent.Indexers {
 	res := c.ent.Indexers.Query().Where(indexers.Implementation(IndexerTorznabImpl)).Order(ent.Asc(indexers.FieldID)).AllX(context.TODO())
 	return res
 }
 
-func (c *Client) SaveDownloader(downloader *ent.DownloadClients) error {
+func (c *client) SaveDownloader(downloader *ent.DownloadClients) error {
 	count := c.ent.DownloadClients.Query().Where(downloadclients.Name(downloader.Name)).CountX(context.TODO())
 	if count != 0 {
 		err := c.ent.DownloadClients.Update().Where(downloadclients.Name(downloader.Name)).SetImplementation(downloader.Implementation).
@@ -318,7 +318,7 @@ func (c *Client) SaveDownloader(downloader *ent.DownloadClients) error {
 	return err
 }
 
-func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
+func (c *client) GetAllDonloadClients() []*ent.DownloadClients {
 	cc, err := c.ent.DownloadClients.Query().Order(ent.Asc(downloadclients.FieldPriority1)).All(context.TODO())
 	if err != nil {
 		log.Errorf("no download client")
@@ -333,7 +333,7 @@ func (c *Client) GetAllDonloadClients() []*ent.DownloadClients {
 	return cc
 }
 
-func (c *Client) DeleteDownloadCLient(id int) {
+func (c *client) DeleteDownloadCLient(id int) {
 	c.ent.DownloadClients.Delete().Where(downloadclients.ID(id)).Exec(context.TODO())
 }
 
@@ -375,7 +375,7 @@ type WebdavSetting struct {
 	ChangeFileHash string `json:"change_file_hash"`
 }
 
-func (c *Client) AddStorage(st *StorageInfo) error {
+func (c *client) AddStorage(st *StorageInfo) error {
 	if !strings.HasSuffix(st.TvPath, "/") {
 		st.TvPath += "/"
 	}
@@ -412,7 +412,7 @@ func (c *Client) AddStorage(st *StorageInfo) error {
 	return nil
 }
 
-func (c *Client) GetAllStorage() []*ent.Storage {
+func (c *client) GetAllStorage() []*ent.Storage {
 	data, err := c.ent.Storage.Query().Where(storage.Deleted(false)).All(context.TODO())
 	if err != nil {
 		log.Errorf("get storage: %v", err)
@@ -434,7 +434,7 @@ func (s *Storage) ToWebDavSetting() WebdavSetting {
 	return webdavSetting
 }
 
-func (c *Client) GetStorage(id int) *Storage {
+func (c *client) GetStorage(id int) *Storage {
 	r, err := c.ent.Storage.Query().Where(storage.ID(id)).First(context.TODO())
 	if err != nil {
 		//use default storage
@@ -444,11 +444,11 @@ func (c *Client) GetStorage(id int) *Storage {
 	return &Storage{*r}
 }
 
-func (c *Client) DeleteStorage(id int) error {
+func (c *client) DeleteStorage(id int) error {
 	return c.ent.Storage.Update().Where(storage.ID(id)).SetDeleted(true).Exec(context.TODO())
 }
 
-func (c *Client) SetDefaultStorage(id int) error {
+func (c *client) SetDefaultStorage(id int) error {
 	err := c.ent.Storage.Update().Where(storage.ID(id)).SetDefault(true).Exec(context.TODO())
 	if err != nil {
 		return err
@@ -457,7 +457,7 @@ func (c *Client) SetDefaultStorage(id int) error {
 	return err
 }
 
-func (c *Client) SetDefaultStorageByName(name string) error {
+func (c *client) SetDefaultStorageByName(name string) error {
 	err := c.ent.Storage.Update().Where(storage.Name(name)).SetDefault(true).Exec(context.TODO())
 	if err != nil {
 		return err
@@ -466,18 +466,18 @@ func (c *Client) SetDefaultStorageByName(name string) error {
 	return err
 }
 
-func (c *Client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
+func (c *client) SaveHistoryRecord(h ent.History) (*ent.History, error) {
 	return c.ent.History.Create().SetMediaID(h.MediaID).SetDate(time.Now()).
 		SetStatus(h.Status).SetTargetDir(h.TargetDir).SetSourceTitle(h.SourceTitle).SetIndexerID(h.IndexerID).
 		SetDownloadClientID(h.DownloadClientID).SetSize(h.Size).SetSeasonNum(h.SeasonNum).
 		SetEpisodeNums(h.EpisodeNums).SetHash(h.Hash).SetLink(h.Link).Save(context.TODO())
 }
 
-func (c *Client) SetHistoryStatus(id int, status history.Status) error {
+func (c *client) SetHistoryStatus(id int, status history.Status) error {
 	return c.ent.History.Update().Where(history.ID(id)).SetStatus(status).Exec(context.TODO())
 }
 
-func (c *Client) GetHistories() ent.Histories {
+func (c *client) GetHistories() ent.Histories {
 	h, err := c.ent.History.Query().Order(history.ByID(sql.OrderDesc())).All(context.TODO())
 	if err != nil {
 		return nil
@@ -485,7 +485,7 @@ func (c *Client) GetHistories() ent.Histories {
 	return h
 }
 
-func (c *Client) GetRunningHistories() ent.Histories {
+func (c *client) GetRunningHistories() ent.Histories {
 	h, err := c.ent.History.Query().Where(history.Or(history.StatusEQ(history.StatusRunning),
 		history.StatusEQ(history.StatusUploading), history.StatusEQ(history.StatusSeeding))).All(context.TODO())
 	if err != nil {
@@ -494,16 +494,16 @@ func (c *Client) GetRunningHistories() ent.Histories {
 	return h
 }
 
-func (c *Client) GetHistory(id int) *ent.History {
+func (c *client) GetHistory(id int) *ent.History {
 	return c.ent.History.Query().Where(history.ID(id)).FirstX(context.TODO())
 }
 
-func (c *Client) DeleteHistory(id int) error {
+func (c *client) DeleteHistory(id int) error {
 	 err := c.ent.History.Update().Where(history.ID(id)).SetStatus(history.StatusRemoved).Exec(context.Background())
 	return err
 }
 
-func (c *Client) GetDownloadDir() string {
+func (c *client) GetDownloadDir() string {
 	r, err := c.ent.Settings.Query().Where(settings.Key(SettingDownloadDir)).First(context.TODO())
 	if err != nil {
 		return "/downloads"
@@ -511,7 +511,7 @@ func (c *Client) GetDownloadDir() string {
 	return r.Value
 }
 
-func (c *Client) UpdateEpisodeStatus(mediaID int, seasonNum, episodeNum int) error {
+func (c *client) UpdateEpisodeStatus(mediaID int, seasonNum, episodeNum int) error {
 	ep, err := c.ent.Episode.Query().Where(episode.MediaID(mediaID)).Where(episode.EpisodeNumber(episodeNum)).
 		Where(episode.SeasonNumber(seasonNum)).First(context.TODO())
 	if err != nil {
@@ -520,11 +520,11 @@ func (c *Client) UpdateEpisodeStatus(mediaID int, seasonNum, episodeNum int) err
 	return ep.Update().SetStatus(episode.StatusDownloaded).Exec(context.TODO())
 }
 
-func (c *Client) SetEpisodeStatus(id int, status episode.Status) error {
+func (c *client) SetEpisodeStatus(id int, status episode.Status) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetStatus(status).Exec(context.TODO())
 }
 
-func (c *Client) IsEpisodeDownloadingOrDownloaded(id int) bool {
+func (c *client) IsEpisodeDownloadingOrDownloaded(id int) bool {
 	ep, _ := c.GetEpisodeByID(id)
 	his := c.ent.History.Query().Where(history.EpisodeNumsNotNil()).AllX(context.Background())
 	for _, h := range his {
@@ -538,19 +538,19 @@ func (c *Client) IsEpisodeDownloadingOrDownloaded(id int) bool {
 	return false
 }
 
-func (c *Client) SetSeasonAllEpisodeStatus(mediaID, seasonNum int, status episode.Status) error {
+func (c *client) SetSeasonAllEpisodeStatus(mediaID, seasonNum int, status episode.Status) error {
 	return c.ent.Episode.Update().Where(episode.MediaID(mediaID), episode.SeasonNumber(seasonNum)).SetStatus(status).Exec(context.TODO())
 }
 
-func (c *Client) TmdbIdInWatchlist(tmdb_id int) bool {
+func (c *client) TmdbIdInWatchlist(tmdb_id int) bool {
 	return c.ent.Media.Query().Where(media.TmdbID(tmdb_id)).CountX(context.TODO()) > 0
 }
 
-func (c *Client) GetDownloadHistory(mediaID int) ([]*ent.History, error) {
+func (c *client) GetDownloadHistory(mediaID int) ([]*ent.History, error) {
 	return c.ent.History.Query().Where(history.MediaID(mediaID)).All(context.TODO())
 }
 
-func (c *Client) GetMovieDummyEpisode(movieId int) (*ent.Episode, error) {
+func (c *client) GetMovieDummyEpisode(movieId int) (*ent.Episode, error) {
 	_, err := c.ent.Media.Query().Where(media.ID(movieId), media.MediaTypeEQ(media.MediaTypeMovie)).First(context.TODO())
 	if err != nil {
 		return nil, errors.Wrap(err, "get movie")
@@ -562,11 +562,11 @@ func (c *Client) GetMovieDummyEpisode(movieId int) (*ent.Episode, error) {
 	return ep, nil
 }
 
-func (c *Client) GetDownloadClient(id int) (*ent.DownloadClients, error) {
+func (c *client) GetDownloadClient(id int) (*ent.DownloadClients, error) {
 	return c.ent.DownloadClients.Query().Where(downloadclients.ID(id)).First(context.Background())
 }
 
-func (c *Client) SetEpisodeMonitoring(id int, b bool) error {
+func (c *client) SetEpisodeMonitoring(id int, b bool) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetMonitored(b).Exec(context.Background())
 }
 
@@ -577,24 +577,24 @@ type EditMediaData struct {
 	Limiter    schema.MediaLimiter `json:"limiter"`
 }
 
-func (c *Client) EditMediaMetadata(in EditMediaData) error {
+func (c *client) EditMediaMetadata(in EditMediaData) error {
 	return c.ent.Media.Update().Where(media.ID(in.ID)).SetResolution(in.Resolution).SetTargetDir(in.TargetDir).SetLimiter(in.Limiter).
 		Exec(context.Background())
 }
 
-func (c *Client) UpdateEpisodeTargetFile(id int, filename string) error {
+func (c *client) UpdateEpisodeTargetFile(id int, filename string) error {
 	return c.ent.Episode.Update().Where(episode.ID(id)).SetTargetFile(filename).Exec(context.Background())
 }
 
-func (c *Client) GetSeasonEpisodes(mediaId, seasonNum int) ([]*ent.Episode, error) {
+func (c *client) GetSeasonEpisodes(mediaId, seasonNum int) ([]*ent.Episode, error) {
 	return c.ent.Episode.Query().Where(episode.MediaID(mediaId), episode.SeasonNumber(seasonNum)).All(context.Background())
 }
 
-func (c *Client) GetAllImportLists() ([]*ent.ImportList, error) {
+func (c *client) GetAllImportLists() ([]*ent.ImportList, error) {
 	return c.ent.ImportList.Query().All(context.Background())
 }
 
-func (c *Client) AddImportlist(il *ent.ImportList) error {
+func (c *client) AddImportlist(il *ent.ImportList) error {
 	count, err := c.ent.ImportList.Query().Where(importlist.Name(il.Name)).Count(context.Background())
 	if err != nil {
 		return err
@@ -608,11 +608,11 @@ func (c *Client) AddImportlist(il *ent.ImportList) error {
 		SetType(il.Type).Exec(context.Background())
 }
 
-func (c *Client) DeleteImportlist(id int) error {
+func (c *client) DeleteImportlist(id int) error {
 	return c.ent.ImportList.DeleteOneID(id).Exec(context.TODO())
 }
 
-func (c *Client) GetSizeLimiter(mediaType string) (*MediaSizeLimiter, error) {
+func (c *client) GetSizeLimiter(mediaType string) (*MediaSizeLimiter, error) {
 	var v string
 	if mediaType == "tv" {
 		v = c.GetSetting(SettingTvSizeLimiter)
@@ -631,7 +631,7 @@ func (c *Client) GetSizeLimiter(mediaType string) (*MediaSizeLimiter, error) {
 	return &limiter, err
 }
 
-func (c *Client) SetSizeLimiter(mediaType string, limiter *MediaSizeLimiter) error {
+func (c *client) SetSizeLimiter(mediaType string, limiter *MediaSizeLimiter) error {
 	data, err := json.Marshal(limiter)
 	if err != nil {
 		return err
@@ -646,7 +646,7 @@ func (c *Client) SetSizeLimiter(mediaType string, limiter *MediaSizeLimiter) err
 
 }
 
-func (c *Client) GetTvNamingFormat() string {
+func (c *client) GetTvNamingFormat() string {
 	s := c.GetSetting(SettingTvNamingFormat)
 	if s == "" {
 		return DefaultNamingFormat
@@ -654,7 +654,7 @@ func (c *Client) GetTvNamingFormat() string {
 	return s
 }
 
-func (c *Client) GetMovingNamingFormat() string {
+func (c *client) GetMovingNamingFormat() string {
 	s := c.GetSetting(SettingMovieNamingFormat)
 	if s == "" {
 		return DefaultNamingFormat
@@ -662,16 +662,11 @@ func (c *Client) GetMovingNamingFormat() string {
 	return s
 }
 
-func (c *Client) CleanAllDanglingEpisodes() error {
+func (c *client) CleanAllDanglingEpisodes() error {
 	_, err := c.ent.Episode.Delete().Where(episode.Not(episode.HasMedia())).Exec(context.Background())
 	return err
 }
-
-func (c *Client) AddBlacklistItem(item *ent.Blacklist) error {
-	return c.ent.Blacklist.Create().SetType(item.Type).SetValue(item.Value).SetNotes(item.Notes).Exec(context.Background())
-}
-
-func (c *Client) GetProwlarrSetting() (*ProwlarrSetting, error) {
+func (c *client) GetProwlarrSetting() (*ProwlarrSetting, error) {
 	s := c.GetSetting(SettingProwlarrInfo)
 	if s == "" {
 		return nil, errors.New("prowlarr setting not set")
@@ -683,7 +678,7 @@ func (c *Client) GetProwlarrSetting() (*ProwlarrSetting, error) {
 	return &se, nil
 }
 
-func (c *Client) SaveProwlarrSetting(se *ProwlarrSetting) error {
+func (c *client) SaveProwlarrSetting(se *ProwlarrSetting) error {
 	data, err := json.Marshal(se)
 	if err != nil {
 		return err
@@ -691,7 +686,7 @@ func (c *Client) SaveProwlarrSetting(se *ProwlarrSetting) error {
 	return c.SetSetting(SettingProwlarrInfo, string(data))
 }
 
-func (c *Client) getAcceptedFormats(key string) ([]string, error) {
+func (c *client) getAcceptedFormats(key string) ([]string, error) {
 	v := c.GetSetting(key)
 	if v == "" {
 		return nil, nil
@@ -702,7 +697,7 @@ func (c *Client) getAcceptedFormats(key string) ([]string, error) {
 	return res, err
 }
 
-func (c *Client) setAcceptedFormats(key string, v []string) error {
+func (c *client) setAcceptedFormats(key string, v []string) error {
 	data, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -710,7 +705,7 @@ func (c *Client) setAcceptedFormats(key string, v []string) error {
 	return c.SetSetting(key, string(data))
 }
 
-func (c *Client) GetAcceptedVideoFormats() ([]string, error) {
+func (c *client) GetAcceptedVideoFormats() ([]string, error) {
 	res, err := c.getAcceptedFormats(SettingAcceptedVideoFormats)
 	if err != nil {
 		return nil, err
@@ -721,11 +716,11 @@ func (c *Client) GetAcceptedVideoFormats() ([]string, error) {
 	return res, nil
 }
 
-func (c *Client) SetAcceptedVideoFormats(key string, v []string) error {
+func (c *client) SetAcceptedVideoFormats(key string, v []string) error {
 	return c.setAcceptedFormats(SettingAcceptedVideoFormats, v)
 }
 
-func (c *Client) GetAcceptedSubtitleFormats() ([]string, error) {
+func (c *client) GetAcceptedSubtitleFormats() ([]string, error) {
 	res, err := c.getAcceptedFormats(SettingAcceptedSubtitleFormats)
 	if err != nil {
 		return nil, err
@@ -736,11 +731,11 @@ func (c *Client) GetAcceptedSubtitleFormats() ([]string, error) {
 	return res, nil
 }
 
-func (c *Client) SetAcceptedSubtitleFormats(key string, v []string) error {
+func (c *client) SetAcceptedSubtitleFormats(key string, v []string) error {
 	return c.setAcceptedFormats(SettingAcceptedSubtitleFormats, v)
 }
 
-func (c *Client) GetTmdbApiKey() string {
+func (c *client) GetTmdbApiKey() string {
 	k := c.GetSetting(SettingTmdbApiKey)
 	if k == "" {
 		return DefaultTmdbApiKey
