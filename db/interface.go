@@ -42,6 +42,7 @@ type Database interface {
 
 	AddTorrent2Blacklist(hash, name string, mediaId int) error
 	GetTorrentBlacklist() (ent.Blacklists, error)
+	DeleteTorrentBlacklist(id int) error
 }
 
 type Settings interface {

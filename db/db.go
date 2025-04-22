@@ -757,3 +757,6 @@ func (c *client) AddTorrent2Blacklist(hash, name string, mediaId int) error  {
 func (c *client) GetTorrentBlacklist() (ent.Blacklists, error) {
 	return c.ent.Blacklist.Query().Where(blacklist.TypeEQ(blacklist.TypeTorrent)).All(context.Background())
 }
+func (c *client) DeleteTorrentBlacklist(id int) error {
+	return c.ent.Blacklist.DeleteOneID(id).Exec(context.Background())
+}

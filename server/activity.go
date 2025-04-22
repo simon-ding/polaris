@@ -135,6 +135,20 @@ func (s *Server) GetAllBlacklistItems(c *gin.Context) (interface{}, error) {
 	}
 	return list, nil
 }
+func (s *Server) RemoveBlacklistItem(c *gin.Context) (interface{}, error) {
+	id := c.Param("id")
+	if id == "" {
+		return nil, fmt.Errorf("id is empty")
+	}
+	idInt, err := strconv.Atoi(id)
+	if err!= nil {
+		return nil, fmt.Errorf("id is not int: %v", id)
+	}
+	if err := s.db.DeleteTorrentBlacklist(idInt); err!= nil {
+		return nil, errors.Wrap(err, "db")	
+	}
+	return nil, nil
+}
 
 func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {
 	var ids = c.Param("id")
