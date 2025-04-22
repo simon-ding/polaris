@@ -290,6 +290,10 @@ class DownloadClient {
     data["remove_failed_downloads"] = removeFailedDownloads;
     return data;
   }
+
+  bool idExists() {
+    return id != null && id != 0;
+  }
 }
 
 class StorageSettingData extends AutoDisposeAsyncNotifier<List<Storage>> {
