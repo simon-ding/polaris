@@ -36,6 +36,7 @@ type Engine struct {
 	tasks      utils.Map[int, *Task]
 	language   string
 	schedulers utils.Map[string, scheduler]
+	buildin *buildin.Downloader
 }
 
 func (c *Engine) registerCronJob(name string, cron string, f func() error) {
@@ -143,8 +144,16 @@ func (c *Engine) reloadTasks() {
 }
 
 func (c *Engine) buildInDownloader() (pkg.Downloader, error) {
+	if c.buildin!= nil {
+		return c.buildin, nil	
+	}
 	dir := c.db.GetDownloadDir()
-	return buildin.NewDownloader(dir)
+	d, err := buildin.NewDownloader(dir)
+	if err != nil {
+		return nil, errors.Wrap(err, "buildin downloader")	
+	}
+	c.buildin = d
+	return d, nil
 }
 
 func (c *Engine) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, error) {
@@ -175,7 +184,7 @@ func (c *Engine) GetDownloadClient() (pkg.Downloader, *ent.DownloadClients, erro
 		} else if d.Implementation == downloadclients.ImplementationBuildin {
 			bin, err := c.buildInDownloader()
 			if err != nil {
-				log.Warnf("connect to download client error: %v", d.URL)
+				log.Warnf("connect to download client error: %v", err)
 				continue
 			}
 			return bin, d, nil

@@ -323,7 +323,14 @@ func (c *client) GetAllDonloadClients() []*ent.DownloadClients {
 	cc, err := c.ent.DownloadClients.Query().Order(ent.Asc(downloadclients.FieldPriority1)).All(context.TODO())
 	if err != nil {
 		log.Errorf("no download client")
-		return nil
+		return []*ent.DownloadClients{
+			{
+				Implementation: downloadclients.ImplementationBuildin,
+				Name:           "内建下载器",
+				Priority1:      9999,
+				Enable:         true,
+			},
+		}
 	}
 	cc = append(cc, &ent.DownloadClients{
 		Implementation: downloadclients.ImplementationBuildin,

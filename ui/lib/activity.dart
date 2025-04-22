@@ -60,11 +60,14 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
           AsyncValue<List<Activity>>? activitiesWatcher;
 
           if (selectedTab == 2) {
-            activitiesWatcher = ref.watch(activitiesDataProvider(ActivityStatus.archive));
+            activitiesWatcher =
+                ref.watch(activitiesDataProvider(ActivityStatus.archive));
           } else if (selectedTab == 1) {
-            activitiesWatcher = ref.watch(activitiesDataProvider(ActivityStatus.seeding));
+            activitiesWatcher =
+                ref.watch(activitiesDataProvider(ActivityStatus.seeding));
           } else if (selectedTab == 0) {
-            activitiesWatcher = ref.watch(activitiesDataProvider(ActivityStatus.active));
+            activitiesWatcher =
+                ref.watch(activitiesDataProvider(ActivityStatus.active));
           }
 
           return activitiesWatcher!.when(
@@ -143,7 +146,8 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                           trailing: selectedTab != 2
                               ? IconButton(
                                   tooltip: "删除任务",
-                                  onPressed: () => onDelete()(ac.id!),
+                                  onPressed: () =>
+                                      showConfirmDialog(context, ac.id!),
                                   icon: const Icon(Icons.delete))
                               : const Text("-"),
                         ),
@@ -160,12 +164,45 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
     );
   }
 
-  Function(int) onDelete() {
-    return (id) {
-      final f = ref
-          .read(activitiesDataProvider(ActivityStatus.active).notifier)
-          .deleteActivity(id);
-      showLoadingWithFuture(f);
-    };
+  Future<void> showConfirmDialog(BuildContext oriContext, int id) {
+    var add2Blacklist = false;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("确认删除"),
+          content: StatefulBuilder(builder: (context, setState) {
+            return CheckboxListTile(
+                value: add2Blacklist,
+                title: Text("加入黑名单"),
+                onChanged: (v) {
+                  setState(
+                    () {
+                      add2Blacklist = v!;
+                    },
+                  );
+                });
+          }),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("取消")),
+            TextButton(
+                child: const Text("确认"),
+                onPressed: () {
+                  final f = ref
+                      .read(activitiesDataProvider(ActivityStatus.active)
+                          .notifier)
+                      .deleteActivity(id, add2Blacklist)
+                      .then((value) {
+                    Navigator.of(context).pop();
+                  });
+                  showLoadingWithFuture(f);
+                }),
+          ],
+        );
+      },
+    );
   }
 }

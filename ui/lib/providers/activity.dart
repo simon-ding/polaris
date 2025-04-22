@@ -68,11 +68,11 @@ class ActivityData
     return activities;
   }
 
-  Future<void> deleteActivity(int id) async {
+  Future<void> deleteActivity(int id, bool add2Blacklist) async {
     final dio = APIs.getDio();
     var resp = await dio.post(APIs.activityDeleteUrl, data: {
       "id": id,
-      "add_2_blacklist": false,
+      "add_2_blacklist": add2Blacklist,
     });
     final sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
