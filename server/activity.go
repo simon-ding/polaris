@@ -7,7 +7,6 @@ import (
 	"polaris/ent/episode"
 	"polaris/ent/history"
 	"polaris/log"
-	"polaris/pkg/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -89,7 +88,7 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	}
 	if in.Add2Blacklist && his.Link != "" {
 		//should add to blacklist
-		if err := s.addTorrent2Blacklist(his.Link); err != nil {
+		if err := s.addTorrent2Blacklist(his); err != nil {
 			return nil, errors.Errorf("add to blacklist: %v", err)
 		} else {
 			log.Infof("success add magnet link to blacklist: %v", his.Link)
@@ -118,25 +117,23 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	return nil, nil
 }
 
-func (s *Server) addTorrent2Blacklist(link string) error {
-	if link == "" {
-		return nil
+func (s *Server) addTorrent2Blacklist(h *ent.History) error {
+	var name string
+
+	task, ok := s.core.GetTask(h.ID)
+	if ok {
+		name, _ = task.Name()
 	}
-	if _, err := utils.MagnetHash(link); err != nil {
-		return err
-	} else {
-		// item := ent.Blacklist{
-		// 	Type: blacklist.TypeTorrent,
-		// 	Value: schema.BlacklistValue{
-		// 		TorrentHash: hash,
-		// 	},
-		// }
-		// err := s.db.AddBlacklistItem(&item)
-		// if err != nil {
-		// 	return errors.Wrap(err, "add to db")
-		// }
+
+	return s.db.AddTorrent2Blacklist(h.Hash, name, h.MediaID)
+}
+
+func (s *Server) GetAllBlacklistItems(c *gin.Context) (interface{}, error) {
+	list, err := s.db.GetTorrentBlacklist()
+	if err!= nil {
+		return nil, errors.Wrap(err, "db")
 	}
-	return nil
+	return list, nil
 }
 
 func (s *Server) GetMediaDownloadHistory(c *gin.Context) (interface{}, error) {

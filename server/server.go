@@ -86,6 +86,7 @@ func (s *Server) Serve() error {
 		activity.GET("/", HttpHandler(s.GetAllActivities))
 		activity.POST("/delete", HttpHandler(s.RemoveActivity))
 		activity.GET("/media/:id", HttpHandler(s.GetMediaDownloadHistory))
+		activity.GET("/blacklist", HttpHandler(s.GetAllBlacklistItems))
 		//activity.GET("/torrents", HttpHandler(s.GetAllTorrents))
 	}
 

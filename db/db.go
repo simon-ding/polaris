@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"polaris/ent"
+	"polaris/ent/blacklist"
 	"polaris/ent/downloadclients"
 	"polaris/ent/episode"
 	"polaris/ent/history"
@@ -741,4 +742,18 @@ func (c *client) GetTmdbApiKey() string {
 		return DefaultTmdbApiKey
 	}
 	return k
+}
+
+
+func (c *client) AddTorrent2Blacklist(hash, name string, mediaId int) error  {
+	count := c.ent.Blacklist.Query().Where(blacklist.TorrentHash(hash), blacklist.MediaID(mediaId)).CountX(context.TODO())
+	if count > 0 { //already exist
+		log.Infof("torrent %s already in blacklist", hash)
+		return nil
+	}
+	return c.ent.Blacklist.Create().SetType(blacklist.TypeTorrent).SetTorrentHash(hash).SetTorrentName(name).SetMediaID(mediaId).Exec(context.Background())
+}
+
+func (c *client) GetTorrentBlacklist() (ent.Blacklists, error) {
+	return c.ent.Blacklist.Query().Where(blacklist.TypeEQ(blacklist.TypeTorrent)).All(context.Background())
 }

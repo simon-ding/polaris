@@ -21,10 +21,10 @@ import (
 func init() {
 	blacklistFields := schema.Blacklist{}.Fields()
 	_ = blacklistFields
-	// blacklistDescValue is the schema descriptor for value field.
-	blacklistDescValue := blacklistFields[1].Descriptor()
-	// blacklist.DefaultValue holds the default value on creation for the value field.
-	blacklist.DefaultValue = blacklistDescValue.Default.(schema.BlacklistValue)
+	// blacklistDescCreateTime is the schema descriptor for create_time field.
+	blacklistDescCreateTime := blacklistFields[4].Descriptor()
+	// blacklist.DefaultCreateTime holds the default value on creation for the create_time field.
+	blacklist.DefaultCreateTime = blacklistDescCreateTime.Default.(func() time.Time)
 	downloadclientsFields := schema.DownloadClients{}.Fields()
 	_ = downloadclientsFields
 	// downloadclientsDescUser is the schema descriptor for user field.

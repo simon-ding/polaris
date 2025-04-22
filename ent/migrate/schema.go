@@ -11,8 +11,11 @@ var (
 	// BlacklistsColumns holds the columns for the "blacklists" table.
 	BlacklistsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"media", "torrent"}},
-		{Name: "value", Type: field.TypeJSON},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"media", "torrent"}, Default: "torrent"},
+		{Name: "torrent_hash", Type: field.TypeString, Nullable: true},
+		{Name: "torrent_name", Type: field.TypeString, Nullable: true},
+		{Name: "media_id", Type: field.TypeInt, Nullable: true},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
 		{Name: "notes", Type: field.TypeString, Nullable: true},
 	}
 	// BlacklistsTable holds the schema information for the "blacklists" table.

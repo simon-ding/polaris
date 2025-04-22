@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"polaris/ent/blacklist"
 	"polaris/ent/predicate"
-	"polaris/ent/schema"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -42,17 +41,70 @@ func (bu *BlacklistUpdate) SetNillableType(b *blacklist.Type) *BlacklistUpdate {
 	return bu
 }
 
-// SetValue sets the "value" field.
-func (bu *BlacklistUpdate) SetValue(sv schema.BlacklistValue) *BlacklistUpdate {
-	bu.mutation.SetValue(sv)
+// SetTorrentHash sets the "torrent_hash" field.
+func (bu *BlacklistUpdate) SetTorrentHash(s string) *BlacklistUpdate {
+	bu.mutation.SetTorrentHash(s)
 	return bu
 }
 
-// SetNillableValue sets the "value" field if the given value is not nil.
-func (bu *BlacklistUpdate) SetNillableValue(sv *schema.BlacklistValue) *BlacklistUpdate {
-	if sv != nil {
-		bu.SetValue(*sv)
+// SetNillableTorrentHash sets the "torrent_hash" field if the given value is not nil.
+func (bu *BlacklistUpdate) SetNillableTorrentHash(s *string) *BlacklistUpdate {
+	if s != nil {
+		bu.SetTorrentHash(*s)
 	}
+	return bu
+}
+
+// ClearTorrentHash clears the value of the "torrent_hash" field.
+func (bu *BlacklistUpdate) ClearTorrentHash() *BlacklistUpdate {
+	bu.mutation.ClearTorrentHash()
+	return bu
+}
+
+// SetTorrentName sets the "torrent_name" field.
+func (bu *BlacklistUpdate) SetTorrentName(s string) *BlacklistUpdate {
+	bu.mutation.SetTorrentName(s)
+	return bu
+}
+
+// SetNillableTorrentName sets the "torrent_name" field if the given value is not nil.
+func (bu *BlacklistUpdate) SetNillableTorrentName(s *string) *BlacklistUpdate {
+	if s != nil {
+		bu.SetTorrentName(*s)
+	}
+	return bu
+}
+
+// ClearTorrentName clears the value of the "torrent_name" field.
+func (bu *BlacklistUpdate) ClearTorrentName() *BlacklistUpdate {
+	bu.mutation.ClearTorrentName()
+	return bu
+}
+
+// SetMediaID sets the "media_id" field.
+func (bu *BlacklistUpdate) SetMediaID(i int) *BlacklistUpdate {
+	bu.mutation.ResetMediaID()
+	bu.mutation.SetMediaID(i)
+	return bu
+}
+
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (bu *BlacklistUpdate) SetNillableMediaID(i *int) *BlacklistUpdate {
+	if i != nil {
+		bu.SetMediaID(*i)
+	}
+	return bu
+}
+
+// AddMediaID adds i to the "media_id" field.
+func (bu *BlacklistUpdate) AddMediaID(i int) *BlacklistUpdate {
+	bu.mutation.AddMediaID(i)
+	return bu
+}
+
+// ClearMediaID clears the value of the "media_id" field.
+func (bu *BlacklistUpdate) ClearMediaID() *BlacklistUpdate {
+	bu.mutation.ClearMediaID()
 	return bu
 }
 
@@ -133,8 +185,29 @@ func (bu *BlacklistUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.GetType(); ok {
 		_spec.SetField(blacklist.FieldType, field.TypeEnum, value)
 	}
-	if value, ok := bu.mutation.Value(); ok {
-		_spec.SetField(blacklist.FieldValue, field.TypeJSON, value)
+	if value, ok := bu.mutation.TorrentHash(); ok {
+		_spec.SetField(blacklist.FieldTorrentHash, field.TypeString, value)
+	}
+	if bu.mutation.TorrentHashCleared() {
+		_spec.ClearField(blacklist.FieldTorrentHash, field.TypeString)
+	}
+	if value, ok := bu.mutation.TorrentName(); ok {
+		_spec.SetField(blacklist.FieldTorrentName, field.TypeString, value)
+	}
+	if bu.mutation.TorrentNameCleared() {
+		_spec.ClearField(blacklist.FieldTorrentName, field.TypeString)
+	}
+	if value, ok := bu.mutation.MediaID(); ok {
+		_spec.SetField(blacklist.FieldMediaID, field.TypeInt, value)
+	}
+	if value, ok := bu.mutation.AddedMediaID(); ok {
+		_spec.AddField(blacklist.FieldMediaID, field.TypeInt, value)
+	}
+	if bu.mutation.MediaIDCleared() {
+		_spec.ClearField(blacklist.FieldMediaID, field.TypeInt)
+	}
+	if bu.mutation.CreateTimeCleared() {
+		_spec.ClearField(blacklist.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := bu.mutation.Notes(); ok {
 		_spec.SetField(blacklist.FieldNotes, field.TypeString, value)
@@ -176,17 +249,70 @@ func (buo *BlacklistUpdateOne) SetNillableType(b *blacklist.Type) *BlacklistUpda
 	return buo
 }
 
-// SetValue sets the "value" field.
-func (buo *BlacklistUpdateOne) SetValue(sv schema.BlacklistValue) *BlacklistUpdateOne {
-	buo.mutation.SetValue(sv)
+// SetTorrentHash sets the "torrent_hash" field.
+func (buo *BlacklistUpdateOne) SetTorrentHash(s string) *BlacklistUpdateOne {
+	buo.mutation.SetTorrentHash(s)
 	return buo
 }
 
-// SetNillableValue sets the "value" field if the given value is not nil.
-func (buo *BlacklistUpdateOne) SetNillableValue(sv *schema.BlacklistValue) *BlacklistUpdateOne {
-	if sv != nil {
-		buo.SetValue(*sv)
+// SetNillableTorrentHash sets the "torrent_hash" field if the given value is not nil.
+func (buo *BlacklistUpdateOne) SetNillableTorrentHash(s *string) *BlacklistUpdateOne {
+	if s != nil {
+		buo.SetTorrentHash(*s)
 	}
+	return buo
+}
+
+// ClearTorrentHash clears the value of the "torrent_hash" field.
+func (buo *BlacklistUpdateOne) ClearTorrentHash() *BlacklistUpdateOne {
+	buo.mutation.ClearTorrentHash()
+	return buo
+}
+
+// SetTorrentName sets the "torrent_name" field.
+func (buo *BlacklistUpdateOne) SetTorrentName(s string) *BlacklistUpdateOne {
+	buo.mutation.SetTorrentName(s)
+	return buo
+}
+
+// SetNillableTorrentName sets the "torrent_name" field if the given value is not nil.
+func (buo *BlacklistUpdateOne) SetNillableTorrentName(s *string) *BlacklistUpdateOne {
+	if s != nil {
+		buo.SetTorrentName(*s)
+	}
+	return buo
+}
+
+// ClearTorrentName clears the value of the "torrent_name" field.
+func (buo *BlacklistUpdateOne) ClearTorrentName() *BlacklistUpdateOne {
+	buo.mutation.ClearTorrentName()
+	return buo
+}
+
+// SetMediaID sets the "media_id" field.
+func (buo *BlacklistUpdateOne) SetMediaID(i int) *BlacklistUpdateOne {
+	buo.mutation.ResetMediaID()
+	buo.mutation.SetMediaID(i)
+	return buo
+}
+
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (buo *BlacklistUpdateOne) SetNillableMediaID(i *int) *BlacklistUpdateOne {
+	if i != nil {
+		buo.SetMediaID(*i)
+	}
+	return buo
+}
+
+// AddMediaID adds i to the "media_id" field.
+func (buo *BlacklistUpdateOne) AddMediaID(i int) *BlacklistUpdateOne {
+	buo.mutation.AddMediaID(i)
+	return buo
+}
+
+// ClearMediaID clears the value of the "media_id" field.
+func (buo *BlacklistUpdateOne) ClearMediaID() *BlacklistUpdateOne {
+	buo.mutation.ClearMediaID()
 	return buo
 }
 
@@ -297,8 +423,29 @@ func (buo *BlacklistUpdateOne) sqlSave(ctx context.Context) (_node *Blacklist, e
 	if value, ok := buo.mutation.GetType(); ok {
 		_spec.SetField(blacklist.FieldType, field.TypeEnum, value)
 	}
-	if value, ok := buo.mutation.Value(); ok {
-		_spec.SetField(blacklist.FieldValue, field.TypeJSON, value)
+	if value, ok := buo.mutation.TorrentHash(); ok {
+		_spec.SetField(blacklist.FieldTorrentHash, field.TypeString, value)
+	}
+	if buo.mutation.TorrentHashCleared() {
+		_spec.ClearField(blacklist.FieldTorrentHash, field.TypeString)
+	}
+	if value, ok := buo.mutation.TorrentName(); ok {
+		_spec.SetField(blacklist.FieldTorrentName, field.TypeString, value)
+	}
+	if buo.mutation.TorrentNameCleared() {
+		_spec.ClearField(blacklist.FieldTorrentName, field.TypeString)
+	}
+	if value, ok := buo.mutation.MediaID(); ok {
+		_spec.SetField(blacklist.FieldMediaID, field.TypeInt, value)
+	}
+	if value, ok := buo.mutation.AddedMediaID(); ok {
+		_spec.AddField(blacklist.FieldMediaID, field.TypeInt, value)
+	}
+	if buo.mutation.MediaIDCleared() {
+		_spec.ClearField(blacklist.FieldMediaID, field.TypeInt)
+	}
+	if buo.mutation.CreateTimeCleared() {
+		_spec.ClearField(blacklist.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := buo.mutation.Notes(); ok {
 		_spec.SetField(blacklist.FieldNotes, field.TypeString, value)

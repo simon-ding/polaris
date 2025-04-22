@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -13,8 +15,11 @@ type Blacklist struct {
 // Fields of the Blacklist.
 func (Blacklist) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("type").Values("media", "torrent"),
-		field.JSON("value", BlacklistValue{}).Default(BlacklistValue{}),
+		field.Enum("type").Values("media", "torrent").Default("torrent"),
+		field.String("torrent_hash").Optional(),
+		field.String("torrent_name").Optional(),
+		field.Int("media_id").Optional(),
+		field.Time("create_time").Optional().Default(time.Now).Immutable(),
 		field.String("notes").Optional(),
 	}
 }
@@ -22,9 +27,4 @@ func (Blacklist) Fields() []ent.Field {
 // Edges of the Blacklist.
 func (Blacklist) Edges() []ent.Edge {
 	return nil
-}
-
-type BlacklistValue struct {
-	TmdbID      int    `json:"tmdb_id"`
-	TorrentHash string `json:"torrent_hash"`
 }

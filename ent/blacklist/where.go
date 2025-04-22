@@ -4,6 +4,7 @@ package blacklist
 
 import (
 	"polaris/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -53,6 +54,26 @@ func IDLTE(id int) predicate.Blacklist {
 	return predicate.Blacklist(sql.FieldLTE(FieldID, id))
 }
 
+// TorrentHash applies equality check predicate on the "torrent_hash" field. It's identical to TorrentHashEQ.
+func TorrentHash(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldTorrentHash, v))
+}
+
+// TorrentName applies equality check predicate on the "torrent_name" field. It's identical to TorrentNameEQ.
+func TorrentName(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldTorrentName, v))
+}
+
+// MediaID applies equality check predicate on the "media_id" field. It's identical to MediaIDEQ.
+func MediaID(v int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldMediaID, v))
+}
+
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldCreateTime, v))
+}
+
 // Notes applies equality check predicate on the "notes" field. It's identical to NotesEQ.
 func Notes(v string) predicate.Blacklist {
 	return predicate.Blacklist(sql.FieldEQ(FieldNotes, v))
@@ -76,6 +97,256 @@ func TypeIn(vs ...Type) predicate.Blacklist {
 // TypeNotIn applies the NotIn predicate on the "type" field.
 func TypeNotIn(vs ...Type) predicate.Blacklist {
 	return predicate.Blacklist(sql.FieldNotIn(FieldType, vs...))
+}
+
+// TorrentHashEQ applies the EQ predicate on the "torrent_hash" field.
+func TorrentHashEQ(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldTorrentHash, v))
+}
+
+// TorrentHashNEQ applies the NEQ predicate on the "torrent_hash" field.
+func TorrentHashNEQ(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNEQ(FieldTorrentHash, v))
+}
+
+// TorrentHashIn applies the In predicate on the "torrent_hash" field.
+func TorrentHashIn(vs ...string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIn(FieldTorrentHash, vs...))
+}
+
+// TorrentHashNotIn applies the NotIn predicate on the "torrent_hash" field.
+func TorrentHashNotIn(vs ...string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotIn(FieldTorrentHash, vs...))
+}
+
+// TorrentHashGT applies the GT predicate on the "torrent_hash" field.
+func TorrentHashGT(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGT(FieldTorrentHash, v))
+}
+
+// TorrentHashGTE applies the GTE predicate on the "torrent_hash" field.
+func TorrentHashGTE(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGTE(FieldTorrentHash, v))
+}
+
+// TorrentHashLT applies the LT predicate on the "torrent_hash" field.
+func TorrentHashLT(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLT(FieldTorrentHash, v))
+}
+
+// TorrentHashLTE applies the LTE predicate on the "torrent_hash" field.
+func TorrentHashLTE(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLTE(FieldTorrentHash, v))
+}
+
+// TorrentHashContains applies the Contains predicate on the "torrent_hash" field.
+func TorrentHashContains(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldContains(FieldTorrentHash, v))
+}
+
+// TorrentHashHasPrefix applies the HasPrefix predicate on the "torrent_hash" field.
+func TorrentHashHasPrefix(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldHasPrefix(FieldTorrentHash, v))
+}
+
+// TorrentHashHasSuffix applies the HasSuffix predicate on the "torrent_hash" field.
+func TorrentHashHasSuffix(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldHasSuffix(FieldTorrentHash, v))
+}
+
+// TorrentHashIsNil applies the IsNil predicate on the "torrent_hash" field.
+func TorrentHashIsNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIsNull(FieldTorrentHash))
+}
+
+// TorrentHashNotNil applies the NotNil predicate on the "torrent_hash" field.
+func TorrentHashNotNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotNull(FieldTorrentHash))
+}
+
+// TorrentHashEqualFold applies the EqualFold predicate on the "torrent_hash" field.
+func TorrentHashEqualFold(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEqualFold(FieldTorrentHash, v))
+}
+
+// TorrentHashContainsFold applies the ContainsFold predicate on the "torrent_hash" field.
+func TorrentHashContainsFold(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldContainsFold(FieldTorrentHash, v))
+}
+
+// TorrentNameEQ applies the EQ predicate on the "torrent_name" field.
+func TorrentNameEQ(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldTorrentName, v))
+}
+
+// TorrentNameNEQ applies the NEQ predicate on the "torrent_name" field.
+func TorrentNameNEQ(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNEQ(FieldTorrentName, v))
+}
+
+// TorrentNameIn applies the In predicate on the "torrent_name" field.
+func TorrentNameIn(vs ...string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIn(FieldTorrentName, vs...))
+}
+
+// TorrentNameNotIn applies the NotIn predicate on the "torrent_name" field.
+func TorrentNameNotIn(vs ...string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotIn(FieldTorrentName, vs...))
+}
+
+// TorrentNameGT applies the GT predicate on the "torrent_name" field.
+func TorrentNameGT(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGT(FieldTorrentName, v))
+}
+
+// TorrentNameGTE applies the GTE predicate on the "torrent_name" field.
+func TorrentNameGTE(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGTE(FieldTorrentName, v))
+}
+
+// TorrentNameLT applies the LT predicate on the "torrent_name" field.
+func TorrentNameLT(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLT(FieldTorrentName, v))
+}
+
+// TorrentNameLTE applies the LTE predicate on the "torrent_name" field.
+func TorrentNameLTE(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLTE(FieldTorrentName, v))
+}
+
+// TorrentNameContains applies the Contains predicate on the "torrent_name" field.
+func TorrentNameContains(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldContains(FieldTorrentName, v))
+}
+
+// TorrentNameHasPrefix applies the HasPrefix predicate on the "torrent_name" field.
+func TorrentNameHasPrefix(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldHasPrefix(FieldTorrentName, v))
+}
+
+// TorrentNameHasSuffix applies the HasSuffix predicate on the "torrent_name" field.
+func TorrentNameHasSuffix(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldHasSuffix(FieldTorrentName, v))
+}
+
+// TorrentNameIsNil applies the IsNil predicate on the "torrent_name" field.
+func TorrentNameIsNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIsNull(FieldTorrentName))
+}
+
+// TorrentNameNotNil applies the NotNil predicate on the "torrent_name" field.
+func TorrentNameNotNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotNull(FieldTorrentName))
+}
+
+// TorrentNameEqualFold applies the EqualFold predicate on the "torrent_name" field.
+func TorrentNameEqualFold(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEqualFold(FieldTorrentName, v))
+}
+
+// TorrentNameContainsFold applies the ContainsFold predicate on the "torrent_name" field.
+func TorrentNameContainsFold(v string) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldContainsFold(FieldTorrentName, v))
+}
+
+// MediaIDEQ applies the EQ predicate on the "media_id" field.
+func MediaIDEQ(v int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldMediaID, v))
+}
+
+// MediaIDNEQ applies the NEQ predicate on the "media_id" field.
+func MediaIDNEQ(v int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNEQ(FieldMediaID, v))
+}
+
+// MediaIDIn applies the In predicate on the "media_id" field.
+func MediaIDIn(vs ...int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIn(FieldMediaID, vs...))
+}
+
+// MediaIDNotIn applies the NotIn predicate on the "media_id" field.
+func MediaIDNotIn(vs ...int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotIn(FieldMediaID, vs...))
+}
+
+// MediaIDGT applies the GT predicate on the "media_id" field.
+func MediaIDGT(v int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGT(FieldMediaID, v))
+}
+
+// MediaIDGTE applies the GTE predicate on the "media_id" field.
+func MediaIDGTE(v int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGTE(FieldMediaID, v))
+}
+
+// MediaIDLT applies the LT predicate on the "media_id" field.
+func MediaIDLT(v int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLT(FieldMediaID, v))
+}
+
+// MediaIDLTE applies the LTE predicate on the "media_id" field.
+func MediaIDLTE(v int) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLTE(FieldMediaID, v))
+}
+
+// MediaIDIsNil applies the IsNil predicate on the "media_id" field.
+func MediaIDIsNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIsNull(FieldMediaID))
+}
+
+// MediaIDNotNil applies the NotNil predicate on the "media_id" field.
+func MediaIDNotNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotNull(FieldMediaID))
+}
+
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldEQ(FieldCreateTime, v))
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNEQ(FieldCreateTime, v))
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotIn(FieldCreateTime, vs...))
+}
+
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGT(FieldCreateTime, v))
+}
+
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldGTE(FieldCreateTime, v))
+}
+
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLT(FieldCreateTime, v))
+}
+
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldLTE(FieldCreateTime, v))
+}
+
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.Blacklist {
+	return predicate.Blacklist(sql.FieldNotNull(FieldCreateTime))
 }
 
 // NotesEQ applies the EQ predicate on the "notes" field.

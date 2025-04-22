@@ -39,6 +39,9 @@ type Database interface {
 	AddNotificationClient(name, service string, setting string, enabled bool) error
 	DeleteNotificationClient(id int) error
 	GetNotificationClient(id int) (*NotificationClient, error)
+
+	AddTorrent2Blacklist(hash, name string, mediaId int) error
+	GetTorrentBlacklist() (ent.Blacklists, error)
 }
 
 type Settings interface {

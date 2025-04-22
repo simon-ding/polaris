@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"polaris/ent/blacklist"
-	"polaris/ent/schema"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -26,16 +26,66 @@ func (bc *BlacklistCreate) SetType(b blacklist.Type) *BlacklistCreate {
 	return bc
 }
 
-// SetValue sets the "value" field.
-func (bc *BlacklistCreate) SetValue(sv schema.BlacklistValue) *BlacklistCreate {
-	bc.mutation.SetValue(sv)
+// SetNillableType sets the "type" field if the given value is not nil.
+func (bc *BlacklistCreate) SetNillableType(b *blacklist.Type) *BlacklistCreate {
+	if b != nil {
+		bc.SetType(*b)
+	}
 	return bc
 }
 
-// SetNillableValue sets the "value" field if the given value is not nil.
-func (bc *BlacklistCreate) SetNillableValue(sv *schema.BlacklistValue) *BlacklistCreate {
-	if sv != nil {
-		bc.SetValue(*sv)
+// SetTorrentHash sets the "torrent_hash" field.
+func (bc *BlacklistCreate) SetTorrentHash(s string) *BlacklistCreate {
+	bc.mutation.SetTorrentHash(s)
+	return bc
+}
+
+// SetNillableTorrentHash sets the "torrent_hash" field if the given value is not nil.
+func (bc *BlacklistCreate) SetNillableTorrentHash(s *string) *BlacklistCreate {
+	if s != nil {
+		bc.SetTorrentHash(*s)
+	}
+	return bc
+}
+
+// SetTorrentName sets the "torrent_name" field.
+func (bc *BlacklistCreate) SetTorrentName(s string) *BlacklistCreate {
+	bc.mutation.SetTorrentName(s)
+	return bc
+}
+
+// SetNillableTorrentName sets the "torrent_name" field if the given value is not nil.
+func (bc *BlacklistCreate) SetNillableTorrentName(s *string) *BlacklistCreate {
+	if s != nil {
+		bc.SetTorrentName(*s)
+	}
+	return bc
+}
+
+// SetMediaID sets the "media_id" field.
+func (bc *BlacklistCreate) SetMediaID(i int) *BlacklistCreate {
+	bc.mutation.SetMediaID(i)
+	return bc
+}
+
+// SetNillableMediaID sets the "media_id" field if the given value is not nil.
+func (bc *BlacklistCreate) SetNillableMediaID(i *int) *BlacklistCreate {
+	if i != nil {
+		bc.SetMediaID(*i)
+	}
+	return bc
+}
+
+// SetCreateTime sets the "create_time" field.
+func (bc *BlacklistCreate) SetCreateTime(t time.Time) *BlacklistCreate {
+	bc.mutation.SetCreateTime(t)
+	return bc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (bc *BlacklistCreate) SetNillableCreateTime(t *time.Time) *BlacklistCreate {
+	if t != nil {
+		bc.SetCreateTime(*t)
 	}
 	return bc
 }
@@ -89,9 +139,13 @@ func (bc *BlacklistCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (bc *BlacklistCreate) defaults() {
-	if _, ok := bc.mutation.Value(); !ok {
-		v := blacklist.DefaultValue
-		bc.mutation.SetValue(v)
+	if _, ok := bc.mutation.GetType(); !ok {
+		v := blacklist.DefaultType
+		bc.mutation.SetType(v)
+	}
+	if _, ok := bc.mutation.CreateTime(); !ok {
+		v := blacklist.DefaultCreateTime()
+		bc.mutation.SetCreateTime(v)
 	}
 }
 
@@ -104,9 +158,6 @@ func (bc *BlacklistCreate) check() error {
 		if err := blacklist.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Blacklist.type": %w`, err)}
 		}
-	}
-	if _, ok := bc.mutation.Value(); !ok {
-		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "Blacklist.value"`)}
 	}
 	return nil
 }
@@ -138,9 +189,21 @@ func (bc *BlacklistCreate) createSpec() (*Blacklist, *sqlgraph.CreateSpec) {
 		_spec.SetField(blacklist.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
-	if value, ok := bc.mutation.Value(); ok {
-		_spec.SetField(blacklist.FieldValue, field.TypeJSON, value)
-		_node.Value = value
+	if value, ok := bc.mutation.TorrentHash(); ok {
+		_spec.SetField(blacklist.FieldTorrentHash, field.TypeString, value)
+		_node.TorrentHash = value
+	}
+	if value, ok := bc.mutation.TorrentName(); ok {
+		_spec.SetField(blacklist.FieldTorrentName, field.TypeString, value)
+		_node.TorrentName = value
+	}
+	if value, ok := bc.mutation.MediaID(); ok {
+		_spec.SetField(blacklist.FieldMediaID, field.TypeInt, value)
+		_node.MediaID = value
+	}
+	if value, ok := bc.mutation.CreateTime(); ok {
+		_spec.SetField(blacklist.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
 	if value, ok := bc.mutation.Notes(); ok {
 		_spec.SetField(blacklist.FieldNotes, field.TypeString, value)

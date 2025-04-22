@@ -53,7 +53,11 @@ type BlacklistMutation struct {
 	typ           string
 	id            *int
 	_type         *blacklist.Type
-	value         *schema.BlacklistValue
+	torrent_hash  *string
+	torrent_name  *string
+	media_id      *int
+	addmedia_id   *int
+	create_time   *time.Time
 	notes         *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -195,40 +199,221 @@ func (m *BlacklistMutation) ResetType() {
 	m._type = nil
 }
 
-// SetValue sets the "value" field.
-func (m *BlacklistMutation) SetValue(sv schema.BlacklistValue) {
-	m.value = &sv
+// SetTorrentHash sets the "torrent_hash" field.
+func (m *BlacklistMutation) SetTorrentHash(s string) {
+	m.torrent_hash = &s
 }
 
-// Value returns the value of the "value" field in the mutation.
-func (m *BlacklistMutation) Value() (r schema.BlacklistValue, exists bool) {
-	v := m.value
+// TorrentHash returns the value of the "torrent_hash" field in the mutation.
+func (m *BlacklistMutation) TorrentHash() (r string, exists bool) {
+	v := m.torrent_hash
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldValue returns the old "value" field's value of the Blacklist entity.
+// OldTorrentHash returns the old "torrent_hash" field's value of the Blacklist entity.
 // If the Blacklist object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BlacklistMutation) OldValue(ctx context.Context) (v schema.BlacklistValue, err error) {
+func (m *BlacklistMutation) OldTorrentHash(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldValue is only allowed on UpdateOne operations")
+		return v, errors.New("OldTorrentHash is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldValue requires an ID field in the mutation")
+		return v, errors.New("OldTorrentHash requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldValue: %w", err)
+		return v, fmt.Errorf("querying old value for OldTorrentHash: %w", err)
 	}
-	return oldValue.Value, nil
+	return oldValue.TorrentHash, nil
 }
 
-// ResetValue resets all changes to the "value" field.
-func (m *BlacklistMutation) ResetValue() {
-	m.value = nil
+// ClearTorrentHash clears the value of the "torrent_hash" field.
+func (m *BlacklistMutation) ClearTorrentHash() {
+	m.torrent_hash = nil
+	m.clearedFields[blacklist.FieldTorrentHash] = struct{}{}
+}
+
+// TorrentHashCleared returns if the "torrent_hash" field was cleared in this mutation.
+func (m *BlacklistMutation) TorrentHashCleared() bool {
+	_, ok := m.clearedFields[blacklist.FieldTorrentHash]
+	return ok
+}
+
+// ResetTorrentHash resets all changes to the "torrent_hash" field.
+func (m *BlacklistMutation) ResetTorrentHash() {
+	m.torrent_hash = nil
+	delete(m.clearedFields, blacklist.FieldTorrentHash)
+}
+
+// SetTorrentName sets the "torrent_name" field.
+func (m *BlacklistMutation) SetTorrentName(s string) {
+	m.torrent_name = &s
+}
+
+// TorrentName returns the value of the "torrent_name" field in the mutation.
+func (m *BlacklistMutation) TorrentName() (r string, exists bool) {
+	v := m.torrent_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTorrentName returns the old "torrent_name" field's value of the Blacklist entity.
+// If the Blacklist object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlacklistMutation) OldTorrentName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTorrentName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTorrentName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTorrentName: %w", err)
+	}
+	return oldValue.TorrentName, nil
+}
+
+// ClearTorrentName clears the value of the "torrent_name" field.
+func (m *BlacklistMutation) ClearTorrentName() {
+	m.torrent_name = nil
+	m.clearedFields[blacklist.FieldTorrentName] = struct{}{}
+}
+
+// TorrentNameCleared returns if the "torrent_name" field was cleared in this mutation.
+func (m *BlacklistMutation) TorrentNameCleared() bool {
+	_, ok := m.clearedFields[blacklist.FieldTorrentName]
+	return ok
+}
+
+// ResetTorrentName resets all changes to the "torrent_name" field.
+func (m *BlacklistMutation) ResetTorrentName() {
+	m.torrent_name = nil
+	delete(m.clearedFields, blacklist.FieldTorrentName)
+}
+
+// SetMediaID sets the "media_id" field.
+func (m *BlacklistMutation) SetMediaID(i int) {
+	m.media_id = &i
+	m.addmedia_id = nil
+}
+
+// MediaID returns the value of the "media_id" field in the mutation.
+func (m *BlacklistMutation) MediaID() (r int, exists bool) {
+	v := m.media_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMediaID returns the old "media_id" field's value of the Blacklist entity.
+// If the Blacklist object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlacklistMutation) OldMediaID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMediaID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMediaID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMediaID: %w", err)
+	}
+	return oldValue.MediaID, nil
+}
+
+// AddMediaID adds i to the "media_id" field.
+func (m *BlacklistMutation) AddMediaID(i int) {
+	if m.addmedia_id != nil {
+		*m.addmedia_id += i
+	} else {
+		m.addmedia_id = &i
+	}
+}
+
+// AddedMediaID returns the value that was added to the "media_id" field in this mutation.
+func (m *BlacklistMutation) AddedMediaID() (r int, exists bool) {
+	v := m.addmedia_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearMediaID clears the value of the "media_id" field.
+func (m *BlacklistMutation) ClearMediaID() {
+	m.media_id = nil
+	m.addmedia_id = nil
+	m.clearedFields[blacklist.FieldMediaID] = struct{}{}
+}
+
+// MediaIDCleared returns if the "media_id" field was cleared in this mutation.
+func (m *BlacklistMutation) MediaIDCleared() bool {
+	_, ok := m.clearedFields[blacklist.FieldMediaID]
+	return ok
+}
+
+// ResetMediaID resets all changes to the "media_id" field.
+func (m *BlacklistMutation) ResetMediaID() {
+	m.media_id = nil
+	m.addmedia_id = nil
+	delete(m.clearedFields, blacklist.FieldMediaID)
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *BlacklistMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *BlacklistMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Blacklist entity.
+// If the Blacklist object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlacklistMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *BlacklistMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[blacklist.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *BlacklistMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[blacklist.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *BlacklistMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, blacklist.FieldCreateTime)
 }
 
 // SetNotes sets the "notes" field.
@@ -314,12 +499,21 @@ func (m *BlacklistMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BlacklistMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 6)
 	if m._type != nil {
 		fields = append(fields, blacklist.FieldType)
 	}
-	if m.value != nil {
-		fields = append(fields, blacklist.FieldValue)
+	if m.torrent_hash != nil {
+		fields = append(fields, blacklist.FieldTorrentHash)
+	}
+	if m.torrent_name != nil {
+		fields = append(fields, blacklist.FieldTorrentName)
+	}
+	if m.media_id != nil {
+		fields = append(fields, blacklist.FieldMediaID)
+	}
+	if m.create_time != nil {
+		fields = append(fields, blacklist.FieldCreateTime)
 	}
 	if m.notes != nil {
 		fields = append(fields, blacklist.FieldNotes)
@@ -334,8 +528,14 @@ func (m *BlacklistMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case blacklist.FieldType:
 		return m.GetType()
-	case blacklist.FieldValue:
-		return m.Value()
+	case blacklist.FieldTorrentHash:
+		return m.TorrentHash()
+	case blacklist.FieldTorrentName:
+		return m.TorrentName()
+	case blacklist.FieldMediaID:
+		return m.MediaID()
+	case blacklist.FieldCreateTime:
+		return m.CreateTime()
 	case blacklist.FieldNotes:
 		return m.Notes()
 	}
@@ -349,8 +549,14 @@ func (m *BlacklistMutation) OldField(ctx context.Context, name string) (ent.Valu
 	switch name {
 	case blacklist.FieldType:
 		return m.OldType(ctx)
-	case blacklist.FieldValue:
-		return m.OldValue(ctx)
+	case blacklist.FieldTorrentHash:
+		return m.OldTorrentHash(ctx)
+	case blacklist.FieldTorrentName:
+		return m.OldTorrentName(ctx)
+	case blacklist.FieldMediaID:
+		return m.OldMediaID(ctx)
+	case blacklist.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	case blacklist.FieldNotes:
 		return m.OldNotes(ctx)
 	}
@@ -369,12 +575,33 @@ func (m *BlacklistMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetType(v)
 		return nil
-	case blacklist.FieldValue:
-		v, ok := value.(schema.BlacklistValue)
+	case blacklist.FieldTorrentHash:
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetValue(v)
+		m.SetTorrentHash(v)
+		return nil
+	case blacklist.FieldTorrentName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTorrentName(v)
+		return nil
+	case blacklist.FieldMediaID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMediaID(v)
+		return nil
+	case blacklist.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
 		return nil
 	case blacklist.FieldNotes:
 		v, ok := value.(string)
@@ -390,13 +617,21 @@ func (m *BlacklistMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *BlacklistMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addmedia_id != nil {
+		fields = append(fields, blacklist.FieldMediaID)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *BlacklistMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case blacklist.FieldMediaID:
+		return m.AddedMediaID()
+	}
 	return nil, false
 }
 
@@ -405,6 +640,13 @@ func (m *BlacklistMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *BlacklistMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case blacklist.FieldMediaID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMediaID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Blacklist numeric field %s", name)
 }
@@ -413,6 +655,18 @@ func (m *BlacklistMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *BlacklistMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(blacklist.FieldTorrentHash) {
+		fields = append(fields, blacklist.FieldTorrentHash)
+	}
+	if m.FieldCleared(blacklist.FieldTorrentName) {
+		fields = append(fields, blacklist.FieldTorrentName)
+	}
+	if m.FieldCleared(blacklist.FieldMediaID) {
+		fields = append(fields, blacklist.FieldMediaID)
+	}
+	if m.FieldCleared(blacklist.FieldCreateTime) {
+		fields = append(fields, blacklist.FieldCreateTime)
+	}
 	if m.FieldCleared(blacklist.FieldNotes) {
 		fields = append(fields, blacklist.FieldNotes)
 	}
@@ -430,6 +684,18 @@ func (m *BlacklistMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *BlacklistMutation) ClearField(name string) error {
 	switch name {
+	case blacklist.FieldTorrentHash:
+		m.ClearTorrentHash()
+		return nil
+	case blacklist.FieldTorrentName:
+		m.ClearTorrentName()
+		return nil
+	case blacklist.FieldMediaID:
+		m.ClearMediaID()
+		return nil
+	case blacklist.FieldCreateTime:
+		m.ClearCreateTime()
+		return nil
 	case blacklist.FieldNotes:
 		m.ClearNotes()
 		return nil
@@ -444,8 +710,17 @@ func (m *BlacklistMutation) ResetField(name string) error {
 	case blacklist.FieldType:
 		m.ResetType()
 		return nil
-	case blacklist.FieldValue:
-		m.ResetValue()
+	case blacklist.FieldTorrentHash:
+		m.ResetTorrentHash()
+		return nil
+	case blacklist.FieldTorrentName:
+		m.ResetTorrentName()
+		return nil
+	case blacklist.FieldMediaID:
+		m.ResetMediaID()
+		return nil
+	case blacklist.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	case blacklist.FieldNotes:
 		m.ResetNotes()

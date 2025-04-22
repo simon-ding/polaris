@@ -36,7 +36,7 @@ type History struct {
 	DownloadClientID int `json:"download_client_id,omitempty"`
 	// IndexerID holds the value of the "indexer_id" field.
 	IndexerID int `json:"indexer_id,omitempty"`
-	// deprecated, use hash instead
+	// torrent link
 	Link string `json:"link,omitempty"`
 	// torrent hash
 	Hash string `json:"hash,omitempty"`

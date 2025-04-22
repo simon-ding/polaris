@@ -25,7 +25,7 @@ func (History) Fields() []ent.Field {
 		field.Int("size").Default(0),
 		field.Int("download_client_id").Optional(),
 		field.Int("indexer_id").Optional(),
-		field.String("link").Optional().Comment("deprecated, use hash instead"), //should be magnet link
+		field.String("link").Optional().Comment("torrent link"), //should be magnet link
 		field.String("hash").Optional().Comment("torrent hash"),
 		field.Enum("status").Values("running", "success", "fail", "uploading", "seeding", "removed"),
 		field.Time("create_time").Optional().Default(time.Now).Immutable(),

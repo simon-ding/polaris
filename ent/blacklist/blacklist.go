@@ -4,7 +4,7 @@ package blacklist
 
 import (
 	"fmt"
-	"polaris/ent/schema"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -16,8 +16,14 @@ const (
 	FieldID = "id"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldValue holds the string denoting the value field in the database.
-	FieldValue = "value"
+	// FieldTorrentHash holds the string denoting the torrent_hash field in the database.
+	FieldTorrentHash = "torrent_hash"
+	// FieldTorrentName holds the string denoting the torrent_name field in the database.
+	FieldTorrentName = "torrent_name"
+	// FieldMediaID holds the string denoting the media_id field in the database.
+	FieldMediaID = "media_id"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// FieldNotes holds the string denoting the notes field in the database.
 	FieldNotes = "notes"
 	// Table holds the table name of the blacklist in the database.
@@ -28,7 +34,10 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldType,
-	FieldValue,
+	FieldTorrentHash,
+	FieldTorrentName,
+	FieldMediaID,
+	FieldCreateTime,
 	FieldNotes,
 }
 
@@ -43,12 +52,15 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultValue holds the default value on creation for the "value" field.
-	DefaultValue schema.BlacklistValue
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
 )
 
 // Type defines the type for the "type" enum field.
 type Type string
+
+// TypeTorrent is the default value of the Type enum.
+const DefaultType = TypeTorrent
 
 // Type values.
 const (
@@ -81,6 +93,26 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
+}
+
+// ByTorrentHash orders the results by the torrent_hash field.
+func ByTorrentHash(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTorrentHash, opts...).ToFunc()
+}
+
+// ByTorrentName orders the results by the torrent_name field.
+func ByTorrentName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTorrentName, opts...).ToFunc()
+}
+
+// ByMediaID orders the results by the media_id field.
+func ByMediaID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMediaID, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
 // ByNotes orders the results by the notes field.
