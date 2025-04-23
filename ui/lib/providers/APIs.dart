@@ -61,6 +61,9 @@ class APIs {
 
   static final mediaSizeLimiterUrl = "$_baseUrl/api/v1/setting/limiter";
 
+  static final blacklistUrl = "$_baseUrl/api/v1/activity/blacklist";
+
+  
   static const tmdbApiKey = "tmdb_api_key";
   static const downloadDirKey = "download_dir";
 

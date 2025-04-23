@@ -7,6 +7,8 @@ import 'package:ui/providers/server_response.dart';
 var activitiesDataProvider = AsyncNotifierProvider.autoDispose
     .family<ActivityData, List<Activity>, ActivityStatus>(ActivityData.new);
 
+var blacklistDataProvider = AsyncNotifierProvider.autoDispose<BlacklistData,List<Blacklist>>(BlacklistData.new);
+
 var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   (ref, arg) async {
     final dio = await APIs.getDio();
@@ -82,6 +84,7 @@ class ActivityData
   }
 }
 
+
 class Activity {
   Activity(
       {required this.id,
@@ -124,5 +127,69 @@ class Activity {
         seedRatio: json["seed_ratio"],
         size: json["size"],
         uploadProgress: json["upload_progress"]);
+  }
+}
+
+
+class BlacklistData extends AutoDisposeAsyncNotifier<List<Blacklist>> {
+  @override
+  FutureOr<List<Blacklist>> build() async {
+    final dio = APIs.getDio();
+    var resp = await dio.get(APIs.blacklistUrl);
+    final sp = ServerResponse.fromJson(resp.data);  
+    if (sp.code!= 0) {
+      throw sp.message; 
+    }
+    List<Blacklist> blaclklists = List.empty(growable: true);
+    for (final a in sp.data as List) {
+      blaclklists.add(Blacklist.fromJson(a));
+    }
+    return blaclklists;
+  }
+
+  Future<void> deleteBlacklist(int id) async {
+    final dio = APIs.getDio();
+    var resp = await dio.delete("${APIs.blacklistUrl}/$id");
+    final sp = ServerResponse.fromJson(resp.data);
+    if (sp.code!= 0) {
+      throw sp.message;
+    }
+  }
+}
+
+class Blacklist {
+  int? id;
+  String? type;
+  String? torrentHash;
+  String? torrentName;
+  int? mediaId;
+  String? createTime;
+
+  Blacklist(
+      {this.id,
+      this.type,
+      this.torrentHash,
+      this.torrentName,
+      this.mediaId,
+      this.createTime});
+
+  Blacklist.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    type = json['type'];
+    torrentHash = json['torrent_hash'];
+    torrentName = json['torrent_name'];
+    mediaId = json['media_id'];
+    createTime = json['create_time'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['type'] = this.type;
+    data['torrent_hash'] = this.torrentHash;
+    data['torrent_name'] = this.torrentName;
+    data['media_id'] = this.mediaId;
+    data['create_time'] = this.createTime;
+    return data;
   }
 }

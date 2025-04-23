@@ -20,7 +20,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
   @override
   void initState() {
     super.initState();
-    _nestedTabController = new TabController(length: 3, vsync: this);
+    _nestedTabController = new TabController(length: 4, vsync: this);
   }
 
   @override
@@ -33,7 +33,8 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return SelectionArea(
+        child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TabBar(
@@ -54,6 +55,9 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
             Tab(
               text: "历史记录",
             ),
+            Tab(
+              text: "黑名单",
+            )
           ],
         ),
         Builder(builder: (context) {
@@ -68,6 +72,8 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
           } else if (selectedTab == 0) {
             activitiesWatcher =
                 ref.watch(activitiesDataProvider(ActivityStatus.active));
+          } else if (selectedTab == 3) {
+            return showBlacklistTab();
           }
 
           return activitiesWatcher!.when(
@@ -161,7 +167,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
               loading: () => const MyProgressIndicator());
         })
       ],
-    );
+    ));
   }
 
   Future<void> showConfirmDialog(BuildContext oriContext, int id) {
@@ -203,6 +209,40 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
           ],
         );
       },
+    );
+  }
+
+  Widget showBlacklistTab() {
+    var blacklistDataWacher = ref.watch(blacklistDataProvider);
+
+    return blacklistDataWacher.when(
+      data: (blacklists) {
+        return Flexible(
+            child: SelectionArea(
+                child: ListView.builder(
+                    itemCount: blacklists.length,
+                    itemBuilder: (context, index) {
+                      final item = blacklists[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(item.torrentName ?? ""),
+                        subtitle: Opacity( opacity: 0.7,child: Text("hash: ${item.torrentHash ?? ""}")),
+                        trailing: IconButton(
+                            onPressed: () {
+                              final f = ref
+                                  .read(blacklistDataProvider.notifier)
+                                  .deleteBlacklist(item.id!)
+                                  .then((value) {
+                                //Navigator.of(context).pop();
+                              });
+                              showLoadingWithFuture(f);
+                            },
+                            icon: const Icon(Icons.delete)),
+                      );
+                    })));
+      },
+      error: (err, trace) => PoNetworkError(err: err),
+      loading: () => const MyProgressIndicator(),
     );
   }
 }
