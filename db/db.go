@@ -534,12 +534,12 @@ func (c *client) SetEpisodeStatus(id int, status episode.Status) error {
 
 func (c *client) IsEpisodeDownloadingOrDownloaded(id int) bool {
 	ep, _ := c.GetEpisodeByID(id)
-	his := c.ent.History.Query().Where(history.EpisodeNumsNotNil(), history.StatusNEQ(history.StatusRemoved)).AllX(context.Background())
+	his := c.ent.History.Query().Where(history.MediaID(ep.MediaID),history.SeasonNum(ep.SeasonNumber), history.StatusEQ(history.StatusRemoved), history.StatusNEQ(history.StatusFail)).AllX(context.Background())
 	for _, h := range his {
-		if !slices.Contains(h.EpisodeNums, ep.EpisodeNumber) {
-			continue
+		if len(h.EpisodeNums) == 0 { //season pack download
+			return true
 		}
-		if h.Status != history.StatusFail {
+		if slices.Contains(h.EpisodeNums, ep.EpisodeNumber) {
 			return true
 		}
 	}
