@@ -166,13 +166,14 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                               : (selectedTab == 1
                                   ? IconButton(
                                       tooltip: "完成做种",
-                                      onPressed: () => {
-                                            ref
-                                                .read(activitiesDataProvider(
-                                                        ActivityStatus.active)
-                                                    .notifier)
-                                                .deleteActivity(ac.id!, false)
-                                          },
+                                      onPressed: () {
+                                        var f = ref
+                                            .read(activitiesDataProvider(
+                                                    ActivityStatus.active)
+                                                .notifier)
+                                            .deleteActivity(ac.id!, false);
+                                        showLoadingWithFuture(f);
+                                      },
                                       icon: const Icon(Icons.check))
                                   : const Text("-")),
                         ),
