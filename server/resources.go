@@ -123,6 +123,9 @@ func (s *Server) SearchTvAndDownload(c *gin.Context) (interface{}, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "download")
 		}
+		if len(name1) == 0 {
+			return nil, fmt.Errorf("no torrent found")
+		}
 		name = name1[0]
 	}
 
