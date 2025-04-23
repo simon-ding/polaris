@@ -534,7 +534,7 @@ func (c *client) SetEpisodeStatus(id int, status episode.Status) error {
 
 func (c *client) IsEpisodeDownloadingOrDownloaded(id int) bool {
 	ep, _ := c.GetEpisodeByID(id)
-	his := c.ent.History.Query().Where(history.EpisodeNumsNotNil()).AllX(context.Background())
+	his := c.ent.History.Query().Where(history.EpisodeNumsNotNil(), history.StatusNEQ(history.StatusRemoved)).AllX(context.Background())
 	for _, h := range his {
 		if !slices.Contains(h.EpisodeNums, ep.EpisodeNumber) {
 			continue
