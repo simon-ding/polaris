@@ -98,6 +98,15 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	if err := s.core.RemoveTaskAndTorrent(his.ID); err != nil {
 		return nil, errors.Wrap(err, "remove torrent")
 	}
+	if his.Status == history.StatusSeeding {
+		//seeding, will mark as complete
+		log.Infof("history is now seeding, will only mark history as success: (%d) %s", his.ID, his.SourceTitle)
+		if err := s.db.SetHistoryStatus(his.ID, history.StatusSuccess); err!= nil {
+			return nil, errors.Wrap(err, "set status")
+		}
+		return nil, nil
+	}
+
 	err := s.db.DeleteHistory(in.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "db")

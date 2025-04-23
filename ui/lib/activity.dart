@@ -151,19 +151,30 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                               children: [
                                 Text("开始时间：${timeago.format(ac.date!)}"),
                                 Text("大小：${(ac.size ?? 0).readableFileSize()}"),
-                                (ac.seedRatio??0) > 0
+                                (ac.seedRatio ?? 0) > 0
                                     ? Text("分享率：${ac.seedRatio}")
                                     : SizedBox()
                               ],
                             ),
                           ),
-                          trailing: selectedTab != 2
+                          trailing: selectedTab == 0
                               ? IconButton(
                                   tooltip: "删除任务",
                                   onPressed: () =>
                                       showConfirmDialog(context, ac.id!),
                                   icon: const Icon(Icons.delete))
-                              : const Text("-"),
+                              : (selectedTab == 1
+                                  ? IconButton(
+                                      tooltip: "完成做种",
+                                      onPressed: () => {
+                                            ref
+                                                .read(activitiesDataProvider(
+                                                        ActivityStatus.active)
+                                                    .notifier)
+                                                .deleteActivity(ac.id!, false)
+                                          },
+                                      icon: const Icon(Icons.check))
+                                  : const Text("-")),
                         ),
                         Divider(),
                       ],
@@ -234,7 +245,9 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                       return ListTile(
                         dense: true,
                         title: Text(item.torrentName ?? ""),
-                        subtitle: Opacity( opacity: 0.7,child: Text("hash: ${item.torrentHash ?? ""}")),
+                        subtitle: Opacity(
+                            opacity: 0.7,
+                            child: Text("hash: ${item.torrentHash ?? ""}")),
                         trailing: IconButton(
                             onPressed: () {
                               final f = ref
