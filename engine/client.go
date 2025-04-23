@@ -18,11 +18,11 @@ import (
 
 func NewEngine(db db.Database, language string) *Engine {
 	return &Engine{
-		db:       db,
-		cron:     cron.New(),
-		tasks:    utils.Map[int, *Task]{},
+		db:         db,
+		cron:       cron.New(),
+		tasks:      utils.Map[int, *Task]{},
 		schedulers: utils.Map[string, scheduler]{},
-		language: language,
+		language:   language,
 	}
 }
 
@@ -36,7 +36,7 @@ type Engine struct {
 	tasks      utils.Map[int, *Task]
 	language   string
 	schedulers utils.Map[string, scheduler]
-	buildin *buildin.Downloader
+	buildin    *buildin.Downloader
 }
 
 func (c *Engine) registerCronJob(name string, cron string, f func() error) {
@@ -52,12 +52,11 @@ func (c *Engine) Init() {
 	go c.checkW500PosterOnStartup()
 }
 
-
 func (c *Engine) GetTask(id int) (*Task, bool) {
 	return c.tasks.Load(id)
 }
 
-func (c *Engine) reloadUsingBuildinDownloader(h *ent.History) error{
+func (c *Engine) reloadUsingBuildinDownloader(h *ent.History) error {
 	cl, err := buildin.NewDownloader(c.db.GetDownloadDir())
 	if err != nil {
 		log.Warnf("buildin downloader error: %v", err)
@@ -66,7 +65,7 @@ func (c *Engine) reloadUsingBuildinDownloader(h *ent.History) error{
 	if err != nil {
 		return errors.Wrap(err, "download torrent")
 	}
-	c.tasks.Store(h.ID,  &Task{Torrent: t})
+	c.tasks.Store(h.ID, &Task{Torrent: t})
 	return nil
 }
 
@@ -145,13 +144,13 @@ func (c *Engine) reloadTasks() {
 }
 
 func (c *Engine) buildInDownloader() (pkg.Downloader, error) {
-	if c.buildin!= nil {
-		return c.buildin, nil	
+	if c.buildin != nil {
+		return c.buildin, nil
 	}
 	dir := c.db.GetDownloadDir()
 	d, err := buildin.NewDownloader(dir)
 	if err != nil {
-		return nil, errors.Wrap(err, "buildin downloader")	
+		return nil, errors.Wrap(err, "buildin downloader")
 	}
 	c.buildin = d
 	return d, nil
