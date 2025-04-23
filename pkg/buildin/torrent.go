@@ -139,7 +139,7 @@ func (t *Torrent) Progress() (int, error) {
 	if p >= 100 {
 		p = 99
 	}
-	return 99, nil
+	return p, nil
 }
 
 func (t *Torrent) Stop() error {
