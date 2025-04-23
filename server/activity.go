@@ -106,10 +106,10 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 	episodeIds := s.core.GetEpisodeIds(his)
 
 	for _, id := range episodeIds {
-		ep, err := s.db.GetEpisode(his.MediaID, his.SeasonNum, id)
+		ep, err := s.db.GetEpisodeByID(id)
 		if err != nil {
-			log.Warnf("get episode error: %v", err)
-			continue	
+			log.Warnf("get episode (%d) error: %v", id, err)
+			continue
 		}
 		if !s.db.IsEpisodeDownloadingOrDownloaded(id) && ep.Status != episode.StatusDownloaded {
 			//没有正在下载中或者下载完成的任务，并且episode状态不是已经下载完成
@@ -127,7 +127,7 @@ func (s *Server) addTorrent2Blacklist(h *ent.History) error {
 
 func (s *Server) GetAllBlacklistItems(c *gin.Context) (interface{}, error) {
 	list, err := s.db.GetTorrentBlacklist()
-	if err!= nil {
+	if err != nil {
 		return nil, errors.Wrap(err, "db")
 	}
 	return list, nil
@@ -138,11 +138,11 @@ func (s *Server) RemoveBlacklistItem(c *gin.Context) (interface{}, error) {
 		return nil, fmt.Errorf("id is empty")
 	}
 	idInt, err := strconv.Atoi(id)
-	if err!= nil {
+	if err != nil {
 		return nil, fmt.Errorf("id is not int: %v", id)
 	}
-	if err := s.db.DeleteTorrentBlacklist(idInt); err!= nil {
-		return nil, errors.Wrap(err, "db")	
+	if err := s.db.DeleteTorrentBlacklist(idInt); err != nil {
+		return nil, errors.Wrap(err, "db")
 	}
 	return nil, nil
 }

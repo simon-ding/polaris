@@ -260,8 +260,9 @@ func (c *Engine) findEpisodeFilesPreMoving(historyId int) error {
 		return err
 	}
 	for _, id := range episodeIds {
-		ep, err := c.db.GetEpisode(his.MediaID, his.SeasonNum, id)
+		ep, err := c.db.GetEpisodeByID(id)
 		if err != nil {
+			log.Warnf("query episode error (%d): %v", id, err)
 			continue
 		}
 		task.WalkFunc()(func(path string, info fs.FileInfo) error {
