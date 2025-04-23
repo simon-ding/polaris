@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"polaris/log"
 	"polaris/pkg"
 	"strings"
 
@@ -92,25 +91,25 @@ func (d *Downloader) Download(link, hash, dir string) (pkg.Torrent, error) {
 	}, nil
 }
 
-func NewTorrentFromHash(hash string, downloadDir string) (*Torrent, error) {
-	cl, err := NewDownloader(downloadDir)
-	if err != nil {
-		return nil, errors.Wrap(err, "create downloader")
-	}
-	ttt := cl.cl.Torrents()
-	log.Infof("all torrents: %+v", ttt)
-	t, _ := cl.cl.AddTorrentInfoHash(metainfo.NewHashFromHex(hash))
-	// if new {
-	// 	return nil, fmt.Errorf("torrent not found")
-	// }
-	<-t.GotInfo()
-	return &Torrent{
-		t:    t,
-		cl:   cl.cl,
-		hash: hash,
-		dir:  downloadDir,
-	}, nil
-}
+// func NewTorrentFromHash(hash string, downloadDir string) (*Torrent, error) {
+// 	cl, err := NewDownloader(downloadDir)
+// 	if err != nil {
+// 		return nil, errors.Wrap(err, "create downloader")
+// 	}
+// 	ttt := cl.cl.Torrents()
+// 	log.Infof("all torrents: %+v", ttt)
+// 	t, _ := cl.cl.AddTorrentInfoHash(metainfo.NewHashFromHex(hash))
+// 	// if new {
+// 	// 	return nil, fmt.Errorf("torrent not found")
+// 	// }
+// 	<-t.GotInfo()
+// 	return &Torrent{
+// 		t:    t,
+// 		cl:   cl.cl,
+// 		hash: hash,
+// 		dir:  downloadDir,
+// 	}, nil
+// }
 
 type Torrent struct {
 	t    *torrent.Torrent

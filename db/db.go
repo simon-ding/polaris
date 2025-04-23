@@ -268,9 +268,9 @@ func (c *client) SaveIndexer(in *ent.Indexers) error {
 
 	count := c.ent.Indexers.Query().Where(indexers.Name(in.Name)).CountX(context.TODO())
 
-	if count > 0 || in.ID != 0 {
+	if count > 0 {
 		//update setting
-		return c.ent.Indexers.Update().Where(indexers.ID(in.ID)).SetName(in.Name).SetImplementation(in.Implementation).
+		return c.ent.Indexers.Update().Where(indexers.Name(in.Name)).SetName(in.Name).SetImplementation(in.Implementation).
 			SetPriority(in.Priority).SetSeedRatio(in.SeedRatio).SetDisabled(in.Disabled).
 			SetTvSearch(in.TvSearch).SetMovieSearch(in.MovieSearch).SetSettings("").SetSynced(in.Synced).
 			SetAPIKey(in.APIKey).SetURL(in.URL).
