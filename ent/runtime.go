@@ -95,6 +95,8 @@ func init() {
 	indexersDescPriority := indexersFields[4].Descriptor()
 	// indexers.DefaultPriority holds the default value on creation for the priority field.
 	indexers.DefaultPriority = indexersDescPriority.Default.(int)
+	// indexers.PriorityValidator is a validator for the "priority" field. It is called by the builders before save.
+	indexers.PriorityValidator = indexersDescPriority.Validators[0].(func(int) error)
 	// indexersDescSeedRatio is the schema descriptor for seed_ratio field.
 	indexersDescSeedRatio := indexersFields[5].Descriptor()
 	// indexers.DefaultSeedRatio holds the default value on creation for the seed_ratio field.

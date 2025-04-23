@@ -78,6 +78,8 @@ var (
 	DefaultEnableRss bool
 	// DefaultPriority holds the default value on creation for the "priority" field.
 	DefaultPriority int
+	// PriorityValidator is a validator for the "priority" field. It is called by the builders before save.
+	PriorityValidator func(int) error
 	// DefaultSeedRatio holds the default value on creation for the "seed_ratio" field.
 	DefaultSeedRatio float32
 	// DefaultDisabled holds the default value on creation for the "disabled" field.

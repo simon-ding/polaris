@@ -365,7 +365,7 @@ func searchWithTorznab(db db.Database, t SearchType, queries ...string) []torzna
 	sort.SliceStable(res, func(i, j int) bool { //再按优先级排序，优先级高的种子排前面
 		var s1 = res[i]
 		var s2 = res[j]
-		return s1.Priority > s2.Priority
+		return s1.Priority < s2.Priority
 	})
 
 	//pt资源中，同一indexer内部，优先下载free的资源

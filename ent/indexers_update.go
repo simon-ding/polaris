@@ -289,7 +289,20 @@ func (iu *IndexersUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (iu *IndexersUpdate) check() error {
+	if v, ok := iu.mutation.Priority(); ok {
+		if err := indexers.PriorityValidator(v); err != nil {
+			return &ValidationError{Name: "priority", err: fmt.Errorf(`ent: validator failed for field "Indexers.priority": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (iu *IndexersUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := iu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(indexers.Table, indexers.Columns, sqlgraph.NewFieldSpec(indexers.FieldID, field.TypeInt))
 	if ps := iu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -662,7 +675,20 @@ func (iuo *IndexersUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (iuo *IndexersUpdateOne) check() error {
+	if v, ok := iuo.mutation.Priority(); ok {
+		if err := indexers.PriorityValidator(v); err != nil {
+			return &ValidationError{Name: "priority", err: fmt.Errorf(`ent: validator failed for field "Indexers.priority": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (iuo *IndexersUpdateOne) sqlSave(ctx context.Context) (_node *Indexers, err error) {
+	if err := iuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(indexers.Table, indexers.Columns, sqlgraph.NewFieldSpec(indexers.FieldID, field.TypeInt))
 	id, ok := iuo.mutation.ID()
 	if !ok {

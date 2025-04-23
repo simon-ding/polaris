@@ -178,7 +178,7 @@ class _IndexerState extends ConsumerState<IndexerSettings> {
             name: "priority",
             decoration: const InputDecoration(
               labelText: "索引优先级",
-              helperText: "取值范围1-128， 数值越大，优先级越高",
+              helperText: "取值范围1-50， 数值越大，优先级越低",
             ),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: FormBuilderValidators.positiveNumber(),

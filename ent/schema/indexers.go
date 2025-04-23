@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"errors"
 	"time"
 
 	"entgo.io/ent"
@@ -19,7 +20,15 @@ func (Indexers) Fields() []ent.Field {
 		field.String("implementation"),
 		field.String("settings").Optional().Default("").Comment("deprecated, use api_key and url"),
 		field.Bool("enable_rss").Default(true),
-		field.Int("priority").Default(50),
+		field.Int("priority").Default(25).Validate(func(i int) error {
+			if i > 50 {
+				return errors.ErrUnsupported
+			}
+			if i <= 0 {
+				return errors.ErrUnsupported
+			}
+			return nil
+		}),
 		field.Float32("seed_ratio").Optional().Default(0).Comment("minimal seed ratio requied, before removing torrent"),
 		field.Bool("disabled").Optional().Default(false),
 		field.Bool("tv_search").Optional().Default(true),

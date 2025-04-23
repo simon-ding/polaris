@@ -273,6 +273,11 @@ func (ic *IndexersCreate) check() error {
 	if _, ok := ic.mutation.Priority(); !ok {
 		return &ValidationError{Name: "priority", err: errors.New(`ent: missing required field "Indexers.priority"`)}
 	}
+	if v, ok := ic.mutation.Priority(); ok {
+		if err := indexers.PriorityValidator(v); err != nil {
+			return &ValidationError{Name: "priority", err: fmt.Errorf(`ent: validator failed for field "Indexers.priority": %w`, err)}
+		}
+	}
 	return nil
 }
 

@@ -120,7 +120,7 @@ var (
 		{Name: "implementation", Type: field.TypeString},
 		{Name: "settings", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "enable_rss", Type: field.TypeBool, Default: true},
-		{Name: "priority", Type: field.TypeInt, Default: 50},
+		{Name: "priority", Type: field.TypeInt, Default: 25},
 		{Name: "seed_ratio", Type: field.TypeFloat32, Nullable: true, Default: 0},
 		{Name: "disabled", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "tv_search", Type: field.TypeBool, Nullable: true, Default: true},

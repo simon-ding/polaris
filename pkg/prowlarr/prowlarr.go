@@ -66,7 +66,7 @@ func (c *Client) GetIndexers() ([]*ent.Indexers, error) {
 			Disabled:       !in.Enable,
 			Name:           in.Name,
 			Implementation: "torznab",
-			Priority:       128 - int(in.Priority),
+			Priority:       int(in.Priority),
 			SeedRatio:      float32(seedRatio),
 			Settings:       string(data),
 			TvSearch:       tvSearch,
