@@ -68,13 +68,13 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
             children: [
               FormBuilderTextField(
                   name: "name",
-                  enabled: client.idExists(),
+                  enabled: client.implementation != "buildin",
                   decoration: const InputDecoration(labelText: "名称"),
                   validator: FormBuilderValidators.required(),
                   autovalidateMode: AutovalidateMode.onUserInteraction),
               FormBuilderTextField(
                 name: "url",
-                enabled: client.idExists(),
+                enabled: client.implementation != "buildin",
                 decoration: const InputDecoration(
                     labelText: "地址", hintText: "http://127.0.0.1:9091"),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -82,7 +82,6 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
               ),
               FormBuilderTextField(
                   name: "priority",
-                  enabled: client.idExists(),
                   decoration: const InputDecoration(
                       labelText: "优先级", helperText: "1-50, 1最高优先级，50最低优先级"),
                   validator: FormBuilderValidators.integer(),
@@ -99,7 +98,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                   children: [
                     FormBuilderSwitch(
                         name: "auth",
-                        enabled: client.idExists(),
+                        enabled: client.implementation != "buildin",
                         title: const Text("需要认证"),
                         initialValue: _enableAuth,
                         onChanged: (v) {
@@ -166,7 +165,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
     }
 
     return showSettingDialog(
-        context, title, client.idExists(), body, onSubmit, onDelete);
+        context, title, client.idExists() && client.implementation != "buildin", body, onSubmit, onDelete);
   }
 
   Future<void> showSelections() {

@@ -69,14 +69,33 @@ func (c *client) init() {
 		log.Infof("set default log level")
 		c.SetSetting(SettingLogLevel, "info")
 	}
-	// if tr := c.GetAllDonloadClients(); len(tr) == 0 {
-	// 	log.Warnf("no download client, set default download client")
-	// 	c.SaveDownloader(&ent.DownloadClients{
-	// 		Name:           "transmission",
-	// 		Implementation: downloadclients.ImplementationTransmission,
-	// 		URL:            "http://transmission:9091",
-	// 	})
-	// }
+	c.initBuildinClient()
+}
+
+func (c *client) initBuildinClient() {
+	hasBuildin := false
+	tr := c.GetAllDonloadClients()
+	for _, d := range tr {
+		if d.Implementation == downloadclients.ImplementationBuildin {
+			hasBuildin = true
+			break
+		}
+	}
+	if !hasBuildin {
+		log.Warnf("no buildin download client, set default download client")
+		if err := c.SaveDownloader(&ent.DownloadClients{
+			Enable:                   true,
+			Name:                     "内建下载器",
+			Implementation:           downloadclients.ImplementationBuildin,
+			URL:                      "buildin",
+			Priority1:                50,
+			RemoveCompletedDownloads: true,
+			RemoveFailedDownloads:    true,
+		}); err != nil {
+			log.Warnf("add buildin client error: %v", err)
+		}
+	}
+
 }
 
 func (c *client) generateJwtSerectIfNotExist() {
@@ -323,26 +342,13 @@ func (c *client) GetAllDonloadClients() []*ent.DownloadClients {
 	cc, err := c.ent.DownloadClients.Query().Order(ent.Asc(downloadclients.FieldPriority1)).All(context.TODO())
 	if err != nil {
 		log.Errorf("no download client")
-		return []*ent.DownloadClients{
-			{
-				Implementation: downloadclients.ImplementationBuildin,
-				Name:           "内建下载器",
-				Priority1:      9999,
-				Enable:         true,
-			},
-		}
+		return nil
 	}
-	cc = append(cc, &ent.DownloadClients{
-		Implementation: downloadclients.ImplementationBuildin,
-		Name:           "内建下载器",
-		Priority1:      9999,
-		Enable:         true,
-	})
 	return cc
 }
 
-func (c *client) DeleteDownloadCLient(id int) {
-	c.ent.DownloadClients.Delete().Where(downloadclients.ID(id)).Exec(context.TODO())
+func (c *client) DeleteDownloadCLient(id int) { //not delete buildin client
+	c.ent.DownloadClients.Delete().Where(downloadclients.ID(id), downloadclients.ImplementationNEQ(downloadclients.ImplementationBuildin)).Exec(context.TODO())
 }
 
 // Storage is the model entity for the Storage schema.

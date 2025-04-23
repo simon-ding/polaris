@@ -65,6 +65,8 @@ func (c *Engine) reloadUsingBuildinDownloader(h *ent.History) error {
 	if err != nil {
 		return errors.Wrap(err, "download torrent")
 	}
+	t.Start()
+
 	c.tasks.Store(h.ID, &Task{Torrent: t})
 	return nil
 }
@@ -137,6 +139,14 @@ func (c *Engine) reloadTasks() {
 				}
 				c.tasks.Store(t.ID, &Task{Torrent: to})
 			}
+		} else if dl.Implementation == downloadclients.ImplementationBuildin {
+			err := c.reloadUsingBuildinDownloader(t)	
+			if err != nil {
+				log.Warnf("buildin downloader error: %v", err)
+			} else {
+				log.Infof("success reloading buildin task: %v", t.SourceTitle)
+			}
+
 		}
 
 	}
