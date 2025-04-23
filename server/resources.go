@@ -28,7 +28,10 @@ func (s *Server) searchAndDownloadSeasonPackage(seriesId, seasonNum int) (*strin
 
 	r1 := res[0]
 	log.Infof("found resource to download: %+v", r1)
-	return s.core.DownloadEpisodeTorrent(r1, seriesId, seasonNum)
+	return s.core.DownloadEpisodeTorrent(r1, engine.DownloadOptions{
+		SeasonNum: seasonNum,
+		MediaId:   seriesId,
+	})
 
 }
 
@@ -154,14 +157,21 @@ func (s *Server) DownloadTorrent(c *gin.Context) (interface{}, error) {
 				name = fmt.Sprintf("%v S%02d", m.OriginalName, in.Season)
 			}
 			res := torznab.Result{Name: name, Link: in.Link, Size: in.Size}
-			return s.core.DownloadEpisodeTorrent(res, in.MediaID, in.Season)
+			return s.core.DownloadEpisodeTorrent(res, engine.DownloadOptions{
+				SeasonNum: in.Season,
+				MediaId:   in.MediaID,
+			})
 		}
 		name := in.Name
 		if name == "" {
 			name = fmt.Sprintf("%v S%02dE%02d", m.OriginalName, in.Season, in.Episode)
 		}
 		res := torznab.Result{Name: name, Link: in.Link, Size: in.Size, IndexerId: in.IndexerId}
-		return s.core.DownloadEpisodeTorrent(res, in.MediaID, in.Season, in.Episode)
+		return s.core.DownloadEpisodeTorrent(res, engine.DownloadOptions{
+			SeasonNum: in.Season,
+			MediaId:   in.MediaID,
+			EpisodeNums: []int{in.Episode},
+		})
 	} else {
 		//movie
 		name := in.Name

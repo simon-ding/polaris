@@ -56,6 +56,7 @@ func (c *Engine) Init() {
 func (c *Engine) GetTask(id int) (*Task, bool) {
 	return c.tasks.Load(id)
 }
+
 func (c *Engine) reloadUsingBuildinDownloader(h *ent.History) error{
 	cl, err := buildin.NewDownloader(c.db.GetDownloadDir())
 	if err != nil {

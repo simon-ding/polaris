@@ -18,6 +18,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+type DownloadOptions struct {
+	HashFilterFn func(hash string) bool
+	SeasonNum    int
+	EpisodeNums  []int
+	MediaId      int
+}
+
 func (c *Engine) addSysCron() {
 	c.registerCronJob("check_running_tasks", "@every 1m", c.checkTasks)
 	c.registerCronJob("check_available_medias_to_download", "0 0 * * * *", func() error {
@@ -494,7 +501,7 @@ func (c *Engine) downloadMovieSingleEpisode(m *ent.Media, ep *ent.Episode) (stri
 	r1 := res[0]
 	log.Infof("begin download torrent resource: %v", r1.Name)
 
-	s, err := c.downloadTorrent(m, r1, 0)
+	s, err := c.downloadTorrent(m, r1, DownloadOptions{MediaId: m.ID, SeasonNum: 0, HashFilterFn: c.hashInBlacklist})
 	if err != nil {
 		return "", err
 	}
