@@ -143,7 +143,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                               children: [
                                 Text("开始时间：${timeago.format(ac.date!)}"),
                                 Text("大小：${(ac.size ?? 0).readableFileSize()}"),
-                                ac.seedRatio > 0
+                                (ac.seedRatio??0) > 0
                                     ? Text("分享率：${ac.seedRatio}")
                                     : SizedBox()
                               ],

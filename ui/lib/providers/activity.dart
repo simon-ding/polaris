@@ -110,8 +110,8 @@ class Activity {
   final String? saved;
   final int? progress;
   final int? size;
-  final double seedRatio;
-  final double uploadProgress;
+  final double? seedRatio;
+  final double? uploadProgress;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
@@ -119,14 +119,14 @@ class Activity {
         mediaId: json["media_id"],
         episodeId: json["episode_id"],
         sourceTitle: json["source_title"],
-        date: DateTime.tryParse(json["date"] ?? ""),
+        date: DateTime.tryParse(json["date"] ?? DateTime.now().toString()),
         targetDir: json["target_dir"],
         status: json["status"],
         saved: json["saved"],
-        progress: json["progress"],
-        seedRatio: json["seed_ratio"],
-        size: json["size"],
-        uploadProgress: json["upload_progress"]);
+        progress: json["progress"]??0,
+        seedRatio: json["seed_ratio"]??0,
+        size: json["size"]??0,
+        uploadProgress: json["upload_progress"]??0);
   }
 }
 
