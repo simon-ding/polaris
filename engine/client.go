@@ -223,6 +223,6 @@ func (c *Engine) RemoveTaskAndTorrent(id int) error {
 	return nil
 }
 
-func (c *Engine) GetTasks() utils.Map[int, *Task] {
-	return c.tasks
+func (c *Engine) GetTasks() *utils.Map[int, *Task] {
+	return &c.tasks
 }
