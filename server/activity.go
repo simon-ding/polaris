@@ -122,14 +122,7 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 }
 
 func (s *Server) addTorrent2Blacklist(h *ent.History) error {
-	var name string
-
-	task, ok := s.core.GetTask(h.ID)
-	if ok {
-		name, _ = task.Name()
-	}
-
-	return s.db.AddTorrent2Blacklist(h.Hash, name, h.MediaID)
+	return s.db.AddTorrent2Blacklist(h.Hash, h.SourceTitle, h.MediaID)
 }
 
 func (s *Server) GetAllBlacklistItems(c *gin.Context) (interface{}, error) {
