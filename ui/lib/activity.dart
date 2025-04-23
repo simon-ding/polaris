@@ -122,6 +122,14 @@ class _ActivityPageState extends ConsumerState<ActivityPage>
                                   color: Colors.green,
                                 ),
                               );
+                            } else if (ac.status == "removed") {
+                              return const Tooltip(
+                                message: "已删除",
+                                child: Icon(
+                                  Icons.remove,
+                                  //color: Colors.orange,
+                                ),
+                              );
                             }
 
                             double p = ac.progress == null
