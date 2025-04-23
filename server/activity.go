@@ -86,14 +86,6 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		log.Errorf("no record of id: %d", in.ID)
 		return nil, nil
 	}
-	if in.Add2Blacklist && his.Link != "" {
-		//should add to blacklist
-		if err := s.addTorrent2Blacklist(his); err != nil {
-			return nil, errors.Errorf("add to blacklist: %v", err)
-		} else {
-			log.Infof("success add magnet link to blacklist: %v", his.Link)
-		}
-	}
 
 	if err := s.core.RemoveTaskAndTorrent(his.ID); err != nil {
 		return nil, errors.Wrap(err, "remove torrent")
@@ -105,6 +97,15 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 			return nil, errors.Wrap(err, "set status")
 		}
 		return nil, nil
+	}
+
+	if in.Add2Blacklist {
+		//should add to blacklist
+		if err := s.addTorrent2Blacklist(his); err != nil {
+			return nil, errors.Errorf("add to blacklist: %v", err)
+		} else {
+			log.Infof("success add magnet link to blacklist: %v", his.Link)
+		}
 	}
 
 	err := s.db.DeleteHistory(in.ID)
@@ -132,6 +133,9 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 }
 
 func (s *Server) addTorrent2Blacklist(h *ent.History) error {
+	if h.Hash == "" { //没有hash，不添加
+		return nil
+	}
 	return s.db.AddTorrent2Blacklist(h.Hash, h.SourceTitle, h.MediaID)
 }
 
