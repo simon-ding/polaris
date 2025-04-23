@@ -113,6 +113,7 @@ func (s *Server) RemoveActivity(c *gin.Context) (interface{}, error) {
 		}
 		if !s.db.IsEpisodeDownloadingOrDownloaded(id) && ep.Status != episode.StatusDownloaded {
 			//没有正在下载中或者下载完成的任务，并且episode状态不是已经下载完成
+			log.Debugf("set episode (%d) status to missing", id)
 			s.db.SetEpisodeStatus(id, episode.StatusMissing)
 		}
 	}

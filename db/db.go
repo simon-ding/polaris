@@ -507,7 +507,7 @@ func (c *client) GetHistory(id int) *ent.History {
 }
 
 func (c *client) DeleteHistory(id int) error {
-	 err := c.ent.History.Update().Where(history.ID(id)).SetStatus(history.StatusRemoved).Exec(context.Background())
+	err := c.ent.History.Update().Where(history.ID(id)).SetStatus(history.StatusRemoved).Exec(context.Background())
 	return err
 }
 
@@ -534,7 +534,7 @@ func (c *client) SetEpisodeStatus(id int, status episode.Status) error {
 
 func (c *client) IsEpisodeDownloadingOrDownloaded(id int) bool {
 	ep, _ := c.GetEpisodeByID(id)
-	his := c.ent.History.Query().Where(history.MediaID(ep.MediaID),history.SeasonNum(ep.SeasonNumber), history.StatusEQ(history.StatusRemoved), history.StatusNEQ(history.StatusFail)).AllX(context.Background())
+	his := c.ent.History.Query().Where(history.MediaID(ep.MediaID), history.SeasonNum(ep.SeasonNumber), history.StatusNEQ(history.StatusRemoved), history.StatusNEQ(history.StatusFail)).AllX(context.Background())
 	for _, h := range his {
 		if len(h.EpisodeNums) == 0 { //season pack download
 			return true
@@ -751,8 +751,7 @@ func (c *client) GetTmdbApiKey() string {
 	return k
 }
 
-
-func (c *client) AddTorrent2Blacklist(hash, name string, mediaId int) error  {
+func (c *client) AddTorrent2Blacklist(hash, name string, mediaId int) error {
 	count := c.ent.Blacklist.Query().Where(blacklist.TorrentHash(hash), blacklist.MediaID(mediaId)).CountX(context.TODO())
 	if count > 0 { //already exist
 		log.Infof("torrent %s already in blacklist", hash)
