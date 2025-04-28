@@ -15,6 +15,11 @@ var atom zap.AtomicLevel
 
 const dataPath = "./data"
 
+
+func init() {
+	InitLogger(false)
+}
+
 func InitLogger(toFile bool) {
 	atom = zap.NewAtomicLevel()
 	atom.SetLevel(zap.DebugLevel)

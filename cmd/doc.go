@@ -10,10 +10,8 @@ import (
 func Start(sharedLib bool) {
 	if sharedLib || os.Getenv("GIN_MODE") == "release" {
 		log.InitLogger(true)
-	} else {
-		log.InitLogger(false)
 	}
-
+	
 	log.Infof("------------------- Starting Polaris ---------------------")
 	dbClient, err := db.Open()
 	if err != nil {
