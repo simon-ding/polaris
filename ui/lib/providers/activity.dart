@@ -7,7 +7,9 @@ import 'package:ui/providers/server_response.dart';
 var activitiesDataProvider = AsyncNotifierProvider.autoDispose
     .family<ActivityData, List<Activity>, ActivityStatus>(ActivityData.new);
 
-var blacklistDataProvider = AsyncNotifierProvider.autoDispose<BlacklistData,List<Blacklist>>(BlacklistData.new);
+var blacklistDataProvider =
+    AsyncNotifierProvider.autoDispose<BlacklistData, List<Blacklist>>(
+        BlacklistData.new);
 
 var mediaHistoryDataProvider = FutureProvider.autoDispose.family(
   (ref, arg) async {
@@ -84,7 +86,6 @@ class ActivityData
   }
 }
 
-
 class Activity {
   Activity(
       {required this.id,
@@ -123,22 +124,21 @@ class Activity {
         targetDir: json["target_dir"],
         status: json["status"],
         saved: json["saved"],
-        progress: json["progress"]??0,
-        seedRatio: json["seed_ratio"]??0,
-        size: json["size"]??0,
-        uploadProgress: json["upload_progress"]??0);
+        progress: json["progress"] ?? 0,
+        seedRatio: json["seed_ratio"] ?? 0,
+        size: json["size"] ?? 0,
+        uploadProgress: json["upload_progress"] ?? 0);
   }
 }
-
 
 class BlacklistData extends AutoDisposeAsyncNotifier<List<Blacklist>> {
   @override
   FutureOr<List<Blacklist>> build() async {
     final dio = APIs.getDio();
     var resp = await dio.get(APIs.blacklistUrl);
-    final sp = ServerResponse.fromJson(resp.data);  
-    if (sp.code!= 0) {
-      throw sp.message; 
+    final sp = ServerResponse.fromJson(resp.data);
+    if (sp.code != 0) {
+      throw sp.message;
     }
     List<Blacklist> blaclklists = List.empty(growable: true);
     for (final a in sp.data as List) {
@@ -151,7 +151,7 @@ class BlacklistData extends AutoDisposeAsyncNotifier<List<Blacklist>> {
     final dio = APIs.getDio();
     var resp = await dio.delete("${APIs.blacklistUrl}/$id");
     final sp = ServerResponse.fromJson(resp.data);
-    if (sp.code!= 0) {
+    if (sp.code != 0) {
       throw sp.message;
     }
   }

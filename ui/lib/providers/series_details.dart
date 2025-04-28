@@ -24,9 +24,10 @@ class SeriesDetailData
     return SeriesDetails.fromJson(rsp.data);
   }
 
-  Future<void> delete(bool removeFiles ) async {
+  Future<void> delete(bool removeFiles) async {
     final dio = APIs.getDio();
-    var resp = await dio.delete("${APIs.seriesDetailUrl}$id", queryParameters: {"delete_files": removeFiles});
+    var resp = await dio.delete("${APIs.seriesDetailUrl}$id",
+        queryParameters: {"delete_files": removeFiles});
     var rsp = ServerResponse.fromJson(resp.data);
     if (rsp.code != 0) {
       throw rsp.message;
@@ -256,6 +257,7 @@ class MediaTorrentResource extends AutoDisposeFamilyAsyncNotifier<
     if (rsp.code != 0) {
       throw rsp.message;
     }
+    ref.invalidate(mediaDetailsProvider(arg.mediaId));
   }
 }
 
