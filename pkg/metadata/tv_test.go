@@ -206,6 +206,16 @@ func Test_ParseTV20(t *testing.T) {
 	assert.Equal(t, true, m.IsSeasonPack)
 }
 
+
+func Test_ParseTV21(t *testing.T) {
+	s1 := "【东京不够热】基督山伯爵-华丽的复仇-【01~09】【1280x720】【简中/日双语字幕】【2018春季日剧】【合集】 "
+	m := ParseTv(s1)
+	log.Infof("results: %+v", m)
+	assert.Equal(t, 1, m.Season)
+	assert.Equal(t, 2018, m.Year)
+	assert.Equal(t, true, m.IsSeasonPack)
+}
+
 // The Day of the Jackal (Season 1) WEB-DL 1080​p
 func Test_ParseTV19(t *testing.T) {
 	s1 := "The Day of the Jackal (Season 1) WEB-DL 1080​p "

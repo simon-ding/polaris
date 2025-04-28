@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -71,6 +72,26 @@ func names2Query(media *ent.Media) []string {
 	return names
 }
 
+func getSeasonReleaseYear(series *db.MediaDetails, seasonNum int) int {
+	if seasonNum == 0 {
+		return 0
+	}
+	releaseYear := 0
+	for _, s := range series.Episodes {
+		if s.SeasonNumber == seasonNum && s.AirDate != "" {
+			ss := strings.Split(s.AirDate, "-")[0]
+			y, err := strconv.Atoi(ss)
+			if err != nil {
+				continue
+			}
+			releaseYear = y
+			break
+
+		}
+	}
+	return releaseYear
+}
+
 func SearchTvSeries(db1 db.Database, param *SearchParam) ([]torznab.Result, error) {
 	series, err := db1.GetMediaDetails(param.MediaId)
 	if err != nil {
@@ -87,6 +108,11 @@ func SearchTvSeries(db1 db.Database, param *SearchParam) ([]torznab.Result, erro
 
 	res := searchWithTorznab(db1, SearchTypeTv, names...)
 
+	ss := strings.Split(series.AirDate, "-")[0]
+	releaseYear, _ := strconv.Atoi(ss)
+
+	seasonYear := getSeasonReleaseYear(series, param.SeasonNum)
+
 	var filtered []torznab.Result
 lo:
 	for _, r := range res {
@@ -101,6 +127,17 @@ lo:
 		if !imdbIDMatchExact(series.ImdbID, r.ImdbId) { //imdb id not exact match, check file name
 			if !torrentNameOk(series, meta) {
 				continue
+			}
+			if meta.Year > 0 && releaseYear > 0 {
+				if meta.Year != releaseYear && meta.Year != releaseYear-1 && meta.Year != releaseYear+1 { //year not match
+					if seasonYear > 0 { // if tv release year is not match, check season release year
+						if meta.Year != seasonYear && meta.Year != seasonYear-1 && meta.Year != seasonYear+1 { //season year not match
+							continue lo
+						}
+					} else {
+						continue lo
+					}
+				}
 			}
 		}
 
@@ -311,6 +348,10 @@ const (
 )
 
 func searchWithTorznab(db db.Database, t SearchType, queries ...string) []torznab.Result {
+	t1 := time.Now()
+	defer func() {
+		log.Infof("search with torznab took %v", time.Since(t1))
+	}()
 
 	var res []torznab.Result
 	allTorznab := db.GetAllIndexers()

@@ -272,7 +272,7 @@ func matchResolution(s string) string {
 
 func maybeSeasonPack(s string) bool {
 	//season pack
-	packRe := regexp.MustCompile(`((\d{1,2}-\d{1,2}))|(complete)|(全集)|(\W[sS]\d{1,2}\W)`)
+	packRe := regexp.MustCompile(`((\d{1,2}-\d{1,2}))|(complete)|(全集)|(合集)|(\W[sS]\d{1,2}\W)`)
 	if packRe.MatchString(s) {
 		return true
 	}
@@ -409,6 +409,8 @@ func parseName(name string) *Info {
 	if strings.TrimSpace(name) == "" {
 		return meta
 	}
+	year, yearP := findYear(name)
+	meta.Year = year
 
 	season, p := findSeason(name)
 	if season == -1 {
@@ -437,7 +439,11 @@ func parseName(name string) *Info {
 
 	//tv name
 	if utils.IsASCII(name) && p < len(name) && p-1 > 0 {
-		meta.NameEn = strings.TrimSpace(name[:p-1])
+		p1 := p -1
+		if yearP > 0 {
+			p1 = min(p1, yearP-1)
+		}
+		meta.NameEn = strings.TrimSpace(name[:p1])
 		meta.NameCn = meta.NameEn
 	} else {
 		fields := strings.FieldsFunc(name, func(r rune) bool {
