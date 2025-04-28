@@ -197,6 +197,15 @@ func Test_ParseTV18(t *testing.T) {
 	//assert.Equal(t, "720p", m.Resolution)
 }
 
+//The Count of Monte Cristo 2024 S01 1080p WEB-DL DD 5.1 H.264-playWEB
+func Test_ParseTV20(t *testing.T) {
+	s1 := "The Count of Monte Cristo 2024 S01 1080p WEB-DL DD 5.1 H.264-playWEB "
+	m := ParseTv(s1)
+	log.Infof("results: %+v", m)
+	assert.Equal(t, 1, m.Season)
+	assert.Equal(t, true, m.IsSeasonPack)
+}
+
 // The Day of the Jackal (Season 1) WEB-DL 1080​p
 func Test_ParseTV19(t *testing.T) {
 	s1 := "The Day of the Jackal (Season 1) WEB-DL 1080​p "

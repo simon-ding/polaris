@@ -272,7 +272,7 @@ func matchResolution(s string) string {
 
 func maybeSeasonPack(s string) bool {
 	//season pack
-	packRe := regexp.MustCompile(`((\d{1,2}-\d{1,2}))|(complete)|(全集)`)
+	packRe := regexp.MustCompile(`((\d{1,2}-\d{1,2}))|(complete)|(全集)|(\W[sS]\d{1,2}\W)`)
 	if packRe.MatchString(s) {
 		return true
 	}
