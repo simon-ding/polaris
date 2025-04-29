@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type MovieMetadata struct {
@@ -15,7 +16,7 @@ type MovieMetadata struct {
 	IsQingban  bool
 }
 
-func (m *MovieMetadata) IsAcceptable(names... string) bool {
+func (m *MovieMetadata) IsAcceptable(names ...string) bool {
 	for _, name := range names {
 		re := regexp.MustCompile(`[^\p{L}\w\s]`)
 		name = re.ReplaceAllString(strings.ToLower(name), " ")
@@ -26,8 +27,8 @@ func (m *MovieMetadata) IsAcceptable(names... string) bool {
 			re := regexp.MustCompile(`\b` + name + `\b`)
 			return re.MatchString(name2)
 		}
-		
-		if  strings.Contains(name2, name) {
+
+		if strings.Contains(name2, name) {
 			return true
 		}
 	}
@@ -51,16 +52,15 @@ func findYear(name string) (year int, index int) {
 		yearMatches := yearRe.FindAllString(name, -1)
 		if len(yearMatches) > 0 {
 			year, index = findYearInMatches(yearMatches, name)
-	
-			
+
 		}
 	}
-	return 
+	return
 }
 
 func findYearInMatches(matches []string, name string) (year int, index int) {
 	if len(matches) == 0 {
-		return 0, -1	
+		return 0, -1
 	}
 	for _, y := range matches {
 		index = strings.Index(name, y)
@@ -68,7 +68,7 @@ func findYearInMatches(matches []string, name string) (year int, index int) {
 		if err != nil {
 			panic(fmt.Sprintf("convert %s error: %v", y, err))
 		}
-		if n < 1900 || n > 2050 {
+		if n < 1900 || n > time.Now().Year()+1 { //filter invalid year
 			continue
 		}
 		year = n
@@ -101,7 +101,7 @@ func ParseMovie(name string) *MovieMetadata {
 
 // https://en.wikipedia.org/wiki/Pirated_movie_release_types
 func isQiangban(name string) bool {
-	qiangbanFilter := []string{"CAMRip","CAM-Rip", "CAM", "HDCAM", "TS","TSRip", "HDTS", "TELESYNC", "PDVD", "PreDVDRip", "TC", "HDTC", "TELECINE", "WP", "WORKPRINT"}
+	qiangbanFilter := []string{"CAMRip", "CAM-Rip", "CAM", "HDCAM", "TS", "TSRip", "HDTS", "TELESYNC", "PDVD", "PreDVDRip", "TC", "HDTC", "TELECINE", "WP", "WORKPRINT"}
 	re := regexp.MustCompile(`\W`)
 	name = re.ReplaceAllString(strings.ToLower(name), " ")
 	fields := strings.Fields(name)
