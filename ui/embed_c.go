@@ -1,4 +1,4 @@
-//go:build c
+//go:build lib
 package ui
 
 import "embed"

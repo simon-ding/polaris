@@ -247,7 +247,7 @@ func GetRealLinkAndHash(link string) (string, string, error) {
 	if err != nil {
 		return "", "", errors.Wrap(err, "parse response")
 	}
-	return link,info.HashInfoBytes().HexString(), nil
+	return link, info.HashInfoBytes().HexString(), nil
 }
 
 func Link2Magnet(link string) (string, error) {

@@ -251,7 +251,7 @@ class MediaTorrentResource extends AutoDisposeFamilyAsyncNotifier<
       "season": arg.seasonNumber,
       "episode": arg.episodeNumber
     });
-    final dio = await APIs.getDio();
+    final dio = APIs.getDio();
     var resp = await dio.post(APIs.downloadTorrentUrl, data: data);
     var rsp = ServerResponse.fromJson(resp.data);
     if (rsp.code != 0) {

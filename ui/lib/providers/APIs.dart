@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/providers/server_response.dart';
-import 'package:ui/widgets/utils.dart';
 
 class APIs {
   static int port = 8096;
@@ -32,7 +31,7 @@ class APIs {
   static final allDownloadClientsUrl = "$_baseUrl/api/v1/downloader";
   static final addDownloadClientUrl = "$_baseUrl/api/v1/downloader/add";
   static final delDownloadClientUrl = "$_baseUrl/api/v1/downloader/del/";
-  static final storageUrl = "$_baseUrl/api/v1/storage/";
+  static final storageUrl = "$_baseUrl/api/v1/storage";
   static final loginUrl = "$_baseUrl/api/login";
   static final logoutUrl = "$_baseUrl/api/v1/setting/logout";
   static final loginSettingUrl = "$_baseUrl/api/v1/setting/auth";
@@ -46,12 +45,12 @@ class APIs {
   static final changeMonitoringUrl = "$_baseUrl/api/v1/setting/monitoring";
   static final addImportlistUrl = "$_baseUrl/api/v1/importlist/add";
   static final deleteImportlistUrl = "$_baseUrl/api/v1/importlist/delete";
-  static final getAllImportlists = "$_baseUrl/api/v1/importlist/";
+  static final getAllImportlists = "$_baseUrl/api/v1/importlist";
   static final prowlarrUrl = "$_baseUrl/api/v1/setting/prowlarr";
 
   static final notifierAllUrl = "$_baseUrl/api/v1/notifier/all";
   static final notifierDeleteUrl = "$_baseUrl/api/v1/notifier/id/";
-  static final notifierAddUrl = "$_baseUrl/api/v1/notifier/add/";
+  static final notifierAddUrl = "$_baseUrl/api/v1/notifier/add";
 
   static final tmdbImgBaseUrl = "$_baseUrl/api/v1/posters";
 
@@ -85,13 +84,20 @@ class APIs {
     var dio = Dio();
     dio.options.followRedirects = true;
     dio.interceptors.add(InterceptorsWrapper(
-      onError: (error, handler) {
+      onError: (error, handler) async {
         if (error.response?.statusCode != null &&
             error.response?.statusCode! == 403) {
+          //not login
           final context = navigatorKey.currentContext;
           if (context != null) {
             context.go('/login');
           }
+        }
+
+        if (error.response?.statusCode == 307) {
+          final redirectUrl = error.response!.headers['Location']!.first;
+          final newResponse = await dio.get(_baseUrl+redirectUrl);
+          return handler.resolve(newResponse); // 返回修正后的响应
         }
         return handler.next(error);
       },

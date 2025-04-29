@@ -1,9 +1,12 @@
 package db
 
-import "polaris/ent/media"
+import (
+	"polaris/ent/media"
+	"polaris/pkg/utils"
+)
 
 var (
-	Version    = "undefined"
+	Version           = "undefined"
 	DefaultTmdbApiKey = ""
 )
 
@@ -37,9 +40,12 @@ const (
 
 const (
 	IndexerTorznabImpl = "torznab"
-	DataPath           = "./data"
-	ImgPath            = DataPath + "/img"
-	LogPath            = DataPath + "/logs"
+)
+
+var (
+	DataPath = utils.GetUserDataDir()
+	ImgPath  = DataPath + "/img"
+	LogPath  = DataPath + "/logs"
 )
 
 const (
@@ -49,7 +55,7 @@ const (
 
 const DefaultNamingFormat = "{{.NameCN}} {{.NameEN}} {{if .Year}} ({{.Year}}) {{end}}"
 
-//https://en.wikipedia.org/wiki/Video_file_format
+// https://en.wikipedia.org/wiki/Video_file_format
 var defaultAcceptedVideoFormats = []string{
 	".webm", ".mkv", ".flv", ".vob", ".ogv", ".ogg", ".drc", ".mng", ".avi", ".mts", ".m2ts", ".ts",
 	".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".viv", ".amv", ".mp4", ".m4p", ".m4v",

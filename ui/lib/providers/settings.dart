@@ -315,7 +315,7 @@ class StorageSettingData extends AutoDisposeAsyncNotifier<List<Storage>> {
 
   Future<void> deleteStorage(int id) async {
     final dio = await APIs.getDio();
-    var resp = await dio.delete("${APIs.storageUrl}$id");
+    var resp = await dio.delete("${APIs.storageUrl}/$id");
     var sp = ServerResponse.fromJson(resp.data);
     if (sp.code != 0) {
       throw sp.message;

@@ -101,7 +101,7 @@ func (s *Server) setupRoutes() {
 		tv.POST("/tv/watchlist", HttpHandler(s.AddTv2Watchlist))
 		tv.GET("/tv/watchlist", HttpHandler(s.GetTvWatchlist))
 		tv.POST("/torrents", HttpHandler(s.SearchAvailableTorrents))
-		tv.POST("/torrents/download/", HttpHandler(s.DownloadTorrent))
+		tv.POST("/torrents/download", HttpHandler(s.DownloadTorrent))
 		tv.POST("/movie/watchlist", HttpHandler(s.AddMovie2Watchlist))
 		tv.GET("/movie/watchlist", HttpHandler(s.GetMovieWatchlist))
 		tv.GET("/record/:id", HttpHandler(s.GetMediaDetails))

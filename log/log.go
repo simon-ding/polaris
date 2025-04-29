@@ -3,6 +3,7 @@ package log
 import (
 	"os"
 	"path/filepath"
+	"polaris/pkg/utils"
 	"strings"
 
 	"github.com/natefinch/lumberjack"
@@ -12,9 +13,6 @@ import (
 
 var sugar *zap.SugaredLogger
 var atom zap.AtomicLevel
-
-const dataPath = "./data"
-
 
 func init() {
 	InitLogger(false)
@@ -27,7 +25,7 @@ func InitLogger(toFile bool) {
 	w := zapcore.Lock(os.Stdout)
 	if toFile {
 		w = zapcore.AddSync(&lumberjack.Logger{
-			Filename:   filepath.Join(dataPath, "logs", "polaris.log"),
+			Filename:   filepath.Join(utils.GetUserDataDir(), "logs", "polaris.log"),
 			MaxSize:    50, // megabytes
 			MaxBackups: 3,
 			MaxAge:     30, // days

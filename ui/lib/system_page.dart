@@ -93,7 +93,7 @@ class _SystemPageState extends ConsumerState<SystemPage> {
                       ]),
                       DataRow(cells: [
                         const DataCell(Text("更新监控列表")),
-                        const DataCell(Text("每小时")),
+                        const DataCell(Text("每20分钟")),
                         DataCell(IconButton(
                           icon: const Icon(Icons.not_started),
                           onPressed: () =>

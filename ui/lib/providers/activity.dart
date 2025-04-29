@@ -111,8 +111,8 @@ class Activity {
   final String? saved;
   final int? progress;
   final int? size;
-  final double? seedRatio;
-  final double? uploadProgress;
+  final num? seedRatio;
+  final num? uploadProgress;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
