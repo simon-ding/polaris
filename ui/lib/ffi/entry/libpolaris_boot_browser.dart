@@ -7,7 +7,7 @@ LibPolarisBoot create() {
 class LibpolarisBootBrowser implements LibPolarisBoot {
   @override
   Future<int> start(String cfg) async{
-    throw 0;
+    return 0;
   }
 
   @override
