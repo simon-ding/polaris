@@ -40,7 +40,7 @@ func (c *Engine) addSysCron() {
 		return nil
 	})
 	c.registerCronJob("check_series_new_release", "0 0 */12 * * *", c.checkAllSeriesNewSeason)
-	c.registerCronJob("update_import_lists", "0 30 * * * *", c.periodicallyUpdateImportlist)
+	c.registerCronJob("update_import_lists", "0 */20 * * * *", c.periodicallyUpdateImportlist)
 
 	c.schedulers.Range(func(key string, value scheduler) bool {
 		log.Debugf("add cron job: %v", key)

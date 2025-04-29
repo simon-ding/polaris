@@ -17,7 +17,7 @@ import (
 func NewDownloader(downloadDir string) (*Downloader, error) {
 	cfg := torrent.NewDefaultClientConfig()
 	cfg.DataDir = downloadDir
-	cfg.ListenPort = 51243
+	//cfg.ListenPort = 51243
 	t, err := torrent.NewClient(cfg)
 	if err != nil {
 		return nil, errors.Wrapf(err, "create torrent client")

@@ -8,6 +8,7 @@ import 'package:ui/providers/server_response.dart';
 import 'package:ui/widgets/utils.dart';
 
 class APIs {
+  static int port = 8096;
   static final _baseUrl = baseUrl();
   static final searchUrl = "$_baseUrl/api/v1/media/search";
   static final editMediaUrl = "$_baseUrl/api/v1/media/edit";
@@ -63,7 +64,6 @@ class APIs {
 
   static final blacklistUrl = "$_baseUrl/api/v1/activity/blacklist";
 
-  
   static const tmdbApiKey = "tmdb_api_key";
   static const downloadDirKey = "download_dir";
 
@@ -71,10 +71,11 @@ class APIs {
       GlobalKey<NavigatorState>();
 
   static String baseUrl() {
+    if (!kIsWeb) {
+      return "http://127.0.0.1:$port";
+    }
+
     if (kReleaseMode) {
-      if (!kIsWeb) {
-        return "http://127.0.0.1:8080";
-      }
       return "";
     }
     return "http://127.0.0.1:8080";

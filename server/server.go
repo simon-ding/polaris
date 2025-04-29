@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -11,6 +12,7 @@ import (
 	"polaris/pkg/cache"
 	"polaris/pkg/tmdb"
 	"polaris/ui"
+	"strconv"
 	"time"
 
 	ginzap "github.com/gin-contrib/zap"
@@ -22,20 +24,20 @@ import (
 )
 
 func NewServer(db db.Database) *Server {
-	r := gin.Default()
 	s := &Server{
-		r:                r,
 		db:               db,
+		srv: &http.Server{},
 		language:         db.GetLanguage(),
 		monitorNumCache:  cache.NewCache[int, int](10 * time.Minute),
 		downloadNumCache: cache.NewCache[int, int](10 * time.Minute),
 	}
 	s.core = engine.NewEngine(db, s.language)
+	s.setupRoutes()
 	return s
 }
 
 type Server struct {
-	r                *gin.Engine
+	srv              *http.Server
 	db               db.Database
 	core             *engine.Engine
 	language         string
@@ -44,20 +46,21 @@ type Server struct {
 	downloadNumCache *cache.Cache[int, int]
 }
 
-func (s *Server) Serve() error {
+func (s *Server) setupRoutes() {
 	s.core.Init()
 
+	r := gin.Default()
 	s.jwtSerect = s.db.GetSetting(db.JwtSerectKey)
 	//st, _ := fs.Sub(ui.Web, "build/web")
-	s.r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
+	r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
 	//s.r.Use(ginzap.Ginzap(log.Logger().Desugar(), time.RFC3339, false))
-	s.r.Use(ginzap.RecoveryWithZap(log.Logger().Desugar(), true))
+	r.Use(ginzap.RecoveryWithZap(log.Logger().Desugar(), true))
 
 	log.SetLogLevel(s.db.GetSetting(db.SettingLogLevel)) //restore log level
 
-	s.r.POST("/api/login", HttpHandler(s.Login))
+	r.POST("/api/login", HttpHandler(s.Login))
 
-	api := s.r.Group("/api/v1")
+	api := r.Group("/api/v1")
 	api.Use(s.authModdleware)
 	api.StaticFS("/img", http.Dir(db.ImgPath))
 	api.StaticFS("/logs", http.Dir(db.LogPath))
@@ -142,9 +145,40 @@ func (s *Server) Serve() error {
 		importlist.POST("/add", HttpHandler(s.addImportlist))
 		importlist.DELETE("/delete", HttpHandler(s.deleteImportList))
 	}
-	log.Infof("----------- Polaris Server Successfully Started ------------")
+	s.srv.Handler = r
 
-	return s.r.Run(":8080")
+}
+
+func (s *Server) Start(addr string) (int, error) {
+	if addr == "" {
+		addr = "127.0.0.1:0" // 0 means any available port
+	}
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return 0, fmt.Errorf("failed to listen on port: %w", err)
+	}
+
+	_, port, _ := net.SplitHostPort(ln.Addr().String())
+
+	p, err := strconv.Atoi(port)
+	if err != nil {
+		return 0, fmt.Errorf("failed to convert port to int: %w", err)
+	}
+	go func() {
+		defer ln.Close()
+		if err := s.srv.Serve(ln); err != nil {
+			log.Errorf("failed to serve: %v", err)
+		}
+	}()
+
+	log.Infof("----------- Polaris Server Successfully Started on Port %d------------", p)
+
+	return p, nil
+}
+
+func (s *Server) Stop() error {
+	log.Infof("Stopping Polaris Server...")
+	return s.srv.Close()
 }
 
 func (s *Server) TMDB() (*tmdb.Client, error) {

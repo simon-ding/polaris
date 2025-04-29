@@ -1,11 +1,14 @@
 import 'dart:ffi';
 import 'dart:io';
-import 'dart:isolate';
 
+import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
+import 'package:quiver/strings.dart';
+import 'package:ui/ffi/lib_polaris_boot.dart';
 
+LibPolarisBoot create() => LibpolarisBootNative();
 
-class FFIBackend {
+class LibpolarisBootNative implements LibPolarisBoot {
   final lib = DynamicLibrary.open(libname());
 
   static String libname() {
@@ -25,17 +28,31 @@ class FFIBackend {
     }
   }
 
-  Future<void> start() async {
+  @override
+  Future<int> start(String cfg) async {
     var s = lib
-        .lookup<NativeFunction<Void Function()>>('Start')
-        .asFunction<void Function()>();
-        
-    return Isolate.run(s);
+        .lookupFunction<StartFunc, StartFunc>('Start')
+        ;
+    var r = s(cfg.toNativeUtf8());
+    if (isNotBlank(r.r1.toDartString())) {
+      throw Exception(r.r1.toDartString()); 
+    }
+    return r.r0;
   }
+
+  @override
   Future<void> stop() async {
-    var s = lib
+        var s = lib
         .lookup<NativeFunction<Void Function()>>('Stop')
         .asFunction<void Function()>();
     return s();
   }
+}
+
+typedef StartFunc = StartReturn Function(Pointer<Utf8> cfg);
+
+final class StartReturn extends Struct {
+  @Int32()
+  external int r0;
+  external Pointer<Utf8> r1;
 }
