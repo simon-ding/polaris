@@ -281,8 +281,8 @@ class TorrentResource {
   String? link;
   String? source;
   int? indexerId;
-  double? downloadFactor;
-  double? uploadFactor;
+  num? downloadFactor;
+  num? uploadFactor;
   bool? isPrivate;
 
   factory TorrentResource.fromJson(Map<String, dynamic> json) {

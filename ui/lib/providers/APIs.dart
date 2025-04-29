@@ -20,7 +20,7 @@ class APIs {
   //static final singleSettingUrl = "$_baseUrl/api/v1/setting/";
   static final watchlistTvUrl = "$_baseUrl/api/v1/media/tv/watchlist";
   static final watchlistMovieUrl = "$_baseUrl/api/v1/media/movie/watchlist";
-  static final availableTorrentsUrl = "$_baseUrl/api/v1/media/torrents/";
+  static final availableTorrentsUrl = "$_baseUrl/api/v1/media/torrents";
   static final downloadTorrentUrl = "$_baseUrl/api/v1/media/torrents/download";
   static final seriesDetailUrl = "$_baseUrl/api/v1/media/record/";
   static final suggestedTvName = "$_baseUrl/api/v1/media/suggest/tv/";
@@ -83,6 +83,7 @@ class APIs {
 
   static Dio getDio() {
     var dio = Dio();
+    dio.options.followRedirects = true;
     dio.interceptors.add(InterceptorsWrapper(
       onError: (error, handler) {
         if (error.response?.statusCode != null &&

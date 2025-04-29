@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"polaris/db"
+	"strings"
 
 	"polaris/log"
 	"polaris/pkg/alist"
@@ -52,10 +53,17 @@ func (s *Server) AddStorage(c *gin.Context) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
+		if !strings.HasSuffix(in.TvPath, string(os.PathSeparator)) {
+			in.TvPath = in.TvPath + string(os.PathSeparator)
+		}
 		_, err = os.Stat(in.MoviePath)
 		if err != nil {
 			return nil, err
 		}
+		if !strings.HasSuffix(in.MoviePath, string(os.PathSeparator)) {
+			in.MoviePath = in.MoviePath + string(os.PathSeparator)
+		}
+
 	}
 	log.Infof("received add storage input: %v", in)
 	err := s.db.AddStorage(&in)

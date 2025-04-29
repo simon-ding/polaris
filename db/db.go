@@ -390,11 +390,13 @@ type WebdavSetting struct {
 }
 
 func (c *client) AddStorage(st *StorageInfo) error {
-	if !strings.HasSuffix(st.TvPath, "/") {
-		st.TvPath += "/"
-	}
-	if !strings.HasSuffix(st.MoviePath, "/") {
-		st.MoviePath += "/"
+	if st.Implementation != storage.ImplementationLocal.String() { //add seperator if not local storage
+		if !strings.HasSuffix(st.TvPath, "/") {
+			st.TvPath += "/"
+		}
+		if !strings.HasSuffix(st.MoviePath, "/") {
+			st.MoviePath += "/"
+		}
 	}
 	if st.Settings == nil {
 		st.Settings = map[string]string{}
