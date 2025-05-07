@@ -11,6 +11,7 @@ import (
 	"polaris/pkg/tmdb"
 	"polaris/pkg/transmission"
 	"polaris/pkg/utils"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/robfig/cron"
@@ -50,6 +51,12 @@ func (c *Engine) Init() {
 	go c.reloadTasks()
 	c.addSysCron()
 	go c.checkW500PosterOnStartup()
+	go func() {
+		time.Sleep(10*time.Second)
+		if err := c.stunProxyDownloadClient(); err != nil {
+			log.Errorf("stun proxy error: %v", err)
+		}
+	}()
 }
 
 func (c *Engine) GetTask(id int) (*Task, bool) {
