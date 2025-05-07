@@ -11,10 +11,17 @@ func Test1(t *testing.T) {
 		log.Errorf("new client error: %v", err)
 		t.Fail()
 	}
-	all, err := c.GetAll()
-	for _, t := range all {
-		name, _ := t.Name()
-		log.Infof("torrent: %+v", name)
+	log.Infof("new client success: %v", c)
+	port, err := c.GetListenPort()
+	if err != nil {
+		log.Errorf("get listen port error: %v", err)
+		t.Fail()
+	} else {
+		log.Infof("listen port: %d", port)
+		err := c.SetListenPort(port + 1)
+		if err!= nil {
+			log.Errorf("set listen port error: %v", err)
+			t.Fail()	
+		}
 	}
-	
 }

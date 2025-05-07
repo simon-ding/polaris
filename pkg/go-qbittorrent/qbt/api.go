@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/cookiejar"
@@ -90,6 +91,28 @@ func (client *Client) get(endpoint string, opts map[string]string) (*http.Respon
 		return nil, wrapper.Wrap(err, "failed to perform request")
 	}
 
+	return resp, nil
+}
+
+func (cleint *Client) postJson(endpoint string, body any)  (*http.Response, error) {
+	var buff bytes.Buffer
+	buff.WriteString("json=")
+	d, err := json.Marshal(body)
+	if err!= nil {
+		return nil, err	
+	}
+	buff.Write(d)
+	log.Println(buff.String())
+	req, err := http.NewRequest("POST", cleint.URL+endpoint, &buff)
+	if err!= nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("User-Agent", "go-qbittorrent v0.1")
+	resp, err := cleint.http.Do(req)
+	if err!= nil {
+		return nil, err
+	}
 	return resp, nil
 }
 
@@ -315,8 +338,9 @@ func (client *Client) Preferences() (prefs Preferences, err error) {
 }
 
 // SetPreferences of the qbittorrent client
-func (client *Client) SetPreferences() (prefsSet bool, err error) {
-	resp, err := client.post("api/v2/app/setPreferences", nil)
+func (client *Client) SetPreferences(m map[string]any) (prefsSet bool, err error) {
+
+	resp, err := client.postJson("api/v2/app/setPreferences", m)
 	return (resp.Status == "200 OK"), err
 }
 

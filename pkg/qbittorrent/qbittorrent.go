@@ -61,6 +61,23 @@ func (c *Client) GetAll() ([]pkg.Torrent, error) {
 	return res, nil
 }
 
+func (c *Client) GetListenPort() (int, error) {
+	pref, err := c.c.Preferences()
+	if err != nil {
+		return 0, errors.Wrap(err, "get preferences")
+	}
+	
+	return pref.ListenPort, nil
+}
+
+func (c *Client) SetListenPort(port int) error {
+	ok, err := c.c.SetPreferences(map[string]any{"listen_port": port})
+	if !ok || err != nil {
+		return errors.Wrap(err, "set preferences")
+	}
+	return nil
+}
+
 func (c *Client) Download(link, hash, dir string) (pkg.Torrent, error) {
 	err := c.c.DownloadLinks([]string{link}, qbt.DownloadOptions{Savepath: &dir, Category: &c.category})
 	if err != nil {
