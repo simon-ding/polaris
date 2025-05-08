@@ -1,8 +1,10 @@
 package engine
 
 import (
+	"fmt"
 	"net/url"
 	"polaris/ent/downloadclients"
+	"polaris/log"
 	"polaris/pkg/nat"
 	"polaris/pkg/qbittorrent"
 
@@ -10,31 +12,33 @@ import (
 )
 
 func (s *Engine) stunProxyDownloadClient() error {
-	downloader, e, err := s.GetDownloadClient()
-	if err != nil {
-		return err
-	}
-	if !e.UseNatTraversal {
-		return nil
-	}
-	if e.Implementation != downloadclients.ImplementationQbittorrent {
-		return nil
-	}
-	d, ok := downloader.(*qbittorrent.Client)
-	if !ok {
-		return nil
-	}
-	u, err := url.Parse(d.URL)
-	if err != nil {
-		return err
-	}
+	downloaders := s.db.GetAllDonloadClients()
+	for _, d := range downloaders {
+		if !d.Enable {
+			continue
+		}
 
-	n, err := nat.NewNatTraversal(func(xa stun.XORMappedAddress) error {
-		return d.SetListenPort(xa.Port)
-	}, u.Hostname())
-	if err != nil {
-		return err
+		if d.Implementation != downloadclients.ImplementationQbittorrent { //TODO only support qbittorrent for now
+			continue
+		}
+
+		qbt, err := qbittorrent.NewClient(d.URL, d.User, d.Password)
+		if err != nil {
+			return fmt.Errorf("connect to download client error: %v", d.URL)
+		}
+		u, err := url.Parse(d.URL)
+		if err != nil {
+			return err
+		}
+		log.Infof("start stun proxy for %s", d.Name)
+		n, err := nat.NewNatTraversal(func(xa stun.XORMappedAddress) error {
+			return qbt.SetListenPort(xa.Port)
+		}, u.Hostname())
+		if err != nil {
+			return err
+		}
+		n.StartProxy()
+
 	}
-	n.StartProxy()
 	return nil
 }

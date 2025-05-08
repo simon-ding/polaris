@@ -251,6 +251,7 @@ class DownloadClient {
   bool? removeCompletedDownloads;
   bool? removeFailedDownloads;
   int? priority;
+  bool useNatTraversal = false;
   DownloadClient(
       {this.id,
       this.enable,
@@ -261,7 +262,7 @@ class DownloadClient {
       this.password,
       this.removeCompletedDownloads = true,
       this.priority = 1,
-      this.removeFailedDownloads = true});
+      this.removeFailedDownloads = true, this.useNatTraversal = false});
 
   DownloadClient.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -274,6 +275,7 @@ class DownloadClient {
     priority = json["priority1"];
     removeCompletedDownloads = json["remove_completed_downloads"] ?? false;
     removeFailedDownloads = json["remove_failed_downloads"] ?? false;
+    useNatTraversal = json["use_nat_traversal"]?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -288,6 +290,7 @@ class DownloadClient {
     data["priority"] = priority;
     data["remove_completed_downloads"] = removeCompletedDownloads;
     data["remove_failed_downloads"] = removeFailedDownloads;
+    data["use_nat_traversal"] = useNatTraversal;
     return data;
   }
 

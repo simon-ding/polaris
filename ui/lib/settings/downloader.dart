@@ -63,6 +63,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
             "remove_completed_downloads": client.removeCompletedDownloads,
             "remove_failed_downloads": client.removeFailedDownloads,
             "priority": client.priority.toString(),
+            "use_nat_traversal": client.useNatTraversal,
           },
           child: Column(
             children: [
@@ -86,6 +87,12 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                       labelText: "优先级", helperText: "1-50, 1最高优先级，50最低优先级"),
                   validator: FormBuilderValidators.integer(),
                   autovalidateMode: AutovalidateMode.onUserInteraction),
+              FormBuilderSwitch(
+                  name: "use_nat_traversal",
+                  enabled: client.implementation == "qbittorrent",
+                  title: const Text("使用内置STUN NAT穿透"),
+                  decoration: InputDecoration(helperText: "内建的NAT穿透功能帮助BT客户端上传(会自动更改下载器的监听地址)"),
+                  ),
               FormBuilderSwitch(
                   name: "remove_completed_downloads",
                   title: const Text("任务完成后删除")),
@@ -150,6 +157,7 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                 user: _enableAuth ? values["user"] : null,
                 password: _enableAuth ? values["password"] : null,
                 priority: int.parse(values["priority"]),
+                useNatTraversal: values["use_nat_traversal"],
                 removeCompletedDownloads: values["remove_completed_downloads"],
                 removeFailedDownloads: values["remove_failed_downloads"]));
       } else {
@@ -165,7 +173,12 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
     }
 
     return showSettingDialog(
-        context, title, client.idExists() && client.implementation != "buildin", body, onSubmit, onDelete);
+        context,
+        title,
+        client.idExists() && client.implementation != "buildin",
+        body,
+        onSubmit,
+        onDelete);
   }
 
   Future<void> showSelections() {
