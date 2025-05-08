@@ -60,33 +60,30 @@ func (s *NatTraversal) StunAddr() (*stun.XORMappedAddress, error) {
 		if err != nil {
 			return nil, fmt.Errorf("send binding request: %w", err)
 		}
-		select {
-		case message, ok := <-s.messageChan:
-			if !ok {
+		message, ok := <-s.messageChan
+		if !ok {
+			continue
+		}
+		if stun.IsMessage(message) {
+			m := new(stun.Message)
+			m.Raw = message
+			decErr := m.Decode()
+			if decErr != nil {
+				log.Warnf("decode:", decErr)
+
+				break
+			}
+			var xorAddr stun.XORMappedAddress
+			if getErr := xorAddr.GetFrom(m); getErr != nil {
+				log.Warnf("getFrom:", getErr)
+
 				continue
 			}
-			if stun.IsMessage(message) {
-				m := new(stun.Message)
-				m.Raw = message
-				decErr := m.Decode()
-				if decErr != nil {
-					log.Warnf("decode:", decErr)
-
-					break
-				}
-				var xorAddr stun.XORMappedAddress
-				if getErr := xorAddr.GetFrom(m); getErr != nil {
-					log.Warnf("getFrom:", getErr)
-
-					continue
-				}
-				if s.stunAddr == nil || s.stunAddr.String() != xorAddr.String() {
-					log.Warnf("My public address: %s\n", xorAddr)
-					s.stunAddr = &xorAddr
-				}
-				return &xorAddr, nil
-
+			if s.stunAddr == nil || s.stunAddr.String() != xorAddr.String() {
+				log.Warnf("My public address: %s\n", xorAddr)
+				s.stunAddr = &xorAddr
 			}
+			return &xorAddr, nil
 		}
 
 	}
@@ -110,7 +107,7 @@ func (s *NatTraversal) StartProxy(targetAddr string) error {
 	for {
 		select {
 		case <-s.cancel:
-			log.Infof("cancelled")
+			log.Infof("stun nat proxy cancelled")
 			return nil
 		case m := <-s.messageChan:
 			//log.Infof("Received message: %d", len(m))
