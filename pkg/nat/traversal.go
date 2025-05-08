@@ -121,15 +121,17 @@ func (s *NatTraversal) StartProxy() {
 	go func() { //tcker message to check public ip and port
 		defer tick.Stop()
 		for {
+			err := s.sendStunServerBindingMsg()
+			if err != nil {
+				log.Warnf("send stun server binding msg: %w", err)
+			}
+
 			select {
 			case <-s.cancel:
 				log.Infof("stun nat proxy cancelled")
 				return
 			case <-tick.C:
-				err := s.sendStunServerBindingMsg()
-				if err != nil {
-					log.Warnf("send stun server binding msg: %w", err)
-				}
+				//do nothing
 			}
 		}
 	}()
