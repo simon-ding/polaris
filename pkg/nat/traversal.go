@@ -77,7 +77,7 @@ func (s *NatTraversal) updateNatAddr() {
 
 func (s *NatTraversal) sendStunServerBindingMsg() error {
 	for _, srv := range getStunServers() {
-		log.Debugf("try to connect to stun server: %s", srv)
+		log.Debugf("send heartbeat to stun server: %s", srv)
 		srvAddr, err := net.ResolveUDPAddr(udp, srv)
 		if err != nil {
 			log.Warnf("Failed to resolve server addr: %s", err)
@@ -116,7 +116,7 @@ func (s *NatTraversal) getNatAddr(msg []byte) (*stun.XORMappedAddress, error) {
 
 func (s *NatTraversal) StartProxy() {
 
-	tick := time.NewTicker(10 * time.Second)
+	tick := time.NewTicker(60 * time.Second)
 
 	go func() { //tcker message to check public ip and port
 		defer tick.Stop()
