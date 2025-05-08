@@ -329,11 +329,11 @@ func (c *client) SaveDownloader(downloader *ent.DownloadClients) error {
 	count := c.ent.DownloadClients.Query().Where(downloadclients.Name(downloader.Name)).CountX(context.TODO())
 	if count != 0 {
 		err := c.ent.DownloadClients.Update().Where(downloadclients.Name(downloader.Name)).SetImplementation(downloader.Implementation).
-			SetURL(downloader.URL).SetUser(downloader.User).SetPassword(downloader.Password).SetPriority1(downloader.Priority1).Exec(context.TODO())
+			SetURL(downloader.URL).SetUser(downloader.User).SetUseNatTraversal(downloader.UseNatTraversal).SetPassword(downloader.Password).SetPriority1(downloader.Priority1).Exec(context.TODO())
 		return err
 	}
 
-	_, err := c.ent.DownloadClients.Create().SetEnable(true).SetImplementation(downloader.Implementation).
+	_, err := c.ent.DownloadClients.Create().SetEnable(true).SetImplementation(downloader.Implementation).SetUseNatTraversal(downloader.UseNatTraversal).
 		SetName(downloader.Name).SetURL(downloader.URL).SetUser(downloader.User).SetPriority1(downloader.Priority1).SetPassword(downloader.Password).Save(context.TODO())
 	return err
 }

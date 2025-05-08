@@ -89,6 +89,11 @@ func Priority1(v int) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldEQ(FieldPriority1, v))
 }
 
+// UseNatTraversal applies equality check predicate on the "use_nat_traversal" field. It's identical to UseNatTraversalEQ.
+func UseNatTraversal(v bool) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldUseNatTraversal, v))
+}
+
 // RemoveCompletedDownloads applies equality check predicate on the "remove_completed_downloads" field. It's identical to RemoveCompletedDownloadsEQ.
 func RemoveCompletedDownloads(v bool) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldEQ(FieldRemoveCompletedDownloads, v))
@@ -502,6 +507,26 @@ func Priority1LT(v int) predicate.DownloadClients {
 // Priority1LTE applies the LTE predicate on the "priority1" field.
 func Priority1LTE(v int) predicate.DownloadClients {
 	return predicate.DownloadClients(sql.FieldLTE(FieldPriority1, v))
+}
+
+// UseNatTraversalEQ applies the EQ predicate on the "use_nat_traversal" field.
+func UseNatTraversalEQ(v bool) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldEQ(FieldUseNatTraversal, v))
+}
+
+// UseNatTraversalNEQ applies the NEQ predicate on the "use_nat_traversal" field.
+func UseNatTraversalNEQ(v bool) predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNEQ(FieldUseNatTraversal, v))
+}
+
+// UseNatTraversalIsNil applies the IsNil predicate on the "use_nat_traversal" field.
+func UseNatTraversalIsNil() predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldIsNull(FieldUseNatTraversal))
+}
+
+// UseNatTraversalNotNil applies the NotNil predicate on the "use_nat_traversal" field.
+func UseNatTraversalNotNil() predicate.DownloadClients {
+	return predicate.DownloadClients(sql.FieldNotNull(FieldUseNatTraversal))
 }
 
 // RemoveCompletedDownloadsEQ applies the EQ predicate on the "remove_completed_downloads" field.

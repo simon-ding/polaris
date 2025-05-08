@@ -792,6 +792,7 @@ type DownloadClientsMutation struct {
 	settings                   *string
 	priority1                  *int
 	addpriority1               *int
+	use_nat_traversal          *bool
 	remove_completed_downloads *bool
 	remove_failed_downloads    *bool
 	tags                       *string
@@ -1208,6 +1209,55 @@ func (m *DownloadClientsMutation) ResetPriority1() {
 	m.addpriority1 = nil
 }
 
+// SetUseNatTraversal sets the "use_nat_traversal" field.
+func (m *DownloadClientsMutation) SetUseNatTraversal(b bool) {
+	m.use_nat_traversal = &b
+}
+
+// UseNatTraversal returns the value of the "use_nat_traversal" field in the mutation.
+func (m *DownloadClientsMutation) UseNatTraversal() (r bool, exists bool) {
+	v := m.use_nat_traversal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUseNatTraversal returns the old "use_nat_traversal" field's value of the DownloadClients entity.
+// If the DownloadClients object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DownloadClientsMutation) OldUseNatTraversal(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUseNatTraversal is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUseNatTraversal requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUseNatTraversal: %w", err)
+	}
+	return oldValue.UseNatTraversal, nil
+}
+
+// ClearUseNatTraversal clears the value of the "use_nat_traversal" field.
+func (m *DownloadClientsMutation) ClearUseNatTraversal() {
+	m.use_nat_traversal = nil
+	m.clearedFields[downloadclients.FieldUseNatTraversal] = struct{}{}
+}
+
+// UseNatTraversalCleared returns if the "use_nat_traversal" field was cleared in this mutation.
+func (m *DownloadClientsMutation) UseNatTraversalCleared() bool {
+	_, ok := m.clearedFields[downloadclients.FieldUseNatTraversal]
+	return ok
+}
+
+// ResetUseNatTraversal resets all changes to the "use_nat_traversal" field.
+func (m *DownloadClientsMutation) ResetUseNatTraversal() {
+	m.use_nat_traversal = nil
+	delete(m.clearedFields, downloadclients.FieldUseNatTraversal)
+}
+
 // SetRemoveCompletedDownloads sets the "remove_completed_downloads" field.
 func (m *DownloadClientsMutation) SetRemoveCompletedDownloads(b bool) {
 	m.remove_completed_downloads = &b
@@ -1399,7 +1449,7 @@ func (m *DownloadClientsMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DownloadClientsMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.enable != nil {
 		fields = append(fields, downloadclients.FieldEnable)
 	}
@@ -1423,6 +1473,9 @@ func (m *DownloadClientsMutation) Fields() []string {
 	}
 	if m.priority1 != nil {
 		fields = append(fields, downloadclients.FieldPriority1)
+	}
+	if m.use_nat_traversal != nil {
+		fields = append(fields, downloadclients.FieldUseNatTraversal)
 	}
 	if m.remove_completed_downloads != nil {
 		fields = append(fields, downloadclients.FieldRemoveCompletedDownloads)
@@ -1460,6 +1513,8 @@ func (m *DownloadClientsMutation) Field(name string) (ent.Value, bool) {
 		return m.Settings()
 	case downloadclients.FieldPriority1:
 		return m.Priority1()
+	case downloadclients.FieldUseNatTraversal:
+		return m.UseNatTraversal()
 	case downloadclients.FieldRemoveCompletedDownloads:
 		return m.RemoveCompletedDownloads()
 	case downloadclients.FieldRemoveFailedDownloads:
@@ -1493,6 +1548,8 @@ func (m *DownloadClientsMutation) OldField(ctx context.Context, name string) (en
 		return m.OldSettings(ctx)
 	case downloadclients.FieldPriority1:
 		return m.OldPriority1(ctx)
+	case downloadclients.FieldUseNatTraversal:
+		return m.OldUseNatTraversal(ctx)
 	case downloadclients.FieldRemoveCompletedDownloads:
 		return m.OldRemoveCompletedDownloads(ctx)
 	case downloadclients.FieldRemoveFailedDownloads:
@@ -1565,6 +1622,13 @@ func (m *DownloadClientsMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPriority1(v)
+		return nil
+	case downloadclients.FieldUseNatTraversal:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUseNatTraversal(v)
 		return nil
 	case downloadclients.FieldRemoveCompletedDownloads:
 		v, ok := value.(bool)
@@ -1639,6 +1703,9 @@ func (m *DownloadClientsMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *DownloadClientsMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(downloadclients.FieldUseNatTraversal) {
+		fields = append(fields, downloadclients.FieldUseNatTraversal)
+	}
 	if m.FieldCleared(downloadclients.FieldCreateTime) {
 		fields = append(fields, downloadclients.FieldCreateTime)
 	}
@@ -1656,6 +1723,9 @@ func (m *DownloadClientsMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *DownloadClientsMutation) ClearField(name string) error {
 	switch name {
+	case downloadclients.FieldUseNatTraversal:
+		m.ClearUseNatTraversal()
+		return nil
 	case downloadclients.FieldCreateTime:
 		m.ClearCreateTime()
 		return nil
@@ -1690,6 +1760,9 @@ func (m *DownloadClientsMutation) ResetField(name string) error {
 		return nil
 	case downloadclients.FieldPriority1:
 		m.ResetPriority1()
+		return nil
+	case downloadclients.FieldUseNatTraversal:
+		m.ResetUseNatTraversal()
 		return nil
 	case downloadclients.FieldRemoveCompletedDownloads:
 		m.ResetRemoveCompletedDownloads()

@@ -30,6 +30,8 @@ const (
 	FieldSettings = "settings"
 	// FieldPriority1 holds the string denoting the priority1 field in the database.
 	FieldPriority1 = "priority1"
+	// FieldUseNatTraversal holds the string denoting the use_nat_traversal field in the database.
+	FieldUseNatTraversal = "use_nat_traversal"
 	// FieldRemoveCompletedDownloads holds the string denoting the remove_completed_downloads field in the database.
 	FieldRemoveCompletedDownloads = "remove_completed_downloads"
 	// FieldRemoveFailedDownloads holds the string denoting the remove_failed_downloads field in the database.
@@ -53,6 +55,7 @@ var Columns = []string{
 	FieldPassword,
 	FieldSettings,
 	FieldPriority1,
+	FieldUseNatTraversal,
 	FieldRemoveCompletedDownloads,
 	FieldRemoveFailedDownloads,
 	FieldTags,
@@ -80,6 +83,8 @@ var (
 	DefaultPriority1 int
 	// Priority1Validator is a validator for the "priority1" field. It is called by the builders before save.
 	Priority1Validator func(int) error
+	// DefaultUseNatTraversal holds the default value on creation for the "use_nat_traversal" field.
+	DefaultUseNatTraversal bool
 	// DefaultRemoveCompletedDownloads holds the default value on creation for the "remove_completed_downloads" field.
 	DefaultRemoveCompletedDownloads bool
 	// DefaultRemoveFailedDownloads holds the default value on creation for the "remove_failed_downloads" field.
@@ -160,6 +165,11 @@ func BySettings(opts ...sql.OrderTermOption) OrderOption {
 // ByPriority1 orders the results by the priority1 field.
 func ByPriority1(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPriority1, opts...).ToFunc()
+}
+
+// ByUseNatTraversal orders the results by the use_nat_traversal field.
+func ByUseNatTraversal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUseNatTraversal, opts...).ToFunc()
 }
 
 // ByRemoveCompletedDownloads orders the results by the remove_completed_downloads field.

@@ -100,6 +100,20 @@ func (dcc *DownloadClientsCreate) SetNillablePriority1(i *int) *DownloadClientsC
 	return dcc
 }
 
+// SetUseNatTraversal sets the "use_nat_traversal" field.
+func (dcc *DownloadClientsCreate) SetUseNatTraversal(b bool) *DownloadClientsCreate {
+	dcc.mutation.SetUseNatTraversal(b)
+	return dcc
+}
+
+// SetNillableUseNatTraversal sets the "use_nat_traversal" field if the given value is not nil.
+func (dcc *DownloadClientsCreate) SetNillableUseNatTraversal(b *bool) *DownloadClientsCreate {
+	if b != nil {
+		dcc.SetUseNatTraversal(*b)
+	}
+	return dcc
+}
+
 // SetRemoveCompletedDownloads sets the "remove_completed_downloads" field.
 func (dcc *DownloadClientsCreate) SetRemoveCompletedDownloads(b bool) *DownloadClientsCreate {
 	dcc.mutation.SetRemoveCompletedDownloads(b)
@@ -206,6 +220,10 @@ func (dcc *DownloadClientsCreate) defaults() {
 	if _, ok := dcc.mutation.Priority1(); !ok {
 		v := downloadclients.DefaultPriority1
 		dcc.mutation.SetPriority1(v)
+	}
+	if _, ok := dcc.mutation.UseNatTraversal(); !ok {
+		v := downloadclients.DefaultUseNatTraversal
+		dcc.mutation.SetUseNatTraversal(v)
 	}
 	if _, ok := dcc.mutation.RemoveCompletedDownloads(); !ok {
 		v := downloadclients.DefaultRemoveCompletedDownloads
@@ -327,6 +345,10 @@ func (dcc *DownloadClientsCreate) createSpec() (*DownloadClients, *sqlgraph.Crea
 	if value, ok := dcc.mutation.Priority1(); ok {
 		_spec.SetField(downloadclients.FieldPriority1, field.TypeInt, value)
 		_node.Priority1 = value
+	}
+	if value, ok := dcc.mutation.UseNatTraversal(); ok {
+		_spec.SetField(downloadclients.FieldUseNatTraversal, field.TypeBool, value)
+		_node.UseNatTraversal = value
 	}
 	if value, ok := dcc.mutation.RemoveCompletedDownloads(); ok {
 		_spec.SetField(downloadclients.FieldRemoveCompletedDownloads, field.TypeBool, value)

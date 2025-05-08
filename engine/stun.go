@@ -5,13 +5,17 @@ import (
 	"polaris/ent/downloadclients"
 	"polaris/pkg/nat"
 	"polaris/pkg/qbittorrent"
-	"strconv"
+
+	"github.com/pion/stun/v3"
 )
 
 func (s *Engine) stunProxyDownloadClient() error {
 	downloader, e, err := s.GetDownloadClient()
 	if err != nil {
 		return err
+	}
+	if !e.UseNatTraversal {
+		return nil
 	}
 	if e.Implementation != downloadclients.ImplementationQbittorrent {
 		return nil
@@ -20,22 +24,17 @@ func (s *Engine) stunProxyDownloadClient() error {
 	if !ok {
 		return nil
 	}
-	n, err := nat.NewNatTraversal()
-	if err != nil {
-		return err
-	}
-	addr, err := n.StunAddr()
-	if err != nil {
-		return err
-	}
-	err = d.SetListenPort(addr.Port)
-	if err != nil {
-		return err
-	}
 	u, err := url.Parse(d.URL)
 	if err != nil {
 		return err
 	}
 
-	return n.StartProxy(u.Hostname() + ":" + strconv.Itoa(addr.Port))
+	n, err := nat.NewNatTraversal(func(xa stun.XORMappedAddress) error {
+		return d.SetListenPort(xa.Port)
+	}, u.Hostname())
+	if err != nil {
+		return err
+	}
+	n.StartProxy()
+	return nil
 }

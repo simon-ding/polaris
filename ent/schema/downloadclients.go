@@ -32,6 +32,7 @@ func (DownloadClients) Fields() []ent.Field {
 			}
 			return nil
 		}),
+		field.Bool("use_nat_traversal").Optional().Default(false).Comment("use stun server to do nat traversal, enable download client to do uploading successfully"),
 		field.Bool("remove_completed_downloads").Default(true),
 		field.Bool("remove_failed_downloads").Default(true),
 		field.String("tags").Default(""),

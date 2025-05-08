@@ -146,6 +146,26 @@ func (dcu *DownloadClientsUpdate) AddPriority1(i int) *DownloadClientsUpdate {
 	return dcu
 }
 
+// SetUseNatTraversal sets the "use_nat_traversal" field.
+func (dcu *DownloadClientsUpdate) SetUseNatTraversal(b bool) *DownloadClientsUpdate {
+	dcu.mutation.SetUseNatTraversal(b)
+	return dcu
+}
+
+// SetNillableUseNatTraversal sets the "use_nat_traversal" field if the given value is not nil.
+func (dcu *DownloadClientsUpdate) SetNillableUseNatTraversal(b *bool) *DownloadClientsUpdate {
+	if b != nil {
+		dcu.SetUseNatTraversal(*b)
+	}
+	return dcu
+}
+
+// ClearUseNatTraversal clears the value of the "use_nat_traversal" field.
+func (dcu *DownloadClientsUpdate) ClearUseNatTraversal() *DownloadClientsUpdate {
+	dcu.mutation.ClearUseNatTraversal()
+	return dcu
+}
+
 // SetRemoveCompletedDownloads sets the "remove_completed_downloads" field.
 func (dcu *DownloadClientsUpdate) SetRemoveCompletedDownloads(b bool) *DownloadClientsUpdate {
 	dcu.mutation.SetRemoveCompletedDownloads(b)
@@ -273,6 +293,12 @@ func (dcu *DownloadClientsUpdate) sqlSave(ctx context.Context) (n int, err error
 	}
 	if value, ok := dcu.mutation.AddedPriority1(); ok {
 		_spec.AddField(downloadclients.FieldPriority1, field.TypeInt, value)
+	}
+	if value, ok := dcu.mutation.UseNatTraversal(); ok {
+		_spec.SetField(downloadclients.FieldUseNatTraversal, field.TypeBool, value)
+	}
+	if dcu.mutation.UseNatTraversalCleared() {
+		_spec.ClearField(downloadclients.FieldUseNatTraversal, field.TypeBool)
 	}
 	if value, ok := dcu.mutation.RemoveCompletedDownloads(); ok {
 		_spec.SetField(downloadclients.FieldRemoveCompletedDownloads, field.TypeBool, value)
@@ -422,6 +448,26 @@ func (dcuo *DownloadClientsUpdateOne) SetNillablePriority1(i *int) *DownloadClie
 // AddPriority1 adds i to the "priority1" field.
 func (dcuo *DownloadClientsUpdateOne) AddPriority1(i int) *DownloadClientsUpdateOne {
 	dcuo.mutation.AddPriority1(i)
+	return dcuo
+}
+
+// SetUseNatTraversal sets the "use_nat_traversal" field.
+func (dcuo *DownloadClientsUpdateOne) SetUseNatTraversal(b bool) *DownloadClientsUpdateOne {
+	dcuo.mutation.SetUseNatTraversal(b)
+	return dcuo
+}
+
+// SetNillableUseNatTraversal sets the "use_nat_traversal" field if the given value is not nil.
+func (dcuo *DownloadClientsUpdateOne) SetNillableUseNatTraversal(b *bool) *DownloadClientsUpdateOne {
+	if b != nil {
+		dcuo.SetUseNatTraversal(*b)
+	}
+	return dcuo
+}
+
+// ClearUseNatTraversal clears the value of the "use_nat_traversal" field.
+func (dcuo *DownloadClientsUpdateOne) ClearUseNatTraversal() *DownloadClientsUpdateOne {
+	dcuo.mutation.ClearUseNatTraversal()
 	return dcuo
 }
 
@@ -582,6 +628,12 @@ func (dcuo *DownloadClientsUpdateOne) sqlSave(ctx context.Context) (_node *Downl
 	}
 	if value, ok := dcuo.mutation.AddedPriority1(); ok {
 		_spec.AddField(downloadclients.FieldPriority1, field.TypeInt, value)
+	}
+	if value, ok := dcuo.mutation.UseNatTraversal(); ok {
+		_spec.SetField(downloadclients.FieldUseNatTraversal, field.TypeBool, value)
+	}
+	if dcuo.mutation.UseNatTraversalCleared() {
+		_spec.ClearField(downloadclients.FieldUseNatTraversal, field.TypeBool)
 	}
 	if value, ok := dcuo.mutation.RemoveCompletedDownloads(); ok {
 		_spec.SetField(downloadclients.FieldRemoveCompletedDownloads, field.TypeBool, value)

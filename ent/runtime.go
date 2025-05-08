@@ -45,20 +45,24 @@ func init() {
 	downloadclients.DefaultPriority1 = downloadclientsDescPriority1.Default.(int)
 	// downloadclients.Priority1Validator is a validator for the "priority1" field. It is called by the builders before save.
 	downloadclients.Priority1Validator = downloadclientsDescPriority1.Validators[0].(func(int) error)
+	// downloadclientsDescUseNatTraversal is the schema descriptor for use_nat_traversal field.
+	downloadclientsDescUseNatTraversal := downloadclientsFields[8].Descriptor()
+	// downloadclients.DefaultUseNatTraversal holds the default value on creation for the use_nat_traversal field.
+	downloadclients.DefaultUseNatTraversal = downloadclientsDescUseNatTraversal.Default.(bool)
 	// downloadclientsDescRemoveCompletedDownloads is the schema descriptor for remove_completed_downloads field.
-	downloadclientsDescRemoveCompletedDownloads := downloadclientsFields[8].Descriptor()
+	downloadclientsDescRemoveCompletedDownloads := downloadclientsFields[9].Descriptor()
 	// downloadclients.DefaultRemoveCompletedDownloads holds the default value on creation for the remove_completed_downloads field.
 	downloadclients.DefaultRemoveCompletedDownloads = downloadclientsDescRemoveCompletedDownloads.Default.(bool)
 	// downloadclientsDescRemoveFailedDownloads is the schema descriptor for remove_failed_downloads field.
-	downloadclientsDescRemoveFailedDownloads := downloadclientsFields[9].Descriptor()
+	downloadclientsDescRemoveFailedDownloads := downloadclientsFields[10].Descriptor()
 	// downloadclients.DefaultRemoveFailedDownloads holds the default value on creation for the remove_failed_downloads field.
 	downloadclients.DefaultRemoveFailedDownloads = downloadclientsDescRemoveFailedDownloads.Default.(bool)
 	// downloadclientsDescTags is the schema descriptor for tags field.
-	downloadclientsDescTags := downloadclientsFields[10].Descriptor()
+	downloadclientsDescTags := downloadclientsFields[11].Descriptor()
 	// downloadclients.DefaultTags holds the default value on creation for the tags field.
 	downloadclients.DefaultTags = downloadclientsDescTags.Default.(string)
 	// downloadclientsDescCreateTime is the schema descriptor for create_time field.
-	downloadclientsDescCreateTime := downloadclientsFields[11].Descriptor()
+	downloadclientsDescCreateTime := downloadclientsFields[12].Descriptor()
 	// downloadclients.DefaultCreateTime holds the default value on creation for the create_time field.
 	downloadclients.DefaultCreateTime = downloadclientsDescCreateTime.Default.(func() time.Time)
 	episodeFields := schema.Episode{}.Fields()

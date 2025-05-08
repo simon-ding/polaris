@@ -33,6 +33,8 @@ type DownloadClients struct {
 	Settings string `json:"settings,omitempty"`
 	// Priority1 holds the value of the "priority1" field.
 	Priority1 int `json:"priority1,omitempty"`
+	// use stun server to do nat traversal, enable download client to do uploading successfully
+	UseNatTraversal bool `json:"use_nat_traversal,omitempty"`
 	// RemoveCompletedDownloads holds the value of the "remove_completed_downloads" field.
 	RemoveCompletedDownloads bool `json:"remove_completed_downloads,omitempty"`
 	// RemoveFailedDownloads holds the value of the "remove_failed_downloads" field.
@@ -49,7 +51,7 @@ func (*DownloadClients) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case downloadclients.FieldEnable, downloadclients.FieldRemoveCompletedDownloads, downloadclients.FieldRemoveFailedDownloads:
+		case downloadclients.FieldEnable, downloadclients.FieldUseNatTraversal, downloadclients.FieldRemoveCompletedDownloads, downloadclients.FieldRemoveFailedDownloads:
 			values[i] = new(sql.NullBool)
 		case downloadclients.FieldID, downloadclients.FieldPriority1:
 			values[i] = new(sql.NullInt64)
@@ -125,6 +127,12 @@ func (dc *DownloadClients) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field priority1", values[i])
 			} else if value.Valid {
 				dc.Priority1 = int(value.Int64)
+			}
+		case downloadclients.FieldUseNatTraversal:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field use_nat_traversal", values[i])
+			} else if value.Valid {
+				dc.UseNatTraversal = value.Bool
 			}
 		case downloadclients.FieldRemoveCompletedDownloads:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -209,6 +217,9 @@ func (dc *DownloadClients) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("priority1=")
 	builder.WriteString(fmt.Sprintf("%v", dc.Priority1))
+	builder.WriteString(", ")
+	builder.WriteString("use_nat_traversal=")
+	builder.WriteString(fmt.Sprintf("%v", dc.UseNatTraversal))
 	builder.WriteString(", ")
 	builder.WriteString("remove_completed_downloads=")
 	builder.WriteString(fmt.Sprintf("%v", dc.RemoveCompletedDownloads))
