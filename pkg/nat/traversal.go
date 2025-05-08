@@ -162,15 +162,13 @@ func listen(conn *net.UDPConn) <-chan []byte {
 		for {
 			buf := make([]byte, 10240)
 
-			n, addr, err := conn.ReadFromUDP(buf)
+			n, _, err := conn.ReadFromUDP(buf)
 			if err != nil {
 				close(messages)
 
 				return
 			}
-			log.Debugf("Received message from %s: %d", addr, n)
 			buf = buf[:n]
-			log.Debugf("recevied message %s", string(buf))
 
 			messages <- buf
 		}
