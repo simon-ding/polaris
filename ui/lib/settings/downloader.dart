@@ -87,12 +87,12 @@ class _DownloaderState extends ConsumerState<DownloaderSettings> {
                       labelText: "优先级", helperText: "1-50, 1最高优先级，50最低优先级"),
                   validator: FormBuilderValidators.integer(),
                   autovalidateMode: AutovalidateMode.onUserInteraction),
-              FormBuilderSwitch(
-                  name: "use_nat_traversal",
-                  enabled: client.implementation == "qbittorrent",
-                  title: const Text("使用内置STUN NAT穿透"),
-                  decoration: InputDecoration(helperText: "内建的NAT穿透功能帮助BT客户端上传(会自动更改下载器的监听地址)"),
-                  ),
+              // FormBuilderSwitch(
+              //     name: "use_nat_traversal",
+              //     enabled: client.implementation == "qbittorrent",
+              //     title: const Text("使用内置STUN NAT穿透"),
+              //     decoration: InputDecoration(helperText: "内建的NAT穿透功能帮助BT客户端上传(会自动更改下载器的监听地址)"),
+              //     ),
               FormBuilderSwitch(
                   name: "remove_completed_downloads",
                   title: const Text("任务完成后删除")),
