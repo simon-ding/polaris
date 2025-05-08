@@ -190,12 +190,13 @@ func (s *Server) GetAllIndexers(c *gin.Context) (interface{}, error) {
 }
 
 type downloadClientIn struct {
-	Name           string `json:"name" binding:"required"`
-	URL            string `json:"url" binding:"required"`
-	User           string `json:"user"`
-	Password       string `json:"password"`
-	Implementation string `json:"implementation" binding:"required"`
-	Priority       int    `json:"priority"`
+	Name            string `json:"name" binding:"required"`
+	URL             string `json:"url" binding:"required"`
+	User            string `json:"user"`
+	Password        string `json:"password"`
+	Implementation  string `json:"implementation" binding:"required"`
+	Priority        int    `json:"priority"`
+	UseNatTraversal bool   `json:"use_nat_traversal"`
 }
 
 func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
@@ -225,12 +226,13 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 		}
 	}
 	if err := s.db.SaveDownloader(&ent.DownloadClients{
-		Name:           in.Name,
-		Implementation: downloadclients.Implementation(in.Implementation),
-		Priority1:      in.Priority,
-		URL:            in.URL,
-		User:           in.User,
-		Password:       in.Password,
+		Name:            in.Name,
+		Implementation:  downloadclients.Implementation(in.Implementation),
+		Priority1:       in.Priority,
+		URL:             in.URL,
+		User:            in.User,
+		Password:        in.Password,
+		UseNatTraversal: in.UseNatTraversal,
 	}); err != nil {
 		return nil, errors.Wrap(err, "save downloader")
 	}
