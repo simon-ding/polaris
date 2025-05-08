@@ -23,6 +23,9 @@ func (s *Engine) StartStunProxy(name string) error {
 		if !d.Enable {
 			continue
 		}
+		if !d.UseNatTraversal {
+			continue
+		}
 		if name != "" && d.Name != name {
 			continue
 		}
