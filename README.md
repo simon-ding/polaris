@@ -34,6 +34,7 @@ docker run -p 8080:8080 ghcr.io/simon-ding/polaris:latest
 
 - [x] 电视剧自动追踪下载
 - [x] 电影自动追踪下载
+- [x] [内建NAT内网穿透功能](./doc/stun_nat_traversal.md)，无需额外配置，可实现BT/PT全速上传
 - [x] 本地、webdav、  [alist](https://github.com/alist-org/alist) 存储支持，使用 alist 存储支持秒传功能
 - [x] 事件通知推送，目前支持 Pushover和 Bark，还在扩充中
 - [x] TMDB 代理支持
