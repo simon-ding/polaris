@@ -12,9 +12,18 @@ import (
 )
 
 func (s *Engine) stunProxyDownloadClient() error {
+	
+	return s.StartStunProxy("")
+}
+
+
+func (s *Engine) StartStunProxy(name string) error {
 	downloaders := s.db.GetAllDonloadClients()
 	for _, d := range downloaders {
 		if !d.Enable {
+			continue
+		}
+		if name != "" && d.Name != name {
 			continue
 		}
 

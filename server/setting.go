@@ -236,6 +236,12 @@ func (s *Server) AddDownloadClient(c *gin.Context) (interface{}, error) {
 	}); err != nil {
 		return nil, errors.Wrap(err, "save downloader")
 	}
+	if in.UseNatTraversal {
+		if err := s.core.StartStunProxy(in.Name); err!= nil {
+			return nil, errors.Wrap(err, "start stun proxy")
+		}
+	}
+	
 	return nil, nil
 }
 
