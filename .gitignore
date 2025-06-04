@@ -12,6 +12,7 @@ config.yml
 .DS_Store
 *.db
 data/
+!internal/data/
 
 ui/node_modules/
 ui/dist/

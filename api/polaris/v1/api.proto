@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package api.polaris.v1;
+
+option go_package = "polaris/api/polaris/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.polaris.v1";
+
+service Api {
+	rpc CreateApi (CreateApiRequest) returns (CreateApiReply);
+	rpc UpdateApi (UpdateApiRequest) returns (UpdateApiReply);
+	rpc DeleteApi (DeleteApiRequest) returns (DeleteApiReply);
+	rpc GetApi (GetApiRequest) returns (GetApiReply);
+	rpc ListApi (ListApiRequest) returns (ListApiReply);
+}
+
+message CreateApiRequest {}
+message CreateApiReply {}
+
+message UpdateApiRequest {}
+message UpdateApiReply {}
+
+message DeleteApiRequest {}
+message DeleteApiReply {}
+
+message GetApiRequest {}
+message GetApiReply {}
+
+message ListApiRequest {}
+message ListApiReply {}

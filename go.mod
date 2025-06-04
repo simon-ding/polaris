@@ -18,16 +18,22 @@ require (
 	github.com/anacrolix/torrent v1.58.1
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/gin-contrib/zap v1.1.3
+	github.com/go-kratos/kratos/v2 v2.8.4
 	github.com/gocolly/colly v1.2.0
+	github.com/google/wire v0.6.0
 	github.com/ncruces/go-sqlite3 v0.18.4
 	github.com/nikoksr/notify v1.0.0
 	github.com/openai/openai-go v0.1.0-beta.10
 	github.com/pion/stun/v3 v3.0.0
 	github.com/stretchr/testify v1.9.0
+	go.uber.org/automaxprocs v1.6.0
 	golift.io/starr v1.0.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20240711142825-46eb208f015d
+	google.golang.org/grpc v1.65.0
 )
 
 require (
+	dario.cat/mergo v1.0.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/RoaringBitmap/roaring v1.2.3 // indirect
@@ -60,16 +66,19 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
+	github.com/go-kratos/aegis v0.2.0 // indirect
 	github.com/go-llsqlite/adapter v0.0.0-20230927005056-7f5ce7f0c916 // indirect
 	github.com/go-llsqlite/crawshaw v0.5.2-0.20240425034140-f30eb7704568 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-playground/form/v4 v4.2.1 // indirect
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible // indirect
 	github.com/go-test/deep v1.0.4 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/btree v1.1.2 // indirect
+	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/gregdel/pushover v1.3.1 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -118,6 +127,7 @@ require (
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240711142825-46eb208f015d // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	lukechampine.com/blake3 v1.1.6 // indirect
@@ -175,7 +185,7 @@ require (
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.25.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.5
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
