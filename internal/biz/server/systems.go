@@ -2,7 +2,7 @@ package server
 
 import (
 	"os"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/log"
 	"polaris/pkg/metadata"
 	"polaris/pkg/uptime"

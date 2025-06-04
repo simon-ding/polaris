@@ -3,7 +3,7 @@ package prowlarr
 import (
 	"encoding/json"
 	"fmt"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/ent"
 	"strings"
 	"time"

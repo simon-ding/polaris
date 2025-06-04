@@ -2,8 +2,8 @@ package server
 
 import (
 	"fmt"
-	"polaris/db"
-	"polaris/engine"
+	"polaris/internal/db"
+	"polaris/internal/biz/engine"
 	"polaris/ent/media"
 	"polaris/log"
 	"polaris/pkg/torznab"

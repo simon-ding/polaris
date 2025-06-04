@@ -2,7 +2,7 @@ package engine
 
 import (
 	"fmt"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/ent"
 	"polaris/ent/media"
 	"polaris/log"

@@ -2,9 +2,9 @@ package main
 
 import (
 	"os"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/log"
-	"polaris/server"
+	"polaris/internal/biz/server"
 )
 
 func main() {

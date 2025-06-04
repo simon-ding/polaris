@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/log"

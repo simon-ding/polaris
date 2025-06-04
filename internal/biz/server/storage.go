@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"os"
-	"polaris/db"
+	"polaris/internal/db"
 	"strings"
 
 	"polaris/log"

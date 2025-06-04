@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"html/template"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/ent"
 	"polaris/ent/downloadclients"
 	"polaris/log"

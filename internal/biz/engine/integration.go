@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path/filepath"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/ent/media"
 	storage1 "polaris/ent/storage"
 	"polaris/log"

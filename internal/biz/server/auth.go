@@ -2,7 +2,7 @@ package server
 
 import (
 	"net/http"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/log"
 	"polaris/pkg/utils"
 	"time"

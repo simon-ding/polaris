@@ -3,8 +3,8 @@ package server
 import (
 	"os"
 	"path/filepath"
-	"polaris/db"
-	"polaris/engine"
+	"polaris/internal/db"
+	"polaris/internal/biz/engine"
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/media"

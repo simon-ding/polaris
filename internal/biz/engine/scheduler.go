@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/history"

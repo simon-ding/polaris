@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"polaris/db"
+	"polaris/internal/db"
 	"polaris/ent"
 	"polaris/ent/episode"
 	"polaris/ent/importlist"
