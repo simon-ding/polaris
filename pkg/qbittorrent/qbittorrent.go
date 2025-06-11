@@ -240,7 +240,7 @@ func (t *Torrent) WalkFunc() func(fn func(path string, info fs.FileInfo) error) 
 			return err
 		}
 	}
-	path, err := t.c.DefaultSavePath()
+	t1, err := t.getTorrent()
 	if err != nil {
 		return func(fn func(path string, info fs.FileInfo) error) error {
 			return err
@@ -249,7 +249,7 @@ func (t *Torrent) WalkFunc() func(fn func(path string, info fs.FileInfo) error) 
 	
 	return func(fn func(path string, info fs.FileInfo) error) error {
 		for _, file := range files {
-			name := filepath.Join(path, file.Name)
+			name := filepath.Join(t1.SavePath, file.Name)
 			info, err := os.Stat(name)
 			if err != nil {
 				return err
