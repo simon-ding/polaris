@@ -100,11 +100,16 @@ func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool,
 		if err != nil {
 			return err
 		}
+
 		rel, err := filepath.Rel(b.src, path)
 		if err != nil {
 			return errors.Wrapf(err, "relation between %s and %s", b.src, path)
 		}
-		destName := filepath.Join(targetBase, rel)
+		destName := filepath.Clean(filepath.Join(targetBase, rel))
+		if !strings.HasPrefix(destName, targetBase) {
+			//如果目标路径不是在目标目录下，则报错
+			return errors.Errorf("destination: %s is not in target dir: %s", destName, targetBase)
+		}
 
 		if info.IsDir() {
 			mkdir(destName)
