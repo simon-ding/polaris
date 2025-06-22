@@ -1,6 +1,6 @@
 module polaris
 
-go 1.23.0
+go 1.24
 
 toolchain go1.24.1
 
@@ -144,7 +144,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
-	github.com/goccy/go-json v0.10.2
+	github.com/goccy/go-json v0.10.5
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -181,7 +181,7 @@ require (
 )
 
 require (
-	github.com/cyruzin/golang-tmdb v1.6.3
+	github.com/cyruzin/golang-tmdb v1.8.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/hekmon/transmissionrpc/v3 v3.0.0
 	github.com/json-iterator/go v1.1.12 // indirect
