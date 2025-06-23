@@ -182,7 +182,7 @@ require (
 
 require (
 	github.com/cyruzin/golang-tmdb v1.8.1
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	github.com/hekmon/transmissionrpc/v3 v3.0.0
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
