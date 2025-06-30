@@ -20,7 +20,7 @@ require (
 	github.com/gin-contrib/zap v1.1.3
 	github.com/gocolly/colly v1.2.0
 	github.com/ncruces/go-sqlite3 v0.26.1
-	github.com/nikoksr/notify v1.0.0
+	github.com/nikoksr/notify v1.3.0
 	github.com/openai/openai-go v1.6.0
 	github.com/pion/stun/v3 v3.0.0
 	github.com/stretchr/testify v1.10.0
@@ -115,11 +115,11 @@ require (
 	github.com/wlynxg/anet v0.0.5 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
-	go.opentelemetry.io/otel v1.28.0 // indirect
-	go.opentelemetry.io/otel/metric v1.28.0 // indirect
-	go.opentelemetry.io/otel/trace v1.28.0 // indirect
+	go.opentelemetry.io/otel v1.32.0 // indirect
+	go.opentelemetry.io/otel/metric v1.32.0 // indirect
+	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -166,7 +166,7 @@ require (
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
-	github.com/spf13/cast v1.6.0 // indirect
+	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
@@ -174,7 +174,7 @@ require (
 	github.com/zclconf/go-cty v1.14.4 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.39.0
-	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
+	golang.org/x/exp v0.0.0-20241215155358-4a5509556b9e
 	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.26.0 // indirect
