@@ -19,7 +19,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/gin-contrib/zap v1.1.3
 	github.com/gocolly/colly v1.2.0
-	github.com/ncruces/go-sqlite3 v0.26.1
+	github.com/ncruces/go-sqlite3 v0.26.2
 	github.com/nikoksr/notify v1.0.0
 	github.com/openai/openai-go v1.6.0
 	github.com/pion/stun/v3 v3.0.0
