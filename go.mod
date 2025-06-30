@@ -24,7 +24,7 @@ require (
 	github.com/openai/openai-go v1.6.0
 	github.com/pion/stun/v3 v3.0.0
 	github.com/stretchr/testify v1.10.0
-	golift.io/starr v1.0.0
+	golift.io/starr v1.1.0
 )
 
 require (
