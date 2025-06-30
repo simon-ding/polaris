@@ -125,7 +125,7 @@ func (c *Client) SearchMedia(query string, lang string, page int) (*SearchResult
 	}
 
 	searchResult := &SearchResult{
-		Page:         res.Page,
+		Page:         int(res.Page),
 		TotalResults: res.TotalResults,
 		TotalPages:   res.TotalPages,
 	}

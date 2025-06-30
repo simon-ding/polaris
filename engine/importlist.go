@@ -217,9 +217,16 @@ func (c *Engine) AddTv2Watchlist(in AddWatchlistIn) (interface{}, error) {
 		Limiter:                 schema.MediaLimiter{SizeMin: in.SizeMin, SizeMax: in.SizeMax},
 		Extras: schema.MediaExtras{
 			OriginalLanguage: detail.OriginalLanguage,
-			Genres:           detail.Genres,
+			//Genres:           detail.Genres,
 		},
 		AlternativeTitles: alterTitles,
+	}
+
+	for _, g := range detail.Genres {
+		m.Extras.Genres = append(m.Extras.Genres, schema.Genre{
+			ID:   g.ID,
+			Name: g.Name,
+		})
 	}
 
 	r, err := c.db.AddMediaWatchlist(m, epIds)
@@ -338,7 +345,14 @@ func (c *Engine) AddMovie2Watchlist(in AddWatchlistIn) (interface{}, error) {
 	extras := schema.MediaExtras{
 		IsAdultMovie:     detail.Adult,
 		OriginalLanguage: detail.OriginalLanguage,
-		Genres:           detail.Genres,
+		//Genres:           detail.Genres,
+	}
+
+	for _, g := range detail.Genres {
+		extras.Genres = append(extras.Genres, schema.Genre{
+			ID:   g.ID,
+			Name: g.Name,
+		})
 	}
 	if IsJav(detail) {
 		javid := c.GetJavid(in.TmdbID)

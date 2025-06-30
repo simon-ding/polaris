@@ -60,10 +60,12 @@ type MediaExtras struct {
 	JavId        string `json:"javid"`
 	//OriginCountry    []string `json:"origin_country"`
 	OriginalLanguage string `json:"original_language"`
-	Genres           []struct {
-		ID   int64  `json:"id"`
-		Name string `json:"name"`
-	} `json:"genres"`
+	Genres           []Genre `json:"genres"`
+}
+
+type Genre struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 func (m *MediaExtras) IsJav() bool {
