@@ -19,7 +19,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/gin-contrib/zap v1.1.3
 	github.com/gocolly/colly v1.2.0
-	github.com/ncruces/go-sqlite3 v0.26.1
+	github.com/ncruces/go-sqlite3 v0.27.1
 	github.com/nikoksr/notify v1.3.0
 	github.com/openai/openai-go v1.6.0
 	github.com/pion/stun/v3 v3.0.0
@@ -118,7 +118,7 @@ require (
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
@@ -173,11 +173,11 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/zclconf/go-cty v1.14.4 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.39.0
+	golang.org/x/crypto v0.40.0
 	golang.org/x/exp v0.0.0-20241215155358-4a5509556b9e
 	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/sys v0.33.0
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/sys v0.34.0
+	golang.org/x/text v0.27.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
