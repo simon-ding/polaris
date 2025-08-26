@@ -1,6 +1,8 @@
 package tmdb
 
 import (
+	"context"
+	"net"
 	"net/http"
 	"net/url"
 	"polaris/log"
@@ -39,6 +41,21 @@ func NewClient(apiKey, proxyUrl string, enableAdultContent bool) (*Client, error
 				},
 			})
 		}
+
+	} else {
+		tmdbClient.SetClientConfig(http.Client{
+			Timeout: time.Second * 10,
+			Transport: &http.Transport{
+				MaxIdleConns:    10,
+				IdleConnTimeout: 15 * time.Second,
+				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+					if addr == "api.themoviedb.org:443" {
+						addr = "18.161.6.19:443"
+					}
+					return net.DialTimeout(network, addr, 10*time.Second)
+				},
+			},
+		})
 
 	}
 
