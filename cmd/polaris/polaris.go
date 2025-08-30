@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"os"
 	"polaris/db"
 	"polaris/log"
@@ -8,6 +10,9 @@ import (
 )
 
 func main() {
+	port := flag.Int("port", 8080, "port to listen on")
+	flag.Parse()
+
 	if os.Getenv("GIN_MODE") == "release" {
 		log.InitLogger(true)
 	}
@@ -19,7 +24,7 @@ func main() {
 	}
 
 	s := server.NewServer(dbClient)
-	if _, err := s.Start(":8080"); err != nil {
+	if _, err := s.Start(fmt.Sprintf(":%d", *port)); err != nil {
 		log.Errorf("server start error: %v", err)
 	}
 	select {} //wait indefinitely
