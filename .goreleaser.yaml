@@ -24,6 +24,8 @@ builds:
       - darwin
       - freebsd
     main: ./cmd/polaris
+    ldflags:
+      - -X polaris/db.Version=$(git describe --tags --long) -X polaris/db.DefaultTmdbApiKey=$(echo $TMDB_API_KEY)
     goarch:
       - amd64
       - arm64
