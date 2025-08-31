@@ -9,4 +9,4 @@ chown -R "${PUID}:${PGID}" /app/data
 umask ${UMASK:-022}
 
 cd /app
-exec gosu "${PUID}:${PGID}" /app/polaris
+exec gosu "${PUID}:${PGID}" /app/polaris -port ${PORT:-8080}
