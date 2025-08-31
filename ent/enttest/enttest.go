@@ -4,6 +4,7 @@ package enttest
 
 import (
 	"context"
+
 	"polaris/ent"
 	// required by schema hooks.
 	_ "polaris/ent/runtime"

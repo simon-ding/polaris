@@ -9,6 +9,7 @@ import (
 	"polaris/ent/blacklist"
 	"polaris/ent/predicate"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -60,7 +61,7 @@ func (bq *BlacklistQuery) Order(o ...blacklist.OrderOption) *BlacklistQuery {
 // First returns the first Blacklist entity from the query.
 // Returns a *NotFoundError when no Blacklist was found.
 func (bq *BlacklistQuery) First(ctx context.Context) (*Blacklist, error) {
-	nodes, err := bq.Limit(1).All(setContextOp(ctx, bq.ctx, "First"))
+	nodes, err := bq.Limit(1).All(setContextOp(ctx, bq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func (bq *BlacklistQuery) FirstX(ctx context.Context) *Blacklist {
 // Returns a *NotFoundError when no Blacklist ID was found.
 func (bq *BlacklistQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = bq.Limit(1).IDs(setContextOp(ctx, bq.ctx, "FirstID")); err != nil {
+	if ids, err = bq.Limit(1).IDs(setContextOp(ctx, bq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -106,7 +107,7 @@ func (bq *BlacklistQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Blacklist entity is found.
 // Returns a *NotFoundError when no Blacklist entities are found.
 func (bq *BlacklistQuery) Only(ctx context.Context) (*Blacklist, error) {
-	nodes, err := bq.Limit(2).All(setContextOp(ctx, bq.ctx, "Only"))
+	nodes, err := bq.Limit(2).All(setContextOp(ctx, bq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +135,7 @@ func (bq *BlacklistQuery) OnlyX(ctx context.Context) *Blacklist {
 // Returns a *NotFoundError when no entities are found.
 func (bq *BlacklistQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = bq.Limit(2).IDs(setContextOp(ctx, bq.ctx, "OnlyID")); err != nil {
+	if ids, err = bq.Limit(2).IDs(setContextOp(ctx, bq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -159,7 +160,7 @@ func (bq *BlacklistQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Blacklists.
 func (bq *BlacklistQuery) All(ctx context.Context) ([]*Blacklist, error) {
-	ctx = setContextOp(ctx, bq.ctx, "All")
+	ctx = setContextOp(ctx, bq.ctx, ent.OpQueryAll)
 	if err := bq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -181,7 +182,7 @@ func (bq *BlacklistQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if bq.ctx.Unique == nil && bq.path != nil {
 		bq.Unique(true)
 	}
-	ctx = setContextOp(ctx, bq.ctx, "IDs")
+	ctx = setContextOp(ctx, bq.ctx, ent.OpQueryIDs)
 	if err = bq.Select(blacklist.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -199,7 +200,7 @@ func (bq *BlacklistQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (bq *BlacklistQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, bq.ctx, "Count")
+	ctx = setContextOp(ctx, bq.ctx, ent.OpQueryCount)
 	if err := bq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -217,7 +218,7 @@ func (bq *BlacklistQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (bq *BlacklistQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, bq.ctx, "Exist")
+	ctx = setContextOp(ctx, bq.ctx, ent.OpQueryExist)
 	switch _, err := bq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -449,7 +450,7 @@ func (bgb *BlacklistGroupBy) Aggregate(fns ...AggregateFunc) *BlacklistGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (bgb *BlacklistGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, bgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, bgb.build.ctx, ent.OpQueryGroupBy)
 	if err := bgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -497,7 +498,7 @@ func (bs *BlacklistSelect) Aggregate(fns ...AggregateFunc) *BlacklistSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (bs *BlacklistSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, bs.ctx, "Select")
+	ctx = setContextOp(ctx, bs.ctx, ent.OpQuerySelect)
 	if err := bs.prepareQuery(ctx); err != nil {
 		return err
 	}

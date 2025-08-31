@@ -9,6 +9,7 @@ import (
 	"polaris/ent/importlist"
 	"polaris/ent/predicate"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -60,7 +61,7 @@ func (ilq *ImportListQuery) Order(o ...importlist.OrderOption) *ImportListQuery 
 // First returns the first ImportList entity from the query.
 // Returns a *NotFoundError when no ImportList was found.
 func (ilq *ImportListQuery) First(ctx context.Context) (*ImportList, error) {
-	nodes, err := ilq.Limit(1).All(setContextOp(ctx, ilq.ctx, "First"))
+	nodes, err := ilq.Limit(1).All(setContextOp(ctx, ilq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func (ilq *ImportListQuery) FirstX(ctx context.Context) *ImportList {
 // Returns a *NotFoundError when no ImportList ID was found.
 func (ilq *ImportListQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = ilq.Limit(1).IDs(setContextOp(ctx, ilq.ctx, "FirstID")); err != nil {
+	if ids, err = ilq.Limit(1).IDs(setContextOp(ctx, ilq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -106,7 +107,7 @@ func (ilq *ImportListQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one ImportList entity is found.
 // Returns a *NotFoundError when no ImportList entities are found.
 func (ilq *ImportListQuery) Only(ctx context.Context) (*ImportList, error) {
-	nodes, err := ilq.Limit(2).All(setContextOp(ctx, ilq.ctx, "Only"))
+	nodes, err := ilq.Limit(2).All(setContextOp(ctx, ilq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +135,7 @@ func (ilq *ImportListQuery) OnlyX(ctx context.Context) *ImportList {
 // Returns a *NotFoundError when no entities are found.
 func (ilq *ImportListQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = ilq.Limit(2).IDs(setContextOp(ctx, ilq.ctx, "OnlyID")); err != nil {
+	if ids, err = ilq.Limit(2).IDs(setContextOp(ctx, ilq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -159,7 +160,7 @@ func (ilq *ImportListQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of ImportLists.
 func (ilq *ImportListQuery) All(ctx context.Context) ([]*ImportList, error) {
-	ctx = setContextOp(ctx, ilq.ctx, "All")
+	ctx = setContextOp(ctx, ilq.ctx, ent.OpQueryAll)
 	if err := ilq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -181,7 +182,7 @@ func (ilq *ImportListQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if ilq.ctx.Unique == nil && ilq.path != nil {
 		ilq.Unique(true)
 	}
-	ctx = setContextOp(ctx, ilq.ctx, "IDs")
+	ctx = setContextOp(ctx, ilq.ctx, ent.OpQueryIDs)
 	if err = ilq.Select(importlist.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -199,7 +200,7 @@ func (ilq *ImportListQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (ilq *ImportListQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, ilq.ctx, "Count")
+	ctx = setContextOp(ctx, ilq.ctx, ent.OpQueryCount)
 	if err := ilq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -217,7 +218,7 @@ func (ilq *ImportListQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (ilq *ImportListQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, ilq.ctx, "Exist")
+	ctx = setContextOp(ctx, ilq.ctx, ent.OpQueryExist)
 	switch _, err := ilq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -449,7 +450,7 @@ func (ilgb *ImportListGroupBy) Aggregate(fns ...AggregateFunc) *ImportListGroupB
 
 // Scan applies the selector query and scans the result into the given value.
 func (ilgb *ImportListGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ilgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ilgb.build.ctx, ent.OpQueryGroupBy)
 	if err := ilgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -497,7 +498,7 @@ func (ils *ImportListSelect) Aggregate(fns ...AggregateFunc) *ImportListSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ils *ImportListSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ils.ctx, "Select")
+	ctx = setContextOp(ctx, ils.ctx, ent.OpQuerySelect)
 	if err := ils.prepareQuery(ctx); err != nil {
 		return err
 	}

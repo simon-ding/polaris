@@ -10,6 +10,7 @@ import (
 	"polaris/ent/media"
 	"polaris/ent/predicate"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -84,7 +85,7 @@ func (eq *EpisodeQuery) QueryMedia() *MediaQuery {
 // First returns the first Episode entity from the query.
 // Returns a *NotFoundError when no Episode was found.
 func (eq *EpisodeQuery) First(ctx context.Context) (*Episode, error) {
-	nodes, err := eq.Limit(1).All(setContextOp(ctx, eq.ctx, "First"))
+	nodes, err := eq.Limit(1).All(setContextOp(ctx, eq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +108,7 @@ func (eq *EpisodeQuery) FirstX(ctx context.Context) *Episode {
 // Returns a *NotFoundError when no Episode ID was found.
 func (eq *EpisodeQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = eq.Limit(1).IDs(setContextOp(ctx, eq.ctx, "FirstID")); err != nil {
+	if ids, err = eq.Limit(1).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -130,7 +131,7 @@ func (eq *EpisodeQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Episode entity is found.
 // Returns a *NotFoundError when no Episode entities are found.
 func (eq *EpisodeQuery) Only(ctx context.Context) (*Episode, error) {
-	nodes, err := eq.Limit(2).All(setContextOp(ctx, eq.ctx, "Only"))
+	nodes, err := eq.Limit(2).All(setContextOp(ctx, eq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +159,7 @@ func (eq *EpisodeQuery) OnlyX(ctx context.Context) *Episode {
 // Returns a *NotFoundError when no entities are found.
 func (eq *EpisodeQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = eq.Limit(2).IDs(setContextOp(ctx, eq.ctx, "OnlyID")); err != nil {
+	if ids, err = eq.Limit(2).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -183,7 +184,7 @@ func (eq *EpisodeQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Episodes.
 func (eq *EpisodeQuery) All(ctx context.Context) ([]*Episode, error) {
-	ctx = setContextOp(ctx, eq.ctx, "All")
+	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryAll)
 	if err := eq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -205,7 +206,7 @@ func (eq *EpisodeQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if eq.ctx.Unique == nil && eq.path != nil {
 		eq.Unique(true)
 	}
-	ctx = setContextOp(ctx, eq.ctx, "IDs")
+	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryIDs)
 	if err = eq.Select(episode.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -223,7 +224,7 @@ func (eq *EpisodeQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (eq *EpisodeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, eq.ctx, "Count")
+	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryCount)
 	if err := eq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -241,7 +242,7 @@ func (eq *EpisodeQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (eq *EpisodeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, eq.ctx, "Exist")
+	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryExist)
 	switch _, err := eq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -528,7 +529,7 @@ func (egb *EpisodeGroupBy) Aggregate(fns ...AggregateFunc) *EpisodeGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (egb *EpisodeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, egb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, egb.build.ctx, ent.OpQueryGroupBy)
 	if err := egb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -576,7 +577,7 @@ func (es *EpisodeSelect) Aggregate(fns ...AggregateFunc) *EpisodeSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (es *EpisodeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, es.ctx, "Select")
+	ctx = setContextOp(ctx, es.ctx, ent.OpQuerySelect)
 	if err := es.prepareQuery(ctx); err != nil {
 		return err
 	}
