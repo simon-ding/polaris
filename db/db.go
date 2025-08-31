@@ -62,7 +62,17 @@ func (c *client) init() {
 	downloadDir := c.GetSetting(SettingDownloadDir)
 	if downloadDir == "" {
 		log.Infof("set default download dir")
-		c.SetSetting(SettingDownloadDir, "/downloads")
+		if utils.IsRunningInDocker() {
+			c.SetSetting(SettingDownloadDir, "/downloads")
+		} else {
+			downloadDir, err := utils.UserDownloadDir()
+			if err != nil {
+				log.Errorf("get user download dir error: %v", err)
+				downloadDir = "/downloads"
+			}
+			c.SetSetting(SettingDownloadDir, downloadDir)
+		}
+		
 	}
 	logLevel := c.GetSetting(SettingLogLevel)
 	if logLevel == "" {

@@ -314,3 +314,35 @@ func DirSize(path string) (int64, error) {
 	})
 	return size, err
 }
+
+func IsRunningInDocker() bool {
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return true
+	}
+	return false
+}
+
+func UserDownloadDir() (string, error) {
+	var downloadDirNames []string = []string{"Downloads", "downloads", "download", "下载"}
+
+	if IsRunningInDocker() {
+		return "/downloads", nil
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	for _, ddn := range downloadDirNames {
+		var dir = filepath.Join(homeDir, ddn)
+
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			continue
+		} else {
+			return dir, nil
+		}
+	}
+
+	return "", errors.New("no download dir found")
+}
