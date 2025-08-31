@@ -325,10 +325,6 @@ func IsRunningInDocker() bool {
 func UserDownloadDir() (string, error) {
 	var downloadDirNames []string = []string{"Downloads", "downloads", "download", "下载"}
 
-	if IsRunningInDocker() {
-		return "/downloads", nil
-	}
-
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
