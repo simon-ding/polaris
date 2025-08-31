@@ -6,11 +6,12 @@ import (
 	"os"
 	"polaris/db"
 	"polaris/log"
+	"polaris/pkg/utils"
 	"polaris/server"
 )
 
 func main() {
-	port := flag.Int("port", 8080, "port to listen on")
+	port := flag.Int("port", 3322, "port to listen on")
 	flag.Parse()
 
 	if os.Getenv("GIN_MODE") == "release" {
@@ -21,6 +22,9 @@ func main() {
 	dbClient, err := db.Open()
 	if err != nil {
 		log.Panicf("init db error: %v", err)
+	}
+	if !utils.IsRunningInDocker() {
+		go utils.OpenURL(fmt.Sprintf("http://127.0.0.1:%d", *port))
 	}
 
 	s := server.NewServer(dbClient)
