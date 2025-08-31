@@ -25,6 +25,7 @@ services:
       - ${DOWNLOAD_LOCATION}:/downloads 
     env_file:
       - .env
+    restart: always
     ports:
       - 9091:9091
       - 51413:51413
@@ -42,4 +43,4 @@ services:
       - .env
     ports:
       - 9696:9696
-    restart: unless-stopped
+    restart: always
