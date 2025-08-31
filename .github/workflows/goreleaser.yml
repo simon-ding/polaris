@@ -28,7 +28,7 @@ jobs:
         run: |
           cd ui
           flutter pub get
-          flutter build web --no-web-resources-cdn --web-renderer html
+          flutter build web --no-web-resources-cdn
       -
         name: Set up Go
         uses: actions/setup-go@v5
