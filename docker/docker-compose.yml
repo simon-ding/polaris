@@ -13,7 +13,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 3322:8080
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     environment:
