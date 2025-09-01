@@ -22,7 +22,6 @@ builds:
       - linux
       - windows
       - darwin
-      - freebsd
     main: ./cmd/polaris
     ldflags:
       - -X polaris/db.Version={{ .Summary }} -X polaris/db.DefaultTmdbApiKey={{ .Env.TMDB_API_KEY }}
@@ -32,13 +31,18 @@ builds:
       - arm
     goarm:
       - 7
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
 
 archives:
   - formats: [tar.gz]
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
-      {{- title .Os }}_
+      {{- .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
