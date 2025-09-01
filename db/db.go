@@ -31,6 +31,8 @@ import (
 	"modernc.org/sqlite"
 )
 
+
+// https://github.com/ent/ent/discussions/1667#discussioncomment-1132296
 type sqliteDriver struct {
 	*sqlite.Driver
 }
@@ -51,7 +53,7 @@ func (d sqliteDriver) Open(name string) (driver.Conn, error) {
 }
 
 func init() {
-	sql.Register("sqlite3", sqliteDriver{Driver: &sqlite.Driver{}})
+	sql.Register(dialect.SQLite, sqliteDriver{Driver: &sqlite.Driver{}})
 }
 
 type client struct {
