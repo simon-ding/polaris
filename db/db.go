@@ -22,12 +22,37 @@ import (
 	"strings"
 	"time"
 
+	"database/sql"
+	"database/sql/driver"
+
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
-	_ "github.com/ncruces/go-sqlite3/driver"
-	_ "github.com/ncruces/go-sqlite3/embed"
+	entsql "entgo.io/ent/dialect/sql"
 	"github.com/pkg/errors"
+	"modernc.org/sqlite"
 )
+
+type sqliteDriver struct {
+	*sqlite.Driver
+}
+
+func (d sqliteDriver) Open(name string) (driver.Conn, error) {
+	conn, err := d.Driver.Open(name)
+	if err != nil {
+		return conn, err
+	}
+	c := conn.(interface {
+		Exec(stmt string, args []driver.Value) (driver.Result, error)
+	})
+	if _, err := c.Exec("PRAGMA foreign_keys = on;", nil); err != nil {
+		conn.Close()
+		return nil, errors.Wrap(err, "failed to enable enable foreign keys")
+	}
+	return conn, nil
+}
+
+func init() {
+	sql.Register("sqlite3", sqliteDriver{Driver: &sqlite.Driver{}})
+}
 
 type client struct {
 	ent *ent.Client
@@ -72,7 +97,7 @@ func (c *client) init() {
 			}
 			c.SetSetting(SettingDownloadDir, downloadDir)
 		}
-		
+
 	}
 	logLevel := c.GetSetting(SettingLogLevel)
 	if logLevel == "" {
@@ -504,7 +529,7 @@ func (c *client) SetHistoryStatus(id int, status history.Status) error {
 }
 
 func (c *client) GetHistories() ent.Histories {
-	h, err := c.ent.History.Query().Order(history.ByID(sql.OrderDesc())).All(context.TODO())
+	h, err := c.ent.History.Query().Order(history.ByID(entsql.OrderDesc())).All(context.TODO())
 	if err != nil {
 		return nil
 	}
