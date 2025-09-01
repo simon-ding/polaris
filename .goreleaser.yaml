@@ -25,7 +25,7 @@ builds:
       - freebsd
     main: ./cmd/polaris
     ldflags:
-      - -X polaris/db.Version=os -X polaris/db.DefaultTmdbApiKey={{ .Env.TMDB_API_KEY }}
+      - -X polaris/db.Version={{ .Summary }} -X polaris/db.DefaultTmdbApiKey={{ .Env.TMDB_API_KEY }}
     goarch:
       - amd64
       - arm64
