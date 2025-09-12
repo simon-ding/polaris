@@ -84,8 +84,8 @@ lo:
 		if len(episodeNums) == 0 { //want season pack
 			if m.IsSeasonPack {
 				name, err := c.DownloadEpisodeTorrent(r, DownloadOptions{
-					SeasonNum: seasonNum,
-					MediaId:   seriesId,
+					SeasonNum:    seasonNum,
+					MediaId:      seriesId,
 					HashFilterFn: c.hashInBlacklist,
 				})
 				if err != nil {
@@ -104,14 +104,14 @@ lo:
 				torrentEpisodes = append(torrentEpisodes, i)
 			}
 			name, err := c.DownloadEpisodeTorrent(r, DownloadOptions{
-				SeasonNum: seasonNum,
-				MediaId:   seriesId,
-				EpisodeNums: torrentEpisodes,
+				SeasonNum:    seasonNum,
+				MediaId:      seriesId,
+				EpisodeNums:  torrentEpisodes,
 				HashFilterFn: c.hashInBlacklist,
 			})
 			if err != nil {
 				log.Warnf("download episode error, continue next item: %v", err)
-				continue lo	
+				continue lo
 			}
 			torrentNames = append(torrentNames, *name)
 
@@ -135,26 +135,26 @@ func (c *Engine) DownloadMovie(m *ent.Media, r1 torznab.Result) (*string, error)
 
 func (c *Engine) hashInBlacklist(hash string) bool {
 	blacklist, err := c.db.GetTorrentBlacklist()
-	if err!= nil {
+	if err != nil {
 		log.Warnf("get torrent blacklist error: %v", err)
-		return false	
+		return false
 	}
 	for _, b := range blacklist {
 		if b.TorrentHash == hash {
 			return true
-		}	
+		}
 	}
 	return false
 }
 
-func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, op DownloadOptions) (*string, error) {
+func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, op DownloadOptions) (s *string, err1 error) {
 	trc, dlc, err := c.GetDownloadClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "get download client")
 	}
 
 	downloadDir := c.db.GetDownloadDir()
-	
+
 	//due to reported bug by user, this will be temporarily disabled
 	// size := utils.AvailableSpace(downloadDir)
 	// if size < uint64(r1.Size) {
@@ -176,6 +176,11 @@ func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, op DownloadOpt
 				}
 				if ep.Status == episode.StatusMissing {
 					c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+					defer func(episodeId int) {
+						if err1 != nil {
+							c.db.SetEpisodeStatus(episodeId, episode.StatusMissing)
+						}
+					}(ep.ID)
 				}
 			}
 			buff := &bytes.Buffer{}
@@ -191,16 +196,27 @@ func (c *Engine) downloadTorrent(m *ent.Media, r1 torznab.Result, op DownloadOpt
 		} else { //season package download
 			name = fmt.Sprintf("全集 (%s)", name)
 			c.db.SetSeasonAllEpisodeStatus(m.ID, op.SeasonNum, episode.StatusDownloading)
+			defer func(mediaId int, seasonNum int) {
+				if err1 != nil {
+					c.db.SetSeasonAllEpisodeStatus(mediaId, seasonNum, episode.StatusMissing)
+				}
+
+			}(m.ID, op.SeasonNum)
 		}
 
-	} else {//movie download
+	} else { //movie download
 		ep, _ := c.db.GetMovieDummyEpisode(m.ID)
 		if ep.Status == episode.StatusMissing {
 			c.db.SetEpisodeStatus(ep.ID, episode.StatusDownloading)
+			defer func(episodeId int) {
+				if err1 != nil {
+					c.db.SetEpisodeStatus(episodeId, episode.StatusMissing)
+				}
+			}(ep.ID)
 		}
 
 	}
-	
+
 	link, hash, err := utils.GetRealLinkAndHash(r1.Link)
 	if err != nil {
 		return nil, errors.Wrap(err, "get hash")
