@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	entgo.io/ent v0.14.4
-	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/robfig/cron v1.2.0
 	go.uber.org/zap v1.27.0
