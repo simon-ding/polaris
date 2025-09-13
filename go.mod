@@ -22,7 +22,7 @@ require (
 	github.com/nikoksr/notify v1.3.0
 	github.com/openai/openai-go v1.12.0
 	github.com/pion/stun/v3 v3.0.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	golift.io/starr v1.1.0
 	modernc.org/sqlite v1.38.2
 )
