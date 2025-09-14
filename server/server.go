@@ -52,7 +52,13 @@ func (s *Server) setupRoutes() {
 	r := gin.Default()
 	s.jwtSerect = s.db.GetSetting(db.JwtSerectKey)
 	//st, _ := fs.Sub(ui.Web, "build/web")
-	r.Use(static.Serve("/", static.EmbedFolder(ui.Web, "build/web")))
+	fs, err := static.EmbedFolder(ui.Web, "build/web")
+	if err == nil {
+		r.Use(static.Serve("/", fs))
+	} else {
+		log.Warnf("serve web static files error: %v", err)
+	}
+	
 	//s.r.Use(ginzap.Ginzap(log.Logger().Desugar(), time.RFC3339, false))
 	r.Use(ginzap.RecoveryWithZap(log.Logger().Desugar(), true))
 
