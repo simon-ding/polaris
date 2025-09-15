@@ -12,6 +12,7 @@ import (
 	"polaris/log"
 	"polaris/pkg"
 	"polaris/pkg/notifier/message"
+	"polaris/pkg/storage"
 	"polaris/pkg/utils"
 	"time"
 
@@ -292,6 +293,10 @@ func (c *Engine) moveCompletedTask(id int) (err1 error) {
 
 	//如果种子是路径，则会把路径展开，只移动文件，类似 move dir/* dir2/, 如果种子是文件，则会直接移动文件，类似 move file dir/
 	if err := stImpl.Copy(filepath.Join(c.db.GetDownloadDir(), torrentName), r.TargetDir, torrent.WalkFunc()); err != nil {
+		if errors.Is(err, &storage.NoVideoFileError{}) {
+			log.Warnf("no video file found in torrent, add torrent to blacklist: %v", torrentName)
+			c.db.AddTorrent2Blacklist(r.Hash, r.SourceTitle, r.MediaID)
+		}
 		return errors.Wrap(err, "move file")
 	}
 	torrent.UploadProgresser = stImpl.UploadProgress

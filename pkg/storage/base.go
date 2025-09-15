@@ -80,10 +80,24 @@ func (b *Base) isFileNeeded(name string) bool {
 
 }
 
+type NoVideoFileError struct {
+	Path string
+}
+
+func (e *NoVideoFileError) Error() string {
+	return "no video file in path: " + e.Path
+}
+
+func (e *NoVideoFileError) Is(target error) bool {
+	_, ok := target.(*NoVideoFileError)
+	return ok
+}
+
 func (b *Base) Upload(destDir string, tryLink, detectMime, changeMediaHash bool, upload uploadFunc, mkdir func(string) error, walkFn WalkFn) error {
 	if !b.checkVideoFilesExist() {
-		return errors.Errorf("torrent has no video file(s)")
+		return &NoVideoFileError{Path: b.src}
 	}
+
 	os.MkdirAll(destDir, os.ModePerm)
 
 	targetBase := filepath.Join(destDir, filepath.Base(b.src)) //文件的场景，要加上文件名, move filename ./dir/
