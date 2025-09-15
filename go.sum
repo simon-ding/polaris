@@ -136,8 +136,8 @@ github.com/cloudwego/base64x v0.1.5 h1:XPciSp1xaq2VCSt6lF0phncD4koWyULpl5bUxbfCy
 github.com/cloudwego/base64x v0.1.5/go.mod h1:0zlkT4Wn5C6NdauXdJRhSKRlJvmclQ1hhJgA0rcu/8w=
 github.com/cloudwego/iasm v0.2.0/go.mod h1:8rXZaNYT2n95jn+zTI1sDr+IgcD2GVs0nlbbQPiEFhY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
-github.com/cyruzin/golang-tmdb v1.8.1 h1:5s0FjKM5NsTfezvIkZKUgAEw0eBHs1t2JmuJ6Gy81sg=
-github.com/cyruzin/golang-tmdb v1.8.1/go.mod h1:Yx4f4KyLgWAnvwgZ729nJPOTKkD4epYoK+cGDZ3AFzs=
+github.com/cyruzin/golang-tmdb v1.8.2 h1:Sr96kuNc3MirbaOwYk6DHEzF0lGFJqPTQBjbanlX6tk=
+github.com/cyruzin/golang-tmdb v1.8.2/go.mod h1:Yx4f4KyLgWAnvwgZ729nJPOTKkD4epYoK+cGDZ3AFzs=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
