@@ -24,7 +24,7 @@ require (
 	github.com/pion/stun/v3 v3.0.0
 	github.com/stretchr/testify v1.11.1
 	golift.io/starr v1.2.0
-	modernc.org/sqlite v1.38.2
+	modernc.org/sqlite v1.39.1
 )
 
 require (
@@ -125,7 +125,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	lukechampine.com/blake3 v1.1.6 // indirect
-	modernc.org/libc v1.66.3 // indirect
+	modernc.org/libc v1.66.10 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	zombiezen.com/go/sqlite v0.13.1 // indirect
