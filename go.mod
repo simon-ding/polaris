@@ -17,7 +17,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/anacrolix/torrent v1.59.1
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/gin-contrib/zap v1.1.3
+	github.com/gin-contrib/zap v1.1.5
 	github.com/gocolly/colly v1.2.0
 	github.com/nikoksr/notify v1.3.0
 	github.com/openai/openai-go v1.12.0
